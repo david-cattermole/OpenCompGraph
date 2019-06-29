@@ -148,7 +148,7 @@ void main() {
     ReadImageOperation readOpB();
     readOpB.setPath("/my/path/to/fileB.1001.jpg");
 
-    MergeOperation mergeOp();
+    MergeImageOperation mergeOp();
     mergeOp.setInput(0, readOpA);
     mergeOp.setInput(1, readOpB);
     mergeOp.setMode("over");
