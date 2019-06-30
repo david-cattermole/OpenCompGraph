@@ -153,5 +153,26 @@ void main() {
     mergeOp.setInput(1, readOpB);
     mergeOp.setMode("over");
 
-    ocg::compile(mergeOp, cacheList);
+    // ocg::compile(mergeOp, cacheList);
+    
+    OperationList opList {mergeOp};
+    while (true) {
+        OperationList tempList = opList;
+        for (const auto op : tempList) {
+            OperationList inputs = op->getNeededInputs();
+            for (const auto inOp : input) {
+                opList.push_back();
+            }
+        }
+        if (tempList.size() == opList.size()) {
+            // Nothing added
+            break;
+        }
+    }
+    // for (auto op : opList) {
+    for (auto it = opList.rbegin(); it != opList.rend(); ++it) {
+        Operation op = &it;
+        // op.getOutput(cacheList);
+        BaseOperationResult res = ocg::OperationHelper::getOpResult(op, cache);
+    }
 }
