@@ -1,2 +1,7 @@
 .idea
+/target
+/build
+/install
+**/*.rs.bk
+Cargo.lock
 *~

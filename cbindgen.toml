@@ -1,0 +1,27 @@
+# The language to output bindings in
+language = "C++"
+
+# Options for wrapping the contents of the header:
+
+# Whether to add a `#pragma once` guard 
+pragma_once = true
+
+# An optional namespace to output around the generated bindings
+# default: doesn't emit a namespace
+namespace = "opencompgraph"
+
+# Whether to make a C header C++ compatible.
+# These will wrap generated functions into a `extern "C"` block, e.g.
+cpp_compat = true
+
+# The desired length of a line to use when formatting lines
+line_length = 80
+
+# The amount of spaces to indent by
+tab_width = 2
+
+# Codegen Options
+
+[export]
+# A list of items to not include in the generated bindings
+exclude = ["SharedThing", "do_thing", "get_name", "make_demo"]

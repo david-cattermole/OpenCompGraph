@@ -1,0 +1,28 @@
+[package]
+name = "opencompgraph-rs"
+version = "0.1.0"
+authors = ["David Cattermole <cattermole91@gmail.com>"]
+edition = "2018"
+publish = false
+
+[lib]
+name = "opencompgraph_rs"
+path = "./src/lib.rs"
+# NOTE: 'lib' is used to link with Rust crates, 'staticlib' is used to
+# link with C++.
+crate_type = ["staticlib"]
+
+[dependencies]
+cxx = "1.0.1"
+libc = "0.2.0"
+
+[profile.release]
+opt-level = 3
+debug = false
+rpath = false
+lto = true
+# NOTE: If we use 'panic = "abort"' then we are unable to produce tests.
+# # https://github.com/rust-lang/cargo/issues/6313
+#
+# panic = "abort"
+debug-assertions = false
