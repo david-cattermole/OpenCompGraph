@@ -2,6 +2,9 @@
  * Example usage of opencompgraph.h
  */
 
+#include <cstdint>
+#include <iostream>
+#include <string>
 // #include "jpeg.h"  // Used as pseudo-code, this header doesn't exist.
 #include "opencompgraph.h"
 
@@ -179,3 +182,28 @@ void test_c() {
 }
 
 */
+
+int test_c() {
+    std::cout << "test_c()" << std::endl;
+
+    usize_t id = 0;
+    auto read_op = ocg::create_op(id++, ocg::OperationType::ReadImage);
+    std::cout << "read_op=" << &read_op << std::endl;
+
+    auto read_id = ocg::operation_get_id(std::move(read_op));
+    std::cout << "read_id=" << read_id << std::endl;
+
+    auto read_status = ocg::operation_compute(std::move(read_op));
+    std::cout << "read_status=" << read_status << std::endl;
+
+    auto write_op = ocg::create_op(id++, ocg::OperationType::WriteImage);
+    std::cout << "write_op=" << &write_op << std::endl;
+
+    auto write_id = ocg::operation_get_id(std::move(write_op));
+    std::cout << "write_id=" << write_id << std::endl;
+
+    auto write_status = ocg::operation_compute(std::move(write_op));
+    std::cout << "write_status=" << write_status << std::endl;
+
+    return 0;
+}

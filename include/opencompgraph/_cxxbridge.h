@@ -1,6 +1,7 @@
 #pragma once
 #include "opencompgraph/_cpp.h"
 #include "opencompgraph.h"
+#include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <new>
@@ -197,8 +198,10 @@ Box<T>::Box() noexcept = default;
 
 namespace opencompgraph {
   struct SharedThing;
+  enum class OperationType : uint8_t;
   using ThingC = ::opencompgraph::ThingC;
   struct ThingR;
+  struct Operation;
 }
 
 namespace opencompgraph {
@@ -211,5 +214,19 @@ struct SharedThing final {
 };
 #endif // CXXBRIDGE1_STRUCT_opencompgraph$SharedThing
 
+#ifndef CXXBRIDGE1_ENUM_opencompgraph$OperationType
+#define CXXBRIDGE1_ENUM_opencompgraph$OperationType
+enum class OperationType : uint8_t {
+  ReadImage = 0,
+  WriteImage = 1,
+};
+#endif // CXXBRIDGE1_ENUM_opencompgraph$OperationType
+
 void print_r(const ::opencompgraph::ThingR &r) noexcept;
+
+::rust::Box<::opencompgraph::Operation> create_op(size_t id, ::opencompgraph::OperationType op_type);
+
+bool operation_compute(::rust::Box<::opencompgraph::Operation> op);
+
+size_t operation_get_id(::rust::Box<::opencompgraph::Operation> op) noexcept;
 } // namespace opencompgraph

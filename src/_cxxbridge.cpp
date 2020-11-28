@@ -1,6 +1,8 @@
 #include "opencompgraph/_cpp.h"
 #include "opencompgraph.h"
+#include <cstddef>
 #include <cstdint>
+#include <exception>
 #include <memory>
 #include <new>
 #include <string>
@@ -192,6 +194,34 @@ template <typename T>
 Box<T>::Box() noexcept = default;
 #endif // CXXBRIDGE1_RUST_BOX
 
+#ifndef CXXBRIDGE1_RUST_ERROR
+#define CXXBRIDGE1_RUST_ERROR
+class Error final : public std::exception {
+public:
+  Error(const Error &);
+  Error(Error &&) noexcept;
+  ~Error() noexcept override;
+
+  Error &operator=(const Error &);
+  Error &operator=(Error &&) noexcept;
+
+  const char *what() const noexcept override;
+
+private:
+  Error() noexcept = default;
+  friend impl<Error>;
+  const char *msg;
+  size_t len;
+};
+#endif // CXXBRIDGE1_RUST_ERROR
+
+template <typename T>
+union MaybeUninit {
+  T value;
+  MaybeUninit() {}
+  ~MaybeUninit() {}
+};
+
 namespace {
 namespace repr {
 struct PtrLen final {
@@ -208,6 +238,17 @@ public:
     str.ptr = static_cast<const char *>(repr.ptr);
     str.len = repr.len;
     return str;
+  }
+};
+
+template <>
+class impl<Error> final {
+public:
+  static Error error(repr::PtrLen repr) noexcept {
+    Error error;
+    error.msg = static_cast<const char *>(repr.ptr);
+    error.len = repr.len;
+    return error;
   }
 };
 
@@ -230,8 +271,10 @@ template <> struct deleter_if<true> {
 
 namespace opencompgraph {
   struct SharedThing;
+  enum class OperationType : uint8_t;
   using ThingC = ::opencompgraph::ThingC;
   struct ThingR;
+  struct Operation;
 }
 
 namespace opencompgraph {
@@ -243,6 +286,14 @@ struct SharedThing final {
   ::std::unique_ptr<::opencompgraph::ThingC> x;
 };
 #endif // CXXBRIDGE1_STRUCT_opencompgraph$SharedThing
+
+#ifndef CXXBRIDGE1_ENUM_opencompgraph$OperationType
+#define CXXBRIDGE1_ENUM_opencompgraph$OperationType
+enum class OperationType : uint8_t {
+  ReadImage = 0,
+  WriteImage = 1,
+};
+#endif // CXXBRIDGE1_ENUM_opencompgraph$OperationType
 
 extern "C" {
 __declspec(dllexport) ::opencompgraph::ThingC *opencompgraph$cxxbridge1$make_thingc(::rust::repr::PtrLen appname) noexcept {
@@ -261,10 +312,38 @@ __declspec(dllexport) void opencompgraph$cxxbridge1$run_sharedthing(::opencompgr
 }
 
 void opencompgraph$cxxbridge1$print_r(const ::opencompgraph::ThingR &r) noexcept;
+
+::rust::repr::PtrLen opencompgraph$cxxbridge1$create_op(size_t id, ::opencompgraph::OperationType op_type, ::rust::Box<::opencompgraph::Operation> *return$) noexcept;
+
+::rust::repr::PtrLen opencompgraph$cxxbridge1$operation_compute(::opencompgraph::Operation *op, bool *return$) noexcept;
+
+size_t opencompgraph$cxxbridge1$operation_get_id(::opencompgraph::Operation *op) noexcept;
 } // extern "C"
 
 void print_r(const ::opencompgraph::ThingR &r) noexcept {
   opencompgraph$cxxbridge1$print_r(r);
+}
+
+::rust::Box<::opencompgraph::Operation> create_op(size_t id, ::opencompgraph::OperationType op_type) {
+  ::rust::MaybeUninit<::rust::Box<::opencompgraph::Operation>> return$;
+  ::rust::repr::PtrLen error$ = opencompgraph$cxxbridge1$create_op(id, op_type, &return$.value);
+  if (error$.ptr) {
+    throw ::rust::impl<::rust::Error>::error(error$);
+  }
+  return ::std::move(return$.value);
+}
+
+bool operation_compute(::rust::Box<::opencompgraph::Operation> op) {
+  ::rust::MaybeUninit<bool> return$;
+  ::rust::repr::PtrLen error$ = opencompgraph$cxxbridge1$operation_compute(op.into_raw(), &return$.value);
+  if (error$.ptr) {
+    throw ::rust::impl<::rust::Error>::error(error$);
+  }
+  return ::std::move(return$.value);
+}
+
+size_t operation_get_id(::rust::Box<::opencompgraph::Operation> op) noexcept {
+  return opencompgraph$cxxbridge1$operation_get_id(op.into_raw());
 }
 } // namespace opencompgraph
 
@@ -296,6 +375,12 @@ void cxxbridge1$unique_ptr$opencompgraph$ThingC$drop(::std::unique_ptr<::opencom
   ::rust::deleter_if<::rust::is_complete<::opencompgraph::ThingC>::value>{}(ptr);
 }
 #endif // CXXBRIDGE1_UNIQUE_PTR_opencompgraph$ThingC
+
+#ifndef CXXBRIDGE1_RUST_BOX_opencompgraph$Operation
+#define CXXBRIDGE1_RUST_BOX_opencompgraph$Operation
+void cxxbridge1$box$opencompgraph$Operation$uninit(::rust::Box<::opencompgraph::Operation> *ptr) noexcept;
+void cxxbridge1$box$opencompgraph$Operation$drop(::rust::Box<::opencompgraph::Operation> *ptr) noexcept;
+#endif // CXXBRIDGE1_RUST_BOX_opencompgraph$Operation
 } // extern "C"
 
 namespace rust {
@@ -307,6 +392,14 @@ void Box<::opencompgraph::ThingR>::uninit() noexcept {
 template <>
 void Box<::opencompgraph::ThingR>::drop() noexcept {
   cxxbridge1$box$opencompgraph$ThingR$drop(this);
+}
+template <>
+void Box<::opencompgraph::Operation>::uninit() noexcept {
+  cxxbridge1$box$opencompgraph$Operation$uninit(this);
+}
+template <>
+void Box<::opencompgraph::Operation>::drop() noexcept {
+  cxxbridge1$box$opencompgraph$Operation$drop(this);
 }
 } // namespace cxxbridge1
 } // namespace rust

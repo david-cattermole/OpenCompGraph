@@ -1,6 +1,7 @@
 #include <iostream>
 #include "test_a.h"
 #include "test_b.h"
+#include "test_c.h"
 
 int main() {
     int x = 2 + 2;
@@ -9,5 +10,8 @@ int main() {
     // Run tests.
     test_a();
     test_b();
+    test_c();
+
+    std::cout << "Completed Tests" << std::endl;
     return 0;
 }
