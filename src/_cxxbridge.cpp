@@ -245,9 +245,9 @@ struct SharedThing final {
 #endif // CXXBRIDGE1_STRUCT_opencompgraph$SharedThing
 
 extern "C" {
-__declspec(dllexport) ::opencompgraph::ThingC *opencompgraph$cxxbridge1$make_demo(::rust::repr::PtrLen appname) noexcept {
-  ::std::unique_ptr<::opencompgraph::ThingC> (*make_demo$)(::rust::Str) = ::opencompgraph::make_demo;
-  return make_demo$(::rust::impl<::rust::Str>::new_unchecked(appname)).release();
+__declspec(dllexport) ::opencompgraph::ThingC *opencompgraph$cxxbridge1$make_thingc(::rust::repr::PtrLen appname) noexcept {
+  ::std::unique_ptr<::opencompgraph::ThingC> (*make_thingc$)(::rust::Str) = ::opencompgraph::make_thingc;
+  return make_thingc$(::rust::impl<::rust::Str>::new_unchecked(appname)).release();
 }
 
 __declspec(dllexport) const ::std::string *opencompgraph$cxxbridge1$get_name(const ::opencompgraph::ThingC &thing) noexcept {
@@ -255,9 +255,9 @@ __declspec(dllexport) const ::std::string *opencompgraph$cxxbridge1$get_name(con
   return &get_name$(thing);
 }
 
-__declspec(dllexport) void opencompgraph$cxxbridge1$do_thing(::opencompgraph::SharedThing *state) noexcept {
-  void (*do_thing$)(::opencompgraph::SharedThing) = ::opencompgraph::do_thing;
-  do_thing$(::std::move(*state));
+__declspec(dllexport) void opencompgraph$cxxbridge1$run_sharedthing(::opencompgraph::SharedThing *state) noexcept {
+  void (*run_sharedthing$)(::opencompgraph::SharedThing) = ::opencompgraph::run_sharedthing;
+  run_sharedthing$(::std::move(*state));
 }
 
 void opencompgraph$cxxbridge1$print_r(const ::opencompgraph::ThingR &r) noexcept;

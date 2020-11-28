@@ -1,2 +1,2 @@
-pub mod ffi;
+pub mod cbindgen;
 pub mod cxxbridge;

@@ -11,9 +11,9 @@ mod ffi {
         include!("opencompgraph.h");
 
         type ThingC;
-        fn make_demo(appname: &str) -> UniquePtr<ThingC>;
+        fn make_thingc(appname: &str) -> UniquePtr<ThingC>;
         fn get_name(thing: &ThingC) -> &CxxString;
-        fn do_thing(state: SharedThing);
+        fn run_sharedthing(state: SharedThing);
     }
 
     extern "Rust" {
@@ -30,10 +30,10 @@ fn print_r(r: &ThingR) {
 
 #[allow(dead_code)]
 fn my_test() {
-    let x = ffi::make_demo("demo of cxx::bridge");
-    println!("this is a {}", ffi::get_name(x.as_ref().unwrap()));
+    let x = ffi::make_thingc("demo of cxx::bridge");
+    println!("this is a \"{}\"", ffi::get_name(x.as_ref().unwrap()));
 
-    ffi::do_thing(ffi::SharedThing {
+    ffi::run_sharedthing(ffi::SharedThing {
         z: 222,
         y: Box::new(ThingR(333)),
         x,

@@ -24,4 +24,4 @@ tab_width = 2
 
 [export]
 # A list of items to not include in the generated bindings
-exclude = ["SharedThing", "do_thing", "get_name", "make_demo"]
+exclude = ["SharedThing", "run_sharedthing", "get_name", "make_thingc"]
