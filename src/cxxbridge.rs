@@ -29,7 +29,7 @@ pub mod ffi {
         type Operation;
 
         // Graph Create, Delete and Connect
-        fn create_op(id: usize, op_type: OperationType) -> Result<Box<Operation>>;
+        fn create_operation(id: usize, op_type: OperationType) -> Result<Box<Operation>>;
 
         // Operation
         fn operation_compute(mut op: Box<Operation>) -> Result<bool>;
@@ -57,6 +57,7 @@ fn my_test() {
 
 pub struct Operation {
     id: usize,
+    op_type: ffi::OperationType,
 }
 
 impl Operation {
@@ -69,11 +70,14 @@ impl Operation {
     }
 }
 
-pub fn create_op(id: usize, op_type: ffi::OperationType) -> Result<Box<Operation>, &'static str> {
-    println!("create_op()");
+pub fn create_operation(
+    id: usize,
+    op_type: ffi::OperationType,
+) -> Result<Box<Operation>, &'static str> {
+    println!("create_operation()");
     match op_type {
-        ffi::OperationType::ReadImage => Ok(Box::new(Operation { id })),
-        ffi::OperationType::WriteImage => Ok(Box::new(Operation { id })),
+        ffi::OperationType::ReadImage => Ok(Box::new(Operation { id, op_type })),
+        ffi::OperationType::WriteImage => Ok(Box::new(Operation { id, op_type })),
         _ => Err("Invalid OperationType"),
     }
 }

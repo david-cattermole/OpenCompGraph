@@ -224,7 +224,7 @@ enum class OperationType : uint8_t {
 
 void print_r(const ::opencompgraph::ThingR &r) noexcept;
 
-::rust::Box<::opencompgraph::Operation> create_op(size_t id, ::opencompgraph::OperationType op_type);
+::rust::Box<::opencompgraph::Operation> create_operation(size_t id, ::opencompgraph::OperationType op_type);
 
 bool operation_compute(::rust::Box<::opencompgraph::Operation> op);
 

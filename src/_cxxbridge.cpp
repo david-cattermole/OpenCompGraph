@@ -313,7 +313,7 @@ __declspec(dllexport) void opencompgraph$cxxbridge1$run_sharedthing(::opencompgr
 
 void opencompgraph$cxxbridge1$print_r(const ::opencompgraph::ThingR &r) noexcept;
 
-::rust::repr::PtrLen opencompgraph$cxxbridge1$create_op(size_t id, ::opencompgraph::OperationType op_type, ::rust::Box<::opencompgraph::Operation> *return$) noexcept;
+::rust::repr::PtrLen opencompgraph$cxxbridge1$create_operation(size_t id, ::opencompgraph::OperationType op_type, ::rust::Box<::opencompgraph::Operation> *return$) noexcept;
 
 ::rust::repr::PtrLen opencompgraph$cxxbridge1$operation_compute(::opencompgraph::Operation *op, bool *return$) noexcept;
 
@@ -324,9 +324,9 @@ void print_r(const ::opencompgraph::ThingR &r) noexcept {
   opencompgraph$cxxbridge1$print_r(r);
 }
 
-::rust::Box<::opencompgraph::Operation> create_op(size_t id, ::opencompgraph::OperationType op_type) {
+::rust::Box<::opencompgraph::Operation> create_operation(size_t id, ::opencompgraph::OperationType op_type) {
   ::rust::MaybeUninit<::rust::Box<::opencompgraph::Operation>> return$;
-  ::rust::repr::PtrLen error$ = opencompgraph$cxxbridge1$create_op(id, op_type, &return$.value);
+  ::rust::repr::PtrLen error$ = opencompgraph$cxxbridge1$create_operation(id, op_type, &return$.value);
   if (error$.ptr) {
     throw ::rust::impl<::rust::Error>::error(error$);
   }
