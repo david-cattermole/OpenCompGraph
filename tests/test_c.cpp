@@ -2,10 +2,12 @@
  * Example usage of opencompgraph.h
  */
 
-#include "jpeg.h"  // Used as pseudo-code, this header doesn't exist.
+// #include "jpeg.h"  // Used as pseudo-code, this header doesn't exist.
 #include "opencompgraph.h"
 
 namespace ocg = opencompgraph;
+
+/*
 
 class ReadImageOperation : ocg::BaseOperation {
 
@@ -127,8 +129,7 @@ private:
 };
 
 
-void main() {
-
+void test_c() {
     // Disk-based cache.
     ocg::DiskCache<ocg::Hash, ocg::BaseOperationResult> cacheB();
     cacheB.setPath("/tmp/openCompGraph");
@@ -176,3 +177,5 @@ void main() {
         BaseOperationResult res = ocg::OperationHelper::getOpResult(op, cache);
     }
 }
+
+*/
