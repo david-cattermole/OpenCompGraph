@@ -29,7 +29,12 @@ target_include_directories(${target_lib}
   PUBLIC ${RUST_INCLUDE_DIR}
   )
 if (MSVC)
-  target_link_libraries(${target_lib} ws2_32 userenv advapi32 shell32 msvcrt)
+  target_link_libraries(${target_lib} ws2_32 userenv advapi32 shell32)
+  if (CMAKE_BUILD_TYPE EQUAL Release)
+    target_link_libraries(${target_lib} msvcrt)
+  else ()
+    target_link_libraries(${target_lib} msvcrtd)
+  endif()
 elseif (UNIX)
   target_link_libraries(${target_lib} pthread m dl)
 endif ()
