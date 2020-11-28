@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <exception>
 #include <iosfwd>
+#include <iterator>
 #include <new>
 #include <stdexcept>
 #include <string>
@@ -47,6 +48,16 @@ public:
   size_t size() const noexcept;
   size_t length() const noexcept;
 
+  using iterator = char *;
+  iterator begin() noexcept;
+  iterator end() noexcept;
+
+  using const_iterator = const char *;
+  const_iterator begin() const noexcept;
+  const_iterator end() const noexcept;
+  const_iterator cbegin() const noexcept;
+  const_iterator cend() const noexcept;
+
   // Internal API only intended for the cxxbridge code generator.
   String(unsafe_bitcopy_t, const String &) noexcept;
 
@@ -63,7 +74,6 @@ public:
   Str(const std::string &);
   Str(const char *);
   Str(const char *, size_t);
-  Str(std::string &&) = delete;
 
   Str &operator=(const Str &) noexcept = default;
 
@@ -78,6 +88,13 @@ public:
   Str(const Str &) noexcept = default;
   ~Str() noexcept = default;
 
+  using iterator = const char *;
+  using const_iterator = const char *;
+  const_iterator begin() const noexcept;
+  const_iterator end() const noexcept;
+  const_iterator cbegin() const noexcept;
+  const_iterator cend() const noexcept;
+
 private:
   friend impl<Str>;
   // Not necessarily ABI compatible with &str. Codegen will translate to
@@ -88,16 +105,28 @@ private:
 #endif // CXXBRIDGE1_RUST_STR
 
 #ifndef CXXBRIDGE1_RUST_SLICE
-template <typename T>
-class Slice final {
-  static_assert(std::is_const<T>::value,
-                "&[T] needs to be written as rust::Slice<const T> in C++");
+namespace detail {
+template <bool>
+struct copy_assignable_if {};
 
+template <>
+struct copy_assignable_if<false> {
+  copy_assignable_if() noexcept = default;
+  copy_assignable_if(const copy_assignable_if &) noexcept = default;
+  copy_assignable_if &operator=(const copy_assignable_if &) noexcept = delete;
+  copy_assignable_if &operator=(copy_assignable_if &&) noexcept = default;
+};
+} // namespace detail
+
+template <typename T>
+class Slice final
+    : private detail::copy_assignable_if<std::is_const<T>::value> {
 public:
   Slice() noexcept;
   Slice(T *, size_t count) noexcept;
 
   Slice &operator=(const Slice<T> &) noexcept = default;
+  Slice &operator=(Slice<T> &&) noexcept = default;
 
   T *data() const noexcept;
   size_t size() const noexcept;
@@ -107,12 +136,37 @@ public:
   Slice(const Slice<T> &) noexcept = default;
   ~Slice() noexcept = default;
 
+  class iterator;
+  iterator begin() const noexcept;
+  iterator end() const noexcept;
+
 private:
   friend impl<Slice>;
   // Not necessarily ABI compatible with &[T]. Codegen will translate to
-  // cxx::rust_sliceu8::RustSliceU8 which matches this layout.
+  // cxx::rust_slice::RustSlice which matches this layout.
   T *ptr;
   size_t len;
+};
+
+template <typename T>
+class Slice<T>::iterator final {
+public:
+  using difference_type = ptrdiff_t;
+  using value_type = T;
+  using pointer = typename std::add_pointer<T>::type;
+  using reference = typename std::add_lvalue_reference<T>::type;
+  using iterator_category = std::forward_iterator_tag;
+
+  T &operator*() const noexcept;
+  T *operator->() const noexcept;
+  iterator &operator++() noexcept;
+  iterator operator++(int) noexcept;
+  bool operator==(const iterator &) const noexcept;
+  bool operator!=(const iterator &) const noexcept;
+
+private:
+  friend class Slice;
+  T *pos;
 };
 #endif // CXXBRIDGE1_RUST_SLICE
 
@@ -186,31 +240,15 @@ public:
   template <typename... Args>
   void emplace_back(Args &&... args);
 
-  class const_iterator final {
-  public:
-    using difference_type = ptrdiff_t;
-    using value_type = typename std::add_const<T>::type;
-    using pointer =
-        typename std::add_pointer<typename std::add_const<T>::type>::type;
-    using reference = typename std::add_lvalue_reference<
-        typename std::add_const<T>::type>::type;
-    using iterator_category = std::forward_iterator_tag;
+  class iterator;
+  iterator begin() noexcept;
+  iterator end() noexcept;
 
-    const T &operator*() const noexcept;
-    const T *operator->() const noexcept;
-    const_iterator &operator++() noexcept;
-    const_iterator operator++(int) noexcept;
-    bool operator==(const const_iterator &) const noexcept;
-    bool operator!=(const const_iterator &) const noexcept;
-
-  private:
-    friend class Vec;
-    const void *pos;
-    size_t stride;
-  };
-
+  using const_iterator = typename Vec<const T>::iterator;
   const_iterator begin() const noexcept;
   const_iterator end() const noexcept;
+  const_iterator cbegin() const noexcept;
+  const_iterator cend() const noexcept;
 
   // Internal API only intended for the cxxbridge code generator.
   Vec(unsafe_bitcopy_t, const Vec &) noexcept;
@@ -223,6 +261,29 @@ private:
 
   // Size and alignment statically verified by rust_vec.rs.
   std::array<uintptr_t, 3> repr;
+};
+
+template <typename T>
+class Vec<T>::iterator final {
+public:
+  using difference_type = ptrdiff_t;
+  using value_type = T;
+  using pointer = typename std::add_pointer<T>::type;
+  using reference = typename std::add_lvalue_reference<T>::type;
+  using iterator_category = std::forward_iterator_tag;
+
+  T &operator*() const noexcept;
+  T *operator->() const noexcept;
+  iterator &operator++() noexcept;
+  iterator operator++(int) noexcept;
+  bool operator==(const iterator &) const noexcept;
+  bool operator!=(const iterator &) const noexcept;
+
+private:
+  friend class Vec;
+  friend class Vec<typename std::remove_const<T>::type>;
+  void *pos;
+  size_t stride;
 };
 #endif // CXXBRIDGE1_RUST_VEC
 
@@ -251,7 +312,7 @@ class Error final : public std::exception {
 public:
   Error(const Error &);
   Error(Error &&) noexcept;
-  ~Error() noexcept;
+  ~Error() noexcept override;
 
   Error &operator=(const Error &);
   Error &operator=(Error &&) noexcept;
@@ -277,6 +338,17 @@ using isize = ssize_t;
 
 std::ostream &operator<<(std::ostream &, const String &);
 std::ostream &operator<<(std::ostream &, const Str &);
+
+#ifndef CXXBRIDGE1_RUST_OPAQUE
+#define CXXBRIDGE1_RUST_OPAQUE
+// Base class of generated opaque Rust types.
+class Opaque {
+public:
+  Opaque() = delete;
+  Opaque(const Opaque &) = delete;
+  ~Opaque() = delete;
+};
+#endif // CXXBRIDGE1_RUST_OPAQUE
 
 // IsRelocatable<T> is used in assertions that a C++ type passed by value
 // between Rust and C++ is soundly relocatable by Rust.
@@ -361,7 +433,7 @@ inline size_t Str::length() const noexcept { return this->len; }
 #ifndef CXXBRIDGE1_RUST_SLICE
 #define CXXBRIDGE1_RUST_SLICE
 template <typename T>
-Slice<T>::Slice() noexcept : ptr(reinterpret_cast<T *>(this)), len(0) {}
+Slice<T>::Slice() noexcept : ptr(reinterpret_cast<T *>(alignof(T))), len(0) {}
 
 template <typename T>
 Slice<T>::Slice(T *s, size_t count) noexcept : ptr(s), len(count) {}
@@ -379,6 +451,53 @@ size_t Slice<T>::size() const noexcept {
 template <typename T>
 size_t Slice<T>::length() const noexcept {
   return this->len;
+}
+
+template <typename T>
+T &Slice<T>::iterator::operator*() const noexcept {
+  return *this->pos;
+}
+
+template <typename T>
+T *Slice<T>::iterator::operator->() const noexcept {
+  return this->pos;
+}
+
+template <typename T>
+typename Slice<T>::iterator &Slice<T>::iterator::operator++() noexcept {
+  ++this->pos;
+  return *this;
+}
+
+template <typename T>
+typename Slice<T>::iterator Slice<T>::iterator::operator++(int) noexcept {
+  auto ret = iterator(*this);
+  ++this->pos;
+  return ret;
+}
+
+template <typename T>
+bool Slice<T>::iterator::operator==(const iterator &other) const noexcept {
+  return this->pos == other.pos;
+}
+
+template <typename T>
+bool Slice<T>::iterator::operator!=(const iterator &other) const noexcept {
+  return this->pos != other.pos;
+}
+
+template <typename T>
+typename Slice<T>::iterator Slice<T>::begin() const noexcept {
+  iterator it;
+  it.pos = this->ptr;
+  return it;
+}
+
+template <typename T>
+typename Slice<T>::iterator Slice<T>::end() const noexcept {
+  iterator it = this->begin();
+  it.pos += this->len;
+  return it;
 }
 #endif // CXXBRIDGE1_RUST_SLICE
 
@@ -478,14 +597,13 @@ T *Box<T>::into_raw() noexcept {
 }
 
 template <typename T>
-Box<T>::Box() noexcept {}
+Box<T>::Box() noexcept = default;
 #endif // CXXBRIDGE1_RUST_BOX
 
 #ifndef CXXBRIDGE1_RUST_VEC
 #define CXXBRIDGE1_RUST_VEC
 template <typename T>
-Vec<T>::Vec(Vec &&other) noexcept {
-  this->repr = other.repr;
+Vec<T>::Vec(Vec &&other) noexcept : repr(other.repr) {
   new (&other) Vec();
 }
 
@@ -565,53 +683,75 @@ void Vec<T>::emplace_back(Args &&... args) {
 }
 
 template <typename T>
-const T &Vec<T>::const_iterator::operator*() const noexcept {
-  return *static_cast<const T *>(this->pos);
+T &Vec<T>::iterator::operator*() const noexcept {
+  return *static_cast<T *>(this->pos);
 }
 
 template <typename T>
-const T *Vec<T>::const_iterator::operator->() const noexcept {
-  return static_cast<const T *>(this->pos);
+T *Vec<T>::iterator::operator->() const noexcept {
+  return static_cast<T *>(this->pos);
 }
 
 template <typename T>
-typename Vec<T>::const_iterator &Vec<T>::const_iterator::operator++() noexcept {
-  this->pos = static_cast<const uint8_t *>(this->pos) + this->stride;
+typename Vec<T>::iterator &Vec<T>::iterator::operator++() noexcept {
+  this->pos = static_cast<char *>(this->pos) + this->stride;
   return *this;
 }
 
 template <typename T>
-typename Vec<T>::const_iterator
-Vec<T>::const_iterator::operator++(int) noexcept {
-  auto ret = const_iterator(*this);
-  this->pos = static_cast<const uint8_t *>(this->pos) + this->stride;
+typename Vec<T>::iterator Vec<T>::iterator::operator++(int) noexcept {
+  auto ret = iterator(*this);
+  this->pos = static_cast<char *>(this->pos) + this->stride;
   return ret;
 }
 
 template <typename T>
-bool Vec<T>::const_iterator::operator==(
-    const const_iterator &other) const noexcept {
+bool Vec<T>::iterator::operator==(const iterator &other) const noexcept {
   return this->pos == other.pos;
 }
 
 template <typename T>
-bool Vec<T>::const_iterator::operator!=(
-    const const_iterator &other) const noexcept {
+bool Vec<T>::iterator::operator!=(const iterator &other) const noexcept {
   return this->pos != other.pos;
 }
 
 template <typename T>
-typename Vec<T>::const_iterator Vec<T>::begin() const noexcept {
-  const_iterator it;
-  it.pos = this->data();
+typename Vec<T>::iterator Vec<T>::begin() noexcept {
+  iterator it;
+  it.pos = const_cast<typename std::remove_const<T>::type *>(this->data());
   it.stride = this->stride();
   return it;
 }
 
 template <typename T>
+typename Vec<T>::iterator Vec<T>::end() noexcept {
+  iterator it = this->begin();
+  it.pos = static_cast<char *>(it.pos) + it.stride * this->size();
+  return it;
+}
+
+template <typename T>
+typename Vec<T>::const_iterator Vec<T>::begin() const noexcept {
+  return this->cbegin();
+}
+
+template <typename T>
 typename Vec<T>::const_iterator Vec<T>::end() const noexcept {
-  const_iterator it = this->begin();
-  it.pos = static_cast<const uint8_t *>(it.pos) + it.stride * this->size();
+  return this->cend();
+}
+
+template <typename T>
+typename Vec<T>::const_iterator Vec<T>::cbegin() const noexcept {
+  const_iterator it;
+  it.pos = const_cast<typename std::remove_const<T>::type *>(this->data());
+  it.stride = this->stride();
+  return it;
+}
+
+template <typename T>
+typename Vec<T>::const_iterator Vec<T>::cend() const noexcept {
+  const_iterator it = this->cbegin();
+  it.pos = static_cast<char *>(it.pos) + it.stride * this->size();
   return it;
 }
 

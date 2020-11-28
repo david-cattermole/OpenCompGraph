@@ -24,7 +24,6 @@ public:
   Str(const std::string &);
   Str(const char *);
   Str(const char *, size_t);
-  Str(std::string &&) = delete;
 
   Str &operator=(const Str &) noexcept = default;
 
@@ -36,6 +35,13 @@ public:
 
   Str(const Str &) noexcept = default;
   ~Str() noexcept = default;
+
+  using iterator = const char *;
+  using const_iterator = const char *;
+  const_iterator begin() const noexcept;
+  const_iterator end() const noexcept;
+  const_iterator cbegin() const noexcept;
+  const_iterator cend() const noexcept;
 
 private:
   friend impl<Str>;
@@ -183,13 +189,13 @@ T *Box<T>::into_raw() noexcept {
 }
 
 template <typename T>
-Box<T>::Box() noexcept {}
+Box<T>::Box() noexcept = default;
 #endif // CXXBRIDGE1_RUST_BOX
 
 namespace {
 namespace repr {
 struct PtrLen final {
-  const void *ptr;
+  void *ptr;
   size_t len;
 };
 } // namespace repr
@@ -203,6 +209,20 @@ public:
     str.len = repr.len;
     return str;
   }
+};
+
+template <typename T, typename = size_t>
+struct is_complete : std::false_type {};
+
+template <typename T>
+struct is_complete<T, decltype(sizeof(T))> : std::true_type {};
+
+template <bool> struct deleter_if {
+  template <typename T> void operator()(T *) {}
+};
+
+template <> struct deleter_if<true> {
+  template <typename T> void operator()(T *ptr) { ptr->~T(); }
 };
 } // namespace
 } // namespace cxxbridge1
@@ -257,6 +277,7 @@ void cxxbridge1$box$opencompgraph$ThingR$drop(::rust::Box<::opencompgraph::Thing
 
 #ifndef CXXBRIDGE1_UNIQUE_PTR_opencompgraph$ThingC
 #define CXXBRIDGE1_UNIQUE_PTR_opencompgraph$ThingC
+static_assert(::rust::is_complete<::opencompgraph::ThingC>::value, "definition of ThingC is required");
 static_assert(sizeof(::std::unique_ptr<::opencompgraph::ThingC>) == sizeof(void *), "");
 static_assert(alignof(::std::unique_ptr<::opencompgraph::ThingC>) == alignof(void *), "");
 void cxxbridge1$unique_ptr$opencompgraph$ThingC$null(::std::unique_ptr<::opencompgraph::ThingC> *ptr) noexcept {
@@ -272,7 +293,7 @@ const ::opencompgraph::ThingC *cxxbridge1$unique_ptr$opencompgraph$ThingC$get(co
   return ptr.release();
 }
 void cxxbridge1$unique_ptr$opencompgraph$ThingC$drop(::std::unique_ptr<::opencompgraph::ThingC> *ptr) noexcept {
-  ptr->~unique_ptr();
+  ::rust::deleter_if<::rust::is_complete<::opencompgraph::ThingC>::value>{}(ptr);
 }
 #endif // CXXBRIDGE1_UNIQUE_PTR_opencompgraph$ThingC
 } // extern "C"

@@ -25,7 +25,6 @@ public:
   Str(const std::string &);
   Str(const char *);
   Str(const char *, size_t);
-  Str(std::string &&) = delete;
 
   Str &operator=(const Str &) noexcept = default;
 
@@ -37,6 +36,13 @@ public:
 
   Str(const Str &) noexcept = default;
   ~Str() noexcept = default;
+
+  using iterator = const char *;
+  using const_iterator = const char *;
+  const_iterator begin() const noexcept;
+  const_iterator end() const noexcept;
+  const_iterator cbegin() const noexcept;
+  const_iterator cend() const noexcept;
 
 private:
   friend impl<Str>;
@@ -184,7 +190,7 @@ T *Box<T>::into_raw() noexcept {
 }
 
 template <typename T>
-Box<T>::Box() noexcept {}
+Box<T>::Box() noexcept = default;
 #endif // CXXBRIDGE1_RUST_BOX
 } // namespace cxxbridge1
 } // namespace rust
