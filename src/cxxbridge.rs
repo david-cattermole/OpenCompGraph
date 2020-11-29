@@ -12,6 +12,7 @@ pub mod ffi {
         WriteImage = 1,
     }
 
+    // ThingC
     unsafe extern "C++" {
         include!("opencompgraph/_cpp.h");
         include!("opencompgraph.h");
@@ -22,20 +23,24 @@ pub mod ffi {
         fn run_sharedthing(state: SharedThing);
     }
 
+    // ThingR
     extern "Rust" {
         type ThingR;
         fn print_r(r: &ThingR);
+    }
 
-        // Operation
+    // Operation
+    extern "Rust" {
         type Operation;
-        fn get_id(self: &mut Operation) -> usize;
-        fn get_op_type(self: &mut Operation) -> OperationType;
-        fn get_op_type_id(self: &mut Operation) -> u8;
-        fn compute(self: &mut Operation) -> Result<bool>;
+        fn get_id(&mut self) -> usize;
+        fn get_op_type(&mut self) -> OperationType;
+        fn get_op_type_id(&mut self) -> u8;
+        fn compute(&mut self) -> Result<bool>;
+    }
 
-        // Graph Create, Delete and Connect
+    // Graph Create, Delete and Connect
+    extern "Rust" {
         fn create_operation(id: usize, op_type: OperationType) -> Result<Box<Operation>>;
-
     }
 }
 
@@ -63,22 +68,22 @@ pub struct Operation {
 }
 
 impl Operation {
-    pub fn get_id(&mut self) -> usize {
+    fn get_id(&self) -> usize {
         println!("Operation.get_id() -> {}", self.id);
         self.id
     }
 
-    pub fn get_op_type(&mut self) -> ffi::OperationType {
+    fn get_op_type(&self) -> ffi::OperationType {
         println!("Operation.get_op_type() -> {}", self.op_type.repr);
         self.op_type
     }
 
-    pub fn get_op_type_id(&mut self) -> u8 {
+    fn get_op_type_id(&self) -> u8 {
         println!("Operation.get_op_type_id() -> {}", self.op_type.repr);
         self.op_type.repr
     }
 
-    pub fn compute(&mut self) -> Result<bool, &'static str> {
+    fn compute(&mut self) -> Result<bool, &'static str> {
         println!("Operation.compute()");
         Ok(true)
     }
