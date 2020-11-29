@@ -13,7 +13,7 @@ path = "./src/lib.rs"
 crate_type = ["staticlib"]
 
 [dependencies]
-cxx = "1.0.5"
+cxx = "1.0.6"
 libc = "0.2.0"
 
 [profile.release]
