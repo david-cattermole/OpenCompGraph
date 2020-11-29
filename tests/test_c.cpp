@@ -4,6 +4,7 @@
 
 #include <cstdint>
 #include <iostream>
+#include <sstream>
 #include <string>
 // #include "jpeg.h"  // Used as pseudo-code, this header doesn't exist.
 #include "opencompgraph.h"
@@ -191,8 +192,17 @@ int test_c() {
         id++, ocg::OperationType::ReadImage);
     std::cout << "read_op=" << &read_op << std::endl;
 
-    auto read_id = ocg::operation_get_id(std::move(read_op));
-    std::cout << "read_id=" << read_id << std::endl;
+    // auto read_id = ocg::operation_get_id(std::move(read_op));
+    // std::cout << "read_id=" << read_id << std::endl;
+
+    auto read_id2 = read_op->get_id();
+    std::cout << "read_id2=" << read_id2 << std::endl;
+
+    auto read_op_type = read_op->get_op_type() == ocg::OperationType::ReadImage;
+    std::cout << "read_op_type=" << read_op_type << std::endl;
+
+    auto read_op_type_id = read_op->get_op_type_id();
+    std::cout << "read_op_type_id=" << std::hex << read_op_type_id << std::endl;
 
     auto read_status = ocg::operation_compute(std::move(read_op));
     std::cout << "read_status=" << read_status << std::endl;
@@ -201,8 +211,14 @@ int test_c() {
         id++, ocg::OperationType::WriteImage);
     std::cout << "write_op=" << &write_op << std::endl;
 
-    auto write_id = ocg::operation_get_id(std::move(write_op));
-    std::cout << "write_id=" << write_id << std::endl;
+    auto write_id2 = write_op->get_id();
+    std::cout << "write_id2=" << write_id2 << std::endl;
+
+    auto write_op_type = write_op->get_op_type() == ocg::OperationType::ReadImage;
+    std::cout << "write_op_type=" << write_op_type << std::endl;
+
+    auto write_op_type_id = write_op->get_op_type_id();
+    std::cout << "write_op_type_id=" << std::hex << write_op_type_id << std::endl;
 
     auto write_status = ocg::operation_compute(std::move(write_op));
     std::cout << "write_status=" << write_status << std::endl;

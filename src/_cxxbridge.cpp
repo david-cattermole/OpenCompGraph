@@ -215,6 +215,16 @@ private:
 };
 #endif // CXXBRIDGE1_RUST_ERROR
 
+#ifndef CXXBRIDGE1_RUST_OPAQUE
+#define CXXBRIDGE1_RUST_OPAQUE
+class Opaque {
+public:
+  Opaque() = delete;
+  Opaque(const Opaque &) = delete;
+  ~Opaque() = delete;
+};
+#endif // CXXBRIDGE1_RUST_OPAQUE
+
 template <typename T>
 union MaybeUninit {
   T value;
@@ -295,6 +305,15 @@ enum class OperationType : uint8_t {
 };
 #endif // CXXBRIDGE1_ENUM_opencompgraph$OperationType
 
+#ifndef CXXBRIDGE1_STRUCT_opencompgraph$Operation
+#define CXXBRIDGE1_STRUCT_opencompgraph$Operation
+struct Operation final : public ::rust::Opaque {
+  size_t get_id() noexcept;
+  ::opencompgraph::OperationType get_op_type() noexcept;
+  uint8_t get_op_type_id() noexcept;
+};
+#endif // CXXBRIDGE1_STRUCT_opencompgraph$Operation
+
 extern "C" {
 __declspec(dllexport) ::opencompgraph::ThingC *opencompgraph$cxxbridge1$make_thingc(::rust::repr::PtrLen appname) noexcept {
   ::std::unique_ptr<::opencompgraph::ThingC> (*make_thingc$)(::rust::Str) = ::opencompgraph::make_thingc;
@@ -313,6 +332,12 @@ __declspec(dllexport) void opencompgraph$cxxbridge1$run_sharedthing(::opencompgr
 
 void opencompgraph$cxxbridge1$print_r(const ::opencompgraph::ThingR &r) noexcept;
 
+size_t opencompgraph$cxxbridge1$Operation$get_id(::opencompgraph::Operation &self) noexcept;
+
+::opencompgraph::OperationType opencompgraph$cxxbridge1$Operation$get_op_type(::opencompgraph::Operation &self) noexcept;
+
+uint8_t opencompgraph$cxxbridge1$Operation$get_op_type_id(::opencompgraph::Operation &self) noexcept;
+
 ::rust::repr::PtrLen opencompgraph$cxxbridge1$create_operation(size_t id, ::opencompgraph::OperationType op_type, ::rust::Box<::opencompgraph::Operation> *return$) noexcept;
 
 ::rust::repr::PtrLen opencompgraph$cxxbridge1$operation_compute(::opencompgraph::Operation *op, bool *return$) noexcept;
@@ -322,6 +347,18 @@ size_t opencompgraph$cxxbridge1$operation_get_id(::opencompgraph::Operation *op)
 
 void print_r(const ::opencompgraph::ThingR &r) noexcept {
   opencompgraph$cxxbridge1$print_r(r);
+}
+
+size_t Operation::get_id() noexcept {
+  return opencompgraph$cxxbridge1$Operation$get_id(*this);
+}
+
+::opencompgraph::OperationType Operation::get_op_type() noexcept {
+  return opencompgraph$cxxbridge1$Operation$get_op_type(*this);
+}
+
+uint8_t Operation::get_op_type_id() noexcept {
+  return opencompgraph$cxxbridge1$Operation$get_op_type_id(*this);
 }
 
 ::rust::Box<::opencompgraph::Operation> create_operation(size_t id, ::opencompgraph::OperationType op_type) {

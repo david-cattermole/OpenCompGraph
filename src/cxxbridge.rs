@@ -27,6 +27,9 @@ pub mod ffi {
         fn print_r(r: &ThingR);
 
         type Operation;
+        fn get_id(self: &mut Operation) -> usize;
+        fn get_op_type(self: &mut Operation) -> OperationType;
+        fn get_op_type_id(self: &mut Operation) -> u8;
 
         // Graph Create, Delete and Connect
         fn create_operation(id: usize, op_type: OperationType) -> Result<Box<Operation>>;
@@ -61,7 +64,22 @@ pub struct Operation {
 }
 
 impl Operation {
-    fn compute(&mut self, in_arg: &str) -> Result<bool, &'static str> {
+    pub fn get_id(&mut self) -> usize {
+        println!("Operation.get_id() -> {}", self.id);
+        self.id
+    }
+
+    pub fn get_op_type(&mut self) -> ffi::OperationType {
+        println!("Operation.get_op_type() -> {}", self.op_type.repr);
+        self.op_type
+    }
+
+    pub fn get_op_type_id(&mut self) -> u8 {
+        println!("Operation.get_op_type_id() -> {}", self.op_type.repr);
+        self.op_type.repr
+    }
+
+    pub fn compute(&mut self, in_arg: &str) -> Result<bool, &'static str> {
         println!("Operation.compute()");
         // Call C++ Function...
         let x = ffi::make_thingc(in_arg);

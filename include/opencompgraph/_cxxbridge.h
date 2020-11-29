@@ -193,6 +193,16 @@ T *Box<T>::into_raw() noexcept {
 template <typename T>
 Box<T>::Box() noexcept = default;
 #endif // CXXBRIDGE1_RUST_BOX
+
+#ifndef CXXBRIDGE1_RUST_OPAQUE
+#define CXXBRIDGE1_RUST_OPAQUE
+class Opaque {
+public:
+  Opaque() = delete;
+  Opaque(const Opaque &) = delete;
+  ~Opaque() = delete;
+};
+#endif // CXXBRIDGE1_RUST_OPAQUE
 } // namespace cxxbridge1
 } // namespace rust
 
@@ -221,6 +231,15 @@ enum class OperationType : uint8_t {
   WriteImage = 1,
 };
 #endif // CXXBRIDGE1_ENUM_opencompgraph$OperationType
+
+#ifndef CXXBRIDGE1_STRUCT_opencompgraph$Operation
+#define CXXBRIDGE1_STRUCT_opencompgraph$Operation
+struct Operation final : public ::rust::Opaque {
+  size_t get_id() noexcept;
+  ::opencompgraph::OperationType get_op_type() noexcept;
+  uint8_t get_op_type_id() noexcept;
+};
+#endif // CXXBRIDGE1_STRUCT_opencompgraph$Operation
 
 void print_r(const ::opencompgraph::ThingR &r) noexcept;
 
