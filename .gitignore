@@ -2,6 +2,7 @@
 /target
 /build
 /install
+/cmake-build-*
 **/*.rs.bk
 Cargo.lock
 *~
