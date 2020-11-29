@@ -37,8 +37,8 @@ function(find_rust_library lib_name build_dir out_linktime_file)
     set(staticlib_name "${lib_name}.lib")
 
     # Get the Rust Library .lib (for Windows).
-    message("Finding: ${staticlib_name}")
-    message("RUST BUILD DIR: ${build_dir}")
+    message(STATUS "Finding: ${staticlib_name}")
+    message(DEBUG "RUST BUILD DIR: ${build_dir}")
     find_path(linktime_dir ${staticlib_name}
       HINTS ${build_dir}
       PATHS ${build_dir}
@@ -51,8 +51,8 @@ function(find_rust_library lib_name build_dir out_linktime_file)
     set(archive_name "lib${lib_name}.a")
 
     # Get the Rust Library .a (for Linux).
-    message("Finding: ${archive_name}")
-    message("RUST BUILD DIR: ${build_dir}")
+    message(STATUS "Finding: ${archive_name}")
+    message(DEBUG "RUST BUILD DIR: ${build_dir}")
     find_path(linktime_dir ${archive_name}
       HINTS ${build_dir}
       PATHS ${build_dir}
@@ -64,7 +64,6 @@ function(find_rust_library lib_name build_dir out_linktime_file)
   else ()
     message(FATAL_ERROR "Only Linux and Windows are supported.")
   endif ()
-  # message("Rust Library: " ${out_linktime_file})
 endfunction()
 
 

@@ -19,8 +19,6 @@ SET RUST_INCLUDE_DIR="%ROOT%\include"
 ::
 :: Assumes 'cxxbridge-cmd' and 'cbindgen' is installed.
 cxxbridge --header --output "%ROOT%\include\cxx.h"
-cxxbridge src/cxxbridge.rs --header --output "%ROOT%\include\opencompgraph\_cxxbridge.h"
-cxxbridge src/cxxbridge.rs --cxx-impl-annotations "__declspec(dllexport)" --output "%ROOT%\src\_cxxbridge.cpp"
 cbindgen --config cbindgen.toml ^
          --crate opencompgraph ^
          --output "%ROOT%\include\opencompgraph\_cbindgen.h"

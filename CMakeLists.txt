@@ -18,7 +18,6 @@ set(PROJECT_COPYRIGHT "2019, 2020, David Cattermole.")
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules)
 include(OpenCompGraphUtils)
 
-# set(CMAKE_CXX_STANDARD 11)
 set_cxx_standard_cpp_11()
 
 set(target_lib "opencompgraph")
