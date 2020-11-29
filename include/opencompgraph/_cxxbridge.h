@@ -238,14 +238,11 @@ struct Operation final : public ::rust::Opaque {
   size_t get_id() noexcept;
   ::opencompgraph::OperationType get_op_type() noexcept;
   uint8_t get_op_type_id() noexcept;
+  bool compute();
 };
 #endif // CXXBRIDGE1_STRUCT_opencompgraph$Operation
 
 void print_r(const ::opencompgraph::ThingR &r) noexcept;
 
 ::rust::Box<::opencompgraph::Operation> create_operation(size_t id, ::opencompgraph::OperationType op_type);
-
-bool operation_compute(::rust::Box<::opencompgraph::Operation> op);
-
-size_t operation_get_id(::rust::Box<::opencompgraph::Operation> op) noexcept;
 } // namespace opencompgraph

@@ -311,6 +311,7 @@ struct Operation final : public ::rust::Opaque {
   size_t get_id() noexcept;
   ::opencompgraph::OperationType get_op_type() noexcept;
   uint8_t get_op_type_id() noexcept;
+  bool compute();
 };
 #endif // CXXBRIDGE1_STRUCT_opencompgraph$Operation
 
@@ -338,11 +339,9 @@ size_t opencompgraph$cxxbridge1$Operation$get_id(::opencompgraph::Operation &sel
 
 uint8_t opencompgraph$cxxbridge1$Operation$get_op_type_id(::opencompgraph::Operation &self) noexcept;
 
+::rust::repr::PtrLen opencompgraph$cxxbridge1$Operation$compute(::opencompgraph::Operation &self, bool *return$) noexcept;
+
 ::rust::repr::PtrLen opencompgraph$cxxbridge1$create_operation(size_t id, ::opencompgraph::OperationType op_type, ::rust::Box<::opencompgraph::Operation> *return$) noexcept;
-
-::rust::repr::PtrLen opencompgraph$cxxbridge1$operation_compute(::opencompgraph::Operation *op, bool *return$) noexcept;
-
-size_t opencompgraph$cxxbridge1$operation_get_id(::opencompgraph::Operation *op) noexcept;
 } // extern "C"
 
 void print_r(const ::opencompgraph::ThingR &r) noexcept {
@@ -361,6 +360,15 @@ uint8_t Operation::get_op_type_id() noexcept {
   return opencompgraph$cxxbridge1$Operation$get_op_type_id(*this);
 }
 
+bool Operation::compute() {
+  ::rust::MaybeUninit<bool> return$;
+  ::rust::repr::PtrLen error$ = opencompgraph$cxxbridge1$Operation$compute(*this, &return$.value);
+  if (error$.ptr) {
+    throw ::rust::impl<::rust::Error>::error(error$);
+  }
+  return ::std::move(return$.value);
+}
+
 ::rust::Box<::opencompgraph::Operation> create_operation(size_t id, ::opencompgraph::OperationType op_type) {
   ::rust::MaybeUninit<::rust::Box<::opencompgraph::Operation>> return$;
   ::rust::repr::PtrLen error$ = opencompgraph$cxxbridge1$create_operation(id, op_type, &return$.value);
@@ -368,19 +376,6 @@ uint8_t Operation::get_op_type_id() noexcept {
     throw ::rust::impl<::rust::Error>::error(error$);
   }
   return ::std::move(return$.value);
-}
-
-bool operation_compute(::rust::Box<::opencompgraph::Operation> op) {
-  ::rust::MaybeUninit<bool> return$;
-  ::rust::repr::PtrLen error$ = opencompgraph$cxxbridge1$operation_compute(op.into_raw(), &return$.value);
-  if (error$.ptr) {
-    throw ::rust::impl<::rust::Error>::error(error$);
-  }
-  return ::std::move(return$.value);
-}
-
-size_t operation_get_id(::rust::Box<::opencompgraph::Operation> op) noexcept {
-  return opencompgraph$cxxbridge1$operation_get_id(op.into_raw());
 }
 } // namespace opencompgraph
 

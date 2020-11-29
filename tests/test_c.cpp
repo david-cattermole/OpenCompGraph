@@ -159,7 +159,7 @@ void test_c() {
     mergeOp.setMode("over");
 
     // ocg::compile(mergeOp, cacheList);
-    
+
     OperationList opList {mergeOp};
     while (true) {
         OperationList tempList = opList;
@@ -192,9 +192,6 @@ int test_c() {
         id++, ocg::OperationType::ReadImage);
     std::cout << "read_op=" << &read_op << std::endl;
 
-    // auto read_id = ocg::operation_get_id(std::move(read_op));
-    // std::cout << "read_id=" << read_id << std::endl;
-
     auto read_id2 = read_op->get_id();
     std::cout << "read_id2=" << read_id2 << std::endl;
 
@@ -204,8 +201,12 @@ int test_c() {
     auto read_op_type_id = read_op->get_op_type_id();
     std::cout << "read_op_type_id=" << std::hex << read_op_type_id << std::endl;
 
-    auto read_status = ocg::operation_compute(std::move(read_op));
+    // ocg::set_op_value(read_op, "file_path", "/path/to/image.exr");
+
+    auto read_status = read_op->compute();
     std::cout << "read_status=" << read_status << std::endl;
+    // auto read_result = ocg::get_op_result(read_op);
+    // auto read_hash = ocg::get_result_hash(read_result);
 
     auto write_op = ocg::create_operation(
         id++, ocg::OperationType::WriteImage);
@@ -220,8 +221,12 @@ int test_c() {
     auto write_op_type_id = write_op->get_op_type_id();
     std::cout << "write_op_type_id=" << std::hex << write_op_type_id << std::endl;
 
-    auto write_status = ocg::operation_compute(std::move(write_op));
+    // ocg::set_op_value(write_op, "file_path", "/path/to/image_out.jpg");
+
+    auto write_status = write_op->compute();
     std::cout << "write_status=" << write_status << std::endl;
+    // auto write_result = ocg::get_op_result(write_op);
+    // auto write_hash = ocg::get_result_hash(read_result);
 
     return 0;
 }
