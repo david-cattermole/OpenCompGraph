@@ -188,8 +188,7 @@ int test_c() {
     std::cout << "test_c()" << std::endl;
 
     size_t id = 0;
-    auto read_op = ocg::create_operation(
-        id++, ocg::OperationType::ReadImage);
+    auto read_op = ocg::create_read_image_op(id++);
     std::cout << "read_op=" << &read_op << std::endl;
 
     auto read_id2 = read_op->get_id();
@@ -208,8 +207,7 @@ int test_c() {
     // auto read_result = ocg::get_op_result(read_op);
     // auto read_hash = ocg::get_result_hash(read_result);
 
-    auto write_op = ocg::create_operation(
-        id++, ocg::OperationType::WriteImage);
+    auto write_op = ocg::create_write_image_op(id++);
     std::cout << "write_op=" << &write_op << std::endl;
 
     auto write_id2 = write_op->get_id();

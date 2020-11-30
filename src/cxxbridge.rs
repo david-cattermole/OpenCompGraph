@@ -31,17 +31,21 @@ pub mod ffi {
 
     // Operation
     extern "Rust" {
-        type Operation;
-        fn get_id(&mut self) -> usize;
-        fn get_op_type(&mut self) -> OperationType;
-        fn get_op_type_id(&mut self) -> u8;
-        fn compute(&mut self) -> Result<bool>;
+        type ReadImageOp;
+        fn get_id(self: &mut ReadImageOp) -> usize;
+        fn get_op_type(self: &mut ReadImageOp) -> OperationType;
+        fn get_op_type_id(self: &mut ReadImageOp) -> u8;
+        fn compute(self: &mut ReadImageOp) -> Result<bool>;
+        fn create_read_image_op(id: usize) -> Box<ReadImageOp>;
+
+        type WriteImageOp;
+        fn get_id(self: &mut WriteImageOp) -> usize;
+        fn get_op_type(self: &mut WriteImageOp) -> OperationType;
+        fn get_op_type_id(self: &mut WriteImageOp) -> u8;
+        fn compute(self: &mut WriteImageOp) -> Result<bool>;
+        fn create_write_image_op(id: usize) -> Box<WriteImageOp>;
     }
 
-    // Graph Create, Delete and Connect
-    extern "Rust" {
-        fn create_operation(id: usize, op_type: OperationType) -> Result<Box<Operation>>;
-    }
 }
 
 pub struct ThingR(usize);
@@ -62,41 +66,68 @@ fn my_test() {
     });
 }
 
-pub struct Operation {
+pub struct ReadImageOp {
     id: usize,
     op_type: ffi::OperationType,
 }
 
-impl Operation {
+impl ReadImageOp {
     fn get_id(&self) -> usize {
-        println!("Operation.get_id() -> {}", self.id);
+        println!("ReadImageOp.get_id() -> {}", self.id);
         self.id
     }
 
     fn get_op_type(&self) -> ffi::OperationType {
-        println!("Operation.get_op_type() -> {}", self.op_type.repr);
+        println!("ReadImageOp.get_op_type() -> {}", self.op_type.repr);
         self.op_type
     }
 
     fn get_op_type_id(&self) -> u8 {
-        println!("Operation.get_op_type_id() -> {}", self.op_type.repr);
+        println!("ReadImageOp.get_op_type_id() -> {}", self.op_type.repr);
         self.op_type.repr
     }
 
     fn compute(&mut self) -> Result<bool, &'static str> {
-        println!("Operation.compute()");
+        println!("ReadImageOp.compute()");
         Ok(true)
     }
 }
 
-pub fn create_operation(
+pub fn create_read_image_op(id: usize) -> Box<ReadImageOp> {
+    println!("create_read_image_op()");
+    let op_type = ffi::OperationType::ReadImage;
+    Box::new(ReadImageOp { id, op_type })
+}
+
+pub struct WriteImageOp {
     id: usize,
     op_type: ffi::OperationType,
-) -> Result<Box<Operation>, &'static str> {
-    println!("create_operation()");
-    match op_type {
-        ffi::OperationType::ReadImage => Ok(Box::new(Operation { id, op_type })),
-        ffi::OperationType::WriteImage => Ok(Box::new(Operation { id, op_type })),
-        _ => Err("Invalid OperationType"),
+}
+
+impl WriteImageOp {
+    fn get_id(&self) -> usize {
+        println!("WriteImageOp.get_id() -> {}", self.id);
+        self.id
     }
+
+    fn get_op_type(&self) -> ffi::OperationType {
+        println!("WriteImageOp.get_op_type() -> {}", self.op_type.repr);
+        self.op_type
+    }
+
+    fn get_op_type_id(&self) -> u8 {
+        println!("WriteImageOp.get_op_type_id() -> {}", self.op_type.repr);
+        self.op_type.repr
+    }
+
+    fn compute(&mut self) -> Result<bool, &'static str> {
+        println!("WriteImageOp.compute()");
+        Ok(true)
+    }
+}
+
+pub fn create_write_image_op(id: usize) -> Box<WriteImageOp> {
+    println!("create_write_image_op()");
+    let op_type = ffi::OperationType::WriteImage;
+    Box::new(WriteImageOp { id, op_type })
 }
