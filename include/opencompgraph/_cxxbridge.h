@@ -18,11 +18,14 @@ template <typename T>
 class impl;
 } // namespace
 
+class String;
+
 #ifndef CXXBRIDGE1_RUST_STR
 #define CXXBRIDGE1_RUST_STR
 class Str final {
 public:
   Str() noexcept;
+  Str(const String &) noexcept;
   Str(const std::string &);
   Str(const char *);
   Str(const char *, size_t);
@@ -44,6 +47,13 @@ public:
   const_iterator end() const noexcept;
   const_iterator cbegin() const noexcept;
   const_iterator cend() const noexcept;
+
+  bool operator==(const Str &) const noexcept;
+  bool operator!=(const Str &) const noexcept;
+  bool operator<(const Str &) const noexcept;
+  bool operator<=(const Str &) const noexcept;
+  bool operator>(const Str &) const noexcept;
+  bool operator>=(const Str &) const noexcept;
 
 private:
   friend impl<Str>;

@@ -1,8 +1,10 @@
 #pragma once
+#include <algorithm>
 #include <array>
 #include <cstddef>
 #include <cstdint>
 #include <exception>
+#include <initializer_list>
 #include <iosfwd>
 #include <iterator>
 #include <new>
@@ -27,6 +29,7 @@ class impl;
 
 #ifndef CXXBRIDGE1_RUST_STRING
 #define CXXBRIDGE1_RUST_STRING
+// https://cxx.rs/binding/string.html
 class String final {
 public:
   String() noexcept;
@@ -58,6 +61,13 @@ public:
   const_iterator cbegin() const noexcept;
   const_iterator cend() const noexcept;
 
+  bool operator==(const String &) const noexcept;
+  bool operator!=(const String &) const noexcept;
+  bool operator<(const String &) const noexcept;
+  bool operator<=(const String &) const noexcept;
+  bool operator>(const String &) const noexcept;
+  bool operator>=(const String &) const noexcept;
+
   // Internal API only intended for the cxxbridge code generator.
   String(unsafe_bitcopy_t, const String &) noexcept;
 
@@ -68,9 +78,11 @@ private:
 #endif // CXXBRIDGE1_RUST_STRING
 
 #ifndef CXXBRIDGE1_RUST_STR
+// https://cxx.rs/binding/str.html
 class Str final {
 public:
   Str() noexcept;
+  Str(const String &) noexcept;
   Str(const std::string &);
   Str(const char *);
   Str(const char *, size_t);
@@ -95,6 +107,13 @@ public:
   const_iterator cbegin() const noexcept;
   const_iterator cend() const noexcept;
 
+  bool operator==(const Str &) const noexcept;
+  bool operator!=(const Str &) const noexcept;
+  bool operator<(const Str &) const noexcept;
+  bool operator<=(const Str &) const noexcept;
+  bool operator>(const Str &) const noexcept;
+  bool operator>=(const Str &) const noexcept;
+
 private:
   friend impl<Str>;
   // Not necessarily ABI compatible with &str. Codegen will translate to
@@ -118,6 +137,7 @@ struct copy_assignable_if<false> {
 };
 } // namespace detail
 
+// https://cxx.rs/binding/slice.html
 template <typename T>
 class Slice final
     : private detail::copy_assignable_if<std::is_const<T>::value> {
@@ -171,6 +191,7 @@ private:
 #endif // CXXBRIDGE1_RUST_SLICE
 
 #ifndef CXXBRIDGE1_RUST_BOX
+// https://cxx.rs/binding/box.html
 template <typename T>
 class Box final {
 public:
@@ -212,12 +233,14 @@ private:
 #endif // CXXBRIDGE1_RUST_BOX
 
 #ifndef CXXBRIDGE1_RUST_VEC
+// https://cxx.rs/binding/vec.html
 template <typename T>
 class Vec final {
 public:
   using value_type = T;
 
   Vec() noexcept;
+  Vec(std::initializer_list<T>);
   Vec(Vec &&) noexcept;
   ~Vec() noexcept;
 
@@ -288,26 +311,25 @@ private:
 #endif // CXXBRIDGE1_RUST_VEC
 
 #ifndef CXXBRIDGE1_RUST_FN
-template <typename Signature, bool Throws = false>
+// https://cxx.rs/binding/fn.html
+template <typename Signature>
 class Fn;
 
-template <typename Ret, typename... Args, bool Throws>
-class Fn<Ret(Args...), Throws> final {
+template <typename Ret, typename... Args>
+class Fn<Ret(Args...)> final {
 public:
-  Ret operator()(Args... args) const noexcept(!Throws);
+  Ret operator()(Args... args) const noexcept;
   Fn operator*() const noexcept;
 
 private:
-  Ret (*trampoline)(Args..., void *fn) noexcept(!Throws);
+  Ret (*trampoline)(Args..., void *fn) noexcept;
   void *fn;
 };
-
-template <typename Signature>
-using TryFn = Fn<Signature, true>;
 #endif // CXXBRIDGE1_RUST_FN
 
 #ifndef CXXBRIDGE1_RUST_ERROR
 #define CXXBRIDGE1_RUST_ERROR
+// https://cxx.rs/binding/result.html
 class Error final : public std::exception {
 public:
   Error(const Error &);
@@ -381,10 +403,8 @@ using box = Box<T>;
 template <typename T>
 using vec = Vec<T>;
 using error = Error;
-template <typename Signature, bool Throws = false>
-using fn = Fn<Signature, Throws>;
 template <typename Signature>
-using try_fn = TryFn<Signature>;
+using fn = Fn<Signature>;
 template <typename T>
 using is_relocatable = IsRelocatable<T>;
 
@@ -401,13 +421,13 @@ void panic [[noreturn]] (const char *msg);
 
 #ifndef CXXBRIDGE1_RUST_FN
 #define CXXBRIDGE1_RUST_FN
-template <typename Ret, typename... Args, bool Throws>
-Ret Fn<Ret(Args...), Throws>::operator()(Args... args) const noexcept(!Throws) {
+template <typename Ret, typename... Args>
+Ret Fn<Ret(Args...)>::operator()(Args... args) const noexcept {
   return (*this->trampoline)(std::move(args)..., this->fn);
 }
 
-template <typename Ret, typename... Args, bool Throws>
-Fn<Ret(Args...), Throws> Fn<Ret(Args...), Throws>::operator*() const noexcept {
+template <typename Ret, typename... Args>
+Fn<Ret(Args...)> Fn<Ret(Args...)>::operator*() const noexcept {
   return *this;
 }
 #endif // CXXBRIDGE1_RUST_FN
@@ -602,6 +622,12 @@ Box<T>::Box() noexcept = default;
 
 #ifndef CXXBRIDGE1_RUST_VEC
 #define CXXBRIDGE1_RUST_VEC
+template <typename T>
+Vec<T>::Vec(std::initializer_list<T> init) : Vec{} {
+  this->reserve_total(init.size());
+  std::move(init.begin(), init.end(), std::back_inserter(*this));
+}
+
 template <typename T>
 Vec<T>::Vec(Vec &&other) noexcept : repr(other.repr) {
   new (&other) Vec();
