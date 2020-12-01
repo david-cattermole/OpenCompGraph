@@ -294,8 +294,7 @@ namespace opencompgraph {
   enum class OperationType : uint8_t;
   using ThingC = ::opencompgraph::ThingC;
   struct ThingR;
-  struct ReadImageOp;
-  struct WriteImageOp;
+  struct Operation;
 }
 
 namespace opencompgraph {
@@ -316,25 +315,15 @@ enum class OperationType : uint8_t {
 };
 #endif // CXXBRIDGE1_ENUM_opencompgraph$OperationType
 
-#ifndef CXXBRIDGE1_STRUCT_opencompgraph$ReadImageOp
-#define CXXBRIDGE1_STRUCT_opencompgraph$ReadImageOp
-struct ReadImageOp final : public ::rust::Opaque {
+#ifndef CXXBRIDGE1_STRUCT_opencompgraph$Operation
+#define CXXBRIDGE1_STRUCT_opencompgraph$Operation
+struct Operation final : public ::rust::Opaque {
   size_t get_id() noexcept;
   ::opencompgraph::OperationType get_op_type() noexcept;
   uint8_t get_op_type_id() noexcept;
   bool compute();
 };
-#endif // CXXBRIDGE1_STRUCT_opencompgraph$ReadImageOp
-
-#ifndef CXXBRIDGE1_STRUCT_opencompgraph$WriteImageOp
-#define CXXBRIDGE1_STRUCT_opencompgraph$WriteImageOp
-struct WriteImageOp final : public ::rust::Opaque {
-  size_t get_id() noexcept;
-  ::opencompgraph::OperationType get_op_type() noexcept;
-  uint8_t get_op_type_id() noexcept;
-  bool compute();
-};
-#endif // CXXBRIDGE1_STRUCT_opencompgraph$WriteImageOp
+#endif // CXXBRIDGE1_STRUCT_opencompgraph$Operation
 
 extern "C" {
 __declspec(dllexport) ::opencompgraph::ThingC *opencompgraph$cxxbridge1$make_thingc(::rust::repr::PtrLen appname) noexcept {
@@ -354,79 +343,44 @@ __declspec(dllexport) void opencompgraph$cxxbridge1$run_sharedthing(::opencompgr
 
 void opencompgraph$cxxbridge1$print_r(const ::opencompgraph::ThingR &r) noexcept;
 
-size_t opencompgraph$cxxbridge1$ReadImageOp$get_id(::opencompgraph::ReadImageOp &self) noexcept;
+size_t opencompgraph$cxxbridge1$Operation$get_id(::opencompgraph::Operation &self) noexcept;
 
-::opencompgraph::OperationType opencompgraph$cxxbridge1$ReadImageOp$get_op_type(::opencompgraph::ReadImageOp &self) noexcept;
+::opencompgraph::OperationType opencompgraph$cxxbridge1$Operation$get_op_type(::opencompgraph::Operation &self) noexcept;
 
-uint8_t opencompgraph$cxxbridge1$ReadImageOp$get_op_type_id(::opencompgraph::ReadImageOp &self) noexcept;
+uint8_t opencompgraph$cxxbridge1$Operation$get_op_type_id(::opencompgraph::Operation &self) noexcept;
 
-::rust::repr::PtrLen opencompgraph$cxxbridge1$ReadImageOp$compute(::opencompgraph::ReadImageOp &self, bool *return$) noexcept;
+::rust::repr::PtrLen opencompgraph$cxxbridge1$Operation$compute(::opencompgraph::Operation &self, bool *return$) noexcept;
 
-::opencompgraph::ReadImageOp *opencompgraph$cxxbridge1$create_read_image_op(size_t id) noexcept;
-
-size_t opencompgraph$cxxbridge1$WriteImageOp$get_id(::opencompgraph::WriteImageOp &self) noexcept;
-
-::opencompgraph::OperationType opencompgraph$cxxbridge1$WriteImageOp$get_op_type(::opencompgraph::WriteImageOp &self) noexcept;
-
-uint8_t opencompgraph$cxxbridge1$WriteImageOp$get_op_type_id(::opencompgraph::WriteImageOp &self) noexcept;
-
-::rust::repr::PtrLen opencompgraph$cxxbridge1$WriteImageOp$compute(::opencompgraph::WriteImageOp &self, bool *return$) noexcept;
-
-::opencompgraph::WriteImageOp *opencompgraph$cxxbridge1$create_write_image_op(size_t id) noexcept;
+::opencompgraph::Operation *opencompgraph$cxxbridge1$create_operation(size_t id, ::opencompgraph::OperationType op_type) noexcept;
 } // extern "C"
 
 void print_r(const ::opencompgraph::ThingR &r) noexcept {
   opencompgraph$cxxbridge1$print_r(r);
 }
 
-size_t ReadImageOp::get_id() noexcept {
-  return opencompgraph$cxxbridge1$ReadImageOp$get_id(*this);
+size_t Operation::get_id() noexcept {
+  return opencompgraph$cxxbridge1$Operation$get_id(*this);
 }
 
-::opencompgraph::OperationType ReadImageOp::get_op_type() noexcept {
-  return opencompgraph$cxxbridge1$ReadImageOp$get_op_type(*this);
+::opencompgraph::OperationType Operation::get_op_type() noexcept {
+  return opencompgraph$cxxbridge1$Operation$get_op_type(*this);
 }
 
-uint8_t ReadImageOp::get_op_type_id() noexcept {
-  return opencompgraph$cxxbridge1$ReadImageOp$get_op_type_id(*this);
+uint8_t Operation::get_op_type_id() noexcept {
+  return opencompgraph$cxxbridge1$Operation$get_op_type_id(*this);
 }
 
-bool ReadImageOp::compute() {
+bool Operation::compute() {
   ::rust::MaybeUninit<bool> return$;
-  ::rust::repr::PtrLen error$ = opencompgraph$cxxbridge1$ReadImageOp$compute(*this, &return$.value);
+  ::rust::repr::PtrLen error$ = opencompgraph$cxxbridge1$Operation$compute(*this, &return$.value);
   if (error$.ptr) {
     throw ::rust::impl<::rust::Error>::error(error$);
   }
   return ::std::move(return$.value);
 }
 
-::rust::Box<::opencompgraph::ReadImageOp> create_read_image_op(size_t id) noexcept {
-  return ::rust::Box<::opencompgraph::ReadImageOp>::from_raw(opencompgraph$cxxbridge1$create_read_image_op(id));
-}
-
-size_t WriteImageOp::get_id() noexcept {
-  return opencompgraph$cxxbridge1$WriteImageOp$get_id(*this);
-}
-
-::opencompgraph::OperationType WriteImageOp::get_op_type() noexcept {
-  return opencompgraph$cxxbridge1$WriteImageOp$get_op_type(*this);
-}
-
-uint8_t WriteImageOp::get_op_type_id() noexcept {
-  return opencompgraph$cxxbridge1$WriteImageOp$get_op_type_id(*this);
-}
-
-bool WriteImageOp::compute() {
-  ::rust::MaybeUninit<bool> return$;
-  ::rust::repr::PtrLen error$ = opencompgraph$cxxbridge1$WriteImageOp$compute(*this, &return$.value);
-  if (error$.ptr) {
-    throw ::rust::impl<::rust::Error>::error(error$);
-  }
-  return ::std::move(return$.value);
-}
-
-::rust::Box<::opencompgraph::WriteImageOp> create_write_image_op(size_t id) noexcept {
-  return ::rust::Box<::opencompgraph::WriteImageOp>::from_raw(opencompgraph$cxxbridge1$create_write_image_op(id));
+::rust::Box<::opencompgraph::Operation> create_operation(size_t id, ::opencompgraph::OperationType op_type) noexcept {
+  return ::rust::Box<::opencompgraph::Operation>::from_raw(opencompgraph$cxxbridge1$create_operation(id, op_type));
 }
 } // namespace opencompgraph
 
@@ -459,17 +413,11 @@ void cxxbridge1$unique_ptr$opencompgraph$ThingC$drop(::std::unique_ptr<::opencom
 }
 #endif // CXXBRIDGE1_UNIQUE_PTR_opencompgraph$ThingC
 
-#ifndef CXXBRIDGE1_RUST_BOX_opencompgraph$ReadImageOp
-#define CXXBRIDGE1_RUST_BOX_opencompgraph$ReadImageOp
-void cxxbridge1$box$opencompgraph$ReadImageOp$uninit(::rust::Box<::opencompgraph::ReadImageOp> *ptr) noexcept;
-void cxxbridge1$box$opencompgraph$ReadImageOp$drop(::rust::Box<::opencompgraph::ReadImageOp> *ptr) noexcept;
-#endif // CXXBRIDGE1_RUST_BOX_opencompgraph$ReadImageOp
-
-#ifndef CXXBRIDGE1_RUST_BOX_opencompgraph$WriteImageOp
-#define CXXBRIDGE1_RUST_BOX_opencompgraph$WriteImageOp
-void cxxbridge1$box$opencompgraph$WriteImageOp$uninit(::rust::Box<::opencompgraph::WriteImageOp> *ptr) noexcept;
-void cxxbridge1$box$opencompgraph$WriteImageOp$drop(::rust::Box<::opencompgraph::WriteImageOp> *ptr) noexcept;
-#endif // CXXBRIDGE1_RUST_BOX_opencompgraph$WriteImageOp
+#ifndef CXXBRIDGE1_RUST_BOX_opencompgraph$Operation
+#define CXXBRIDGE1_RUST_BOX_opencompgraph$Operation
+void cxxbridge1$box$opencompgraph$Operation$uninit(::rust::Box<::opencompgraph::Operation> *ptr) noexcept;
+void cxxbridge1$box$opencompgraph$Operation$drop(::rust::Box<::opencompgraph::Operation> *ptr) noexcept;
+#endif // CXXBRIDGE1_RUST_BOX_opencompgraph$Operation
 } // extern "C"
 
 namespace rust {
@@ -483,20 +431,12 @@ void Box<::opencompgraph::ThingR>::drop() noexcept {
   cxxbridge1$box$opencompgraph$ThingR$drop(this);
 }
 template <>
-void Box<::opencompgraph::ReadImageOp>::uninit() noexcept {
-  cxxbridge1$box$opencompgraph$ReadImageOp$uninit(this);
+void Box<::opencompgraph::Operation>::uninit() noexcept {
+  cxxbridge1$box$opencompgraph$Operation$uninit(this);
 }
 template <>
-void Box<::opencompgraph::ReadImageOp>::drop() noexcept {
-  cxxbridge1$box$opencompgraph$ReadImageOp$drop(this);
-}
-template <>
-void Box<::opencompgraph::WriteImageOp>::uninit() noexcept {
-  cxxbridge1$box$opencompgraph$WriteImageOp$uninit(this);
-}
-template <>
-void Box<::opencompgraph::WriteImageOp>::drop() noexcept {
-  cxxbridge1$box$opencompgraph$WriteImageOp$drop(this);
+void Box<::opencompgraph::Operation>::drop() noexcept {
+  cxxbridge1$box$opencompgraph$Operation$drop(this);
 }
 } // namespace cxxbridge1
 } // namespace rust

@@ -221,8 +221,7 @@ namespace opencompgraph {
   enum class OperationType : uint8_t;
   using ThingC = ::opencompgraph::ThingC;
   struct ThingR;
-  struct ReadImageOp;
-  struct WriteImageOp;
+  struct Operation;
 }
 
 namespace opencompgraph {
@@ -243,29 +242,17 @@ enum class OperationType : uint8_t {
 };
 #endif // CXXBRIDGE1_ENUM_opencompgraph$OperationType
 
-#ifndef CXXBRIDGE1_STRUCT_opencompgraph$ReadImageOp
-#define CXXBRIDGE1_STRUCT_opencompgraph$ReadImageOp
-struct ReadImageOp final : public ::rust::Opaque {
+#ifndef CXXBRIDGE1_STRUCT_opencompgraph$Operation
+#define CXXBRIDGE1_STRUCT_opencompgraph$Operation
+struct Operation final : public ::rust::Opaque {
   size_t get_id() noexcept;
   ::opencompgraph::OperationType get_op_type() noexcept;
   uint8_t get_op_type_id() noexcept;
   bool compute();
 };
-#endif // CXXBRIDGE1_STRUCT_opencompgraph$ReadImageOp
-
-#ifndef CXXBRIDGE1_STRUCT_opencompgraph$WriteImageOp
-#define CXXBRIDGE1_STRUCT_opencompgraph$WriteImageOp
-struct WriteImageOp final : public ::rust::Opaque {
-  size_t get_id() noexcept;
-  ::opencompgraph::OperationType get_op_type() noexcept;
-  uint8_t get_op_type_id() noexcept;
-  bool compute();
-};
-#endif // CXXBRIDGE1_STRUCT_opencompgraph$WriteImageOp
+#endif // CXXBRIDGE1_STRUCT_opencompgraph$Operation
 
 void print_r(const ::opencompgraph::ThingR &r) noexcept;
 
-::rust::Box<::opencompgraph::ReadImageOp> create_read_image_op(size_t id) noexcept;
-
-::rust::Box<::opencompgraph::WriteImageOp> create_write_image_op(size_t id) noexcept;
+::rust::Box<::opencompgraph::Operation> create_operation(size_t id, ::opencompgraph::OperationType op_type) noexcept;
 } // namespace opencompgraph
