@@ -1,6 +1,7 @@
 #pragma once
 #include "opencompgraph/_cpp.h"
 #include "opencompgraph.h"
+#include <array>
 #include <cstddef>
 #include <cstdint>
 #include <memory>
@@ -13,12 +14,58 @@ namespace rust {
 inline namespace cxxbridge1 {
 // #include "rust/cxx.h"
 
+struct unsafe_bitcopy_t;
+
 namespace {
 template <typename T>
 class impl;
 } // namespace
 
-class String;
+#ifndef CXXBRIDGE1_RUST_STRING
+#define CXXBRIDGE1_RUST_STRING
+class String final {
+public:
+  String() noexcept;
+  String(const String &) noexcept;
+  String(String &&) noexcept;
+  ~String() noexcept;
+
+  String(const std::string &);
+  String(const char *);
+  String(const char *, size_t);
+
+  String &operator=(const String &) noexcept;
+  String &operator=(String &&) noexcept;
+
+  explicit operator std::string() const;
+
+  const char *data() const noexcept;
+  size_t size() const noexcept;
+  size_t length() const noexcept;
+
+  using iterator = char *;
+  iterator begin() noexcept;
+  iterator end() noexcept;
+
+  using const_iterator = const char *;
+  const_iterator begin() const noexcept;
+  const_iterator end() const noexcept;
+  const_iterator cbegin() const noexcept;
+  const_iterator cend() const noexcept;
+
+  bool operator==(const String &) const noexcept;
+  bool operator!=(const String &) const noexcept;
+  bool operator<(const String &) const noexcept;
+  bool operator<=(const String &) const noexcept;
+  bool operator>(const String &) const noexcept;
+  bool operator>=(const String &) const noexcept;
+
+  String(unsafe_bitcopy_t, const String &) noexcept;
+
+private:
+  std::array<uintptr_t, 3> repr;
+};
+#endif // CXXBRIDGE1_RUST_STRING
 
 #ifndef CXXBRIDGE1_RUST_STR
 #define CXXBRIDGE1_RUST_STR
@@ -219,6 +266,8 @@ public:
 namespace opencompgraph {
   struct SharedThing;
   enum class OperationType : uint8_t;
+  enum class AttrState : uint8_t;
+  enum class AttrValueType : uint8_t;
   using ThingC = ::opencompgraph::ThingC;
   struct ThingR;
   struct Operation;
@@ -242,13 +291,33 @@ enum class OperationType : uint8_t {
 };
 #endif // CXXBRIDGE1_ENUM_opencompgraph$OperationType
 
+#ifndef CXXBRIDGE1_ENUM_opencompgraph$AttrState
+#define CXXBRIDGE1_ENUM_opencompgraph$AttrState
+enum class AttrState : uint8_t {
+  Missing = 0,
+  Exists = 1,
+};
+#endif // CXXBRIDGE1_ENUM_opencompgraph$AttrState
+
+#ifndef CXXBRIDGE1_ENUM_opencompgraph$AttrValueType
+#define CXXBRIDGE1_ENUM_opencompgraph$AttrValueType
+enum class AttrValueType : uint8_t {
+  None = 0,
+  Integer = 1,
+  Float = 2,
+  String = 3,
+};
+#endif // CXXBRIDGE1_ENUM_opencompgraph$AttrValueType
+
 #ifndef CXXBRIDGE1_STRUCT_opencompgraph$Operation
 #define CXXBRIDGE1_STRUCT_opencompgraph$Operation
 struct Operation final : public ::rust::Opaque {
-  size_t get_id() noexcept;
-  ::opencompgraph::OperationType get_op_type() noexcept;
-  uint8_t get_op_type_id() noexcept;
+  size_t get_id() const noexcept;
+  ::opencompgraph::OperationType get_op_type() const noexcept;
+  uint8_t get_op_type_id() const noexcept;
   bool compute();
+  ::rust::String get_attr_str(::rust::Str name) const noexcept;
+  void set_attr(::rust::Str name, ::rust::Str value) noexcept;
 };
 #endif // CXXBRIDGE1_STRUCT_opencompgraph$Operation
 

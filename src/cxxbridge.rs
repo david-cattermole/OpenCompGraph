@@ -13,6 +13,22 @@ pub mod ffi {
         WriteImage = 1,
     }
 
+    #[repr(u8)]
+    #[derive(Debug, Copy, Clone, Hash)]
+    enum AttrState {
+        Missing = 0,
+        Exists = 1,
+    }
+
+    #[repr(u8)]
+    #[derive(Debug, Copy, Clone, Hash)]
+    enum AttrValueType {
+        None = 0,
+        Integer = 1,
+        Float = 2,
+        String = 3,
+    }
+
     // ThingC
     unsafe extern "C++" {
         include!("opencompgraph/_cpp.h");
@@ -33,13 +49,21 @@ pub mod ffi {
     // Operation
     extern "Rust" {
         type Operation;
-        fn get_id(&mut self) -> usize;
-        fn get_op_type(&mut self) -> OperationType;
-        fn get_op_type_id(&mut self) -> u8;
+        fn get_id(&self) -> usize;
+        fn get_op_type(&self) -> OperationType;
+        fn get_op_type_id(&self) -> u8;
         fn compute(&mut self) -> Result<bool>;
-        fn create_operation(id: usize, op_type: OperationType) -> Box<Operation>;
+
+        fn get_attr_str(&self, name: &str) -> String;
+
+        #[cxx_name = "set_attr"]
+        fn set_attr_str(&mut self, name: &str, value: &str);
+
     }
 
+    extern "Rust" {
+        fn create_operation(id: usize, op_type: OperationType) -> Box<Operation>;
+    }
 
 }
 
@@ -61,13 +85,17 @@ fn my_test() {
     });
 }
 
-pub trait Compute {
+trait Compute {
     fn get_id(&self) -> usize;
     fn compute(&mut self) -> Result<bool, &'static str>;
+    fn get_attr_str(&self, name: &str) -> String;
+    fn set_attr_str(&mut self, name: &str, value: &str);
 }
 
-pub struct ReadImageOpImpl {
+#[derive(Debug, Clone, Default)]
+struct ReadImageOpImpl {
     id: usize,
+    file_path: String,
 }
 
 impl Compute for ReadImageOpImpl {
@@ -80,10 +108,26 @@ impl Compute for ReadImageOpImpl {
         println!("ReadImageOpImpl.compute()");
         Ok(true)
     }
+
+    fn get_attr_str(&self, name: &str) -> String {
+        match name {
+            "file_path" => self.file_path.clone(),
+            _ => "".to_string(),
+        }
+    }
+
+    fn set_attr_str(&mut self, name: &str, value: &str) {
+        match name {
+            "file_path" => self.file_path = value.to_string(),
+            _ => (),
+        };
+    }
 }
 
-pub struct WriteImageOpImpl {
+#[derive(Debug, Clone, Default)]
+struct WriteImageOpImpl {
     id: usize,
+    file_path: String,
 }
 
 impl Compute for WriteImageOpImpl {
@@ -95,6 +139,20 @@ impl Compute for WriteImageOpImpl {
     fn compute(&mut self) -> Result<bool, &'static str> {
         println!("WriteImageOpImpl.compute()");
         Ok(true)
+    }
+
+    fn get_attr_str(&self, name: &str) -> String {
+        match name {
+            "file_path" => self.file_path.clone(),
+            _ => "".to_string(),
+        }
+    }
+
+    fn set_attr_str(&mut self, name: &str, value: &str) {
+        match name {
+            "file_path" => self.file_path = value.to_string().clone(),
+            _ => (),
+        };
     }
 }
 
@@ -110,6 +168,14 @@ impl Operation {
 
     fn compute(&mut self) -> Result<bool, &'static str> {
         self.inner.compute()
+    }
+
+    fn get_attr_str(&self, name: &str) -> String {
+        self.inner.get_attr_str(name)
+    }
+
+    fn set_attr_str(&mut self, name: &str, value: &str) {
+        self.inner.set_attr_str(name, value);
     }
 
     fn get_op_type(&self) -> ffi::OperationType {
@@ -128,11 +194,11 @@ pub fn create_operation(id: usize, op_type: ffi::OperationType) -> Box<Operation
     match op_type {
         ffi::OperationType::ReadImage => Box::new(Operation {
             op_type,
-            inner: Box::new(ReadImageOpImpl { id }),
+            inner: Box::new(ReadImageOpImpl { id, file_path: "".to_string() }),
         }),
         ffi::OperationType::WriteImage => Box::new(Operation {
             op_type,
-            inner: Box::new(WriteImageOpImpl { id }),
+            inner: Box::new(WriteImageOpImpl { id, file_path: "".to_string() }),
         }),
         _ => panic!("Invalid OperationType: {:?}", op_type),
     }

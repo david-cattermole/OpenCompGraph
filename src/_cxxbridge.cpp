@@ -1,5 +1,6 @@
 #include "opencompgraph/_cpp.h"
 #include "opencompgraph.h"
+#include <array>
 #include <cstddef>
 #include <cstdint>
 #include <exception>
@@ -13,12 +14,58 @@ namespace rust {
 inline namespace cxxbridge1 {
 // #include "rust/cxx.h"
 
+struct unsafe_bitcopy_t;
+
 namespace {
 template <typename T>
 class impl;
 } // namespace
 
-class String;
+#ifndef CXXBRIDGE1_RUST_STRING
+#define CXXBRIDGE1_RUST_STRING
+class String final {
+public:
+  String() noexcept;
+  String(const String &) noexcept;
+  String(String &&) noexcept;
+  ~String() noexcept;
+
+  String(const std::string &);
+  String(const char *);
+  String(const char *, size_t);
+
+  String &operator=(const String &) noexcept;
+  String &operator=(String &&) noexcept;
+
+  explicit operator std::string() const;
+
+  const char *data() const noexcept;
+  size_t size() const noexcept;
+  size_t length() const noexcept;
+
+  using iterator = char *;
+  iterator begin() noexcept;
+  iterator end() noexcept;
+
+  using const_iterator = const char *;
+  const_iterator begin() const noexcept;
+  const_iterator end() const noexcept;
+  const_iterator cbegin() const noexcept;
+  const_iterator cend() const noexcept;
+
+  bool operator==(const String &) const noexcept;
+  bool operator!=(const String &) const noexcept;
+  bool operator<(const String &) const noexcept;
+  bool operator<=(const String &) const noexcept;
+  bool operator>(const String &) const noexcept;
+  bool operator>=(const String &) const noexcept;
+
+  String(unsafe_bitcopy_t, const String &) noexcept;
+
+private:
+  std::array<uintptr_t, 3> repr;
+};
+#endif // CXXBRIDGE1_RUST_STRING
 
 #ifndef CXXBRIDGE1_RUST_STR
 #define CXXBRIDGE1_RUST_STR
@@ -259,6 +306,9 @@ public:
     str.len = repr.len;
     return str;
   }
+  static repr::PtrLen repr(Str str) noexcept {
+    return repr::PtrLen{const_cast<char *>(str.ptr), str.len};
+  }
 };
 
 template <>
@@ -292,6 +342,8 @@ template <> struct deleter_if<true> {
 namespace opencompgraph {
   struct SharedThing;
   enum class OperationType : uint8_t;
+  enum class AttrState : uint8_t;
+  enum class AttrValueType : uint8_t;
   using ThingC = ::opencompgraph::ThingC;
   struct ThingR;
   struct Operation;
@@ -315,13 +367,33 @@ enum class OperationType : uint8_t {
 };
 #endif // CXXBRIDGE1_ENUM_opencompgraph$OperationType
 
+#ifndef CXXBRIDGE1_ENUM_opencompgraph$AttrState
+#define CXXBRIDGE1_ENUM_opencompgraph$AttrState
+enum class AttrState : uint8_t {
+  Missing = 0,
+  Exists = 1,
+};
+#endif // CXXBRIDGE1_ENUM_opencompgraph$AttrState
+
+#ifndef CXXBRIDGE1_ENUM_opencompgraph$AttrValueType
+#define CXXBRIDGE1_ENUM_opencompgraph$AttrValueType
+enum class AttrValueType : uint8_t {
+  None = 0,
+  Integer = 1,
+  Float = 2,
+  String = 3,
+};
+#endif // CXXBRIDGE1_ENUM_opencompgraph$AttrValueType
+
 #ifndef CXXBRIDGE1_STRUCT_opencompgraph$Operation
 #define CXXBRIDGE1_STRUCT_opencompgraph$Operation
 struct Operation final : public ::rust::Opaque {
-  size_t get_id() noexcept;
-  ::opencompgraph::OperationType get_op_type() noexcept;
-  uint8_t get_op_type_id() noexcept;
+  size_t get_id() const noexcept;
+  ::opencompgraph::OperationType get_op_type() const noexcept;
+  uint8_t get_op_type_id() const noexcept;
   bool compute();
+  ::rust::String get_attr_str(::rust::Str name) const noexcept;
+  void set_attr(::rust::Str name, ::rust::Str value) noexcept;
 };
 #endif // CXXBRIDGE1_STRUCT_opencompgraph$Operation
 
@@ -343,13 +415,17 @@ __declspec(dllexport) void opencompgraph$cxxbridge1$run_sharedthing(::opencompgr
 
 void opencompgraph$cxxbridge1$print_r(const ::opencompgraph::ThingR &r) noexcept;
 
-size_t opencompgraph$cxxbridge1$Operation$get_id(::opencompgraph::Operation &self) noexcept;
+size_t opencompgraph$cxxbridge1$Operation$get_id(const ::opencompgraph::Operation &self) noexcept;
 
-::opencompgraph::OperationType opencompgraph$cxxbridge1$Operation$get_op_type(::opencompgraph::Operation &self) noexcept;
+::opencompgraph::OperationType opencompgraph$cxxbridge1$Operation$get_op_type(const ::opencompgraph::Operation &self) noexcept;
 
-uint8_t opencompgraph$cxxbridge1$Operation$get_op_type_id(::opencompgraph::Operation &self) noexcept;
+uint8_t opencompgraph$cxxbridge1$Operation$get_op_type_id(const ::opencompgraph::Operation &self) noexcept;
 
 ::rust::repr::PtrLen opencompgraph$cxxbridge1$Operation$compute(::opencompgraph::Operation &self, bool *return$) noexcept;
+
+void opencompgraph$cxxbridge1$Operation$get_attr_str(const ::opencompgraph::Operation &self, ::rust::repr::PtrLen name, ::rust::String *return$) noexcept;
+
+void opencompgraph$cxxbridge1$Operation$set_attr_str(::opencompgraph::Operation &self, ::rust::repr::PtrLen name, ::rust::repr::PtrLen value) noexcept;
 
 ::opencompgraph::Operation *opencompgraph$cxxbridge1$create_operation(size_t id, ::opencompgraph::OperationType op_type) noexcept;
 } // extern "C"
@@ -358,15 +434,15 @@ void print_r(const ::opencompgraph::ThingR &r) noexcept {
   opencompgraph$cxxbridge1$print_r(r);
 }
 
-size_t Operation::get_id() noexcept {
+size_t Operation::get_id() const noexcept {
   return opencompgraph$cxxbridge1$Operation$get_id(*this);
 }
 
-::opencompgraph::OperationType Operation::get_op_type() noexcept {
+::opencompgraph::OperationType Operation::get_op_type() const noexcept {
   return opencompgraph$cxxbridge1$Operation$get_op_type(*this);
 }
 
-uint8_t Operation::get_op_type_id() noexcept {
+uint8_t Operation::get_op_type_id() const noexcept {
   return opencompgraph$cxxbridge1$Operation$get_op_type_id(*this);
 }
 
@@ -377,6 +453,16 @@ bool Operation::compute() {
     throw ::rust::impl<::rust::Error>::error(error$);
   }
   return ::std::move(return$.value);
+}
+
+::rust::String Operation::get_attr_str(::rust::Str name) const noexcept {
+  ::rust::MaybeUninit<::rust::String> return$;
+  opencompgraph$cxxbridge1$Operation$get_attr_str(*this, ::rust::impl<::rust::Str>::repr(name), &return$.value);
+  return ::std::move(return$.value);
+}
+
+void Operation::set_attr(::rust::Str name, ::rust::Str value) noexcept {
+  opencompgraph$cxxbridge1$Operation$set_attr_str(*this, ::rust::impl<::rust::Str>::repr(name), ::rust::impl<::rust::Str>::repr(value));
 }
 
 ::rust::Box<::opencompgraph::Operation> create_operation(size_t id, ::opencompgraph::OperationType op_type) noexcept {
