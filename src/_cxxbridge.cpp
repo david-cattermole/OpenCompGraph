@@ -340,7 +340,7 @@ namespace opencompgraph {
   struct SharedThing;
   enum class OperationType : uint8_t;
   enum class AttrState : uint8_t;
-  enum class AttrValueType : uint8_t;
+  enum class AttrDataType : uint8_t;
   enum class AttrId : uint8_t;
   using ThingC = ::opencompgraph::ThingC;
   struct ThingR;
@@ -373,15 +373,23 @@ enum class AttrState : uint8_t {
 };
 #endif // CXXBRIDGE1_ENUM_opencompgraph$AttrState
 
-#ifndef CXXBRIDGE1_ENUM_opencompgraph$AttrValueType
-#define CXXBRIDGE1_ENUM_opencompgraph$AttrValueType
-enum class AttrValueType : uint8_t {
+#ifndef CXXBRIDGE1_ENUM_opencompgraph$AttrDataType
+#define CXXBRIDGE1_ENUM_opencompgraph$AttrDataType
+enum class AttrDataType : uint8_t {
   None = 0,
-  Integer = 1,
-  Float = 2,
-  String = 3,
+  UnsignedInteger8 = 1,
+  UnsignedInteger16 = 2,
+  UnsignedInteger32 = 3,
+  UnsignedInteger64 = 4,
+  SignedInteger8 = 5,
+  SignedInteger16 = 6,
+  SignedInteger32 = 7,
+  SignedInteger64 = 8,
+  Float32 = 9,
+  Float64 = 10,
+  String = 11,
 };
-#endif // CXXBRIDGE1_ENUM_opencompgraph$AttrValueType
+#endif // CXXBRIDGE1_ENUM_opencompgraph$AttrDataType
 
 #ifndef CXXBRIDGE1_ENUM_opencompgraph$AttrId
 #define CXXBRIDGE1_ENUM_opencompgraph$AttrId

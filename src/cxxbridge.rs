@@ -22,11 +22,19 @@ pub mod ffi {
 
     #[repr(u8)]
     #[derive(Debug, Copy, Clone, Hash)]
-    enum AttrValueType {
+    enum AttrDataType {
         None = 0,
-        Integer = 1,
-        Float = 2,
-        String = 3,
+        UnsignedInteger8 = 1,  // C++ uint8_t
+        UnsignedInteger16 = 2, // C++ uint16_t
+        UnsignedInteger32 = 3, // C++ uint32_t
+        UnsignedInteger64 = 4, // C++ uint64_t
+        SignedInteger8 = 5,    // C++ int8_t
+        SignedInteger16 = 6,   // C++ int16_t
+        SignedInteger32 = 7,   // C++ int32_t
+        SignedInteger64 = 8,   // C++ int64_t
+        Float32 = 9,           // C++ float
+        Float64 = 10,          // C++ double
+        String = 11,
     }
 
     #[repr(u8)]
