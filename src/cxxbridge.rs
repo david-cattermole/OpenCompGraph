@@ -29,6 +29,13 @@ pub mod ffi {
         String = 3,
     }
 
+    #[repr(u8)]
+    #[derive(Debug, Copy, Clone, Hash)]
+    enum AttrId {
+        ReadImage_FilePath = 0,
+        WriteImage_FilePath = 1,
+    }
+
     // ThingC
     unsafe extern "C++" {
         include!("opencompgraph/_cpp.h");
@@ -54,11 +61,12 @@ pub mod ffi {
         fn get_op_type_id(&self) -> u8;
         fn compute(&mut self) -> Result<bool>;
 
-        fn get_attr_str(&self, name: &str) -> String;
+        fn attr_exists(&self, attr: AttrId) -> AttrState;
+
+        fn get_attr_string(&self, attr: AttrId) -> String;
 
         #[cxx_name = "set_attr"]
-        fn set_attr_str(&mut self, name: &str, value: &str);
-
+        fn set_attr_string(&mut self, attr: AttrId, value: String);
     }
 
     extern "Rust" {
@@ -88,8 +96,9 @@ fn my_test() {
 trait Compute {
     fn get_id(&self) -> usize;
     fn compute(&mut self) -> Result<bool, &'static str>;
-    fn get_attr_str(&self, name: &str) -> String;
-    fn set_attr_str(&mut self, name: &str, value: &str);
+    fn attr_exists(&self, attr: ffi::AttrId) -> ffi::AttrState;
+    fn get_attr_string(&self, attr: ffi::AttrId) -> String;
+    fn set_attr_string(&mut self, attr: ffi::AttrId, value: String);
 }
 
 #[derive(Debug, Clone, Default)]
@@ -109,16 +118,23 @@ impl Compute for ReadImageOpImpl {
         Ok(true)
     }
 
-    fn get_attr_str(&self, name: &str) -> String {
-        match name {
-            "file_path" => self.file_path.clone(),
+    fn attr_exists(&self, attr: ffi::AttrId) -> ffi::AttrState {
+        match attr {
+            ffi::AttrId::ReadImage_FilePath => ffi::AttrState::Exists,
+            _ => ffi::AttrState::Missing,
+        }
+    }
+
+    fn get_attr_string(&self, attr: ffi::AttrId) -> String {
+        match attr {
+            ffi::AttrId::ReadImage_FilePath => self.file_path.clone(),
             _ => "".to_string(),
         }
     }
 
-    fn set_attr_str(&mut self, name: &str, value: &str) {
-        match name {
-            "file_path" => self.file_path = value.to_string(),
+    fn set_attr_string(&mut self, attr: ffi::AttrId, value: String) {
+        match attr {
+            ffi::AttrId::ReadImage_FilePath => self.file_path = value,
             _ => (),
         };
     }
@@ -141,16 +157,23 @@ impl Compute for WriteImageOpImpl {
         Ok(true)
     }
 
-    fn get_attr_str(&self, name: &str) -> String {
-        match name {
-            "file_path" => self.file_path.clone(),
+    fn attr_exists(&self, attr: ffi::AttrId) -> ffi::AttrState {
+        match attr {
+            ffi::AttrId::WriteImage_FilePath => ffi::AttrState::Exists,
+            _ => ffi::AttrState::Missing,
+        }
+    }
+
+    fn get_attr_string(&self, attr: ffi::AttrId) -> String {
+        match attr {
+            ffi::AttrId::WriteImage_FilePath => self.file_path.clone(),
             _ => "".to_string(),
         }
     }
 
-    fn set_attr_str(&mut self, name: &str, value: &str) {
-        match name {
-            "file_path" => self.file_path = value.to_string().clone(),
+    fn set_attr_string(&mut self, attr: ffi::AttrId, value: String) {
+        match attr {
+            ffi::AttrId::WriteImage_FilePath => self.file_path = value,
             _ => (),
         };
     }
@@ -170,12 +193,16 @@ impl Operation {
         self.inner.compute()
     }
 
-    fn get_attr_str(&self, name: &str) -> String {
-        self.inner.get_attr_str(name)
+    fn attr_exists(&self, attr: ffi::AttrId) -> ffi::AttrState {
+        self.inner.attr_exists(attr)
     }
 
-    fn set_attr_str(&mut self, name: &str, value: &str) {
-        self.inner.set_attr_str(name, value);
+    fn get_attr_string(&self, attr: ffi::AttrId) -> String {
+        self.inner.get_attr_string(attr)
+    }
+
+    fn set_attr_string(&mut self, attr: ffi::AttrId, value: String) {
+        self.inner.set_attr_string(attr, value);
     }
 
     fn get_op_type(&self) -> ffi::OperationType {
@@ -194,11 +221,17 @@ pub fn create_operation(id: usize, op_type: ffi::OperationType) -> Box<Operation
     match op_type {
         ffi::OperationType::ReadImage => Box::new(Operation {
             op_type,
-            inner: Box::new(ReadImageOpImpl { id, file_path: "".to_string() }),
+            inner: Box::new(ReadImageOpImpl {
+                id,
+                file_path: "".to_string(),
+            }),
         }),
         ffi::OperationType::WriteImage => Box::new(Operation {
             op_type,
-            inner: Box::new(WriteImageOpImpl { id, file_path: "".to_string() }),
+            inner: Box::new(WriteImageOpImpl {
+                id,
+                file_path: "".to_string(),
+            }),
         }),
         _ => panic!("Invalid OperationType: {:?}", op_type),
     }

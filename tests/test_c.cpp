@@ -200,12 +200,15 @@ int test_c() {
     auto read_op_type_id = read_op->get_op_type_id();
     std::cout << "read_op_type_id=" << std::hex << read_op_type_id << std::endl;
 
-    auto read_path1 = read_op->get_attr_str("file_path");
-    std::cout << "read_path1=" << read_path1 << std::endl;
+    auto read_attr = ocg::AttrId::ReadImage_FilePath;
+    if (read_op->attr_exists(read_attr) == ocg::AttrState::Exists) {
+        auto read_path1 = read_op->get_attr_string(read_attr);
+        std::cout << "read_path1=" << read_path1 << std::endl;
 
-    read_op->set_attr("file_path", "/path/to/image.exr");
-    auto read_path2 = read_op->get_attr_str("file_path");
-    std::cout << "read_path2=" << read_path2 << std::endl;
+        read_op->set_attr(read_attr, "/path/to/image.exr");
+        auto read_path2 = read_op->get_attr_string(read_attr);
+        std::cout << "read_path2=" << read_path2 << std::endl;
+    }
 
     auto read_status = read_op->compute();
     std::cout << "read_status=" << read_status << std::endl;
@@ -224,12 +227,15 @@ int test_c() {
     auto write_op_type_id = write_op->get_op_type_id();
     std::cout << "write_op_type_id=" << std::hex << write_op_type_id << std::endl;
 
-    auto write_path1 = write_op->get_attr_str("file_path");
-    std::cout << "write_path1=" << write_path1 << std::endl;
+    auto write_attr = ocg::AttrId::WriteImage_FilePath;
+    if (write_op->attr_exists(write_attr) == ocg::AttrState::Exists) {
+        auto write_path1 = write_op->get_attr_string(write_attr);
+        std::cout << "write_path1=" << write_path1 << std::endl;
 
-    write_op->set_attr("file_path", "/path/to/image_out.jpg");
-    auto write_path2 = write_op->get_attr_str("file_path");
-    std::cout << "write_path2=" << write_path2 << std::endl;
+        write_op->set_attr(write_attr, "/path/to/image_out.jpg");
+        auto write_path2 = write_op->get_attr_string(write_attr);
+        std::cout << "write_path2=" << write_path2 << std::endl;
+    }
 
     auto write_status = write_op->compute();
     std::cout << "write_status=" << write_status << std::endl;

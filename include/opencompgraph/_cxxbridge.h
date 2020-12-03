@@ -268,6 +268,7 @@ namespace opencompgraph {
   enum class OperationType : uint8_t;
   enum class AttrState : uint8_t;
   enum class AttrValueType : uint8_t;
+  enum class AttrId : uint8_t;
   using ThingC = ::opencompgraph::ThingC;
   struct ThingR;
   struct Operation;
@@ -309,6 +310,14 @@ enum class AttrValueType : uint8_t {
 };
 #endif // CXXBRIDGE1_ENUM_opencompgraph$AttrValueType
 
+#ifndef CXXBRIDGE1_ENUM_opencompgraph$AttrId
+#define CXXBRIDGE1_ENUM_opencompgraph$AttrId
+enum class AttrId : uint8_t {
+  ReadImage_FilePath = 0,
+  WriteImage_FilePath = 1,
+};
+#endif // CXXBRIDGE1_ENUM_opencompgraph$AttrId
+
 #ifndef CXXBRIDGE1_STRUCT_opencompgraph$Operation
 #define CXXBRIDGE1_STRUCT_opencompgraph$Operation
 struct Operation final : public ::rust::Opaque {
@@ -316,8 +325,9 @@ struct Operation final : public ::rust::Opaque {
   ::opencompgraph::OperationType get_op_type() const noexcept;
   uint8_t get_op_type_id() const noexcept;
   bool compute();
-  ::rust::String get_attr_str(::rust::Str name) const noexcept;
-  void set_attr(::rust::Str name, ::rust::Str value) noexcept;
+  ::opencompgraph::AttrState attr_exists(::opencompgraph::AttrId attr) const noexcept;
+  ::rust::String get_attr_string(::opencompgraph::AttrId attr) const noexcept;
+  void set_attr(::opencompgraph::AttrId attr, ::rust::String value) noexcept;
 };
 #endif // CXXBRIDGE1_STRUCT_opencompgraph$Operation
 

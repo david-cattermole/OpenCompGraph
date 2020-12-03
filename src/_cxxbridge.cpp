@@ -306,9 +306,6 @@ public:
     str.len = repr.len;
     return str;
   }
-  static repr::PtrLen repr(Str str) noexcept {
-    return repr::PtrLen{const_cast<char *>(str.ptr), str.len};
-  }
 };
 
 template <>
@@ -344,6 +341,7 @@ namespace opencompgraph {
   enum class OperationType : uint8_t;
   enum class AttrState : uint8_t;
   enum class AttrValueType : uint8_t;
+  enum class AttrId : uint8_t;
   using ThingC = ::opencompgraph::ThingC;
   struct ThingR;
   struct Operation;
@@ -385,6 +383,14 @@ enum class AttrValueType : uint8_t {
 };
 #endif // CXXBRIDGE1_ENUM_opencompgraph$AttrValueType
 
+#ifndef CXXBRIDGE1_ENUM_opencompgraph$AttrId
+#define CXXBRIDGE1_ENUM_opencompgraph$AttrId
+enum class AttrId : uint8_t {
+  ReadImage_FilePath = 0,
+  WriteImage_FilePath = 1,
+};
+#endif // CXXBRIDGE1_ENUM_opencompgraph$AttrId
+
 #ifndef CXXBRIDGE1_STRUCT_opencompgraph$Operation
 #define CXXBRIDGE1_STRUCT_opencompgraph$Operation
 struct Operation final : public ::rust::Opaque {
@@ -392,8 +398,9 @@ struct Operation final : public ::rust::Opaque {
   ::opencompgraph::OperationType get_op_type() const noexcept;
   uint8_t get_op_type_id() const noexcept;
   bool compute();
-  ::rust::String get_attr_str(::rust::Str name) const noexcept;
-  void set_attr(::rust::Str name, ::rust::Str value) noexcept;
+  ::opencompgraph::AttrState attr_exists(::opencompgraph::AttrId attr) const noexcept;
+  ::rust::String get_attr_string(::opencompgraph::AttrId attr) const noexcept;
+  void set_attr(::opencompgraph::AttrId attr, ::rust::String value) noexcept;
 };
 #endif // CXXBRIDGE1_STRUCT_opencompgraph$Operation
 
@@ -423,9 +430,11 @@ uint8_t opencompgraph$cxxbridge1$Operation$get_op_type_id(const ::opencompgraph:
 
 ::rust::repr::PtrLen opencompgraph$cxxbridge1$Operation$compute(::opencompgraph::Operation &self, bool *return$) noexcept;
 
-void opencompgraph$cxxbridge1$Operation$get_attr_str(const ::opencompgraph::Operation &self, ::rust::repr::PtrLen name, ::rust::String *return$) noexcept;
+::opencompgraph::AttrState opencompgraph$cxxbridge1$Operation$attr_exists(const ::opencompgraph::Operation &self, ::opencompgraph::AttrId attr) noexcept;
 
-void opencompgraph$cxxbridge1$Operation$set_attr_str(::opencompgraph::Operation &self, ::rust::repr::PtrLen name, ::rust::repr::PtrLen value) noexcept;
+void opencompgraph$cxxbridge1$Operation$get_attr_string(const ::opencompgraph::Operation &self, ::opencompgraph::AttrId attr, ::rust::String *return$) noexcept;
+
+void opencompgraph$cxxbridge1$Operation$set_attr_string(::opencompgraph::Operation &self, ::opencompgraph::AttrId attr, ::rust::String *value) noexcept;
 
 ::opencompgraph::Operation *opencompgraph$cxxbridge1$create_operation(size_t id, ::opencompgraph::OperationType op_type) noexcept;
 } // extern "C"
@@ -455,14 +464,18 @@ bool Operation::compute() {
   return ::std::move(return$.value);
 }
 
-::rust::String Operation::get_attr_str(::rust::Str name) const noexcept {
+::opencompgraph::AttrState Operation::attr_exists(::opencompgraph::AttrId attr) const noexcept {
+  return opencompgraph$cxxbridge1$Operation$attr_exists(*this, attr);
+}
+
+::rust::String Operation::get_attr_string(::opencompgraph::AttrId attr) const noexcept {
   ::rust::MaybeUninit<::rust::String> return$;
-  opencompgraph$cxxbridge1$Operation$get_attr_str(*this, ::rust::impl<::rust::Str>::repr(name), &return$.value);
+  opencompgraph$cxxbridge1$Operation$get_attr_string(*this, attr, &return$.value);
   return ::std::move(return$.value);
 }
 
-void Operation::set_attr(::rust::Str name, ::rust::Str value) noexcept {
-  opencompgraph$cxxbridge1$Operation$set_attr_str(*this, ::rust::impl<::rust::Str>::repr(name), ::rust::impl<::rust::Str>::repr(value));
+void Operation::set_attr(::opencompgraph::AttrId attr, ::rust::String value) noexcept {
+  opencompgraph$cxxbridge1$Operation$set_attr_string(*this, attr, &value);
 }
 
 ::rust::Box<::opencompgraph::Operation> create_operation(size_t id, ::opencompgraph::OperationType op_type) noexcept {
