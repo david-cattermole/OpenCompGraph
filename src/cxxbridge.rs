@@ -205,7 +205,7 @@ impl Operation {
     }
 
     fn get_op_type(&self) -> ffi::OperationType {
-        println!("Operation.get_op_type() -> {:?}", self.op_type.repr);
+        println!("Operation.get_op_type() -> {:?}", self.op_type);
         self.op_type
     }
 
