@@ -102,7 +102,6 @@ fn my_test() {
 }
 
 trait Compute {
-    fn get_id(&self) -> usize;
     fn compute(&mut self) -> Result<bool, &'static str>;
     fn attr_exists(&self, attr: ffi::AttrId) -> ffi::AttrState;
     fn get_attr_string(&self, attr: ffi::AttrId) -> String;
@@ -111,16 +110,10 @@ trait Compute {
 
 #[derive(Debug, Clone, Default)]
 struct ReadImageOpImpl {
-    id: usize,
     file_path: String,
 }
 
 impl Compute for ReadImageOpImpl {
-    fn get_id(&self) -> usize {
-        println!("ReadImageOpImpl.get_id() -> {}", self.id);
-        self.id
-    }
-
     fn compute(&mut self) -> Result<bool, &'static str> {
         println!("ReadImageOpImpl.compute()");
         Ok(true)
@@ -150,16 +143,10 @@ impl Compute for ReadImageOpImpl {
 
 #[derive(Debug, Clone, Default)]
 struct WriteImageOpImpl {
-    id: usize,
     file_path: String,
 }
 
 impl Compute for WriteImageOpImpl {
-    fn get_id(&self) -> usize {
-        println!("WriteImageOpImpl.get_id() -> {}", self.id);
-        self.id
-    }
-
     fn compute(&mut self) -> Result<bool, &'static str> {
         println!("WriteImageOpImpl.compute()");
         Ok(true)
@@ -188,13 +175,14 @@ impl Compute for WriteImageOpImpl {
 }
 
 pub struct Operation {
-    inner: Box<dyn Compute>,
     op_type: ffi::OperationType,
+    id: usize,
+    inner: Box<dyn Compute>,
 }
 
 impl Operation {
     fn get_id(&self) -> usize {
-        self.inner.get_id()
+        self.id
     }
 
     fn compute(&mut self) -> Result<bool, &'static str> {
@@ -229,15 +217,15 @@ pub fn create_operation(id: usize, op_type: ffi::OperationType) -> Box<Operation
     match op_type {
         ffi::OperationType::ReadImage => Box::new(Operation {
             op_type,
+            id,
             inner: Box::new(ReadImageOpImpl {
-                id,
                 file_path: "".to_string(),
             }),
         }),
         ffi::OperationType::WriteImage => Box::new(Operation {
             op_type,
+            id,
             inner: Box::new(WriteImageOpImpl {
-                id,
                 file_path: "".to_string(),
             }),
         }),
