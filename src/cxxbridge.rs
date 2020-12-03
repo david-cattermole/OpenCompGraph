@@ -102,7 +102,6 @@ fn my_test() {
 }
 
 trait Compute {
-    fn compute(&mut self) -> Result<bool, &'static str>;
     fn attr_exists(&self, attr: ffi::AttrId) -> ffi::AttrState;
     fn get_attr_string(&self, attr: ffi::AttrId) -> String;
     fn set_attr_string(&mut self, attr: ffi::AttrId, value: String);
@@ -113,12 +112,17 @@ struct ReadImageOpImpl {
     file_path: String,
 }
 
-impl Compute for ReadImageOpImpl {
-    fn compute(&mut self) -> Result<bool, &'static str> {
-        println!("ReadImageOpImpl.compute()");
-        Ok(true)
-    }
+fn read_image_compute() -> Result<bool, &'static str> {
+    println!("read_image_compute()");
+    Ok(true)
+}
 
+fn write_image_compute() -> Result<bool, &'static str> {
+    println!("write_image_compute()");
+    Ok(true)
+}
+
+impl Compute for ReadImageOpImpl {
     fn attr_exists(&self, attr: ffi::AttrId) -> ffi::AttrState {
         match attr {
             ffi::AttrId::ReadImage_FilePath => ffi::AttrState::Exists,
@@ -147,11 +151,6 @@ struct WriteImageOpImpl {
 }
 
 impl Compute for WriteImageOpImpl {
-    fn compute(&mut self) -> Result<bool, &'static str> {
-        println!("WriteImageOpImpl.compute()");
-        Ok(true)
-    }
-
     fn attr_exists(&self, attr: ffi::AttrId) -> ffi::AttrState {
         match attr {
             ffi::AttrId::WriteImage_FilePath => ffi::AttrState::Exists,
@@ -186,7 +185,11 @@ impl Operation {
     }
 
     fn compute(&mut self) -> Result<bool, &'static str> {
-        self.inner.compute()
+        match self.op_type {
+            ffi::OperationType::ReadImage => read_image_compute(),
+            ffi::OperationType::WriteImage => write_image_compute(),
+            _ => Ok(true),
+        }
     }
 
     fn attr_exists(&self, attr: ffi::AttrId) -> ffi::AttrState {
