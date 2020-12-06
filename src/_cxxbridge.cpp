@@ -297,7 +297,6 @@ namespace opencompgraph {
   enum class OperationType : uint8_t;
   enum class AttrState : uint8_t;
   enum class AttrDataType : uint8_t;
-  enum class AttrId : uint8_t;
   using ThingC = ::opencompgraph::ThingC;
   struct ThingR;
   struct Operation;
@@ -346,14 +345,6 @@ enum class AttrDataType : uint8_t {
   String = 11,
 };
 #endif // CXXBRIDGE1_ENUM_opencompgraph$AttrDataType
-
-#ifndef CXXBRIDGE1_ENUM_opencompgraph$AttrId
-#define CXXBRIDGE1_ENUM_opencompgraph$AttrId
-enum class AttrId : uint8_t {
-  ReadImage_FilePath = 0,
-  WriteImage_FilePath = 1,
-};
-#endif // CXXBRIDGE1_ENUM_opencompgraph$AttrId
 
 #ifndef CXXBRIDGE1_STRUCT_opencompgraph$Operation
 #define CXXBRIDGE1_STRUCT_opencompgraph$Operation

@@ -38,12 +38,6 @@ pub mod ffi {
         String = 11,
     }
 
-    #[repr(u8)]
-    #[derive(Debug, Copy, Clone, Hash)]
-    enum AttrId {
-        ReadImage_FilePath = 0,
-        WriteImage_FilePath = 1,
-    }
 
     // ThingC
     unsafe extern "C++" {
