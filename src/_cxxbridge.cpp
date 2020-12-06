@@ -1,6 +1,5 @@
 #include "opencompgraph/_cpp.h"
 #include "opencompgraph.h"
-#include <array>
 #include <cstddef>
 #include <cstdint>
 #include <exception>
@@ -14,58 +13,12 @@ namespace rust {
 inline namespace cxxbridge1 {
 // #include "rust/cxx.h"
 
-struct unsafe_bitcopy_t;
-
 namespace {
 template <typename T>
 class impl;
 } // namespace
 
-#ifndef CXXBRIDGE1_RUST_STRING
-#define CXXBRIDGE1_RUST_STRING
-class String final {
-public:
-  String() noexcept;
-  String(const String &) noexcept;
-  String(String &&) noexcept;
-  ~String() noexcept;
-
-  String(const std::string &);
-  String(const char *);
-  String(const char *, size_t);
-
-  String &operator=(const String &) noexcept;
-  String &operator=(String &&) noexcept;
-
-  explicit operator std::string() const;
-
-  const char *data() const noexcept;
-  size_t size() const noexcept;
-  size_t length() const noexcept;
-
-  using iterator = char *;
-  iterator begin() noexcept;
-  iterator end() noexcept;
-
-  using const_iterator = const char *;
-  const_iterator begin() const noexcept;
-  const_iterator end() const noexcept;
-  const_iterator cbegin() const noexcept;
-  const_iterator cend() const noexcept;
-
-  bool operator==(const String &) const noexcept;
-  bool operator!=(const String &) const noexcept;
-  bool operator<(const String &) const noexcept;
-  bool operator<=(const String &) const noexcept;
-  bool operator>(const String &) const noexcept;
-  bool operator>=(const String &) const noexcept;
-
-  String(unsafe_bitcopy_t, const String &) noexcept;
-
-private:
-  std::array<uintptr_t, 3> repr;
-};
-#endif // CXXBRIDGE1_RUST_STRING
+class String;
 
 #ifndef CXXBRIDGE1_RUST_STR
 #define CXXBRIDGE1_RUST_STR
@@ -306,6 +259,9 @@ public:
     str.len = repr.len;
     return str;
   }
+  static repr::PtrLen repr(Str str) noexcept {
+    return repr::PtrLen{const_cast<char *>(str.ptr), str.len};
+  }
 };
 
 template <>
@@ -406,9 +362,9 @@ struct Operation final : public ::rust::Opaque {
   ::opencompgraph::OperationType get_op_type() const noexcept;
   uint8_t get_op_type_id() const noexcept;
   bool compute();
-  ::opencompgraph::AttrState attr_exists(::opencompgraph::AttrId attr) const noexcept;
-  ::rust::String get_attr_string(::opencompgraph::AttrId attr) const noexcept;
-  void set_attr(::opencompgraph::AttrId attr, ::rust::String value) noexcept;
+  ::opencompgraph::AttrState attr_exists(::rust::Str name) const noexcept;
+  ::rust::Str get_attr_string(::rust::Str name) const noexcept;
+  void set_attr(::rust::Str name, ::rust::Str value) noexcept;
 };
 #endif // CXXBRIDGE1_STRUCT_opencompgraph$Operation
 
@@ -438,11 +394,11 @@ uint8_t opencompgraph$cxxbridge1$Operation$get_op_type_id(const ::opencompgraph:
 
 ::rust::repr::PtrLen opencompgraph$cxxbridge1$Operation$compute(::opencompgraph::Operation &self, bool *return$) noexcept;
 
-::opencompgraph::AttrState opencompgraph$cxxbridge1$Operation$attr_exists(const ::opencompgraph::Operation &self, ::opencompgraph::AttrId attr) noexcept;
+::opencompgraph::AttrState opencompgraph$cxxbridge1$Operation$attr_exists(const ::opencompgraph::Operation &self, ::rust::repr::PtrLen name) noexcept;
 
-void opencompgraph$cxxbridge1$Operation$get_attr_string(const ::opencompgraph::Operation &self, ::opencompgraph::AttrId attr, ::rust::String *return$) noexcept;
+::rust::repr::PtrLen opencompgraph$cxxbridge1$Operation$get_attr_string(const ::opencompgraph::Operation &self, ::rust::repr::PtrLen name) noexcept;
 
-void opencompgraph$cxxbridge1$Operation$set_attr_string(::opencompgraph::Operation &self, ::opencompgraph::AttrId attr, ::rust::String *value) noexcept;
+void opencompgraph$cxxbridge1$Operation$set_attr_string(::opencompgraph::Operation &self, ::rust::repr::PtrLen name, ::rust::repr::PtrLen value) noexcept;
 
 ::opencompgraph::Operation *opencompgraph$cxxbridge1$create_operation(size_t id, ::opencompgraph::OperationType op_type) noexcept;
 } // extern "C"
@@ -472,18 +428,16 @@ bool Operation::compute() {
   return ::std::move(return$.value);
 }
 
-::opencompgraph::AttrState Operation::attr_exists(::opencompgraph::AttrId attr) const noexcept {
-  return opencompgraph$cxxbridge1$Operation$attr_exists(*this, attr);
+::opencompgraph::AttrState Operation::attr_exists(::rust::Str name) const noexcept {
+  return opencompgraph$cxxbridge1$Operation$attr_exists(*this, ::rust::impl<::rust::Str>::repr(name));
 }
 
-::rust::String Operation::get_attr_string(::opencompgraph::AttrId attr) const noexcept {
-  ::rust::MaybeUninit<::rust::String> return$;
-  opencompgraph$cxxbridge1$Operation$get_attr_string(*this, attr, &return$.value);
-  return ::std::move(return$.value);
+::rust::Str Operation::get_attr_string(::rust::Str name) const noexcept {
+  return ::rust::impl<::rust::Str>::new_unchecked(opencompgraph$cxxbridge1$Operation$get_attr_string(*this, ::rust::impl<::rust::Str>::repr(name)));
 }
 
-void Operation::set_attr(::opencompgraph::AttrId attr, ::rust::String value) noexcept {
-  opencompgraph$cxxbridge1$Operation$set_attr_string(*this, attr, &value);
+void Operation::set_attr(::rust::Str name, ::rust::Str value) noexcept {
+  opencompgraph$cxxbridge1$Operation$set_attr_string(*this, ::rust::impl<::rust::Str>::repr(name), ::rust::impl<::rust::Str>::repr(value));
 }
 
 ::rust::Box<::opencompgraph::Operation> create_operation(size_t id, ::opencompgraph::OperationType op_type) noexcept {

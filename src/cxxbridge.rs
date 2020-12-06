@@ -9,6 +9,7 @@ pub mod ffi {
     #[repr(u8)]
     #[derive(Debug, Copy, Clone, Hash)]
     enum OperationType {
+        // Creation / Input / Output
         ReadImage = 0,
         WriteImage = 1,
     }
@@ -69,12 +70,12 @@ pub mod ffi {
         fn get_op_type_id(&self) -> u8;
         fn compute(&mut self) -> Result<bool>;
 
-        fn attr_exists(&self, attr: AttrId) -> AttrState;
+        fn attr_exists(&self, name: &str) -> AttrState;
 
-        fn get_attr_string(&self, attr: AttrId) -> String;
+        unsafe fn get_attr_string<'a, 'b>(&'b self, name: &'a str) -> &'b str;
 
         #[cxx_name = "set_attr"]
-        fn set_attr_string(&mut self, attr: AttrId, value: String);
+        fn set_attr_string(&mut self, name: &str, value: &str);
     }
 
     extern "Rust" {
@@ -101,73 +102,89 @@ fn my_test() {
     });
 }
 
+trait AttrBlock {
+    fn attr_exists(&self, name: &str) -> ffi::AttrState;
+    fn get_attr_string(&self, name: &str) -> &str;
+    fn set_attr_string(&mut self, name: &str, value: &str);
+}
+
 trait Compute {
-    fn attr_exists(&self, attr: ffi::AttrId) -> ffi::AttrState;
-    fn get_attr_string(&self, attr: ffi::AttrId) -> String;
-    fn set_attr_string(&mut self, attr: ffi::AttrId, value: String);
+    fn compute(&mut self, attr_block: &Box<dyn AttrBlock>) -> Result<bool, &'static str>;
 }
 
 #[derive(Debug, Clone, Default)]
-struct ReadImageOpImpl {
+struct ReadImageCompute {}
+
+#[derive(Debug, Clone, Default)]
+struct ReadImageAttrs {
     file_path: String,
 }
 
-fn read_image_compute() -> Result<bool, &'static str> {
-    println!("read_image_compute()");
-    Ok(true)
+impl Compute for ReadImageCompute {
+    fn compute(&mut self, attr_block: &Box<dyn AttrBlock>) -> Result<bool, &'static str> {
+        println!("ReadImageCompute.compute()");
+        println!("file_name={}", attr_block.get_attr_string("file_path"));
+        Ok(true)
+    }
 }
 
-fn write_image_compute() -> Result<bool, &'static str> {
-    println!("write_image_compute()");
-    Ok(true)
-}
-
-impl Compute for ReadImageOpImpl {
-    fn attr_exists(&self, attr: ffi::AttrId) -> ffi::AttrState {
-        match attr {
-            ffi::AttrId::ReadImage_FilePath => ffi::AttrState::Exists,
+impl AttrBlock for ReadImageAttrs {
+    fn attr_exists(&self, name: &str) -> ffi::AttrState {
+        match name {
+            "file_path" => ffi::AttrState::Exists,
             _ => ffi::AttrState::Missing,
         }
     }
 
-    fn get_attr_string(&self, attr: ffi::AttrId) -> String {
-        match attr {
-            ffi::AttrId::ReadImage_FilePath => self.file_path.clone(),
-            _ => "".to_string(),
+    fn get_attr_string(&self, name: &str) -> &str {
+        match name {
+            "file_path" => &self.file_path,
+            _ => "",
         }
     }
 
-    fn set_attr_string(&mut self, attr: ffi::AttrId, value: String) {
-        match attr {
-            ffi::AttrId::ReadImage_FilePath => self.file_path = value,
+    fn set_attr_string(&mut self, name: &str, value: &str) {
+        match name {
+            "file_path" => self.file_path = value.to_string(),
             _ => (),
         };
     }
 }
 
 #[derive(Debug, Clone, Default)]
-struct WriteImageOpImpl {
+struct WriteImageCompute {}
+
+#[derive(Debug, Clone, Default)]
+struct WriteImageAttrs {
     file_path: String,
 }
 
-impl Compute for WriteImageOpImpl {
-    fn attr_exists(&self, attr: ffi::AttrId) -> ffi::AttrState {
-        match attr {
-            ffi::AttrId::WriteImage_FilePath => ffi::AttrState::Exists,
+impl Compute for WriteImageCompute {
+    fn compute(&mut self, attr_block: &Box<dyn AttrBlock>) -> Result<bool, &'static str> {
+        println!("WriteImageCompute.compute()");
+        println!("file_name={}", attr_block.get_attr_string("file_path"));
+        Ok(true)
+    }
+}
+
+impl AttrBlock for WriteImageAttrs {
+    fn attr_exists(&self, name: &str) -> ffi::AttrState {
+        match name {
+            "file_path" => ffi::AttrState::Exists,
             _ => ffi::AttrState::Missing,
         }
     }
 
-    fn get_attr_string(&self, attr: ffi::AttrId) -> String {
-        match attr {
-            ffi::AttrId::WriteImage_FilePath => self.file_path.clone(),
-            _ => "".to_string(),
+    fn get_attr_string(&self, name: &str) -> &str {
+        match name {
+            "file_path" => &self.file_path,
+            _ => "",
         }
     }
 
-    fn set_attr_string(&mut self, attr: ffi::AttrId, value: String) {
-        match attr {
-            ffi::AttrId::WriteImage_FilePath => self.file_path = value,
+    fn set_attr_string(&mut self, name: &str, value: &str) {
+        match name {
+            "file_path" => self.file_path = value.to_string(),
             _ => (),
         };
     }
@@ -176,32 +193,13 @@ impl Compute for WriteImageOpImpl {
 pub struct Operation {
     op_type: ffi::OperationType,
     id: usize,
-    inner: Box<dyn Compute>,
+    compute: Box<dyn Compute>,
+    attr_block: Box<dyn AttrBlock>,
 }
 
 impl Operation {
     fn get_id(&self) -> usize {
         self.id
-    }
-
-    fn compute(&mut self) -> Result<bool, &'static str> {
-        match self.op_type {
-            ffi::OperationType::ReadImage => read_image_compute(),
-            ffi::OperationType::WriteImage => write_image_compute(),
-            _ => Ok(true),
-        }
-    }
-
-    fn attr_exists(&self, attr: ffi::AttrId) -> ffi::AttrState {
-        self.inner.attr_exists(attr)
-    }
-
-    fn get_attr_string(&self, attr: ffi::AttrId) -> String {
-        self.inner.get_attr_string(attr)
-    }
-
-    fn set_attr_string(&mut self, attr: ffi::AttrId, value: String) {
-        self.inner.set_attr_string(attr, value);
     }
 
     fn get_op_type(&self) -> ffi::OperationType {
@@ -213,6 +211,22 @@ impl Operation {
         println!("Operation.get_op_type_id() -> {}", self.op_type.repr);
         self.op_type.repr
     }
+
+    fn compute(&mut self) -> Result<bool, &'static str> {
+        self.compute.compute(&self.attr_block)
+    }
+
+    fn attr_exists(&self, name: &str) -> ffi::AttrState {
+        self.attr_block.attr_exists(name)
+    }
+
+    fn get_attr_string(&self, name: &str) -> &str {
+        self.attr_block.get_attr_string(name)
+    }
+
+    fn set_attr_string(&mut self, name: &str, value: &str) {
+        self.attr_block.set_attr_string(name, value);
+    }
 }
 
 pub fn create_operation(id: usize, op_type: ffi::OperationType) -> Box<Operation> {
@@ -221,14 +235,16 @@ pub fn create_operation(id: usize, op_type: ffi::OperationType) -> Box<Operation
         ffi::OperationType::ReadImage => Box::new(Operation {
             op_type,
             id,
-            inner: Box::new(ReadImageOpImpl {
+            compute: Box::new(ReadImageCompute {}),
+            attr_block: Box::new(ReadImageAttrs {
                 file_path: "".to_string(),
             }),
         }),
         ffi::OperationType::WriteImage => Box::new(Operation {
             op_type,
             id,
-            inner: Box::new(WriteImageOpImpl {
+            compute: Box::new(WriteImageCompute {}),
+            attr_block: Box::new(WriteImageAttrs {
                 file_path: "".to_string(),
             }),
         }),
