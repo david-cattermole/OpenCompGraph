@@ -200,6 +200,7 @@ int test_c() {
     auto read_op_type_id = read_op->get_op_type_id();
     std::cout << "read_op_type_id=" << std::hex << read_op_type_id << std::endl;
 
+    // Set string attribute
     auto read_attr = "file_path";
     if (read_op->attr_exists(read_attr) == ocg::AttrState::Exists) {
         auto read_path1 = read_op->get_attr_string(read_attr);
@@ -210,13 +211,46 @@ int test_c() {
         std::cout << "read_path2=" << read_path2 << std::endl;
     }
 
-    auto read_status = read_op->compute();
-    std::cout << "read_status=" << read_status << std::endl;
-    // auto read_result = ocg::get_op_result(read_op);
-    // auto read_hash = ocg::get_result_hash(read_result);
+    // // Set float attribute
+    // auto read_attr_x = "x";
+    // if (read_op->attr_exists(read_attr_x) == ocg::AttrState::Exists) {
+    //     auto read_x = read_op->get_attr_f32(read_attr_x);
+    //     std::cout << "read_x=" << read_path1 << std::endl;
+
+    //     read_op->set_attr(read_attr_x, 3.147);
+    //     auto read_x2 = read_op->get_attr_f32(read_attr_x);
+    //     std::cout << "read_x2=" << read_x2 << std::endl;
+    // }
+
+    // // Set integer attribute
+    // auto read_attr_y = "y";
+    // if (read_op->attr_exists(read_attr_y) == ocg::AttrState::Exists) {
+    //     auto read_y = read_op->get_attr_f32(read_attr_y);
+    //     std::cout << "read_y=" << read_path1 << std::endl;
+
+    //     read_op->set_attr(read_attr_y, 42);
+    //     auto read_y2 = read_op->get_attr_f32(read_attr_y);
+    //     std::cout << "read_y2=" << read_y2 << std::endl;
+    // }
+
+    auto read_op_hash = read_op->hash();
+    std::cout << "read_op_hash=" << read_op_hash << std::endl;
+
+    read_op->compute();
+    // auto read_status = read_op->get_compute_status();
+    // std::cout << "read_status=" << read_status << std::endl;
+    
+    // auto read_output = read_op->get_output();
+    // auto read_hash = read_output->get_hash();
+    // auto read_pixels = read_output->get_pixel_block();
+    // auto read_bbox = read_output->get_bounding_box();
+    // auto read_cmat = read_output->get_color_matrix();
+    // auto read_tmat = read_output->get_transform_matrix();
 
     auto write_op = ocg::create_operation(id++, ocg::OperationType::WriteImage);
     std::cout << "write_op=" << &write_op << std::endl;
+
+    // write_op->set_input(0, read_op);
 
     auto write_id2 = write_op->get_id();
     std::cout << "write_id2=" << write_id2 << std::endl;
@@ -238,7 +272,7 @@ int test_c() {
     }
 
     auto write_status = write_op->compute();
-    std::cout << "write_status=" << write_status << std::endl;
+    std::cout << "write_status=" << static_cast<uint8_t>(write_status) << std::endl;
     // auto write_result = ocg::get_op_result(write_op);
     // auto write_hash = ocg::get_result_hash(read_result);
 

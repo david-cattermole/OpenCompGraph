@@ -1,5 +1,7 @@
+use crate::data::{BoundingBox2D, Matrix4, PixelBlock};
 use crate::ops::create_operation;
 use crate::ops::Operation;
+use cxx::{CxxString, UniquePtr};
 
 #[rustfmt::skip]
 #[cxx::bridge(namespace = "opencompgraph")]
@@ -12,7 +14,7 @@ pub mod ffi {
 
     #[repr(u8)]
     #[derive(Debug, Copy, Clone, Hash)]
-    enum OperationType {
+    pub(crate) enum OperationType {
         // Creation / Input / Output
         ReadImage = 0,
         WriteImage = 1,
@@ -20,26 +22,16 @@ pub mod ffi {
 
     #[repr(u8)]
     #[derive(Debug, Copy, Clone, Hash)]
-    enum AttrState {
-        Missing = 0,
-        Exists = 1,
+    pub(crate) enum ComputeStatus {
+        Failure = 0,
+        Success = 1,
     }
 
     #[repr(u8)]
     #[derive(Debug, Copy, Clone, Hash)]
-    enum AttrDataType {
-        None = 0,
-        UnsignedInteger8 = 1,  // C++ uint8_t
-        UnsignedInteger16 = 2, // C++ uint16_t
-        UnsignedInteger32 = 3, // C++ uint32_t
-        UnsignedInteger64 = 4, // C++ uint64_t
-        SignedInteger8 = 5,    // C++ int8_t
-        SignedInteger16 = 6,   // C++ int16_t
-        SignedInteger32 = 7,   // C++ int32_t
-        SignedInteger64 = 8,   // C++ int64_t
-        Float32 = 9,           // C++ float
-        Float64 = 10,          // C++ double
-        String = 11,
+    pub(crate) enum AttrState {
+        Missing = 0,
+        Exists = 1,
     }
 
 
@@ -60,18 +52,36 @@ pub mod ffi {
         fn print_r(r: &ThingR);
     }
 
+    // PixelBlock
+    extern "Rust" {
+        type PixelBlock;
+    }
+
+    // BoundingBox2D
+    extern "Rust" {
+        type BoundingBox2D;
+    }
+
+    // Matrix4
+    extern "Rust" {
+        type Matrix4;
+    }
+
     // Operation
     extern "Rust" {
         type Operation;
         fn get_id(&self) -> usize;
         fn get_op_type(&self) -> OperationType;
         fn get_op_type_id(&self) -> u8;
-        fn compute(&mut self) -> Result<bool>;
 
+        // Compute
+        fn hash(&mut self) -> usize;
+        fn compute(&mut self) -> ComputeStatus;
+
+
+        // AttrBlock
         fn attr_exists(&self, name: &str) -> AttrState;
-
         unsafe fn get_attr_string<'a, 'b>(&'b self, name: &'a str) -> &'b str;
-
         #[cxx_name = "set_attr"]
         fn set_attr_string(&mut self, name: &str, value: &str);
     }
@@ -79,7 +89,6 @@ pub mod ffi {
     extern "Rust" {
         fn create_operation(id: usize, op_type: OperationType) -> Box<Operation>;
     }
-
 }
 
 pub struct ThingR(usize);
@@ -98,4 +107,45 @@ fn my_test() {
         y: Box::new(ThingR(333)),
         x,
     });
+}
+
+pub struct Output {
+    hash: usize,
+    bbox: BoundingBox2D,
+    pixel_block: Box<PixelBlock>,
+    color_matrix: Matrix4,
+    transform_matrix: Matrix4,
+}
+
+impl Output {
+    pub fn new() -> Output {
+        let hash = 0;
+        let bbox = BoundingBox2D { data: true };
+        let pixel_block = Box::new(PixelBlock { data: true });
+        let color_matrix = Matrix4 { data: true };
+        let transform_matrix = Matrix4 { data: true };
+        Output {
+            hash,
+            bbox,
+            pixel_block,
+            color_matrix,
+            transform_matrix,
+        }
+    }
+
+    pub fn get_hash(&self) -> usize {
+        self.hash
+    }
+    pub fn get_bounding_box(&self) -> BoundingBox2D {
+        self.bbox
+    }
+    pub fn get_pixel_block(&self) -> &PixelBlock {
+        &self.pixel_block
+    }
+    pub fn get_color_matrix(&self) -> Matrix4 {
+        self.color_matrix
+    }
+    pub fn get_transform_matrix(&self) -> Matrix4 {
+        self.transform_matrix
+    }
 }

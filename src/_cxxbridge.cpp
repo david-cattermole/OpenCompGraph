@@ -2,7 +2,6 @@
 #include "opencompgraph.h"
 #include <cstddef>
 #include <cstdint>
-#include <exception>
 #include <memory>
 #include <new>
 #include <string>
@@ -204,27 +203,6 @@ template <typename T>
 Box<T>::Box() noexcept = default;
 #endif // CXXBRIDGE1_RUST_BOX
 
-#ifndef CXXBRIDGE1_RUST_ERROR
-#define CXXBRIDGE1_RUST_ERROR
-class Error final : public std::exception {
-public:
-  Error(const Error &);
-  Error(Error &&) noexcept;
-  ~Error() noexcept override;
-
-  Error &operator=(const Error &);
-  Error &operator=(Error &&) noexcept;
-
-  const char *what() const noexcept override;
-
-private:
-  Error() noexcept = default;
-  friend impl<Error>;
-  const char *msg;
-  size_t len;
-};
-#endif // CXXBRIDGE1_RUST_ERROR
-
 #ifndef CXXBRIDGE1_RUST_OPAQUE
 #define CXXBRIDGE1_RUST_OPAQUE
 class Opaque {
@@ -234,13 +212,6 @@ public:
   ~Opaque() = delete;
 };
 #endif // CXXBRIDGE1_RUST_OPAQUE
-
-template <typename T>
-union MaybeUninit {
-  T value;
-  MaybeUninit() {}
-  ~MaybeUninit() {}
-};
 
 namespace {
 namespace repr {
@@ -264,17 +235,6 @@ public:
   }
 };
 
-template <>
-class impl<Error> final {
-public:
-  static Error error(repr::PtrLen repr) noexcept {
-    Error error;
-    error.msg = static_cast<const char *>(repr.ptr);
-    error.len = repr.len;
-    return error;
-  }
-};
-
 template <typename T, typename = size_t>
 struct is_complete : std::false_type {};
 
@@ -295,10 +255,13 @@ template <> struct deleter_if<true> {
 namespace opencompgraph {
   struct SharedThing;
   enum class OperationType : uint8_t;
+  enum class ComputeStatus : uint8_t;
   enum class AttrState : uint8_t;
-  enum class AttrDataType : uint8_t;
   using ThingC = ::opencompgraph::ThingC;
   struct ThingR;
+  struct PixelBlock;
+  struct BoundingBox2D;
+  struct Matrix4;
   struct Operation;
 }
 
@@ -320,6 +283,14 @@ enum class OperationType : uint8_t {
 };
 #endif // CXXBRIDGE1_ENUM_opencompgraph$OperationType
 
+#ifndef CXXBRIDGE1_ENUM_opencompgraph$ComputeStatus
+#define CXXBRIDGE1_ENUM_opencompgraph$ComputeStatus
+enum class ComputeStatus : uint8_t {
+  Failure = 0,
+  Success = 1,
+};
+#endif // CXXBRIDGE1_ENUM_opencompgraph$ComputeStatus
+
 #ifndef CXXBRIDGE1_ENUM_opencompgraph$AttrState
 #define CXXBRIDGE1_ENUM_opencompgraph$AttrState
 enum class AttrState : uint8_t {
@@ -328,31 +299,14 @@ enum class AttrState : uint8_t {
 };
 #endif // CXXBRIDGE1_ENUM_opencompgraph$AttrState
 
-#ifndef CXXBRIDGE1_ENUM_opencompgraph$AttrDataType
-#define CXXBRIDGE1_ENUM_opencompgraph$AttrDataType
-enum class AttrDataType : uint8_t {
-  None = 0,
-  UnsignedInteger8 = 1,
-  UnsignedInteger16 = 2,
-  UnsignedInteger32 = 3,
-  UnsignedInteger64 = 4,
-  SignedInteger8 = 5,
-  SignedInteger16 = 6,
-  SignedInteger32 = 7,
-  SignedInteger64 = 8,
-  Float32 = 9,
-  Float64 = 10,
-  String = 11,
-};
-#endif // CXXBRIDGE1_ENUM_opencompgraph$AttrDataType
-
 #ifndef CXXBRIDGE1_STRUCT_opencompgraph$Operation
 #define CXXBRIDGE1_STRUCT_opencompgraph$Operation
 struct Operation final : public ::rust::Opaque {
   size_t get_id() const noexcept;
   ::opencompgraph::OperationType get_op_type() const noexcept;
   uint8_t get_op_type_id() const noexcept;
-  bool compute();
+  size_t hash() noexcept;
+  ::opencompgraph::ComputeStatus compute() noexcept;
   ::opencompgraph::AttrState attr_exists(::rust::Str name) const noexcept;
   ::rust::Str get_attr_string(::rust::Str name) const noexcept;
   void set_attr(::rust::Str name, ::rust::Str value) noexcept;
@@ -383,7 +337,9 @@ size_t opencompgraph$cxxbridge1$Operation$get_id(const ::opencompgraph::Operatio
 
 uint8_t opencompgraph$cxxbridge1$Operation$get_op_type_id(const ::opencompgraph::Operation &self) noexcept;
 
-::rust::repr::PtrLen opencompgraph$cxxbridge1$Operation$compute(::opencompgraph::Operation &self, bool *return$) noexcept;
+size_t opencompgraph$cxxbridge1$Operation$hash(::opencompgraph::Operation &self) noexcept;
+
+::opencompgraph::ComputeStatus opencompgraph$cxxbridge1$Operation$compute(::opencompgraph::Operation &self) noexcept;
 
 ::opencompgraph::AttrState opencompgraph$cxxbridge1$Operation$attr_exists(const ::opencompgraph::Operation &self, ::rust::repr::PtrLen name) noexcept;
 
@@ -410,13 +366,12 @@ uint8_t Operation::get_op_type_id() const noexcept {
   return opencompgraph$cxxbridge1$Operation$get_op_type_id(*this);
 }
 
-bool Operation::compute() {
-  ::rust::MaybeUninit<bool> return$;
-  ::rust::repr::PtrLen error$ = opencompgraph$cxxbridge1$Operation$compute(*this, &return$.value);
-  if (error$.ptr) {
-    throw ::rust::impl<::rust::Error>::error(error$);
-  }
-  return ::std::move(return$.value);
+size_t Operation::hash() noexcept {
+  return opencompgraph$cxxbridge1$Operation$hash(*this);
+}
+
+::opencompgraph::ComputeStatus Operation::compute() noexcept {
+  return opencompgraph$cxxbridge1$Operation$compute(*this);
 }
 
 ::opencompgraph::AttrState Operation::attr_exists(::rust::Str name) const noexcept {

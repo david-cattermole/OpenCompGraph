@@ -1,16 +1,18 @@
-use crate::cxxbridge::ffi::AttrState;
 use crate::cxxbridge::ffi::OperationType;
-use crate::traits::AttrBlock;
-use crate::traits::Compute;
+use crate::cxxbridge::ffi::{AttrState, ComputeStatus};
+use crate::cxxbridge::Output;
+use crate::data::{BoundingBox2D, Matrix4, PixelBlock};
 
 pub mod read_image;
+pub mod traits;
 pub mod write_image;
 
 pub struct Operation {
     op_type: OperationType,
     id: usize,
-    compute: Box<dyn Compute>,
-    attr_block: Box<dyn AttrBlock>,
+    attr_block: Box<dyn traits::AttrBlock>,
+    compute: Box<dyn traits::Compute>,
+    output: Box<Output>,
 }
 
 impl Operation {
@@ -28,8 +30,15 @@ impl Operation {
         self.op_type.repr
     }
 
-    pub fn compute(&mut self) -> Result<bool, &'static str> {
-        self.compute.compute(&self.attr_block)
+    pub fn hash(&mut self) -> usize {
+        println!("Operation.hash() -> {}", self.id);
+        let id = self.get_id();
+        let op_type_id = self.get_op_type_id();
+        self.compute.hash(id, op_type_id, &self.attr_block)
+    }
+
+    pub fn compute(&mut self) -> ComputeStatus {
+        self.compute.compute(&self.attr_block, &self.output)
     }
 
     pub fn attr_exists(&self, name: &str) -> AttrState {
@@ -55,6 +64,7 @@ pub fn create_operation(id: usize, op_type: OperationType) -> Box<Operation> {
             attr_block: Box::new(read_image::ReadImageAttrs {
                 file_path: "".to_string(),
             }),
+            output: Box::new(Output::new()),
         }),
         OperationType::WriteImage => Box::new(Operation {
             op_type,
@@ -63,6 +73,7 @@ pub fn create_operation(id: usize, op_type: OperationType) -> Box<Operation> {
             attr_block: Box::new(write_image::WriteImageAttrs {
                 file_path: "".to_string(),
             }),
+            output: Box::new(Output::new()),
         }),
         _ => panic!("Invalid OperationType: {:?}", op_type),
     }

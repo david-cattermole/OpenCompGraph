@@ -1,6 +1,8 @@
-use crate::cxxbridge::ffi::AttrState;
-use crate::traits::AttrBlock;
-use crate::traits::Compute;
+use std::string::String;
+
+use crate::cxxbridge::ffi::{AttrState, ComputeStatus};
+use crate::cxxbridge::Output;
+use crate::ops::traits::{AttrBlock, Compute};
 
 #[derive(Debug, Clone, Default)]
 pub struct ReadImageCompute {}
@@ -11,10 +13,19 @@ pub struct ReadImageAttrs {
 }
 
 impl Compute for ReadImageCompute {
-    fn compute(&mut self, attr_block: &Box<dyn AttrBlock>) -> Result<bool, &'static str> {
+    fn hash(
+        &mut self,
+        id: usize,
+        op_type_id: u8,
+        attr_block: &Box<dyn AttrBlock>,
+    ) -> usize {
+        0
+    }
+
+    fn compute(&mut self, attr_block: &Box<dyn AttrBlock>, output: &Box<Output>) -> ComputeStatus {
         println!("ReadImageCompute.compute()");
-        println!("file_name={}", attr_block.get_attr_string("file_path"));
-        Ok(true)
+        println!("AttrBlock: {:?}", attr_block);
+        ComputeStatus::Success
     }
 }
 
