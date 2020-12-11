@@ -16,15 +16,18 @@ pub mod ffi {
     #[derive(Debug, Copy, Clone, Hash)]
     pub(crate) enum OperationType {
         // Creation / Input / Output
-        ReadImage = 0,
-        WriteImage = 1,
+        Null = 0,
+        ReadImage = 1,
+        WriteImage = 2,
     }
 
     #[repr(u8)]
     #[derive(Debug, Copy, Clone, Hash)]
-    pub(crate) enum ComputeStatus {
-        Failure = 0,
-        Success = 1,
+    pub(crate) enum OperationStatus {
+        Error = 0,
+        Warning = 1,
+        Valid = 2,
+        Uninitialized = 3,
     }
 
     #[repr(u8)]
@@ -73,10 +76,12 @@ pub mod ffi {
         fn get_id(&self) -> usize;
         fn get_op_type(&self) -> OperationType;
         fn get_op_type_id(&self) -> u8;
+        fn get_status(&self) -> OperationStatus;
+        fn get_status_id(&self) -> u8;
 
         // Compute
         fn hash(&mut self) -> usize;
-        fn compute(&mut self) -> ComputeStatus;
+        fn compute(&mut self) -> OperationStatus;
 
 
         // AttrBlock
@@ -101,7 +106,6 @@ fn print_r(r: &ThingR) {
 fn my_test() {
     let x = ffi::make_thingc("demo of cxx::bridge");
     println!("this is a \"{}\"", ffi::get_name(x.as_ref().unwrap()));
-
     ffi::run_sharedthing(ffi::SharedThing {
         z: 222,
         y: Box::new(ThingR(333)),
@@ -109,6 +113,7 @@ fn my_test() {
     });
 }
 
+#[derive(Debug, Clone, Hash)]
 pub struct Output {
     hash: usize,
     bbox: BoundingBox2D,
@@ -120,10 +125,10 @@ pub struct Output {
 impl Output {
     pub fn new() -> Output {
         let hash = 0;
-        let bbox = BoundingBox2D { data: true };
-        let pixel_block = Box::new(PixelBlock { data: true });
-        let color_matrix = Matrix4 { data: true };
-        let transform_matrix = Matrix4 { data: true };
+        let bbox = BoundingBox2D::default();
+        let pixel_block = Box::new(PixelBlock::default());
+        let color_matrix = Matrix4::default();
+        let transform_matrix = Matrix4::default();
         Output {
             hash,
             bbox,

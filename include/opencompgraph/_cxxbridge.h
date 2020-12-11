@@ -219,7 +219,7 @@ public:
 namespace opencompgraph {
   struct SharedThing;
   enum class OperationType : uint8_t;
-  enum class ComputeStatus : uint8_t;
+  enum class OperationStatus : uint8_t;
   enum class AttrState : uint8_t;
   using ThingC = ::opencompgraph::ThingC;
   struct ThingR;
@@ -242,18 +242,21 @@ struct SharedThing final {
 #ifndef CXXBRIDGE1_ENUM_opencompgraph$OperationType
 #define CXXBRIDGE1_ENUM_opencompgraph$OperationType
 enum class OperationType : uint8_t {
-  ReadImage = 0,
-  WriteImage = 1,
+  Null = 0,
+  ReadImage = 1,
+  WriteImage = 2,
 };
 #endif // CXXBRIDGE1_ENUM_opencompgraph$OperationType
 
-#ifndef CXXBRIDGE1_ENUM_opencompgraph$ComputeStatus
-#define CXXBRIDGE1_ENUM_opencompgraph$ComputeStatus
-enum class ComputeStatus : uint8_t {
-  Failure = 0,
-  Success = 1,
+#ifndef CXXBRIDGE1_ENUM_opencompgraph$OperationStatus
+#define CXXBRIDGE1_ENUM_opencompgraph$OperationStatus
+enum class OperationStatus : uint8_t {
+  Error = 0,
+  Warning = 1,
+  Valid = 2,
+  Uninitialized = 3,
 };
-#endif // CXXBRIDGE1_ENUM_opencompgraph$ComputeStatus
+#endif // CXXBRIDGE1_ENUM_opencompgraph$OperationStatus
 
 #ifndef CXXBRIDGE1_ENUM_opencompgraph$AttrState
 #define CXXBRIDGE1_ENUM_opencompgraph$AttrState
@@ -269,8 +272,10 @@ struct Operation final : public ::rust::Opaque {
   size_t get_id() const noexcept;
   ::opencompgraph::OperationType get_op_type() const noexcept;
   uint8_t get_op_type_id() const noexcept;
+  ::opencompgraph::OperationStatus get_status() const noexcept;
+  uint8_t get_status_id() const noexcept;
   size_t hash() noexcept;
-  ::opencompgraph::ComputeStatus compute() noexcept;
+  ::opencompgraph::OperationStatus compute() noexcept;
   ::opencompgraph::AttrState attr_exists(::rust::Str name) const noexcept;
   ::rust::Str get_attr_string(::rust::Str name) const noexcept;
   void set_attr(::rust::Str name, ::rust::Str value) noexcept;

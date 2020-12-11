@@ -7,31 +7,29 @@ use crate::ops::Operation;
 
 pub fn new(id: usize) -> Box<Operation> {
     Box::new(Operation {
-        op_type: OperationType::WriteImage,
+        op_type: OperationType::Null,
         id,
         op_status: OperationStatus::Uninitialized,
-        compute: Box::new(WriteImageCompute {}),
-        attr_block: Box::new(WriteImageAttrs {
-            file_path: "".to_string(),
-        }),
+        compute: Box::new(NullCompute {}),
+        attr_block: Box::new(NullAttrs {}),
+        // inputs: Vec::<Option<&Operation>>::new(),
         output: Box::new(Output::new()),
     })
 }
 
 #[derive(Debug, Clone, Default)]
-pub struct WriteImageCompute {}
+pub struct NullCompute {}
 
 #[derive(Debug, Clone, Default)]
-pub struct WriteImageAttrs {
-    pub file_path: String,
-}
+pub struct NullAttrs {}
 
-impl Compute for WriteImageCompute {
+impl Compute for NullCompute {
     fn hash(
         &mut self,
         id: usize,
         op_type_id: u8,
         attr_block: &Box<dyn AttrBlock>,
+        // inputs: &Vec<Option<&Operation>>,
     ) -> usize {
         0
     }
@@ -41,33 +39,22 @@ impl Compute for WriteImageCompute {
         attr_block: &Box<dyn AttrBlock>,
         output: &mut Box<Output>,
     ) -> OperationStatus {
-        println!("WriteImageCompute.compute()");
+        println!("NullCompute.compute()");
         println!("AttrBlock: {:?}", attr_block);
-        println!("Output: {:?}", output);
-        println!("Output: {:?}", output);
         OperationStatus::Valid
     }
 }
 
-impl AttrBlock for WriteImageAttrs {
+impl AttrBlock for NullAttrs {
     fn attr_exists(&self, name: &str) -> AttrState {
-        match name {
-            "file_path" => AttrState::Exists,
-            _ => AttrState::Missing,
-        }
+        AttrState::Missing
     }
 
     fn get_attr_string(&self, name: &str) -> &str {
-        match name {
-            "file_path" => &self.file_path,
-            _ => "",
-        }
+        ""
     }
 
     fn set_attr_string(&mut self, name: &str, value: &str) {
-        match name {
-            "file_path" => self.file_path = value.to_string(),
-            _ => (),
-        };
+        ()
     }
 }

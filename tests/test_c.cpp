@@ -237,9 +237,9 @@ int test_c() {
     std::cout << "read_op_hash=" << read_op_hash << std::endl;
 
     read_op->compute();
-    // auto read_status = read_op->get_compute_status();
-    // std::cout << "read_status=" << read_status << std::endl;
-    
+    auto read_status = read_op->get_status_id();
+    std::cout << "read_status=" << read_status << std::endl;
+
     // auto read_output = read_op->get_output();
     // auto read_hash = read_output->get_hash();
     // auto read_pixels = read_output->get_pixel_block();
@@ -271,8 +271,9 @@ int test_c() {
         std::cout << "write_path2=" << write_path2 << std::endl;
     }
 
-    auto write_status = write_op->compute();
-    std::cout << "write_status=" << static_cast<uint8_t>(write_status) << std::endl;
+    write_op->compute();
+    auto write_status = write_op->get_status_id();
+    std::cout << "write_status=" << write_status << std::endl;
     // auto write_result = ocg::get_op_result(write_op);
     // auto write_hash = ocg::get_result_hash(read_result);
 

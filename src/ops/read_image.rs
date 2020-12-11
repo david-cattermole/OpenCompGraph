@@ -1,8 +1,22 @@
 use std::string::String;
 
-use crate::cxxbridge::ffi::{AttrState, ComputeStatus};
+use crate::cxxbridge::ffi::{AttrState, OperationStatus, OperationType};
 use crate::cxxbridge::Output;
 use crate::ops::traits::{AttrBlock, Compute};
+use crate::ops::Operation;
+
+pub fn new(id: usize) -> Box<Operation> {
+    Box::new(Operation {
+        op_type: OperationType::ReadImage,
+        id,
+        op_status: OperationStatus::Uninitialized,
+        compute: Box::new(ReadImageCompute {}),
+        attr_block: Box::new(ReadImageAttrs {
+            file_path: "".to_string(),
+        }),
+        output: Box::new(Output::new()),
+    })
+}
 
 #[derive(Debug, Clone, Default)]
 pub struct ReadImageCompute {}
@@ -22,10 +36,14 @@ impl Compute for ReadImageCompute {
         0
     }
 
-    fn compute(&mut self, attr_block: &Box<dyn AttrBlock>, output: &Box<Output>) -> ComputeStatus {
+    fn compute(
+        &mut self,
+        attr_block: &Box<dyn AttrBlock>,
+        output: &mut Box<Output>,
+    ) -> OperationStatus {
         println!("ReadImageCompute.compute()");
         println!("AttrBlock: {:?}", attr_block);
-        ComputeStatus::Success
+        OperationStatus::Valid
     }
 }
 
