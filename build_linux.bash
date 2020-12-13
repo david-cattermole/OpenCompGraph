@@ -23,7 +23,7 @@ cxxbridge --header --output "${ROOT}/include/rust/cxx.h"
 cbindgen --config cbindgen.toml \
          --crate opencompgraph \
          --output "${ROOT}/include/opencompgraph/_cbindgen.h"
-cargo build --release --verbose
+cargo build --release
 
 # Build C++
 mkdir -p build_linux
