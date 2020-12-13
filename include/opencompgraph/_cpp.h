@@ -10,9 +10,9 @@
 #include <functional>
 #include <algorithm>
 
-
 namespace opencompgraph {
 
+    void my_func();
     class ThingC {
     public:
         ThingC(std::string appname);

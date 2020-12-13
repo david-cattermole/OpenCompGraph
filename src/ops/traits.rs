@@ -2,7 +2,7 @@ use crate::cxxbridge::ffi::AttrState;
 use crate::cxxbridge::ffi::OperationStatus;
 use crate::cxxbridge::Output;
 // use crate::data::{BoundingBox2D, Hash, Matrix4, PixelBlock};
-use crate::ops::Operation;
+use crate::ops::OperationImpl;
 
 // pub trait Input {
 //     fn get_input(&self, num: usize) -> Operation;

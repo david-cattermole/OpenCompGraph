@@ -31,7 +31,10 @@ int test_c() {
     */
 
     size_t id = 0;
-    auto read_op = ocg::create_operation(id++, ocg::OperationType::ReadImage);
+
+
+    auto read_op = ocg::internal::create_operation_box(
+            id++, ocg::OperationType::ReadImage);
     std::cout << "read_op=" << &read_op << std::endl;
 
     auto read_id2 = read_op->get_id();
@@ -90,7 +93,8 @@ int test_c() {
     // auto read_cmat = read_output->get_color_matrix();
     // auto read_tmat = read_output->get_transform_matrix();
 
-    auto write_op = ocg::create_operation(id++, ocg::OperationType::WriteImage);
+    auto write_op = ocg::internal::create_operation_box(
+            id++, ocg::OperationType::WriteImage);
     std::cout << "write_op=" << &write_op << std::endl;
 
     // write_op->set_input(0, read_op);

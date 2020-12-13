@@ -3,10 +3,10 @@ use std::string::String;
 use crate::cxxbridge::ffi::{AttrState, OperationStatus, OperationType};
 use crate::cxxbridge::Output;
 use crate::ops::traits::{AttrBlock, Compute};
-use crate::ops::Operation;
+use crate::ops::OperationImpl;
 
-pub fn new(id: usize) -> Box<Operation> {
-    Box::new(Operation {
+pub fn new(id: usize) -> OperationImpl {
+    OperationImpl {
         op_type: OperationType::ReadImage,
         id,
         op_status: OperationStatus::Uninitialized,
@@ -15,7 +15,7 @@ pub fn new(id: usize) -> Box<Operation> {
             file_path: "".to_string(),
         }),
         output: Box::new(Output::new()),
-    })
+    }
 }
 
 #[derive(Debug, Clone, Default)]

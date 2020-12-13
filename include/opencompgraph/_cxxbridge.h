@@ -218,15 +218,19 @@ public:
 
 namespace opencompgraph {
   struct SharedThing;
+  struct SharedGraph;
   enum class OperationType : uint8_t;
   enum class OperationStatus : uint8_t;
   enum class AttrState : uint8_t;
   using ThingC = ::opencompgraph::ThingC;
   struct ThingR;
-  struct PixelBlock;
-  struct BoundingBox2D;
-  struct Matrix4;
-  struct Operation;
+  struct GraphImpl;
+  namespace internal {
+    struct PixelBlock;
+    struct BoundingBox2D;
+    struct Matrix4;
+    struct OperationImpl;
+  }
 }
 
 namespace opencompgraph {
@@ -236,8 +240,19 @@ struct SharedThing final {
   int32_t z;
   ::rust::Box<::opencompgraph::ThingR> y;
   ::std::unique_ptr<::opencompgraph::ThingC> x;
+
+  using IsRelocatable = ::std::true_type;
 };
 #endif // CXXBRIDGE1_STRUCT_opencompgraph$SharedThing
+
+#ifndef CXXBRIDGE1_STRUCT_opencompgraph$SharedGraph
+#define CXXBRIDGE1_STRUCT_opencompgraph$SharedGraph
+struct SharedGraph final {
+  ::rust::Box<::opencompgraph::GraphImpl> inner;
+
+  using IsRelocatable = ::std::true_type;
+};
+#endif // CXXBRIDGE1_STRUCT_opencompgraph$SharedGraph
 
 #ifndef CXXBRIDGE1_ENUM_opencompgraph$OperationType
 #define CXXBRIDGE1_ENUM_opencompgraph$OperationType
@@ -266,9 +281,10 @@ enum class AttrState : uint8_t {
 };
 #endif // CXXBRIDGE1_ENUM_opencompgraph$AttrState
 
-#ifndef CXXBRIDGE1_STRUCT_opencompgraph$Operation
-#define CXXBRIDGE1_STRUCT_opencompgraph$Operation
-struct Operation final : public ::rust::Opaque {
+namespace internal {
+#ifndef CXXBRIDGE1_STRUCT_opencompgraph$internal$OperationImpl
+#define CXXBRIDGE1_STRUCT_opencompgraph$internal$OperationImpl
+struct OperationImpl final : public ::rust::Opaque {
   size_t get_id() const noexcept;
   ::opencompgraph::OperationType get_op_type() const noexcept;
   uint8_t get_op_type_id() const noexcept;
@@ -280,9 +296,23 @@ struct Operation final : public ::rust::Opaque {
   ::rust::Str get_attr_string(::rust::Str name) const noexcept;
   void set_attr(::rust::Str name, ::rust::Str value) noexcept;
 };
-#endif // CXXBRIDGE1_STRUCT_opencompgraph$Operation
+#endif // CXXBRIDGE1_STRUCT_opencompgraph$internal$OperationImpl
+} // namespace internal
+
+#ifndef CXXBRIDGE1_STRUCT_opencompgraph$GraphImpl
+#define CXXBRIDGE1_STRUCT_opencompgraph$GraphImpl
+struct GraphImpl final : public ::rust::Opaque {
+  void add_op(::rust::Box<::opencompgraph::internal::OperationImpl> op) noexcept;
+};
+#endif // CXXBRIDGE1_STRUCT_opencompgraph$GraphImpl
 
 void print_r(const ::opencompgraph::ThingR &r) noexcept;
 
-::rust::Box<::opencompgraph::Operation> create_operation(size_t id, ::opencompgraph::OperationType op_type) noexcept;
+::opencompgraph::SharedGraph create_shared_graph() noexcept;
+
+namespace internal {
+::rust::Box<::opencompgraph::internal::OperationImpl> create_operation_box(size_t id, ::opencompgraph::OperationType op_type) noexcept;
+
+::rust::Box<::opencompgraph::GraphImpl> create_graph_box() noexcept;
+} // namespace internal
 } // namespace opencompgraph

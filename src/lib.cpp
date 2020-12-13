@@ -3,6 +3,10 @@
 
 namespace opencompgraph {
 
+    void my_func() {
+        std::cout << "my_func was called." << std::endl;
+    };
+
 ThingC::ThingC(std::string appname) : appname(std::move(appname)) {
     std::cout << "ThingC()" << std::endl;
 }

@@ -1,6 +1,6 @@
 use crate::data::{BoundingBox2D, Matrix4, PixelBlock};
-use crate::ops::create_operation;
-use crate::ops::Operation;
+use crate::ops::create_operation_box;
+use crate::ops::OperationImpl;
 use cxx::{CxxString, UniquePtr};
 
 #[rustfmt::skip]
@@ -12,8 +12,14 @@ pub mod ffi {
         x: UniquePtr<ThingC>,
     }
 
+    pub(crate) struct SharedGraph {
+        inner: Box<GraphImpl>,
+    }
+
+
     #[repr(u8)]
     #[derive(Debug, Copy, Clone, Hash)]
+    #[namespace = "opencompgraph"]
     pub(crate) enum OperationType {
         // Creation / Input / Output
         Null = 0,
@@ -23,6 +29,7 @@ pub mod ffi {
 
     #[repr(u8)]
     #[derive(Debug, Copy, Clone, Hash)]
+    #[namespace = "opencompgraph"]
     pub(crate) enum OperationStatus {
         Error = 0,
         Warning = 1,
@@ -32,11 +39,11 @@ pub mod ffi {
 
     #[repr(u8)]
     #[derive(Debug, Copy, Clone, Hash)]
+    #[namespace = "opencompgraph"]
     pub(crate) enum AttrState {
         Missing = 0,
         Exists = 1,
     }
-
 
     // ThingC
     unsafe extern "C++" {
@@ -56,23 +63,27 @@ pub mod ffi {
     }
 
     // PixelBlock
+    #[namespace = "opencompgraph::internal"]
     extern "Rust" {
         type PixelBlock;
     }
 
     // BoundingBox2D
+    #[namespace = "opencompgraph::internal"]
     extern "Rust" {
         type BoundingBox2D;
     }
 
     // Matrix4
+    #[namespace = "opencompgraph::internal"]
     extern "Rust" {
         type Matrix4;
     }
 
-    // Operation
+    // OperationImpl
+    #[namespace = "opencompgraph::internal"]
     extern "Rust" {
-        type Operation;
+        type OperationImpl;
         fn get_id(&self) -> usize;
         fn get_op_type(&self) -> OperationType;
         fn get_op_type_id(&self) -> u8;
@@ -91,8 +102,23 @@ pub mod ffi {
         fn set_attr_string(&mut self, name: &str, value: &str);
     }
 
+    // Graph
     extern "Rust" {
-        fn create_operation(id: usize, op_type: OperationType) -> Box<Operation>;
+        type GraphImpl;
+        fn add_op(&mut self, op: Box<OperationImpl>);
+
+    }
+
+    #[namespace = "opencompgraph"]
+    extern "Rust" {
+        fn create_shared_graph() -> SharedGraph;
+    }
+
+    #[namespace = "opencompgraph::internal"]
+    extern "Rust" {
+        fn create_operation_box(id: usize, op_type: OperationType) -> Box<OperationImpl>;
+
+        fn create_graph_box() -> Box<GraphImpl>;
     }
 }
 
@@ -111,6 +137,28 @@ fn my_test() {
         y: Box::new(ThingR(333)),
         x,
     });
+}
+
+fn create_shared_graph() -> ffi::SharedGraph {
+    ffi::SharedGraph {
+        inner: create_graph_box(),
+    }
+}
+
+#[derive(Debug)]
+pub struct GraphImpl {
+    ops: Vec<Box<OperationImpl>>,
+}
+
+fn create_graph_box() -> Box<GraphImpl> {
+    let ops = Vec::new();
+    Box::new(GraphImpl { ops })
+}
+
+impl GraphImpl {
+    pub fn add_op(&mut self, op: Box<OperationImpl>) {
+        self.ops.push(op);
+    }
 }
 
 #[derive(Debug, Clone, Hash)]

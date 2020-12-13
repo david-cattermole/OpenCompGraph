@@ -9,7 +9,7 @@ pub mod traits;
 pub mod write_image;
 
 #[derive(Debug)]
-pub struct Operation {
+pub struct OperationImpl {
     op_type: OperationType,
     id: usize,
     op_status: OperationStatus,
@@ -18,7 +18,7 @@ pub struct Operation {
     output: Box<Output>,
 }
 
-impl Operation {
+impl OperationImpl {
     pub fn get_id(&self) -> usize {
         self.id
     }
@@ -70,12 +70,12 @@ impl Operation {
     }
 }
 
-pub fn create_operation(id: usize, op_type: OperationType) -> Box<Operation> {
+pub fn create_operation_box(id: usize, op_type: OperationType) -> Box<OperationImpl> {
     println!("create_operation(id={:?}, op_type={:?})", id, op_type);
     match op_type {
-        OperationType::ReadImage => read_image::new(id),
-        OperationType::WriteImage => write_image::new(id),
-        OperationType::Null => null::new(id),
+        OperationType::ReadImage => Box::new(read_image::new(id)),
+        OperationType::WriteImage => Box::new(write_image::new(id)),
+        OperationType::Null => Box::new(null::new(id)),
         _ => panic!("Invalid OperationType: {:?}", op_type),
     }
 }
