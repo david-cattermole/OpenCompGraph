@@ -7,13 +7,13 @@
 #include <sstream>
 #include <string>
 // #include "jpeg.h"  // Used as pseudo-code, this header doesn't exist.
-#include "opencompgraph.h"
+#include <opencompgraph.h>
 
 namespace ocg = opencompgraph;
 
 
 int test_c() {
-    std::cout << "test_c()" << std::endl;
+    std::cout << "====================================== test_c()" << std::endl;
 
     /*
       // Disk-based cache.
@@ -102,11 +102,13 @@ int test_c() {
     auto write_id2 = write_op->get_id();
     std::cout << "write_id2=" << write_id2 << std::endl;
 
-    auto write_op_type = write_op->get_op_type() == ocg::OperationType::ReadImage;
+    auto write_op_type =
+            write_op->get_op_type() == ocg::OperationType::ReadImage;
     std::cout << "write_op_type=" << write_op_type << std::endl;
 
     auto write_op_type_id = write_op->get_op_type_id();
-    std::cout << "write_op_type_id=" << std::hex << write_op_type_id << std::endl;
+    std::cout << "write_op_type_id=" << std::hex << write_op_type_id
+              << std::endl;
 
     auto write_attr = "file_path";
     if (write_op->attr_exists(write_attr) == ocg::AttrState::Exists) {

@@ -34,6 +34,7 @@ add_custom_command(
 # library.
 add_library(${target_lib} SHARED
   lib.cpp
+  cpp.cpp
   _cxxbridge.cpp)
 target_link_libraries(${target_lib}
   ${rust_linktime_file})

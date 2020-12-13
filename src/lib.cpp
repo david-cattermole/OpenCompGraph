@@ -3,32 +3,17 @@
 
 namespace opencompgraph {
 
-    void my_func() {
-        std::cout << "my_func was called." << std::endl;
-    };
-
-ThingC::ThingC(std::string appname) : appname(std::move(appname)) {
-    std::cout << "ThingC()" << std::endl;
+Graph::Graph() noexcept : inner{internal::create_graph_shared()} {
+    std::cout << "Graph()" << std::endl;
 }
 
-ThingC::~ThingC() {
-    std::cout << "~ThingC()" << std::endl;
-    std::cout << "done with ThingC" << std::endl;
+Graph::~Graph() {
+    std::cout << "~Graph()" << std::endl;
+    std::cout << "done with Graph" << std::endl;
 }
 
-std::unique_ptr<ThingC> make_thingc(rust::Str appname) {
-    std::cout << "make_thingc()" << std::endl;
-    return std::unique_ptr<ThingC>(new ThingC(std::string(appname)));
-}
-
-const std::string &get_name(const ThingC &thing) {
-    std::cout << "get_name()" << std::endl;
-    return thing.appname;
-}
-
-void run_sharedthing(SharedThing state) {
-    std::cout << "run_sharedthing()" << std::endl;
-    print_r(*state.y);
+void Graph::add_op(rust::Box<opencompgraph::internal::OperationImpl> op_box) {
+    this->inner.inner->add_op(std::move(op_box));
 }
 
 } // namespace opencompgraph

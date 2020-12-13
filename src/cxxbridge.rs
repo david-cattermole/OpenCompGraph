@@ -6,16 +6,17 @@ use cxx::{CxxString, UniquePtr};
 #[rustfmt::skip]
 #[cxx::bridge(namespace = "opencompgraph")]
 pub mod ffi {
+    #[namespace = "opencompgraph::shared"]
     struct SharedThing {
         z: i32,
         y: Box<ThingR>,
         x: UniquePtr<ThingC>,
     }
 
-    pub(crate) struct SharedGraph {
+    #[namespace = "opencompgraph::internal"]
+    pub(crate) struct GraphImplShared {
         inner: Box<GraphImpl>,
     }
-
 
     #[repr(u8)]
     #[derive(Debug, Copy, Clone, Hash)]
@@ -46,8 +47,9 @@ pub mod ffi {
     }
 
     // ThingC
+    #[namespace = "opencompgraph::cpp"]
     unsafe extern "C++" {
-        include!("opencompgraph/_cpp.h");
+        include!("opencompgraph/cpp.h");
         include!("opencompgraph.h");
 
         type ThingC;
@@ -57,6 +59,7 @@ pub mod ffi {
     }
 
     // ThingR
+    #[namespace = "opencompgraph::internal"]
     extern "Rust" {
         type ThingR;
         fn print_r(r: &ThingR);
@@ -103,22 +106,19 @@ pub mod ffi {
     }
 
     // Graph
+    #[namespace = "opencompgraph::internal"]
     extern "Rust" {
         type GraphImpl;
         fn add_op(&mut self, op: Box<OperationImpl>);
 
-    }
 
-    #[namespace = "opencompgraph"]
-    extern "Rust" {
-        fn create_shared_graph() -> SharedGraph;
     }
 
     #[namespace = "opencompgraph::internal"]
     extern "Rust" {
         fn create_operation_box(id: usize, op_type: OperationType) -> Box<OperationImpl>;
-
         fn create_graph_box() -> Box<GraphImpl>;
+        fn create_graph_shared() -> GraphImplShared;
     }
 }
 
@@ -139,8 +139,8 @@ fn my_test() {
     });
 }
 
-fn create_shared_graph() -> ffi::SharedGraph {
-    ffi::SharedGraph {
+fn create_graph_shared() -> ffi::GraphImplShared {
+    ffi::GraphImplShared {
         inner: create_graph_box(),
     }
 }

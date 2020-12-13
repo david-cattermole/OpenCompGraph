@@ -1,4 +1,4 @@
-#include "opencompgraph/_cpp.h"
+#include "opencompgraph/cpp.h"
 #include "opencompgraph.h"
 #include <cstddef>
 #include <cstdint>
@@ -273,42 +273,50 @@ template <> struct deleter_if<true> {
 } // namespace rust
 
 namespace opencompgraph {
-  struct SharedThing;
-  struct SharedGraph;
   enum class OperationType : uint8_t;
   enum class OperationStatus : uint8_t;
   enum class AttrState : uint8_t;
-  using ThingC = ::opencompgraph::ThingC;
-  struct ThingR;
-  struct GraphImpl;
+  namespace shared {
+    struct SharedThing;
+  }
   namespace internal {
+    struct GraphImplShared;
+    struct ThingR;
     struct PixelBlock;
     struct BoundingBox2D;
     struct Matrix4;
     struct OperationImpl;
+    struct GraphImpl;
+  }
+  namespace cpp {
+    using ThingC = ::opencompgraph::cpp::ThingC;
   }
 }
 
 namespace opencompgraph {
-#ifndef CXXBRIDGE1_STRUCT_opencompgraph$SharedThing
-#define CXXBRIDGE1_STRUCT_opencompgraph$SharedThing
+namespace shared {
+#ifndef CXXBRIDGE1_STRUCT_opencompgraph$shared$SharedThing
+#define CXXBRIDGE1_STRUCT_opencompgraph$shared$SharedThing
 struct SharedThing final {
   int32_t z;
-  ::rust::Box<::opencompgraph::ThingR> y;
-  ::std::unique_ptr<::opencompgraph::ThingC> x;
+  ::rust::Box<::opencompgraph::internal::ThingR> y;
+  ::std::unique_ptr<::opencompgraph::cpp::ThingC> x;
 
   using IsRelocatable = ::std::true_type;
 };
-#endif // CXXBRIDGE1_STRUCT_opencompgraph$SharedThing
+#endif // CXXBRIDGE1_STRUCT_opencompgraph$shared$SharedThing
+} // namespace shared
 
-#ifndef CXXBRIDGE1_STRUCT_opencompgraph$SharedGraph
-#define CXXBRIDGE1_STRUCT_opencompgraph$SharedGraph
-struct SharedGraph final {
-  ::rust::Box<::opencompgraph::GraphImpl> inner;
+namespace internal {
+#ifndef CXXBRIDGE1_STRUCT_opencompgraph$internal$GraphImplShared
+#define CXXBRIDGE1_STRUCT_opencompgraph$internal$GraphImplShared
+struct GraphImplShared final {
+  ::rust::Box<::opencompgraph::internal::GraphImpl> inner;
 
   using IsRelocatable = ::std::true_type;
 };
-#endif // CXXBRIDGE1_STRUCT_opencompgraph$SharedGraph
+#endif // CXXBRIDGE1_STRUCT_opencompgraph$internal$GraphImplShared
+} // namespace internal
 
 #ifndef CXXBRIDGE1_ENUM_opencompgraph$OperationType
 #define CXXBRIDGE1_ENUM_opencompgraph$OperationType
@@ -353,36 +361,38 @@ struct OperationImpl final : public ::rust::Opaque {
   void set_attr(::rust::Str name, ::rust::Str value) noexcept;
 };
 #endif // CXXBRIDGE1_STRUCT_opencompgraph$internal$OperationImpl
-} // namespace internal
 
-#ifndef CXXBRIDGE1_STRUCT_opencompgraph$GraphImpl
-#define CXXBRIDGE1_STRUCT_opencompgraph$GraphImpl
+#ifndef CXXBRIDGE1_STRUCT_opencompgraph$internal$GraphImpl
+#define CXXBRIDGE1_STRUCT_opencompgraph$internal$GraphImpl
 struct GraphImpl final : public ::rust::Opaque {
   void add_op(::rust::Box<::opencompgraph::internal::OperationImpl> op) noexcept;
 };
-#endif // CXXBRIDGE1_STRUCT_opencompgraph$GraphImpl
+#endif // CXXBRIDGE1_STRUCT_opencompgraph$internal$GraphImpl
+} // namespace internal
 
+namespace cpp {
 extern "C" {
-__declspec(dllexport) ::opencompgraph::ThingC *opencompgraph$cxxbridge1$make_thingc(::rust::repr::PtrLen appname) noexcept {
-  ::std::unique_ptr<::opencompgraph::ThingC> (*make_thingc$)(::rust::Str) = ::opencompgraph::make_thingc;
+__declspec(dllexport) ::opencompgraph::cpp::ThingC *opencompgraph$cpp$cxxbridge1$make_thingc(::rust::repr::PtrLen appname) noexcept {
+  ::std::unique_ptr<::opencompgraph::cpp::ThingC> (*make_thingc$)(::rust::Str) = ::opencompgraph::cpp::make_thingc;
   return make_thingc$(::rust::impl<::rust::Str>::new_unchecked(appname)).release();
 }
 
-__declspec(dllexport) const ::std::string *opencompgraph$cxxbridge1$get_name(const ::opencompgraph::ThingC &thing) noexcept {
-  const ::std::string &(*get_name$)(const ::opencompgraph::ThingC &) = ::opencompgraph::get_name;
+__declspec(dllexport) const ::std::string *opencompgraph$cpp$cxxbridge1$get_name(const ::opencompgraph::cpp::ThingC &thing) noexcept {
+  const ::std::string &(*get_name$)(const ::opencompgraph::cpp::ThingC &) = ::opencompgraph::cpp::get_name;
   return &get_name$(thing);
 }
 
-__declspec(dllexport) void opencompgraph$cxxbridge1$run_sharedthing(::opencompgraph::SharedThing *state) noexcept {
-  void (*run_sharedthing$)(::opencompgraph::SharedThing) = ::opencompgraph::run_sharedthing;
+__declspec(dllexport) void opencompgraph$cpp$cxxbridge1$run_sharedthing(::opencompgraph::shared::SharedThing *state) noexcept {
+  void (*run_sharedthing$)(::opencompgraph::shared::SharedThing) = ::opencompgraph::cpp::run_sharedthing;
   run_sharedthing$(::std::move(*state));
 }
-
-void opencompgraph$cxxbridge1$print_r(const ::opencompgraph::ThingR &r) noexcept;
 } // extern "C"
+} // namespace cpp
 
 namespace internal {
 extern "C" {
+void opencompgraph$internal$cxxbridge1$print_r(const ::opencompgraph::internal::ThingR &r) noexcept;
+
 size_t opencompgraph$internal$cxxbridge1$OperationImpl$get_id(const ::opencompgraph::internal::OperationImpl &self) noexcept;
 
 ::opencompgraph::OperationType opencompgraph$internal$cxxbridge1$OperationImpl$get_op_type(const ::opencompgraph::internal::OperationImpl &self) noexcept;
@@ -402,28 +412,20 @@ size_t opencompgraph$internal$cxxbridge1$OperationImpl$hash(::opencompgraph::int
 ::rust::repr::PtrLen opencompgraph$internal$cxxbridge1$OperationImpl$get_attr_string(const ::opencompgraph::internal::OperationImpl &self, ::rust::repr::PtrLen name) noexcept;
 
 void opencompgraph$internal$cxxbridge1$OperationImpl$set_attr_string(::opencompgraph::internal::OperationImpl &self, ::rust::repr::PtrLen name, ::rust::repr::PtrLen value) noexcept;
-} // extern "C"
-} // namespace internal
 
-extern "C" {
-void opencompgraph$cxxbridge1$GraphImpl$add_op(::opencompgraph::GraphImpl &self, ::opencompgraph::internal::OperationImpl *op) noexcept;
+void opencompgraph$internal$cxxbridge1$GraphImpl$add_op(::opencompgraph::internal::GraphImpl &self, ::opencompgraph::internal::OperationImpl *op) noexcept;
 
-void opencompgraph$cxxbridge1$create_shared_graph(::opencompgraph::SharedGraph *return$) noexcept;
-} // extern "C"
-
-namespace internal {
-extern "C" {
 ::opencompgraph::internal::OperationImpl *opencompgraph$internal$cxxbridge1$create_operation_box(size_t id, ::opencompgraph::OperationType op_type) noexcept;
 
-::opencompgraph::GraphImpl *opencompgraph$internal$cxxbridge1$create_graph_box() noexcept;
-} // extern "C"
-} // namespace internal
+::opencompgraph::internal::GraphImpl *opencompgraph$internal$cxxbridge1$create_graph_box() noexcept;
 
-void print_r(const ::opencompgraph::ThingR &r) noexcept {
-  opencompgraph$cxxbridge1$print_r(r);
+void opencompgraph$internal$cxxbridge1$create_graph_shared(::opencompgraph::internal::GraphImplShared *return$) noexcept;
+} // extern "C"
+
+void print_r(const ::opencompgraph::internal::ThingR &r) noexcept {
+  opencompgraph$internal$cxxbridge1$print_r(r);
 }
 
-namespace internal {
 size_t OperationImpl::get_id() const noexcept {
   return opencompgraph$internal$cxxbridge1$OperationImpl$get_id(*this);
 }
@@ -463,63 +465,61 @@ size_t OperationImpl::hash() noexcept {
 void OperationImpl::set_attr(::rust::Str name, ::rust::Str value) noexcept {
   opencompgraph$internal$cxxbridge1$OperationImpl$set_attr_string(*this, ::rust::impl<::rust::Str>::repr(name), ::rust::impl<::rust::Str>::repr(value));
 }
-} // namespace internal
 
 void GraphImpl::add_op(::rust::Box<::opencompgraph::internal::OperationImpl> op) noexcept {
-  opencompgraph$cxxbridge1$GraphImpl$add_op(*this, op.into_raw());
+  opencompgraph$internal$cxxbridge1$GraphImpl$add_op(*this, op.into_raw());
 }
 
-::opencompgraph::SharedGraph create_shared_graph() noexcept {
-  ::rust::MaybeUninit<::opencompgraph::SharedGraph> return$;
-  opencompgraph$cxxbridge1$create_shared_graph(&return$.value);
-  return ::std::move(return$.value);
-}
-
-namespace internal {
 ::rust::Box<::opencompgraph::internal::OperationImpl> create_operation_box(size_t id, ::opencompgraph::OperationType op_type) noexcept {
   return ::rust::Box<::opencompgraph::internal::OperationImpl>::from_raw(opencompgraph$internal$cxxbridge1$create_operation_box(id, op_type));
 }
 
-::rust::Box<::opencompgraph::GraphImpl> create_graph_box() noexcept {
-  return ::rust::Box<::opencompgraph::GraphImpl>::from_raw(opencompgraph$internal$cxxbridge1$create_graph_box());
+::rust::Box<::opencompgraph::internal::GraphImpl> create_graph_box() noexcept {
+  return ::rust::Box<::opencompgraph::internal::GraphImpl>::from_raw(opencompgraph$internal$cxxbridge1$create_graph_box());
+}
+
+::opencompgraph::internal::GraphImplShared create_graph_shared() noexcept {
+  ::rust::MaybeUninit<::opencompgraph::internal::GraphImplShared> return$;
+  opencompgraph$internal$cxxbridge1$create_graph_shared(&return$.value);
+  return ::std::move(return$.value);
 }
 } // namespace internal
 } // namespace opencompgraph
 
 extern "C" {
-#ifndef CXXBRIDGE1_RUST_BOX_opencompgraph$ThingR
-#define CXXBRIDGE1_RUST_BOX_opencompgraph$ThingR
-void cxxbridge1$box$opencompgraph$ThingR$uninit(::rust::Box<::opencompgraph::ThingR> *ptr) noexcept;
-void cxxbridge1$box$opencompgraph$ThingR$drop(::rust::Box<::opencompgraph::ThingR> *ptr) noexcept;
-#endif // CXXBRIDGE1_RUST_BOX_opencompgraph$ThingR
+#ifndef CXXBRIDGE1_RUST_BOX_opencompgraph$internal$ThingR
+#define CXXBRIDGE1_RUST_BOX_opencompgraph$internal$ThingR
+void cxxbridge1$box$opencompgraph$internal$ThingR$uninit(::rust::Box<::opencompgraph::internal::ThingR> *ptr) noexcept;
+void cxxbridge1$box$opencompgraph$internal$ThingR$drop(::rust::Box<::opencompgraph::internal::ThingR> *ptr) noexcept;
+#endif // CXXBRIDGE1_RUST_BOX_opencompgraph$internal$ThingR
 
-#ifndef CXXBRIDGE1_UNIQUE_PTR_opencompgraph$ThingC
-#define CXXBRIDGE1_UNIQUE_PTR_opencompgraph$ThingC
-static_assert(::rust::is_complete<::opencompgraph::ThingC>::value, "definition of ThingC is required");
-static_assert(sizeof(::std::unique_ptr<::opencompgraph::ThingC>) == sizeof(void *), "");
-static_assert(alignof(::std::unique_ptr<::opencompgraph::ThingC>) == alignof(void *), "");
-void cxxbridge1$unique_ptr$opencompgraph$ThingC$null(::std::unique_ptr<::opencompgraph::ThingC> *ptr) noexcept {
-  ::new (ptr) ::std::unique_ptr<::opencompgraph::ThingC>();
+#ifndef CXXBRIDGE1_UNIQUE_PTR_opencompgraph$cpp$ThingC
+#define CXXBRIDGE1_UNIQUE_PTR_opencompgraph$cpp$ThingC
+static_assert(::rust::is_complete<::opencompgraph::cpp::ThingC>::value, "definition of ThingC is required");
+static_assert(sizeof(::std::unique_ptr<::opencompgraph::cpp::ThingC>) == sizeof(void *), "");
+static_assert(alignof(::std::unique_ptr<::opencompgraph::cpp::ThingC>) == alignof(void *), "");
+void cxxbridge1$unique_ptr$opencompgraph$cpp$ThingC$null(::std::unique_ptr<::opencompgraph::cpp::ThingC> *ptr) noexcept {
+  ::new (ptr) ::std::unique_ptr<::opencompgraph::cpp::ThingC>();
 }
-void cxxbridge1$unique_ptr$opencompgraph$ThingC$raw(::std::unique_ptr<::opencompgraph::ThingC> *ptr, ::opencompgraph::ThingC *raw) noexcept {
-  ::new (ptr) ::std::unique_ptr<::opencompgraph::ThingC>(raw);
+void cxxbridge1$unique_ptr$opencompgraph$cpp$ThingC$raw(::std::unique_ptr<::opencompgraph::cpp::ThingC> *ptr, ::opencompgraph::cpp::ThingC *raw) noexcept {
+  ::new (ptr) ::std::unique_ptr<::opencompgraph::cpp::ThingC>(raw);
 }
-const ::opencompgraph::ThingC *cxxbridge1$unique_ptr$opencompgraph$ThingC$get(const ::std::unique_ptr<::opencompgraph::ThingC>& ptr) noexcept {
+const ::opencompgraph::cpp::ThingC *cxxbridge1$unique_ptr$opencompgraph$cpp$ThingC$get(const ::std::unique_ptr<::opencompgraph::cpp::ThingC>& ptr) noexcept {
   return ptr.get();
 }
-::opencompgraph::ThingC *cxxbridge1$unique_ptr$opencompgraph$ThingC$release(::std::unique_ptr<::opencompgraph::ThingC>& ptr) noexcept {
+::opencompgraph::cpp::ThingC *cxxbridge1$unique_ptr$opencompgraph$cpp$ThingC$release(::std::unique_ptr<::opencompgraph::cpp::ThingC>& ptr) noexcept {
   return ptr.release();
 }
-void cxxbridge1$unique_ptr$opencompgraph$ThingC$drop(::std::unique_ptr<::opencompgraph::ThingC> *ptr) noexcept {
-  ::rust::deleter_if<::rust::is_complete<::opencompgraph::ThingC>::value>{}(ptr);
+void cxxbridge1$unique_ptr$opencompgraph$cpp$ThingC$drop(::std::unique_ptr<::opencompgraph::cpp::ThingC> *ptr) noexcept {
+  ::rust::deleter_if<::rust::is_complete<::opencompgraph::cpp::ThingC>::value>{}(ptr);
 }
-#endif // CXXBRIDGE1_UNIQUE_PTR_opencompgraph$ThingC
+#endif // CXXBRIDGE1_UNIQUE_PTR_opencompgraph$cpp$ThingC
 
-#ifndef CXXBRIDGE1_RUST_BOX_opencompgraph$GraphImpl
-#define CXXBRIDGE1_RUST_BOX_opencompgraph$GraphImpl
-void cxxbridge1$box$opencompgraph$GraphImpl$uninit(::rust::Box<::opencompgraph::GraphImpl> *ptr) noexcept;
-void cxxbridge1$box$opencompgraph$GraphImpl$drop(::rust::Box<::opencompgraph::GraphImpl> *ptr) noexcept;
-#endif // CXXBRIDGE1_RUST_BOX_opencompgraph$GraphImpl
+#ifndef CXXBRIDGE1_RUST_BOX_opencompgraph$internal$GraphImpl
+#define CXXBRIDGE1_RUST_BOX_opencompgraph$internal$GraphImpl
+void cxxbridge1$box$opencompgraph$internal$GraphImpl$uninit(::rust::Box<::opencompgraph::internal::GraphImpl> *ptr) noexcept;
+void cxxbridge1$box$opencompgraph$internal$GraphImpl$drop(::rust::Box<::opencompgraph::internal::GraphImpl> *ptr) noexcept;
+#endif // CXXBRIDGE1_RUST_BOX_opencompgraph$internal$GraphImpl
 
 #ifndef CXXBRIDGE1_RUST_BOX_opencompgraph$internal$OperationImpl
 #define CXXBRIDGE1_RUST_BOX_opencompgraph$internal$OperationImpl
@@ -531,20 +531,20 @@ void cxxbridge1$box$opencompgraph$internal$OperationImpl$drop(::rust::Box<::open
 namespace rust {
 inline namespace cxxbridge1 {
 template <>
-void Box<::opencompgraph::ThingR>::uninit() noexcept {
-  cxxbridge1$box$opencompgraph$ThingR$uninit(this);
+void Box<::opencompgraph::internal::ThingR>::uninit() noexcept {
+  cxxbridge1$box$opencompgraph$internal$ThingR$uninit(this);
 }
 template <>
-void Box<::opencompgraph::ThingR>::drop() noexcept {
-  cxxbridge1$box$opencompgraph$ThingR$drop(this);
+void Box<::opencompgraph::internal::ThingR>::drop() noexcept {
+  cxxbridge1$box$opencompgraph$internal$ThingR$drop(this);
 }
 template <>
-void Box<::opencompgraph::GraphImpl>::uninit() noexcept {
-  cxxbridge1$box$opencompgraph$GraphImpl$uninit(this);
+void Box<::opencompgraph::internal::GraphImpl>::uninit() noexcept {
+  cxxbridge1$box$opencompgraph$internal$GraphImpl$uninit(this);
 }
 template <>
-void Box<::opencompgraph::GraphImpl>::drop() noexcept {
-  cxxbridge1$box$opencompgraph$GraphImpl$drop(this);
+void Box<::opencompgraph::internal::GraphImpl>::drop() noexcept {
+  cxxbridge1$box$opencompgraph$internal$GraphImpl$drop(this);
 }
 template <>
 void Box<::opencompgraph::internal::OperationImpl>::uninit() noexcept {

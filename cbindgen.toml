@@ -8,7 +8,7 @@ pragma_once = true
 
 # An optional namespace to output around the generated bindings
 # default: doesn't emit a namespace
-namespace = "opencompgraph"
+namespace = "opencompgraph::cbindgen"
 
 # Whether to make a C header C++ compatible.
 # These will wrap generated functions into a `extern "C"` block, e.g.

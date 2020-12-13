@@ -1,5 +1,5 @@
 #pragma once
-#include "opencompgraph/_cpp.h"
+#include "opencompgraph/cpp.h"
 #include "opencompgraph.h"
 #include <cstddef>
 #include <cstdint>
@@ -217,42 +217,50 @@ public:
 } // namespace rust
 
 namespace opencompgraph {
-  struct SharedThing;
-  struct SharedGraph;
   enum class OperationType : uint8_t;
   enum class OperationStatus : uint8_t;
   enum class AttrState : uint8_t;
-  using ThingC = ::opencompgraph::ThingC;
-  struct ThingR;
-  struct GraphImpl;
+  namespace shared {
+    struct SharedThing;
+  }
   namespace internal {
+    struct GraphImplShared;
+    struct ThingR;
     struct PixelBlock;
     struct BoundingBox2D;
     struct Matrix4;
     struct OperationImpl;
+    struct GraphImpl;
+  }
+  namespace cpp {
+    using ThingC = ::opencompgraph::cpp::ThingC;
   }
 }
 
 namespace opencompgraph {
-#ifndef CXXBRIDGE1_STRUCT_opencompgraph$SharedThing
-#define CXXBRIDGE1_STRUCT_opencompgraph$SharedThing
+namespace shared {
+#ifndef CXXBRIDGE1_STRUCT_opencompgraph$shared$SharedThing
+#define CXXBRIDGE1_STRUCT_opencompgraph$shared$SharedThing
 struct SharedThing final {
   int32_t z;
-  ::rust::Box<::opencompgraph::ThingR> y;
-  ::std::unique_ptr<::opencompgraph::ThingC> x;
+  ::rust::Box<::opencompgraph::internal::ThingR> y;
+  ::std::unique_ptr<::opencompgraph::cpp::ThingC> x;
 
   using IsRelocatable = ::std::true_type;
 };
-#endif // CXXBRIDGE1_STRUCT_opencompgraph$SharedThing
+#endif // CXXBRIDGE1_STRUCT_opencompgraph$shared$SharedThing
+} // namespace shared
 
-#ifndef CXXBRIDGE1_STRUCT_opencompgraph$SharedGraph
-#define CXXBRIDGE1_STRUCT_opencompgraph$SharedGraph
-struct SharedGraph final {
-  ::rust::Box<::opencompgraph::GraphImpl> inner;
+namespace internal {
+#ifndef CXXBRIDGE1_STRUCT_opencompgraph$internal$GraphImplShared
+#define CXXBRIDGE1_STRUCT_opencompgraph$internal$GraphImplShared
+struct GraphImplShared final {
+  ::rust::Box<::opencompgraph::internal::GraphImpl> inner;
 
   using IsRelocatable = ::std::true_type;
 };
-#endif // CXXBRIDGE1_STRUCT_opencompgraph$SharedGraph
+#endif // CXXBRIDGE1_STRUCT_opencompgraph$internal$GraphImplShared
+} // namespace internal
 
 #ifndef CXXBRIDGE1_ENUM_opencompgraph$OperationType
 #define CXXBRIDGE1_ENUM_opencompgraph$OperationType
@@ -297,22 +305,20 @@ struct OperationImpl final : public ::rust::Opaque {
   void set_attr(::rust::Str name, ::rust::Str value) noexcept;
 };
 #endif // CXXBRIDGE1_STRUCT_opencompgraph$internal$OperationImpl
-} // namespace internal
 
-#ifndef CXXBRIDGE1_STRUCT_opencompgraph$GraphImpl
-#define CXXBRIDGE1_STRUCT_opencompgraph$GraphImpl
+#ifndef CXXBRIDGE1_STRUCT_opencompgraph$internal$GraphImpl
+#define CXXBRIDGE1_STRUCT_opencompgraph$internal$GraphImpl
 struct GraphImpl final : public ::rust::Opaque {
   void add_op(::rust::Box<::opencompgraph::internal::OperationImpl> op) noexcept;
 };
-#endif // CXXBRIDGE1_STRUCT_opencompgraph$GraphImpl
+#endif // CXXBRIDGE1_STRUCT_opencompgraph$internal$GraphImpl
 
-void print_r(const ::opencompgraph::ThingR &r) noexcept;
+void print_r(const ::opencompgraph::internal::ThingR &r) noexcept;
 
-::opencompgraph::SharedGraph create_shared_graph() noexcept;
-
-namespace internal {
 ::rust::Box<::opencompgraph::internal::OperationImpl> create_operation_box(size_t id, ::opencompgraph::OperationType op_type) noexcept;
 
-::rust::Box<::opencompgraph::GraphImpl> create_graph_box() noexcept;
+::rust::Box<::opencompgraph::internal::GraphImpl> create_graph_box() noexcept;
+
+::opencompgraph::internal::GraphImplShared create_graph_shared() noexcept;
 } // namespace internal
 } // namespace opencompgraph

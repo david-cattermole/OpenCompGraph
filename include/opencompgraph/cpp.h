@@ -12,7 +12,12 @@
 
 namespace opencompgraph {
 
-    void my_func();
+namespace shared {
+    struct SharedThing;
+} // namespace shared
+
+namespace cpp {
+
     class ThingC {
     public:
         ThingC(std::string appname);
@@ -22,13 +27,11 @@ namespace opencompgraph {
         std::string appname;
     };
 
-    struct SharedThing;
-
     std::unique_ptr <ThingC> make_thingc(rust::Str appname);
 
     const std::string &get_name(const ThingC &thing);
 
-    void run_sharedthing(SharedThing state);
+    void run_sharedthing(shared::SharedThing state);
 
 /*
 
@@ -377,6 +380,7 @@ namespace opencompgraph {
 
 */
 
+} // namespace cpp
 } // namespace opencompgraph
 
 #endif // OPENCOMPGRAPH_CPP_H

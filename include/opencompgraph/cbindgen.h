@@ -6,6 +6,7 @@
 #include <new>
 
 namespace opencompgraph {
+namespace cbindgen {
 
 /// The Scene Graph.
 struct SceneGraph {
@@ -20,4 +21,5 @@ SceneGraph *scene_graph_new(int id);
 
 } // extern "C"
 
+} // namespace cbindgen
 } // namespace opencompgraph
