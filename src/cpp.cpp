@@ -1,4 +1,5 @@
 #include <iostream>
+#include <rust/cxx.h>
 #include <opencompgraph.h>
 
 namespace opencompgraph {

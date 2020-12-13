@@ -1,7 +1,7 @@
 #ifndef OPENCOMPGRAPH_CPP_H
 #define OPENCOMPGRAPH_CPP_H
 
-#include <cxx.h>
+#include <rust/cxx.h>
 #include <memory>
 #include <string>
 #include <list>

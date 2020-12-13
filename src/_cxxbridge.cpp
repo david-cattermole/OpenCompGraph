@@ -1,5 +1,5 @@
+#include "rust/cxx.h"
 #include "opencompgraph/cpp.h"
-#include "opencompgraph.h"
 #include <cstddef>
 #include <cstdint>
 #include <memory>
@@ -281,6 +281,7 @@ namespace opencompgraph {
   }
   namespace internal {
     struct GraphImplShared;
+    struct OperationImplShared;
     struct ThingR;
     struct PixelBlock;
     struct BoundingBox2D;
@@ -316,6 +317,15 @@ struct GraphImplShared final {
   using IsRelocatable = ::std::true_type;
 };
 #endif // CXXBRIDGE1_STRUCT_opencompgraph$internal$GraphImplShared
+
+#ifndef CXXBRIDGE1_STRUCT_opencompgraph$internal$OperationImplShared
+#define CXXBRIDGE1_STRUCT_opencompgraph$internal$OperationImplShared
+struct OperationImplShared final {
+  ::rust::Box<::opencompgraph::internal::OperationImpl> inner;
+
+  using IsRelocatable = ::std::true_type;
+};
+#endif // CXXBRIDGE1_STRUCT_opencompgraph$internal$OperationImplShared
 } // namespace internal
 
 #ifndef CXXBRIDGE1_ENUM_opencompgraph$OperationType
@@ -365,7 +375,7 @@ struct OperationImpl final : public ::rust::Opaque {
 #ifndef CXXBRIDGE1_STRUCT_opencompgraph$internal$GraphImpl
 #define CXXBRIDGE1_STRUCT_opencompgraph$internal$GraphImpl
 struct GraphImpl final : public ::rust::Opaque {
-  void add_op(::rust::Box<::opencompgraph::internal::OperationImpl> op) noexcept;
+  void add_op(::rust::Box<::opencompgraph::internal::OperationImpl> op_box) noexcept;
   void connect(size_t src_op_id, size_t dst_op_id) noexcept;
 };
 #endif // CXXBRIDGE1_STRUCT_opencompgraph$internal$GraphImpl
@@ -414,11 +424,13 @@ size_t opencompgraph$internal$cxxbridge1$OperationImpl$hash(::opencompgraph::int
 
 void opencompgraph$internal$cxxbridge1$OperationImpl$set_attr_string(::opencompgraph::internal::OperationImpl &self, ::rust::repr::PtrLen name, ::rust::repr::PtrLen value) noexcept;
 
-void opencompgraph$internal$cxxbridge1$GraphImpl$add_op(::opencompgraph::internal::GraphImpl &self, ::opencompgraph::internal::OperationImpl *op) noexcept;
+void opencompgraph$internal$cxxbridge1$GraphImpl$add_op(::opencompgraph::internal::GraphImpl &self, ::opencompgraph::internal::OperationImpl *op_box) noexcept;
 
 void opencompgraph$internal$cxxbridge1$GraphImpl$connect(::opencompgraph::internal::GraphImpl &self, size_t src_op_id, size_t dst_op_id) noexcept;
 
 ::opencompgraph::internal::OperationImpl *opencompgraph$internal$cxxbridge1$create_operation_box(size_t id, ::opencompgraph::OperationType op_type) noexcept;
+
+void opencompgraph$internal$cxxbridge1$create_operation_shared(size_t id, ::opencompgraph::OperationType op_type, ::opencompgraph::internal::OperationImplShared *return$) noexcept;
 
 ::opencompgraph::internal::GraphImpl *opencompgraph$internal$cxxbridge1$create_graph_box() noexcept;
 
@@ -469,8 +481,8 @@ void OperationImpl::set_attr(::rust::Str name, ::rust::Str value) noexcept {
   opencompgraph$internal$cxxbridge1$OperationImpl$set_attr_string(*this, ::rust::impl<::rust::Str>::repr(name), ::rust::impl<::rust::Str>::repr(value));
 }
 
-void GraphImpl::add_op(::rust::Box<::opencompgraph::internal::OperationImpl> op) noexcept {
-  opencompgraph$internal$cxxbridge1$GraphImpl$add_op(*this, op.into_raw());
+void GraphImpl::add_op(::rust::Box<::opencompgraph::internal::OperationImpl> op_box) noexcept {
+  opencompgraph$internal$cxxbridge1$GraphImpl$add_op(*this, op_box.into_raw());
 }
 
 void GraphImpl::connect(size_t src_op_id, size_t dst_op_id) noexcept {
@@ -479,6 +491,12 @@ void GraphImpl::connect(size_t src_op_id, size_t dst_op_id) noexcept {
 
 ::rust::Box<::opencompgraph::internal::OperationImpl> create_operation_box(size_t id, ::opencompgraph::OperationType op_type) noexcept {
   return ::rust::Box<::opencompgraph::internal::OperationImpl>::from_raw(opencompgraph$internal$cxxbridge1$create_operation_box(id, op_type));
+}
+
+::opencompgraph::internal::OperationImplShared create_operation_shared(size_t id, ::opencompgraph::OperationType op_type) noexcept {
+  ::rust::MaybeUninit<::opencompgraph::internal::OperationImplShared> return$;
+  opencompgraph$internal$cxxbridge1$create_operation_shared(id, op_type, &return$.value);
+  return ::std::move(return$.value);
 }
 
 ::rust::Box<::opencompgraph::internal::GraphImpl> create_graph_box() noexcept {

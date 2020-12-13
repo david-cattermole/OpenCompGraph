@@ -1,6 +1,6 @@
 #pragma once
+#include "rust/cxx.h"
 #include "opencompgraph/cpp.h"
-#include "opencompgraph.h"
 #include <cstddef>
 #include <cstdint>
 #include <memory>
@@ -225,6 +225,7 @@ namespace opencompgraph {
   }
   namespace internal {
     struct GraphImplShared;
+    struct OperationImplShared;
     struct ThingR;
     struct PixelBlock;
     struct BoundingBox2D;
@@ -260,6 +261,15 @@ struct GraphImplShared final {
   using IsRelocatable = ::std::true_type;
 };
 #endif // CXXBRIDGE1_STRUCT_opencompgraph$internal$GraphImplShared
+
+#ifndef CXXBRIDGE1_STRUCT_opencompgraph$internal$OperationImplShared
+#define CXXBRIDGE1_STRUCT_opencompgraph$internal$OperationImplShared
+struct OperationImplShared final {
+  ::rust::Box<::opencompgraph::internal::OperationImpl> inner;
+
+  using IsRelocatable = ::std::true_type;
+};
+#endif // CXXBRIDGE1_STRUCT_opencompgraph$internal$OperationImplShared
 } // namespace internal
 
 #ifndef CXXBRIDGE1_ENUM_opencompgraph$OperationType
@@ -309,7 +319,7 @@ struct OperationImpl final : public ::rust::Opaque {
 #ifndef CXXBRIDGE1_STRUCT_opencompgraph$internal$GraphImpl
 #define CXXBRIDGE1_STRUCT_opencompgraph$internal$GraphImpl
 struct GraphImpl final : public ::rust::Opaque {
-  void add_op(::rust::Box<::opencompgraph::internal::OperationImpl> op) noexcept;
+  void add_op(::rust::Box<::opencompgraph::internal::OperationImpl> op_box) noexcept;
   void connect(size_t src_op_id, size_t dst_op_id) noexcept;
 };
 #endif // CXXBRIDGE1_STRUCT_opencompgraph$internal$GraphImpl
@@ -317,6 +327,8 @@ struct GraphImpl final : public ::rust::Opaque {
 void print_r(const ::opencompgraph::internal::ThingR &r) noexcept;
 
 ::rust::Box<::opencompgraph::internal::OperationImpl> create_operation_box(size_t id, ::opencompgraph::OperationType op_type) noexcept;
+
+::opencompgraph::internal::OperationImplShared create_operation_shared(size_t id, ::opencompgraph::OperationType op_type) noexcept;
 
 ::rust::Box<::opencompgraph::internal::GraphImpl> create_graph_box() noexcept;
 

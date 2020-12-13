@@ -30,12 +30,15 @@ add_custom_command(
   COMMENT "Generating CXX Bridge: ${cxxbridge_header_out} ${cxxbridge_source_out}"
   DEPENDS ${cxxbridge_in})
 
+set(opencompgraph_source_files
+  ${CMAKE_CURRENT_SOURCE_DIR}/_cxxbridge.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/cpp.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/operation.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/graph.cpp)
+
 # Add 'opencompgraph' library as a C++ wrapper around the Rust
 # library.
-add_library(${target_lib} SHARED
-  lib.cpp
-  cpp.cpp
-  _cxxbridge.cpp)
+add_library(${target_lib} SHARED ${opencompgraph_source_files})
 target_link_libraries(${target_lib}
   ${rust_linktime_file})
 target_include_directories(${target_lib}
@@ -59,3 +62,5 @@ install(
   ARCHIVE DESTINATION "lib"
   LIBRARY DESTINATION "lib"
   RUNTIME DESTINATION "bin")
+
+set(opencompgraph_source_files ${opencompgraph_source_files} PARENT_SCOPE)

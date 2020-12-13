@@ -19,7 +19,7 @@ RUST_INCLUDE_DIR="${ROOT}/include/"
 # Build Rust
 #
 # Assumes 'cxxbridge-cmd' and 'cbindgen' is installed.
-cxxbridge --header --output "${ROOT}/include/cxx.h"
+cxxbridge --header --output "${ROOT}/include/rust/cxx.h"
 cbindgen --config cbindgen.toml \
          --crate opencompgraph \
          --output "${ROOT}/include/opencompgraph/_cbindgen.h"

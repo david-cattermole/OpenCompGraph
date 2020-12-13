@@ -18,6 +18,11 @@ pub mod ffi {
         inner: Box<GraphImpl>,
     }
 
+    #[namespace = "opencompgraph::internal"]
+    pub(crate) struct OperationImplShared {
+        inner: Box<OperationImpl>,
+    }
+
     #[repr(u8)]
     #[derive(Debug, Copy, Clone, Hash)]
     #[namespace = "opencompgraph"]
@@ -49,8 +54,8 @@ pub mod ffi {
     // ThingC
     #[namespace = "opencompgraph::cpp"]
     unsafe extern "C++" {
+        include!("rust/cxx.h");
         include!("opencompgraph/cpp.h");
-        include!("opencompgraph.h");
 
         type ThingC;
         fn make_thingc(appname: &str) -> UniquePtr<ThingC>;
@@ -109,7 +114,8 @@ pub mod ffi {
     #[namespace = "opencompgraph::internal"]
     extern "Rust" {
         type GraphImpl;
-        fn add_op(&mut self, op: Box<OperationImpl>);
+        fn add_op(&mut self, op_box: Box<OperationImpl>);
+        fn connect(&mut self, src_op_id: usize, dst_op_id: usize);
 
 
     }
@@ -117,6 +123,7 @@ pub mod ffi {
     #[namespace = "opencompgraph::internal"]
     extern "Rust" {
         fn create_operation_box(id: usize, op_type: OperationType) -> Box<OperationImpl>;
+        fn create_operation_shared(id: usize, op_type: OperationType) -> OperationImplShared;
         fn create_graph_box() -> Box<GraphImpl>;
         fn create_graph_shared() -> GraphImplShared;
     }
@@ -145,6 +152,12 @@ fn create_graph_shared() -> ffi::GraphImplShared {
     }
 }
 
+fn create_operation_shared(id: usize, op_type: ffi::OperationType) -> ffi::OperationImplShared {
+    ffi::OperationImplShared {
+        inner: create_operation_box(id, op_type),
+    }
+}
+
 #[derive(Debug)]
 pub struct GraphImpl {
     ops: Vec<Box<OperationImpl>>,
@@ -156,8 +169,9 @@ fn create_graph_box() -> Box<GraphImpl> {
 }
 
 impl GraphImpl {
-    pub fn add_op(&mut self, op: Box<OperationImpl>) {
-        self.ops.push(op);
+    pub fn add_op(&mut self, op_box: Box<OperationImpl>) {
+        println!("Add Op id={}", op_box.get_id());
+        self.ops.push(op_box);
     }
 
     pub fn connect(&mut self, src_op_id: usize, dst_op_id: usize) {
