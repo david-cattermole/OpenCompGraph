@@ -375,7 +375,7 @@ struct OperationImpl final : public ::rust::Opaque {
 #ifndef CXXBRIDGE1_STRUCT_opencompgraph$internal$GraphImpl
 #define CXXBRIDGE1_STRUCT_opencompgraph$internal$GraphImpl
 struct GraphImpl final : public ::rust::Opaque {
-  void add_op(::rust::Box<::opencompgraph::internal::OperationImpl> op_box) noexcept;
+  size_t add_op(::rust::Box<::opencompgraph::internal::OperationImpl> op_box) noexcept;
   void connect(size_t src_op_id, size_t dst_op_id) noexcept;
 };
 #endif // CXXBRIDGE1_STRUCT_opencompgraph$internal$GraphImpl
@@ -424,7 +424,7 @@ size_t opencompgraph$internal$cxxbridge1$OperationImpl$hash(::opencompgraph::int
 
 void opencompgraph$internal$cxxbridge1$OperationImpl$set_attr_string(::opencompgraph::internal::OperationImpl &self, ::rust::repr::PtrLen name, ::rust::repr::PtrLen value) noexcept;
 
-void opencompgraph$internal$cxxbridge1$GraphImpl$add_op(::opencompgraph::internal::GraphImpl &self, ::opencompgraph::internal::OperationImpl *op_box) noexcept;
+size_t opencompgraph$internal$cxxbridge1$GraphImpl$add_op(::opencompgraph::internal::GraphImpl &self, ::opencompgraph::internal::OperationImpl *op_box) noexcept;
 
 void opencompgraph$internal$cxxbridge1$GraphImpl$connect(::opencompgraph::internal::GraphImpl &self, size_t src_op_id, size_t dst_op_id) noexcept;
 
@@ -481,8 +481,8 @@ void OperationImpl::set_attr(::rust::Str name, ::rust::Str value) noexcept {
   opencompgraph$internal$cxxbridge1$OperationImpl$set_attr_string(*this, ::rust::impl<::rust::Str>::repr(name), ::rust::impl<::rust::Str>::repr(value));
 }
 
-void GraphImpl::add_op(::rust::Box<::opencompgraph::internal::OperationImpl> op_box) noexcept {
-  opencompgraph$internal$cxxbridge1$GraphImpl$add_op(*this, op_box.into_raw());
+size_t GraphImpl::add_op(::rust::Box<::opencompgraph::internal::OperationImpl> op_box) noexcept {
+  return opencompgraph$internal$cxxbridge1$GraphImpl$add_op(*this, op_box.into_raw());
 }
 
 void GraphImpl::connect(size_t src_op_id, size_t dst_op_id) noexcept {

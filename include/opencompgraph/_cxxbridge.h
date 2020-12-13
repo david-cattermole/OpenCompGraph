@@ -319,7 +319,7 @@ struct OperationImpl final : public ::rust::Opaque {
 #ifndef CXXBRIDGE1_STRUCT_opencompgraph$internal$GraphImpl
 #define CXXBRIDGE1_STRUCT_opencompgraph$internal$GraphImpl
 struct GraphImpl final : public ::rust::Opaque {
-  void add_op(::rust::Box<::opencompgraph::internal::OperationImpl> op_box) noexcept;
+  size_t add_op(::rust::Box<::opencompgraph::internal::OperationImpl> op_box) noexcept;
   void connect(size_t src_op_id, size_t dst_op_id) noexcept;
 };
 #endif // CXXBRIDGE1_STRUCT_opencompgraph$internal$GraphImpl

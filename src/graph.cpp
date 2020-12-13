@@ -14,9 +14,8 @@ Graph::~Graph() {
 }
 
 size_t Graph::add_op(rust::Box<opencompgraph::internal::OperationImpl> op_box) noexcept {
-    auto id = op_box->get_id();
-    this->inner.inner->add_op(std::move(op_box));
-    return id;
+    auto index = this->inner.inner->add_op(std::move(op_box));
+    return index;
 }
 
 size_t Graph::add_op(Operation &op) noexcept {

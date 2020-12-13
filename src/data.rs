@@ -1,5 +1,13 @@
+#[allow(unused_imports)]
+use petgraph;
 use std::hash::{Hash, Hasher};
 use std::mem;
+
+pub type GraphIdx = usize;
+pub type NodeWeight = usize;
+pub type EdgeWeight = ();
+pub type NodeIdx = petgraph::graph::NodeIndex<GraphIdx>;
+pub type EdgeIdx = petgraph::graph::EdgeIndex<GraphIdx>;
 
 /// Returns the mantissa, exponent and sign as integers.
 fn integer_decode_f32(val: f32) -> (u64, i16, i8) {

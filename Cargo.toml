@@ -16,6 +16,11 @@ crate_type = ["staticlib"]
 cxx = "=1.0.17"
 libc = "0.2.0"
 
+[dependencies.petgraph]
+version = "0.5.1"
+default-features = false
+features = ["stable_graph"]  # "serde-1"
+
 [profile.release]
 opt-level = 3
 debug = false

@@ -117,7 +117,7 @@ pub mod ffi {
     #[namespace = "opencompgraph::internal"]
     extern "Rust" {
         type GraphImpl;
-        fn add_op(&mut self, op_box: Box<OperationImpl>);
+        fn add_op(&mut self, op_box: Box<OperationImpl>) -> usize;
         fn connect(&mut self, src_op_id: usize, dst_op_id: usize);
 
 
