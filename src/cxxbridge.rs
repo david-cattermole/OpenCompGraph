@@ -1,10 +1,15 @@
 #[allow(unused_imports)]
+use cxx::{CxxString, UniquePtr};
+use rand::rngs::SmallRng;
+use rand::{Rng, SeedableRng};
+use std::collections::hash_map::DefaultHasher;
+use std::hash::{Hash, Hasher};
+
 use crate::data::{BoundingBox2D, Matrix4, PixelBlock};
 use crate::graph::create_graph;
 use crate::graph::GraphImpl;
 use crate::ops::create_operation;
 use crate::ops::OperationImpl;
-use cxx::{CxxString, UniquePtr};
 
 #[rustfmt::skip]
 #[cxx::bridge(namespace = "opencompgraph")]
@@ -125,10 +130,12 @@ pub mod ffi {
 
     #[namespace = "opencompgraph::internal"]
     extern "Rust" {
-        fn create_operation_box(id: usize, op_type: OperationType) -> Box<OperationImpl>;
-        fn create_operation_shared(id: usize, op_type: OperationType) -> OperationImplShared;
+        fn create_operation_box(op_type: OperationType, id: usize) -> Box<OperationImpl>;
+        fn create_operation_shared(op_type: OperationType, id: usize) -> OperationImplShared;
         fn create_graph_box() -> Box<GraphImpl>;
         fn create_graph_shared() -> GraphImplShared;
+        fn generate_random_id() -> u64;
+        fn generate_id_from_name(name: &str) -> u64;
     }
 }
 
@@ -149,9 +156,9 @@ fn my_test() {
     });
 }
 
-pub fn create_operation_box(id: usize, op_type: ffi::OperationType) -> Box<OperationImpl> {
-    println!("create_operation_box(id={:?}, op_type={:?})", id, op_type);
-    Box::new(create_operation(id, op_type))
+pub fn create_operation_box(op_type: ffi::OperationType, id: usize) -> Box<OperationImpl> {
+    println!("create_operation_box(op_type={:?}, id={:?})", op_type, id);
+    Box::new(create_operation(op_type, id))
 }
 
 fn create_graph_shared() -> ffi::GraphImplShared {
@@ -161,13 +168,13 @@ fn create_graph_shared() -> ffi::GraphImplShared {
     }
 }
 
-fn create_operation_shared(id: usize, op_type: ffi::OperationType) -> ffi::OperationImplShared {
+fn create_operation_shared(op_type: ffi::OperationType, id: usize) -> ffi::OperationImplShared {
     println!(
-        "create_operation_shared(id={:?}, op_type={:?})",
-        id, op_type
+        "create_operation_shared(op_type={:?}, id={:?})",
+        op_type, id,
     );
     ffi::OperationImplShared {
-        inner: create_operation_box(id, op_type),
+        inner: create_operation_box(op_type, id),
     }
 }
 
@@ -216,4 +223,21 @@ impl Output {
     pub fn get_transform_matrix(&self) -> Matrix4 {
         self.transform_matrix
     }
+}
+
+fn calculate_hash<T: Hash>(t: &T) -> u64 {
+    let mut s = DefaultHasher::new();
+    t.hash(&mut s);
+    s.finish()
+}
+
+fn generate_id_from_name(name: &str) -> u64 {
+    calculate_hash::<&str>(&name)
+}
+
+fn generate_random_id() -> u64 {
+    // Create small, cheap to initialize and fast RNG with a random seed.
+    // The randomness is supplied by the operating system.
+    let mut rng = SmallRng::from_entropy();
+    rng.gen()
 }

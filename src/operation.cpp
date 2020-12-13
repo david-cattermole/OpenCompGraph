@@ -4,11 +4,18 @@
 
 namespace opencompgraph {
 
-Operation::Operation(size_t id, opencompgraph::OperationType op_type) noexcept
-        : inner{internal::create_operation_shared(id, op_type)} {
+
+Operation::Operation(OperationType op_type) noexcept
+        : inner{internal::create_operation_shared(op_type, internal::generate_random_id())} {}
+
+Operation::Operation(OperationType op_type, const char *name) noexcept
+        : inner{internal::create_operation_shared(op_type, internal::generate_id_from_name(name))} {}
+
+Operation::Operation(opencompgraph::OperationType op_type, size_t id) noexcept
+        : inner{internal::create_operation_shared(op_type, id)} {
     std::cout << "Operation()"
-            << " id=" << id
-            << " op_type=" << static_cast<uint8_t>(op_type)
+              << " op_type=" << static_cast<uint32_t>(op_type)
+              << " id=" << id
               << std::endl;
 }
 

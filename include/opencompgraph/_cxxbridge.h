@@ -326,12 +326,16 @@ struct GraphImpl final : public ::rust::Opaque {
 
 void print_r(const ::opencompgraph::internal::ThingR &r) noexcept;
 
-::rust::Box<::opencompgraph::internal::OperationImpl> create_operation_box(size_t id, ::opencompgraph::OperationType op_type) noexcept;
+::rust::Box<::opencompgraph::internal::OperationImpl> create_operation_box(::opencompgraph::OperationType op_type, size_t id) noexcept;
 
-::opencompgraph::internal::OperationImplShared create_operation_shared(size_t id, ::opencompgraph::OperationType op_type) noexcept;
+::opencompgraph::internal::OperationImplShared create_operation_shared(::opencompgraph::OperationType op_type, size_t id) noexcept;
 
 ::rust::Box<::opencompgraph::internal::GraphImpl> create_graph_box() noexcept;
 
 ::opencompgraph::internal::GraphImplShared create_graph_shared() noexcept;
+
+uint64_t generate_random_id() noexcept;
+
+uint64_t generate_id_from_name(::rust::Str name) noexcept;
 } // namespace internal
 } // namespace opencompgraph

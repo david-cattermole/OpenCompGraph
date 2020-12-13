@@ -70,7 +70,7 @@ impl OperationImpl {
     }
 }
 
-pub fn create_operation(id: usize, op_type: OperationType) -> OperationImpl {
+pub fn create_operation(op_type: OperationType, id: usize) -> OperationImpl {
     println!("create_operation(id={:?}, op_type={:?})", id, op_type);
     match op_type {
         OperationType::ReadImage => read_image::new(id),

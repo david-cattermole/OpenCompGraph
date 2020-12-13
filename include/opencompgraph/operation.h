@@ -7,7 +7,10 @@
 namespace opencompgraph {
     class Operation {
     public:
-        Operation(size_t id, OperationType op_type) noexcept;
+        Operation(OperationType op_type) noexcept;
+        Operation(OperationType op_type, const char *name) noexcept;
+        Operation(OperationType op_type, size_t id) noexcept;
+
         ~Operation();
 
         size_t get_id() noexcept;

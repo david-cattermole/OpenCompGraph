@@ -34,7 +34,7 @@ int test_c() {
 
 
     auto read_op = ocg::internal::create_operation_box(
-            id++, ocg::OperationType::ReadImage);
+            ocg::OperationType::ReadImage, id++);
     std::cout << "read_op=" << &read_op << std::endl;
 
     auto read_id2 = read_op->get_id();
@@ -94,7 +94,7 @@ int test_c() {
     // auto read_tmat = read_output->get_transform_matrix();
 
     auto write_op = ocg::internal::create_operation_box(
-            id++, ocg::OperationType::WriteImage);
+            ocg::OperationType::WriteImage, id++);
     std::cout << "write_op=" << &write_op << std::endl;
 
     // write_op->set_input(0, read_op);

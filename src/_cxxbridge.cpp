@@ -428,13 +428,17 @@ size_t opencompgraph$internal$cxxbridge1$GraphImpl$add_op(::opencompgraph::inter
 
 void opencompgraph$internal$cxxbridge1$GraphImpl$connect(::opencompgraph::internal::GraphImpl &self, size_t src_op_id, size_t dst_op_id) noexcept;
 
-::opencompgraph::internal::OperationImpl *opencompgraph$internal$cxxbridge1$create_operation_box(size_t id, ::opencompgraph::OperationType op_type) noexcept;
+::opencompgraph::internal::OperationImpl *opencompgraph$internal$cxxbridge1$create_operation_box(::opencompgraph::OperationType op_type, size_t id) noexcept;
 
-void opencompgraph$internal$cxxbridge1$create_operation_shared(size_t id, ::opencompgraph::OperationType op_type, ::opencompgraph::internal::OperationImplShared *return$) noexcept;
+void opencompgraph$internal$cxxbridge1$create_operation_shared(::opencompgraph::OperationType op_type, size_t id, ::opencompgraph::internal::OperationImplShared *return$) noexcept;
 
 ::opencompgraph::internal::GraphImpl *opencompgraph$internal$cxxbridge1$create_graph_box() noexcept;
 
 void opencompgraph$internal$cxxbridge1$create_graph_shared(::opencompgraph::internal::GraphImplShared *return$) noexcept;
+
+uint64_t opencompgraph$internal$cxxbridge1$generate_random_id() noexcept;
+
+uint64_t opencompgraph$internal$cxxbridge1$generate_id_from_name(::rust::repr::PtrLen name) noexcept;
 } // extern "C"
 
 void print_r(const ::opencompgraph::internal::ThingR &r) noexcept {
@@ -489,13 +493,13 @@ void GraphImpl::connect(size_t src_op_id, size_t dst_op_id) noexcept {
   opencompgraph$internal$cxxbridge1$GraphImpl$connect(*this, src_op_id, dst_op_id);
 }
 
-::rust::Box<::opencompgraph::internal::OperationImpl> create_operation_box(size_t id, ::opencompgraph::OperationType op_type) noexcept {
-  return ::rust::Box<::opencompgraph::internal::OperationImpl>::from_raw(opencompgraph$internal$cxxbridge1$create_operation_box(id, op_type));
+::rust::Box<::opencompgraph::internal::OperationImpl> create_operation_box(::opencompgraph::OperationType op_type, size_t id) noexcept {
+  return ::rust::Box<::opencompgraph::internal::OperationImpl>::from_raw(opencompgraph$internal$cxxbridge1$create_operation_box(op_type, id));
 }
 
-::opencompgraph::internal::OperationImplShared create_operation_shared(size_t id, ::opencompgraph::OperationType op_type) noexcept {
+::opencompgraph::internal::OperationImplShared create_operation_shared(::opencompgraph::OperationType op_type, size_t id) noexcept {
   ::rust::MaybeUninit<::opencompgraph::internal::OperationImplShared> return$;
-  opencompgraph$internal$cxxbridge1$create_operation_shared(id, op_type, &return$.value);
+  opencompgraph$internal$cxxbridge1$create_operation_shared(op_type, id, &return$.value);
   return ::std::move(return$.value);
 }
 
@@ -507,6 +511,14 @@ void GraphImpl::connect(size_t src_op_id, size_t dst_op_id) noexcept {
   ::rust::MaybeUninit<::opencompgraph::internal::GraphImplShared> return$;
   opencompgraph$internal$cxxbridge1$create_graph_shared(&return$.value);
   return ::std::move(return$.value);
+}
+
+uint64_t generate_random_id() noexcept {
+  return opencompgraph$internal$cxxbridge1$generate_random_id();
+}
+
+uint64_t generate_id_from_name(::rust::Str name) noexcept {
+  return opencompgraph$internal$cxxbridge1$generate_id_from_name(::rust::impl<::rust::Str>::repr(name));
 }
 } // namespace internal
 } // namespace opencompgraph
