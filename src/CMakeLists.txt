@@ -15,18 +15,19 @@ message(STATUS "Rust Library: " ${rust_linktime_file})
 # Generate CXX Bridge files.
 find_program(CXXBRIDGE cxxbridge REQUIRED PATHS $ENV{HOME}/.cargo/bin)
 message(STATUS "Using cxxbridge: ${CXXBRIDGE}")
-set(cxxbridge_in "${CMAKE_SOURCE_DIR}/src/cxxbridge.rs")
-set(cxxbridge_source_out "${CMAKE_SOURCE_DIR}/src/_cxxbridge.cpp")
-set(cxxbridge_header_out "${CMAKE_SOURCE_DIR}/include/opencompgraph/_cxxbridge.h")
+set(cxxbridge_in ${CMAKE_SOURCE_DIR}/src/cxxbridge.rs)
+set(cxxbridge_source_out ${CMAKE_SOURCE_DIR}/src/_cxxbridge.cpp)
+set(cxxbridge_header_out ${CMAKE_SOURCE_DIR}/include/opencompgraph/_cxxbridge.h)
 if (MSVC)
   set(cxxbridge_args "--cxx-impl-annotations \"__declspec(dllexport)\"")
 elseif (UNIX) # GCC
-  set(cxxbridge_args "--cxx-impl-annotations \"__attribute__((visibility(\\\"default\\\")))\"")
+  set(cxxbridge_args "--cxx-impl-annotations" "\"__attribute__((visibility(\\\"default\\\")))\"")
 endif()
 add_custom_command(
   OUTPUT ${cxxbridge_source_out} ${cxxbridge_header_out}
   COMMAND ${CXXBRIDGE} ${cxxbridge_in} ${cxxbridge_args} --header --output ${cxxbridge_header_out}
   COMMAND ${CXXBRIDGE} ${cxxbridge_in} ${cxxbridge_args} --output ${cxxbridge_source_out}
+  COMMENT "Generating CXX Bridge: ${cxxbridge_header_out} ${cxxbridge_source_out}"
   DEPENDS ${cxxbridge_in})
 
 # Add 'opencompgraph' library as a C++ wrapper around the Rust

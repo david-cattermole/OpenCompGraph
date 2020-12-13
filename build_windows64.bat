@@ -27,6 +27,9 @@ cargo build --release --verbose
 :: Build C++
 MKDIR build_windows
 CHDIR build_windows
+:: HACK: Create empty file so that CMake can use add_executable, but
+:: the file contents have not yet been written.
+cmake -E touch "%ROOT%\src\_cxxbridge.cpp"
 cmake -G "NMake Makefiles" ^
     -DCMAKE_BUILD_TYPE=Release ^
     -DCMAKE_INSTALL_PREFIX=%INSTALL_DIR% ^
