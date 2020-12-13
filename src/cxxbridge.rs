@@ -159,6 +159,10 @@ impl GraphImpl {
     pub fn add_op(&mut self, op: Box<OperationImpl>) {
         self.ops.push(op);
     }
+
+    pub fn connect(&mut self, src_op_id: usize, dst_op_id: usize) {
+        println!("Connect {} to {}", src_op_id, dst_op_id);
+    }
 }
 
 #[derive(Debug, Clone, Hash)]

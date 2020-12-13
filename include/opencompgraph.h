@@ -14,7 +14,9 @@ namespace opencompgraph {
 
         ~Graph();
 
-        void add_op(rust::Box<opencompgraph::internal::OperationImpl> op_box);
+        size_t add_op(rust::Box<opencompgraph::internal::OperationImpl> op_box) noexcept ;
+
+        void connect(size_t src_op_id, size_t dst_op_id) noexcept ;
 
     private:
 

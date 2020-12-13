@@ -9,11 +9,17 @@ int test_d() {
 
     auto g = ocg::Graph();
 
-    auto op = ocg::internal::create_operation_box(
-            0, ocg::OperationType::Null);
-    std::cout << "op=" << &op << std::endl;
+    auto read_op = ocg::internal::create_operation_box(
+            0, ocg::OperationType::ReadImage);
+    std::cout << "read_op=" << &read_op << std::endl;
 
-    g.add_op(std::move(op));
+    auto write_op = ocg::internal::create_operation_box(
+            0, ocg::OperationType::WriteImage);
+    std::cout << "write_op=" << &write_op << std::endl;
+
+    auto read_op_id = g.add_op(std::move(read_op));
+    auto write_op_id = g.add_op(std::move(write_op));
+    g.connect(read_op_id, write_op_id);
 
     return 0;
 }
