@@ -70,12 +70,12 @@ impl OperationImpl {
     }
 }
 
-pub fn create_operation_box(id: usize, op_type: OperationType) -> Box<OperationImpl> {
+pub fn create_operation(id: usize, op_type: OperationType) -> OperationImpl {
     println!("create_operation(id={:?}, op_type={:?})", id, op_type);
     match op_type {
-        OperationType::ReadImage => Box::new(read_image::new(id)),
-        OperationType::WriteImage => Box::new(write_image::new(id)),
-        OperationType::Null => Box::new(null::new(id)),
+        OperationType::ReadImage => read_image::new(id),
+        OperationType::WriteImage => write_image::new(id),
+        OperationType::Null => null::new(id),
         _ => panic!("Invalid OperationType: {:?}", op_type),
     }
 }

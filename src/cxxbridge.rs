@@ -1,5 +1,8 @@
+#[allow(unused_imports)]
 use crate::data::{BoundingBox2D, Matrix4, PixelBlock};
-use crate::ops::create_operation_box;
+use crate::graph::create_graph;
+use crate::graph::GraphImpl;
+use crate::ops::create_operation;
 use crate::ops::OperationImpl;
 use cxx::{CxxString, UniquePtr};
 
@@ -146,37 +149,31 @@ fn my_test() {
     });
 }
 
+pub fn create_operation_box(id: usize, op_type: ffi::OperationType) -> Box<OperationImpl> {
+    println!("create_operation_box(id={:?}, op_type={:?})", id, op_type);
+    Box::new(create_operation(id, op_type))
+}
+
 fn create_graph_shared() -> ffi::GraphImplShared {
+    println!("create_graph_shared()");
     ffi::GraphImplShared {
         inner: create_graph_box(),
     }
 }
 
 fn create_operation_shared(id: usize, op_type: ffi::OperationType) -> ffi::OperationImplShared {
+    println!(
+        "create_operation_shared(id={:?}, op_type={:?})",
+        id, op_type
+    );
     ffi::OperationImplShared {
         inner: create_operation_box(id, op_type),
     }
 }
 
-#[derive(Debug)]
-pub struct GraphImpl {
-    ops: Vec<Box<OperationImpl>>,
-}
-
 fn create_graph_box() -> Box<GraphImpl> {
-    let ops = Vec::new();
-    Box::new(GraphImpl { ops })
-}
-
-impl GraphImpl {
-    pub fn add_op(&mut self, op_box: Box<OperationImpl>) {
-        println!("Add Op id={}", op_box.get_id());
-        self.ops.push(op_box);
-    }
-
-    pub fn connect(&mut self, src_op_id: usize, dst_op_id: usize) {
-        println!("Connect {} to {}", src_op_id, dst_op_id);
-    }
+    println!("create_graph_box()");
+    Box::new(create_graph())
 }
 
 #[derive(Debug, Clone, Hash)]
