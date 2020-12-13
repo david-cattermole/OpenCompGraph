@@ -1,6 +1,7 @@
 .idea
 /target
-/build
+/build_linux
+/build_windows
 /install
 /cmake-build-*
 **/*.rs.bk

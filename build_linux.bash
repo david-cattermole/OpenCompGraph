@@ -26,8 +26,8 @@ cbindgen --config cbindgen.toml \
 cargo build --release --verbose
 
 # Build C++
-mkdir -p build
-cd build
+mkdir -p build_linux
+cd build_linux
 cmake \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR} \

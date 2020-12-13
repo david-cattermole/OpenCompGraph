@@ -25,8 +25,8 @@ cbindgen --config cbindgen.toml ^
 cargo build --release --verbose
 
 :: Build C++
-MKDIR build
-CHDIR build
+MKDIR build_windows
+CHDIR build_windows
 cmake -G "NMake Makefiles" ^
     -DCMAKE_BUILD_TYPE=Release ^
     -DCMAKE_INSTALL_PREFIX=%INSTALL_DIR% ^
