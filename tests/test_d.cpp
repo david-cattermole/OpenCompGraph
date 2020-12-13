@@ -8,19 +8,23 @@ int test_d() {
 
     auto g = ocg::Graph();
 
+    std::cout << "Operation() ===================================" << std::endl;
     auto read_op = ocg::Operation(0, ocg::OperationType::ReadImage);
     auto write_op = ocg::Operation(1, ocg::OperationType::WriteImage);
     std::cout << "read_op=" << &read_op << std::endl;
     std::cout << "write_op=" << &write_op << std::endl;
-    g.add_op(read_op);
-    g.add_op(write_op);
+    auto read_op_id1 = g.add_op(read_op);
+    auto write_op_id1 = g.add_op(write_op);
+    g.connect(read_op_id1, write_op_id1);
 
-    auto read_op_id = g.create_op(0, ocg::OperationType::ReadImage);
-    auto write_op_id = g.create_op(1, ocg::OperationType::WriteImage);
-    std::cout << "read_op_id=" << read_op_id << std::endl;
-    std::cout << "write_op_id=" << write_op_id << std::endl;
-    g.connect(read_op_id, write_op_id);
+    std::cout << "Graph.create_op() =============================" << std::endl;
+    auto read_op_id2 = g.create_op(0, ocg::OperationType::ReadImage);
+    auto write_op_id2 = g.create_op(1, ocg::OperationType::WriteImage);
+    std::cout << "read_op_id2=" << read_op_id2 << std::endl;
+    std::cout << "write_op_id2=" << write_op_id2 << std::endl;
+    g.connect(read_op_id2, write_op_id2);
 
+    std::cout << "Operation.add_op(Box<OperationImpl>) ==========" << std::endl;
     auto read_op_box = ocg::internal::create_operation_box(
             0, ocg::OperationType::ReadImage);
     auto write_op_box = ocg::internal::create_operation_box(
