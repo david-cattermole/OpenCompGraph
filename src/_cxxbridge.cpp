@@ -443,10 +443,6 @@ void opencompgraph$internal$cxxbridge1$create_operation_shared_with_id(::opencom
 ::opencompgraph::internal::GraphImpl *opencompgraph$internal$cxxbridge1$create_graph_box() noexcept;
 
 void opencompgraph$internal$cxxbridge1$create_graph_shared(::opencompgraph::internal::GraphImplShared *return$) noexcept;
-
-uint64_t opencompgraph$internal$cxxbridge1$generate_random_id() noexcept;
-
-uint64_t opencompgraph$internal$cxxbridge1$generate_id_from_name(::rust::repr::PtrLen name) noexcept;
 } // extern "C"
 
 void print_r(const ::opencompgraph::internal::ThingR &r) noexcept {
@@ -539,14 +535,6 @@ void GraphImpl::connect(uint64_t src_op_id, uint64_t dst_op_id) noexcept {
   ::rust::MaybeUninit<::opencompgraph::internal::GraphImplShared> return$;
   opencompgraph$internal$cxxbridge1$create_graph_shared(&return$.value);
   return ::std::move(return$.value);
-}
-
-uint64_t generate_random_id() noexcept {
-  return opencompgraph$internal$cxxbridge1$generate_random_id();
-}
-
-uint64_t generate_id_from_name(::rust::Str name) noexcept {
-  return opencompgraph$internal$cxxbridge1$generate_id_from_name(::rust::impl<::rust::Str>::repr(name));
 }
 } // namespace internal
 } // namespace opencompgraph

@@ -148,8 +148,6 @@ pub mod ffi {
         fn create_graph_box() -> Box<GraphImpl>;
         fn create_graph_shared() -> GraphImplShared;
 
-        fn generate_random_id() -> u64;
-        fn generate_id_from_name(name: &str) -> u64;
     }
 }
 
