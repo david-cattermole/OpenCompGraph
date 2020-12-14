@@ -124,7 +124,7 @@ pub mod ffi {
     extern "Rust" {
         type GraphImpl;
         fn add_op(&mut self, op_box: Box<OperationImpl>) -> usize;
-        fn connect(&mut self, src_op_id: u64, dst_op_id: u64);
+        fn connect(&mut self, src_index: usize, dst_index: usize);
 
 
     }

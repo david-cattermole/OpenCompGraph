@@ -19,16 +19,13 @@ size_t Graph::add_op(rust::Box<opencompgraph::internal::OperationImpl> op_box) n
 }
 
 size_t Graph::add_op(Operation &op) noexcept {
-    auto id = op.get_id();
     auto op_box = op.get_box();
-    this->inner.inner->add_op(std::move(op_box));
-    return id;
+    return this->inner.inner->add_op(std::move(op_box));
 }
 
 size_t Graph::create_op(opencompgraph::OperationType op_type, size_t id) noexcept {
     auto op = internal::create_operation_shared(op_type, id);
-    this->inner.inner->add_op(std::move(op.inner));
-    return id;
+    return this->inner.inner->add_op(std::move(op.inner));
 }
 
 void Graph::connect(size_t src_op_id, size_t dst_op_id) noexcept {

@@ -27,9 +27,13 @@ impl GraphImpl {
         index
     }
 
-    pub fn connect(&mut self, src_op_id: Identifier, dst_op_id: Identifier) {
-        println!("Connect {} to {}", src_op_id, dst_op_id);
+    pub fn connect(&mut self, src_index: usize, dst_index: usize) {
+        let src = petgraph::graph::NodeIndex::new(src_index);
+        let dst = petgraph::graph::NodeIndex::new(dst_index);
+        let index = self.graph.add_edge(src, dst, ()).index();
+        println!("Connect {} to {}", src_index, dst_index);
     }
+
 }
 
 pub fn create_graph() -> GraphImpl {
