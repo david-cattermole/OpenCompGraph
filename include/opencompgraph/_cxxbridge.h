@@ -217,6 +217,7 @@ public:
 } // namespace rust
 
 namespace opencompgraph {
+  enum class ExecuteStatus : uint8_t;
   enum class OperationType : uint8_t;
   enum class OperationStatus : uint8_t;
   enum class AttrState : uint8_t;
@@ -272,6 +273,14 @@ struct OperationImplShared final {
 #endif // CXXBRIDGE1_STRUCT_opencompgraph$internal$OperationImplShared
 } // namespace internal
 
+#ifndef CXXBRIDGE1_ENUM_opencompgraph$ExecuteStatus
+#define CXXBRIDGE1_ENUM_opencompgraph$ExecuteStatus
+enum class ExecuteStatus : uint8_t {
+  Error = 0,
+  Success = 1,
+};
+#endif // CXXBRIDGE1_ENUM_opencompgraph$ExecuteStatus
+
 #ifndef CXXBRIDGE1_ENUM_opencompgraph$OperationType
 #define CXXBRIDGE1_ENUM_opencompgraph$OperationType
 enum class OperationType : uint8_t {
@@ -321,6 +330,7 @@ struct OperationImpl final : public ::rust::Opaque {
 struct GraphImpl final : public ::rust::Opaque {
   size_t add_op(::rust::Box<::opencompgraph::internal::OperationImpl> op_box) noexcept;
   void connect(size_t src_index, size_t dst_index) noexcept;
+  ::opencompgraph::ExecuteStatus execute(size_t start_index) noexcept;
 };
 #endif // CXXBRIDGE1_STRUCT_opencompgraph$internal$GraphImpl
 

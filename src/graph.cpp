@@ -28,8 +28,12 @@ size_t Graph::create_op(opencompgraph::OperationType op_type, size_t id) noexcep
     return this->inner.inner->add_op(std::move(op.inner));
 }
 
-void Graph::connect(size_t src_op_id, size_t dst_op_id) noexcept {
-    this->inner.inner->connect(src_op_id, dst_op_id);
+void Graph::connect(size_t src_index, size_t dst_index) noexcept {
+    this->inner.inner->connect(src_index, dst_index);
+}
+
+void Graph::execute(size_t start_index) noexcept {
+    this->inner.inner->execute(start_index);
 }
 
 } // namespace opencompgraph

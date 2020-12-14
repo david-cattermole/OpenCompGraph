@@ -14,7 +14,8 @@ namespace opencompgraph {
         size_t add_op(rust::Box<opencompgraph::internal::OperationImpl> op_box) noexcept;
         size_t add_op(Operation &op) noexcept;
         size_t create_op(opencompgraph::OperationType op_type, size_t id) noexcept;
-        void connect(size_t src_op_id, size_t dst_op_id) noexcept;
+        void connect(size_t src_index, size_t dst_index) noexcept;
+        void execute(size_t start_index) noexcept;
 
     private:
         internal::GraphImplShared inner;

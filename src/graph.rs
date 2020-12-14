@@ -28,12 +28,24 @@ impl GraphImpl {
     }
 
     pub fn connect(&mut self, src_index: usize, dst_index: usize) {
+        println!("Connect {} to {}", src_index, dst_index);
         let src = petgraph::graph::NodeIndex::new(src_index);
         let dst = petgraph::graph::NodeIndex::new(dst_index);
         let index = self.graph.add_edge(src, dst, ()).index();
-        println!("Connect {} to {}", src_index, dst_index);
     }
 
+    // Compute The graph
+    pub fn execute(&mut self, start_index: usize) -> ExecuteStatus {
+        println!("Execute: {}", start_index);
+        let start = petgraph::graph::NodeIndex::new(start_index);
+        let mut walker = Bfs::new(&self.graph, start);
+        while let Some(nx) = walker.next(&self.graph) {
+            // we can access `graph` mutably here still
+            println!("walk nx: {}", nx.index());
+            self.graph[nx] += 1;
+        }
+        ExecuteStatus::Success
+    }
 }
 
 pub fn create_graph() -> GraphImpl {

@@ -35,6 +35,14 @@ pub mod ffi {
     #[repr(u8)]
     #[derive(Debug, Copy, Clone, Hash)]
     #[namespace = "opencompgraph"]
+    pub(crate) enum ExecuteStatus {
+        Error = 0,
+        Success = 1,
+    }
+
+    #[repr(u8)]
+    #[derive(Debug, Copy, Clone, Hash)]
+    #[namespace = "opencompgraph"]
     pub(crate) enum OperationType {
         // Creation / Input / Output
         Null = 0,
@@ -125,6 +133,7 @@ pub mod ffi {
         type GraphImpl;
         fn add_op(&mut self, op_box: Box<OperationImpl>) -> usize;
         fn connect(&mut self, src_index: usize, dst_index: usize);
+        fn execute(&mut self, start_index: usize) -> ExecuteStatus;
 
 
     }

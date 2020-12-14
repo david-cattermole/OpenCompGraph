@@ -36,5 +36,9 @@ int test_d() {
     auto write_op_box_id = g.add_op(std::move(write_op_box));
     g.connect(read_op_box_id, write_op_box_id);
 
+    g.execute(write_op_id1);
+    g.execute(write_op_id2);
+    g.execute(write_op_box_id);
+
     return 0;
 }

@@ -273,6 +273,7 @@ template <> struct deleter_if<true> {
 } // namespace rust
 
 namespace opencompgraph {
+  enum class ExecuteStatus : uint8_t;
   enum class OperationType : uint8_t;
   enum class OperationStatus : uint8_t;
   enum class AttrState : uint8_t;
@@ -328,6 +329,14 @@ struct OperationImplShared final {
 #endif // CXXBRIDGE1_STRUCT_opencompgraph$internal$OperationImplShared
 } // namespace internal
 
+#ifndef CXXBRIDGE1_ENUM_opencompgraph$ExecuteStatus
+#define CXXBRIDGE1_ENUM_opencompgraph$ExecuteStatus
+enum class ExecuteStatus : uint8_t {
+  Error = 0,
+  Success = 1,
+};
+#endif // CXXBRIDGE1_ENUM_opencompgraph$ExecuteStatus
+
 #ifndef CXXBRIDGE1_ENUM_opencompgraph$OperationType
 #define CXXBRIDGE1_ENUM_opencompgraph$OperationType
 enum class OperationType : uint8_t {
@@ -377,6 +386,7 @@ struct OperationImpl final : public ::rust::Opaque {
 struct GraphImpl final : public ::rust::Opaque {
   size_t add_op(::rust::Box<::opencompgraph::internal::OperationImpl> op_box) noexcept;
   void connect(size_t src_index, size_t dst_index) noexcept;
+  ::opencompgraph::ExecuteStatus execute(size_t start_index) noexcept;
 };
 #endif // CXXBRIDGE1_STRUCT_opencompgraph$internal$GraphImpl
 } // namespace internal
@@ -427,6 +437,8 @@ void opencompgraph$internal$cxxbridge1$OperationImpl$set_attr_string(::opencompg
 size_t opencompgraph$internal$cxxbridge1$GraphImpl$add_op(::opencompgraph::internal::GraphImpl &self, ::opencompgraph::internal::OperationImpl *op_box) noexcept;
 
 void opencompgraph$internal$cxxbridge1$GraphImpl$connect(::opencompgraph::internal::GraphImpl &self, size_t src_index, size_t dst_index) noexcept;
+
+::opencompgraph::ExecuteStatus opencompgraph$internal$cxxbridge1$GraphImpl$execute(::opencompgraph::internal::GraphImpl &self, size_t start_index) noexcept;
 
 ::opencompgraph::internal::OperationImpl *opencompgraph$internal$cxxbridge1$create_operation_box(::opencompgraph::OperationType op_type) noexcept;
 
@@ -495,6 +507,10 @@ size_t GraphImpl::add_op(::rust::Box<::opencompgraph::internal::OperationImpl> o
 
 void GraphImpl::connect(size_t src_index, size_t dst_index) noexcept {
   opencompgraph$internal$cxxbridge1$GraphImpl$connect(*this, src_index, dst_index);
+}
+
+::opencompgraph::ExecuteStatus GraphImpl::execute(size_t start_index) noexcept {
+  return opencompgraph$internal$cxxbridge1$GraphImpl$execute(*this, start_index);
 }
 
 ::rust::Box<::opencompgraph::internal::OperationImpl> create_operation_box(::opencompgraph::OperationType op_type) noexcept {
