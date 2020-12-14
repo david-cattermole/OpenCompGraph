@@ -5,6 +5,7 @@ use rand::{Rng, SeedableRng};
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
 
+use crate::data::Identifier;
 use crate::data::{BoundingBox2D, Matrix4, PixelBlock};
 use crate::graph::create_graph;
 use crate::graph::GraphImpl;
@@ -100,7 +101,7 @@ pub mod ffi {
     #[namespace = "opencompgraph::internal"]
     extern "Rust" {
         type OperationImpl;
-        fn get_id(&self) -> usize;
+        fn get_id(&self) -> u64;
         fn get_op_type(&self) -> OperationType;
         fn get_op_type_id(&self) -> u8;
         fn get_status(&self) -> OperationStatus;
@@ -123,17 +124,30 @@ pub mod ffi {
     extern "Rust" {
         type GraphImpl;
         fn add_op(&mut self, op_box: Box<OperationImpl>) -> usize;
-        fn connect(&mut self, src_op_id: usize, dst_op_id: usize);
+        fn connect(&mut self, src_op_id: u64, dst_op_id: u64);
 
 
     }
 
     #[namespace = "opencompgraph::internal"]
     extern "Rust" {
-        fn create_operation_box(op_type: OperationType, id: usize) -> Box<OperationImpl>;
-        fn create_operation_shared(op_type: OperationType, id: usize) -> OperationImplShared;
+        #[cxx_name = "create_operation_box"]
+        fn create_operation_box(op_type: OperationType) -> Box<OperationImpl>;
+        #[cxx_name = "create_operation_box"]
+        fn create_operation_box_with_name(op_type: OperationType, name: &str) -> Box<OperationImpl>;
+        #[cxx_name = "create_operation_box"]
+        fn create_operation_box_with_id(op_type: OperationType, id: u64) -> Box<OperationImpl>;
+
+        #[cxx_name = "create_operation_shared"]
+        fn create_operation_shared(op_type: OperationType) -> OperationImplShared;
+        #[cxx_name = "create_operation_shared"]
+        fn create_operation_shared_with_name(op_type: OperationType, name: &str) -> OperationImplShared;
+        #[cxx_name = "create_operation_shared"]
+        fn create_operation_shared_with_id(op_type: OperationType, id: u64) -> OperationImplShared;
+
         fn create_graph_box() -> Box<GraphImpl>;
         fn create_graph_shared() -> GraphImplShared;
+
         fn generate_random_id() -> u64;
         fn generate_id_from_name(name: &str) -> u64;
     }
@@ -156,7 +170,23 @@ fn my_test() {
     });
 }
 
-pub fn create_operation_box(op_type: ffi::OperationType, id: usize) -> Box<OperationImpl> {
+pub fn create_operation_box(op_type: ffi::OperationType) -> Box<OperationImpl> {
+    let id = generate_random_id();
+    create_operation_box_with_id(op_type, id)
+}
+
+pub fn create_operation_box_with_name(
+    op_type: ffi::OperationType,
+    name: &str,
+) -> Box<OperationImpl> {
+    let id = generate_id_from_name(name);
+    create_operation_box_with_id(op_type, id)
+}
+
+pub fn create_operation_box_with_id(
+    op_type: ffi::OperationType,
+    id: Identifier,
+) -> Box<OperationImpl> {
     println!("create_operation_box(op_type={:?}, id={:?})", op_type, id);
     Box::new(create_operation(op_type, id))
 }
@@ -168,13 +198,29 @@ fn create_graph_shared() -> ffi::GraphImplShared {
     }
 }
 
-fn create_operation_shared(op_type: ffi::OperationType, id: usize) -> ffi::OperationImplShared {
+fn create_operation_shared(op_type: ffi::OperationType) -> ffi::OperationImplShared {
+    let id = generate_random_id();
+    create_operation_shared_with_id(op_type, id)
+}
+
+fn create_operation_shared_with_name(
+    op_type: ffi::OperationType,
+    name: &str,
+) -> ffi::OperationImplShared {
+    let id = generate_id_from_name(name);
+    create_operation_shared_with_id(op_type, id)
+}
+
+fn create_operation_shared_with_id(
+    op_type: ffi::OperationType,
+    id: Identifier,
+) -> ffi::OperationImplShared {
     println!(
         "create_operation_shared(op_type={:?}, id={:?})",
         op_type, id,
     );
     ffi::OperationImplShared {
-        inner: create_operation_box(op_type, id),
+        inner: create_operation_box_with_id(op_type, id),
     }
 }
 
@@ -225,17 +271,17 @@ impl Output {
     }
 }
 
-fn calculate_hash<T: Hash>(t: &T) -> u64 {
+fn calculate_hash<T: Hash>(t: &T) -> Identifier {
     let mut s = DefaultHasher::new();
     t.hash(&mut s);
     s.finish()
 }
 
-fn generate_id_from_name(name: &str) -> u64 {
+fn generate_id_from_name(name: &str) -> Identifier {
     calculate_hash::<&str>(&name)
 }
 
-fn generate_random_id() -> u64 {
+fn generate_random_id() -> Identifier {
     // Create small, cheap to initialize and fast RNG with a random seed.
     // The randomness is supplied by the operating system.
     let mut rng = SmallRng::from_entropy();

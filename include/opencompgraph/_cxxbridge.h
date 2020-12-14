@@ -303,7 +303,7 @@ namespace internal {
 #ifndef CXXBRIDGE1_STRUCT_opencompgraph$internal$OperationImpl
 #define CXXBRIDGE1_STRUCT_opencompgraph$internal$OperationImpl
 struct OperationImpl final : public ::rust::Opaque {
-  size_t get_id() const noexcept;
+  uint64_t get_id() const noexcept;
   ::opencompgraph::OperationType get_op_type() const noexcept;
   uint8_t get_op_type_id() const noexcept;
   ::opencompgraph::OperationStatus get_status() const noexcept;
@@ -320,15 +320,23 @@ struct OperationImpl final : public ::rust::Opaque {
 #define CXXBRIDGE1_STRUCT_opencompgraph$internal$GraphImpl
 struct GraphImpl final : public ::rust::Opaque {
   size_t add_op(::rust::Box<::opencompgraph::internal::OperationImpl> op_box) noexcept;
-  void connect(size_t src_op_id, size_t dst_op_id) noexcept;
+  void connect(uint64_t src_op_id, uint64_t dst_op_id) noexcept;
 };
 #endif // CXXBRIDGE1_STRUCT_opencompgraph$internal$GraphImpl
 
 void print_r(const ::opencompgraph::internal::ThingR &r) noexcept;
 
-::rust::Box<::opencompgraph::internal::OperationImpl> create_operation_box(::opencompgraph::OperationType op_type, size_t id) noexcept;
+::rust::Box<::opencompgraph::internal::OperationImpl> create_operation_box(::opencompgraph::OperationType op_type) noexcept;
 
-::opencompgraph::internal::OperationImplShared create_operation_shared(::opencompgraph::OperationType op_type, size_t id) noexcept;
+::rust::Box<::opencompgraph::internal::OperationImpl> create_operation_box(::opencompgraph::OperationType op_type, ::rust::Str name) noexcept;
+
+::rust::Box<::opencompgraph::internal::OperationImpl> create_operation_box(::opencompgraph::OperationType op_type, uint64_t id) noexcept;
+
+::opencompgraph::internal::OperationImplShared create_operation_shared(::opencompgraph::OperationType op_type) noexcept;
+
+::opencompgraph::internal::OperationImplShared create_operation_shared(::opencompgraph::OperationType op_type, ::rust::Str name) noexcept;
+
+::opencompgraph::internal::OperationImplShared create_operation_shared(::opencompgraph::OperationType op_type, uint64_t id) noexcept;
 
 ::rust::Box<::opencompgraph::internal::GraphImpl> create_graph_box() noexcept;
 

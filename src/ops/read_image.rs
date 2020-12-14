@@ -2,10 +2,11 @@ use std::string::String;
 
 use crate::cxxbridge::ffi::{AttrState, OperationStatus, OperationType};
 use crate::cxxbridge::Output;
+use crate::data::Identifier;
 use crate::ops::traits::{AttrBlock, Compute};
 use crate::ops::OperationImpl;
 
-pub fn new(id: usize) -> OperationImpl {
+pub fn new(id: Identifier) -> OperationImpl {
     OperationImpl {
         op_type: OperationType::ReadImage,
         id,
@@ -27,12 +28,11 @@ pub struct ReadImageAttrs {
 }
 
 impl Compute for ReadImageCompute {
-    fn hash(
-        &mut self,
-        id: usize,
-        op_type_id: u8,
-        attr_block: &Box<dyn AttrBlock>,
-    ) -> usize {
+    fn hash(&mut self, id: Identifier, op_type_id: u8, attr_block: &Box<dyn AttrBlock>) -> usize {
+        // virtual const Hash hash() {
+        //     return this->id * this->type * 123456789;
+        // };
+
         0
     }
 

@@ -2,17 +2,17 @@ use std::string::String;
 
 use crate::cxxbridge::ffi::{AttrState, OperationStatus, OperationType};
 use crate::cxxbridge::Output;
+use crate::data::Identifier;
 use crate::ops::traits::{AttrBlock, Compute};
 use crate::ops::OperationImpl;
 
-pub fn new(id: usize) -> OperationImpl {
+pub fn new(id: Identifier) -> OperationImpl {
     OperationImpl {
         op_type: OperationType::Null,
         id,
         op_status: OperationStatus::Uninitialized,
         compute: Box::new(NullCompute {}),
         attr_block: Box::new(NullAttrs {}),
-        // inputs: Vec::<Option<&Operation>>::new(),
         output: Box::new(Output::new()),
     }
 }
@@ -24,13 +24,7 @@ pub struct NullCompute {}
 pub struct NullAttrs {}
 
 impl Compute for NullCompute {
-    fn hash(
-        &mut self,
-        id: usize,
-        op_type_id: u8,
-        attr_block: &Box<dyn AttrBlock>,
-        // inputs: &Vec<Option<&Operation>>,
-    ) -> usize {
+    fn hash(&mut self, id: Identifier, op_type_id: u8, attr_block: &Box<dyn AttrBlock>) -> usize {
         0
     }
 

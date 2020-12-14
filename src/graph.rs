@@ -5,9 +5,8 @@ use std::hash::{Hash, Hasher};
 use crate::cxxbridge::ffi::OperationType;
 use crate::cxxbridge::ffi::{AttrState, OperationStatus};
 use crate::cxxbridge::Output;
-use crate::data::{
-    BoundingBox2D, EdgeIdx, EdgeWeight, GraphIdx, Matrix4, NodeIdx, NodeWeight, PixelBlock,
-};
+use crate::data::{BoundingBox2D, Matrix4, PixelBlock};
+use crate::data::{EdgeIdx, EdgeWeight, GraphIdx, Identifier, NodeIdx, NodeWeight};
 use crate::ops::OperationImpl;
 
 type InnerGraph =
@@ -28,7 +27,7 @@ impl GraphImpl {
         index
     }
 
-    pub fn connect(&mut self, src_op_id: usize, dst_op_id: usize) {
+    pub fn connect(&mut self, src_op_id: Identifier, dst_op_id: Identifier) {
         println!("Connect {} to {}", src_op_id, dst_op_id);
     }
 }

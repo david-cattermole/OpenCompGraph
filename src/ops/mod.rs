@@ -1,6 +1,7 @@
 use crate::cxxbridge::ffi::OperationType;
 use crate::cxxbridge::ffi::{AttrState, OperationStatus};
 use crate::cxxbridge::Output;
+use crate::data::Identifier;
 use crate::data::{BoundingBox2D, Matrix4, PixelBlock};
 
 pub mod null;
@@ -11,7 +12,7 @@ pub mod write_image;
 #[derive(Debug)]
 pub struct OperationImpl {
     op_type: OperationType,
-    id: usize,
+    id: Identifier,
     op_status: OperationStatus,
     attr_block: Box<dyn traits::AttrBlock>,
     compute: Box<dyn traits::Compute>,
@@ -19,7 +20,7 @@ pub struct OperationImpl {
 }
 
 impl OperationImpl {
-    pub fn get_id(&self) -> usize {
+    pub fn get_id(&self) -> Identifier {
         self.id
     }
 
@@ -70,7 +71,7 @@ impl OperationImpl {
     }
 }
 
-pub fn create_operation(op_type: OperationType, id: usize) -> OperationImpl {
+pub fn create_operation(op_type: OperationType, id: Identifier) -> OperationImpl {
     println!("create_operation(id={:?}, op_type={:?})", id, op_type);
     match op_type {
         OperationType::ReadImage => read_image::new(id),

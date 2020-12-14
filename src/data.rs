@@ -3,8 +3,9 @@ use petgraph;
 use std::hash::{Hash, Hasher};
 use std::mem;
 
+pub type Identifier = u64;
 pub type GraphIdx = usize;
-pub type NodeWeight = usize;
+pub type NodeWeight = u64;
 pub type EdgeWeight = ();
 pub type NodeIdx = petgraph::graph::NodeIndex<GraphIdx>;
 pub type EdgeIdx = petgraph::graph::EdgeIndex<GraphIdx>;

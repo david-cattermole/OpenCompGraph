@@ -1,7 +1,8 @@
+#[allow(unused_imports)]
 use crate::cxxbridge::ffi::AttrState;
 use crate::cxxbridge::ffi::OperationStatus;
 use crate::cxxbridge::Output;
-// use crate::data::{BoundingBox2D, Hash, Matrix4, PixelBlock};
+use crate::data::Identifier;
 use crate::ops::OperationImpl;
 
 // pub trait Input {
@@ -19,7 +20,7 @@ pub trait AttrBlock: std::fmt::Debug {
 pub trait Compute: std::fmt::Debug {
     fn hash(
         &mut self,
-        id: usize,
+        id: Identifier,
         op_type_id: u8,
         attr_block: &Box<dyn AttrBlock>,
         // inputs: &Vec<Option<&Operation>>,
