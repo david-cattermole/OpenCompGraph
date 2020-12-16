@@ -2,7 +2,7 @@
 use petgraph;
 use std::hash::{Hash, Hasher};
 
-use crate::cxxbridge::ffi::OperationType;
+use crate::cxxbridge::ffi::ExecuteStatus;
 use crate::cxxbridge::ffi::{AttrState, OperationStatus};
 use crate::cxxbridge::Output;
 use crate::data::{BoundingBox2D, Matrix4, PixelBlock};
