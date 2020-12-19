@@ -79,11 +79,12 @@ int test_c() {
     //     std::cout << "read_y2=" << read_y2 << std::endl;
     // }
 
-    auto inputs = rust::Vec<ocg::internal::Output>();
-    auto read_op_hash = read_op->hash(inputs);
+    auto read_op_inputs = rust::Vec<ocg::internal::StreamDataImplShared>();
+    auto read_op_hash = read_op->hash(read_op_inputs);
     std::cout << "read_op_hash=" << read_op_hash << std::endl;
 
-    read_op->compute(inputs);
+    auto read_op_output = ocg::internal::create_stream_data_shared();
+    read_op->compute(read_op_inputs, read_op_output);
     auto read_status = read_op->get_status_id();
     std::cout << "read_status=" << read_status << std::endl;
 
@@ -120,7 +121,11 @@ int test_c() {
         std::cout << "write_path2=" << write_path2 << std::endl;
     }
 
-    write_op->compute(inputs);
+    auto write_op_inputs = rust::Vec<ocg::internal::StreamDataImplShared>();
+    write_op_inputs.push_back(std::move(read_op_output));
+
+    auto write_op_output = ocg::internal::create_stream_data_shared();
+    write_op->compute(write_op_inputs, write_op_output);
     auto write_status = write_op->get_status_id();
     std::cout << "write_status=" << write_status << std::endl;
     // auto write_result = ocg::get_op_result(write_op);

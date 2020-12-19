@@ -11,6 +11,7 @@ use crate::graph::create_graph;
 use crate::graph::GraphImpl;
 use crate::ops::create_operation;
 use crate::ops::OperationImpl;
+use crate::stream::StreamDataImpl;
 
 #[rustfmt::skip]
 #[cxx::bridge(namespace = "opencompgraph")]
@@ -22,15 +23,24 @@ pub mod ffi {
         x: UniquePtr<ThingC>,
     }
 
+    #[derive(Debug)]
     #[namespace = "opencompgraph::internal"]
     pub(crate) struct GraphImplShared {
         inner: Box<GraphImpl>,
     }
 
+    #[derive(Debug)]
     #[namespace = "opencompgraph::internal"]
     pub(crate) struct OperationImplShared {
         inner: Box<OperationImpl>,
     }
+
+    #[derive(Debug)]
+    #[namespace = "opencompgraph::internal"]
+    pub(crate) struct StreamDataImplShared {
+        inner: Box<StreamDataImpl>,
+    }
+    impl Vec<StreamDataImplShared> {}
 
     #[repr(u8)]
     #[derive(Debug, Copy, Clone, Hash)]
@@ -71,7 +81,7 @@ pub mod ffi {
     #[repr(u8)]
     #[derive(Debug, Copy, Clone, Hash)]
     #[namespace = "opencompgraph"]
-    pub(crate) enum OutputState {
+    pub(crate) enum StreamDataState {
         Invalid = 0,
         Valid = 1,
     }
@@ -113,10 +123,10 @@ pub mod ffi {
         type Matrix4;
     }
 
-    // Operation Outputs
+    // StreamDataImpl
     #[namespace = "opencompgraph::internal"]
     extern "Rust" {
-        type Output;
+        type StreamDataImpl;
         fn get_hash(&self) -> usize;
         fn get_pixel_block(&self) -> &Box<PixelBlock>;
         fn get_bounding_box(&self) -> &Box<BoundingBox2D>;
@@ -135,8 +145,8 @@ pub mod ffi {
         fn get_status_id(&self) -> u8;
 
         // Compute
-        fn hash(&mut self, inputs: &Vec<Output>) -> usize;
-        fn compute(&mut self, inputs: &Vec<Output>) -> OperationStatus;
+        fn hash(&mut self, inputs: &Vec<StreamDataImplShared>) -> usize;
+        fn compute(&mut self, inputs: &Vec<StreamDataImplShared>, output: &mut StreamDataImplShared) -> OperationStatus;
 
 
         // AttrBlock
@@ -157,6 +167,7 @@ pub mod ffi {
 
     }
 
+    // Struct Creation
     #[namespace = "opencompgraph::internal"]
     extern "Rust" {
         #[cxx_name = "create_operation_box"]
@@ -176,6 +187,8 @@ pub mod ffi {
         fn create_graph_box() -> Box<GraphImpl>;
         fn create_graph_shared() -> GraphImplShared;
 
+        fn create_stream_data_box() -> Box<StreamDataImpl>;
+        fn create_stream_data_shared() -> StreamDataImplShared;
     }
 }
 
@@ -255,60 +268,16 @@ fn create_graph_box() -> Box<GraphImpl> {
     Box::new(create_graph())
 }
 
-#[derive(Debug, Clone, Hash)]
-pub struct Output {
-    state: ffi::OutputState,
-    hash: usize,
-    bbox: Box<BoundingBox2D>,
-    pixel_block: Box<PixelBlock>,
-    color_matrix: Box<Matrix4>,
-    transform_matrix: Box<Matrix4>,
+pub fn create_stream_data_shared() -> ffi::StreamDataImplShared {
+    println!("create_stream_data_shared()");
+    ffi::StreamDataImplShared {
+        inner: create_stream_data_box(),
+    }
 }
 
-impl Output {
-    pub fn new() -> Output {
-        let state = ffi::OutputState::Invalid;
-        let hash = 0;
-        let width = 2;
-        let height = 2;
-        let num_channels = 3;
-        let bbox = Box::new(BoundingBox2D::new());
-        let pixel_block = Box::new(PixelBlock::new(width, height, num_channels));
-        let color_matrix = Box::new(Matrix4::new());
-        let transform_matrix = Box::new(Matrix4::new());
-        Output {
-            state,
-            hash,
-            bbox,
-            pixel_block,
-            color_matrix,
-            transform_matrix,
-        }
-    }
-
-    pub fn get_state(&self) -> ffi::OutputState {
-        self.state
-    }
-
-    pub fn get_hash(&self) -> usize {
-        self.hash
-    }
-
-    pub fn get_bounding_box(&self) -> &Box<BoundingBox2D> {
-        &self.bbox
-    }
-
-    pub fn get_pixel_block(&self) -> &Box<PixelBlock> {
-        &self.pixel_block
-    }
-
-    pub fn get_color_matrix(&self) -> &Box<Matrix4> {
-        &self.color_matrix
-    }
-
-    pub fn get_transform_matrix(&self) -> &Box<Matrix4> {
-        &self.transform_matrix
-    }
+pub fn create_stream_data_box() -> Box<StreamDataImpl> {
+    println!("create_stream_data_box()");
+    Box::new(StreamDataImpl::new())
 }
 
 fn calculate_hash<T: Hash>(t: &T) -> Identifier {

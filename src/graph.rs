@@ -3,9 +3,11 @@ use petgraph;
 use petgraph::dot::{Config, Dot};
 use std::hash::{Hash, Hasher};
 
+use crate::cxxbridge::create_stream_data_shared;
+use crate::cxxbridge::ffi::AttrState;
 use crate::cxxbridge::ffi::ExecuteStatus;
-use crate::cxxbridge::ffi::{AttrState, OperationStatus};
-use crate::cxxbridge::Output;
+use crate::cxxbridge::ffi::OperationStatus;
+use crate::cxxbridge::ffi::StreamDataImplShared;
 use crate::data::{BoundingBox2D, Matrix4, PixelBlock};
 use crate::data::{EdgeIdx, EdgeWeight, GraphIdx, Identifier, NodeIdx, NodeWeight};
 use crate::graphiter::UpstreamEvalSearch;
@@ -60,19 +62,20 @@ impl GraphImpl {
             let op = &self.ops[index];
             sorted_op_indexes.push(index);
             assert_eq!(node_weight, op.get_id());
-            println!("walk index: {}", index);
+            // println!("walk index: {}", index);
 
             // // We can access `graph` mutably here still
             // self.graph[nx] += 1;  // Modify the node weight.
         }
 
-        let inputs = Vec::<Output>::new();
+        let inputs = Vec::<StreamDataImplShared>::new();
+        let mut output = create_stream_data_shared();
         for op_index in sorted_op_indexes.iter().rev() {
             println!("op_index: {:?}", op_index);
 
             let op = &mut self.ops[*op_index];
-            println!("op: {:#?}", op);
-            op.compute(&inputs);
+            // println!("op: {:#?}", op);
+            op.compute(&inputs, &mut output);
         }
 
         ExecuteStatus::Success

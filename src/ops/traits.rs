@@ -1,7 +1,7 @@
 #[allow(unused_imports)]
 use crate::cxxbridge::ffi::AttrState;
 use crate::cxxbridge::ffi::OperationStatus;
-use crate::cxxbridge::Output;
+use crate::cxxbridge::ffi::StreamDataImplShared;
 use crate::data::Identifier;
 use crate::ops::OperationImpl;
 
@@ -17,13 +17,13 @@ pub trait Compute: std::fmt::Debug {
         id: Identifier,
         op_type_id: u8,
         attr_block: &Box<dyn AttrBlock>,
-        inputs: &Vec<Output>,
+        inputs: &Vec<StreamDataImplShared>,
     ) -> usize;
 
     fn compute(
         &mut self,
         attr_block: &Box<dyn AttrBlock>,
-        inputs: &Vec<Output>,
-        output: &mut Box<Output>,
+        inputs: &Vec<StreamDataImplShared>,
+        output: &mut StreamDataImplShared,
     ) -> OperationStatus;
 }

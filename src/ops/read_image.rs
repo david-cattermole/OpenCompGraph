@@ -3,7 +3,7 @@ use std::string::String;
 use crate::cxxbridge::ffi::AttrState;
 use crate::cxxbridge::ffi::OperationStatus;
 use crate::cxxbridge::ffi::OperationType;
-use crate::cxxbridge::Output;
+use crate::cxxbridge::ffi::StreamDataImplShared;
 use crate::data::Identifier;
 use crate::ops::traits::{AttrBlock, Compute};
 use crate::ops::OperationImpl;
@@ -17,7 +17,6 @@ pub fn new(id: Identifier) -> OperationImpl {
         attr_block: Box::new(ReadImageAttrs {
             file_path: "".to_string(),
         }),
-        output: Box::new(Output::new()),
     }
 }
 
@@ -35,7 +34,7 @@ impl Compute for ReadImageCompute {
         id: Identifier,
         op_type_id: u8,
         attr_block: &Box<dyn AttrBlock>,
-        inputs: &Vec<Output>,
+        inputs: &Vec<StreamDataImplShared>,
     ) -> usize {
         // virtual const Hash hash() {
         //     return this->id * this->type * 123456789;
@@ -47,8 +46,8 @@ impl Compute for ReadImageCompute {
     fn compute(
         &mut self,
         attr_block: &Box<dyn AttrBlock>,
-        inputs: &Vec<Output>,
-        output: &mut Box<Output>,
+        inputs: &Vec<StreamDataImplShared>,
+        output: &mut StreamDataImplShared,
     ) -> OperationStatus {
         println!("ReadImageCompute.compute()");
         println!("AttrBlock: {:?}", attr_block);

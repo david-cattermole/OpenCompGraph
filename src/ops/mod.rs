@@ -1,8 +1,8 @@
 use crate::cxxbridge::ffi::AttrState;
 use crate::cxxbridge::ffi::OperationStatus;
 use crate::cxxbridge::ffi::OperationType;
-use crate::cxxbridge::ffi::OutputState;
-use crate::cxxbridge::Output;
+use crate::cxxbridge::ffi::StreamDataImplShared;
+use crate::cxxbridge::ffi::StreamDataState;
 use crate::data::Identifier;
 use crate::data::{BoundingBox2D, Matrix4, PixelBlock};
 
@@ -18,7 +18,6 @@ pub struct OperationImpl {
     op_status: OperationStatus,
     attr_block: Box<dyn traits::AttrBlock>,
     compute: Box<dyn traits::Compute>,
-    output: Box<Output>,
 }
 
 impl OperationImpl {
@@ -48,16 +47,19 @@ impl OperationImpl {
 
     // This method is used to determine "has this operation changed?
     // If I re-compute this Operation, do I expect a different value?"
-    pub fn hash(&mut self, inputs: &Vec<Output>) -> usize {
+    pub fn hash(&mut self, inputs: &Vec<StreamDataImplShared>) -> usize {
         println!("Operation.hash() -> {}", self.id);
         let id = self.get_id();
         let op_type_id = self.get_op_type_id();
         self.compute.hash(id, op_type_id, &self.attr_block, inputs)
     }
 
-    pub fn compute(&mut self, inputs: &Vec<Output>) -> OperationStatus {
-        self.compute
-            .compute(&self.attr_block, inputs, &mut self.output)
+    pub fn compute(
+        &mut self,
+        inputs: &Vec<StreamDataImplShared>,
+        output: &mut StreamDataImplShared,
+    ) -> OperationStatus {
+        self.compute.compute(&self.attr_block, inputs, output)
     }
 
     pub fn attr_exists(&self, name: &str) -> AttrState {

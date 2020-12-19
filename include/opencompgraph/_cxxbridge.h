@@ -619,18 +619,19 @@ namespace opencompgraph {
   enum class OperationType : uint8_t;
   enum class OperationStatus : uint8_t;
   enum class AttrState : uint8_t;
-  enum class OutputState : uint8_t;
+  enum class StreamDataState : uint8_t;
   namespace shared {
     struct SharedThing;
   }
   namespace internal {
     struct GraphImplShared;
     struct OperationImplShared;
+    struct StreamDataImplShared;
     struct ThingR;
     struct PixelBlock;
     struct BoundingBox2D;
     struct Matrix4;
-    struct Output;
+    struct StreamDataImpl;
     struct OperationImpl;
     struct GraphImpl;
   }
@@ -671,6 +672,15 @@ struct OperationImplShared final {
   using IsRelocatable = ::std::true_type;
 };
 #endif // CXXBRIDGE1_STRUCT_opencompgraph$internal$OperationImplShared
+
+#ifndef CXXBRIDGE1_STRUCT_opencompgraph$internal$StreamDataImplShared
+#define CXXBRIDGE1_STRUCT_opencompgraph$internal$StreamDataImplShared
+struct StreamDataImplShared final {
+  ::rust::Box<::opencompgraph::internal::StreamDataImpl> inner;
+
+  using IsRelocatable = ::std::true_type;
+};
+#endif // CXXBRIDGE1_STRUCT_opencompgraph$internal$StreamDataImplShared
 } // namespace internal
 
 #ifndef CXXBRIDGE1_ENUM_opencompgraph$ExecuteStatus
@@ -708,25 +718,25 @@ enum class AttrState : uint8_t {
 };
 #endif // CXXBRIDGE1_ENUM_opencompgraph$AttrState
 
-#ifndef CXXBRIDGE1_ENUM_opencompgraph$OutputState
-#define CXXBRIDGE1_ENUM_opencompgraph$OutputState
-enum class OutputState : uint8_t {
+#ifndef CXXBRIDGE1_ENUM_opencompgraph$StreamDataState
+#define CXXBRIDGE1_ENUM_opencompgraph$StreamDataState
+enum class StreamDataState : uint8_t {
   Invalid = 0,
   Valid = 1,
 };
-#endif // CXXBRIDGE1_ENUM_opencompgraph$OutputState
+#endif // CXXBRIDGE1_ENUM_opencompgraph$StreamDataState
 
 namespace internal {
-#ifndef CXXBRIDGE1_STRUCT_opencompgraph$internal$Output
-#define CXXBRIDGE1_STRUCT_opencompgraph$internal$Output
-struct Output final : public ::rust::Opaque {
+#ifndef CXXBRIDGE1_STRUCT_opencompgraph$internal$StreamDataImpl
+#define CXXBRIDGE1_STRUCT_opencompgraph$internal$StreamDataImpl
+struct StreamDataImpl final : public ::rust::Opaque {
   size_t get_hash() const noexcept;
   const ::rust::Box<::opencompgraph::internal::PixelBlock> &get_pixel_block() const noexcept;
   const ::rust::Box<::opencompgraph::internal::BoundingBox2D> &get_bounding_box() const noexcept;
   const ::rust::Box<::opencompgraph::internal::Matrix4> &get_color_matrix() const noexcept;
   const ::rust::Box<::opencompgraph::internal::Matrix4> &get_transform_matrix() const noexcept;
 };
-#endif // CXXBRIDGE1_STRUCT_opencompgraph$internal$Output
+#endif // CXXBRIDGE1_STRUCT_opencompgraph$internal$StreamDataImpl
 
 #ifndef CXXBRIDGE1_STRUCT_opencompgraph$internal$OperationImpl
 #define CXXBRIDGE1_STRUCT_opencompgraph$internal$OperationImpl
@@ -736,8 +746,8 @@ struct OperationImpl final : public ::rust::Opaque {
   uint8_t get_op_type_id() const noexcept;
   ::opencompgraph::OperationStatus get_status() const noexcept;
   uint8_t get_status_id() const noexcept;
-  size_t hash(const ::rust::Vec<::opencompgraph::internal::Output> &inputs) noexcept;
-  ::opencompgraph::OperationStatus compute(const ::rust::Vec<::opencompgraph::internal::Output> &inputs) noexcept;
+  size_t hash(const ::rust::Vec<::opencompgraph::internal::StreamDataImplShared> &inputs) noexcept;
+  ::opencompgraph::OperationStatus compute(const ::rust::Vec<::opencompgraph::internal::StreamDataImplShared> &inputs, ::opencompgraph::internal::StreamDataImplShared &output) noexcept;
   ::opencompgraph::AttrState attr_exists(::rust::Str name) const noexcept;
   ::rust::Str get_attr_string(::rust::Str name) const noexcept;
   void set_attr(::rust::Str name, ::rust::Str value) noexcept;
@@ -770,5 +780,9 @@ void print_r(const ::opencompgraph::internal::ThingR &r) noexcept;
 ::rust::Box<::opencompgraph::internal::GraphImpl> create_graph_box() noexcept;
 
 ::opencompgraph::internal::GraphImplShared create_graph_shared() noexcept;
+
+::rust::Box<::opencompgraph::internal::StreamDataImpl> create_stream_data_box() noexcept;
+
+::opencompgraph::internal::StreamDataImplShared create_stream_data_shared() noexcept;
 } // namespace internal
 } // namespace opencompgraph
