@@ -189,6 +189,7 @@ pub mod ffi {
 
         fn create_stream_data_box() -> Box<StreamDataImpl>;
         fn create_stream_data_shared() -> StreamDataImplShared;
+        fn create_vec_stream_data_shared() -> Vec<StreamDataImplShared>;
     }
 }
 
@@ -266,6 +267,11 @@ fn create_operation_shared_with_id(
 fn create_graph_box() -> Box<GraphImpl> {
     println!("create_graph_box()");
     Box::new(create_graph())
+}
+
+pub fn create_vec_stream_data_shared() -> Vec<ffi::StreamDataImplShared> {
+    println!("create_stream_data_shared()");
+    Vec::<ffi::StreamDataImplShared>::new()
 }
 
 pub fn create_stream_data_shared() -> ffi::StreamDataImplShared {

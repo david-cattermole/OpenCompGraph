@@ -809,5 +809,7 @@ void print_r(const ::opencompgraph::internal::ThingR &r) noexcept;
 ::rust::Box<::opencompgraph::internal::StreamDataImpl> create_stream_data_box() noexcept;
 
 ::opencompgraph::internal::StreamDataImplShared create_stream_data_shared() noexcept;
+
+::rust::Vec<::opencompgraph::internal::StreamDataImplShared> create_vec_stream_data_shared() noexcept;
 } // namespace internal
 } // namespace opencompgraph

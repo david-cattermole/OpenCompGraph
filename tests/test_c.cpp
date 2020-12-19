@@ -79,7 +79,7 @@ int test_c() {
     //     std::cout << "read_y2=" << read_y2 << std::endl;
     // }
 
-    auto read_op_inputs = rust::Vec<ocg::internal::StreamDataImplShared>();
+    auto read_op_inputs = ocg::internal::create_vec_stream_data_shared();
     auto read_op_hash = read_op->hash(read_op_inputs);
     std::cout << "read_op_hash=" << read_op_hash << std::endl;
 
@@ -121,7 +121,7 @@ int test_c() {
         std::cout << "write_path2=" << write_path2 << std::endl;
     }
 
-    auto write_op_inputs = rust::Vec<ocg::internal::StreamDataImplShared>();
+    auto write_op_inputs = ocg::internal::create_vec_stream_data_shared();
     write_op_inputs.push_back(std::move(read_op_output));
 
     auto write_op_output = ocg::internal::create_stream_data_shared();

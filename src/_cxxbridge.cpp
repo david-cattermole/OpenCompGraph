@@ -923,6 +923,8 @@ void opencompgraph$internal$cxxbridge1$create_graph_shared(::opencompgraph::inte
 ::opencompgraph::internal::StreamDataImpl *opencompgraph$internal$cxxbridge1$create_stream_data_box() noexcept;
 
 void opencompgraph$internal$cxxbridge1$create_stream_data_shared(::opencompgraph::internal::StreamDataImplShared *return$) noexcept;
+
+void opencompgraph$internal$cxxbridge1$create_vec_stream_data_shared(::rust::Vec<::opencompgraph::internal::StreamDataImplShared> *return$) noexcept;
 } // extern "C"
 
 void print_r(const ::opencompgraph::internal::ThingR &r) noexcept {
@@ -1048,6 +1050,12 @@ void GraphImpl::connect(::std::size_t src_index, ::std::size_t dst_index, ::std:
 ::opencompgraph::internal::StreamDataImplShared create_stream_data_shared() noexcept {
   ::rust::MaybeUninit<::opencompgraph::internal::StreamDataImplShared> return$;
   opencompgraph$internal$cxxbridge1$create_stream_data_shared(&return$.value);
+  return ::std::move(return$.value);
+}
+
+::rust::Vec<::opencompgraph::internal::StreamDataImplShared> create_vec_stream_data_shared() noexcept {
+  ::rust::MaybeUninit<::rust::Vec<::opencompgraph::internal::StreamDataImplShared>> return$;
+  opencompgraph$internal$cxxbridge1$create_vec_stream_data_shared(&return$.value);
   return ::std::move(return$.value);
 }
 } // namespace internal
