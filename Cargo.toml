@@ -26,6 +26,11 @@ version = "0.5.1"
 default-features = false
 features = ["stable_graph"]  # "serde-1"
 
+[dependencies.image]
+version = "0.23.12"
+default-features = false
+features = ["jpeg", "png", "tga", "tiff"]
+
 [profile.release]
 opt-level = 3
 debug = false

@@ -32,7 +32,6 @@ int test_c() {
 
     size_t id = 0;
 
-
     auto read_op = ocg::internal::create_node_box(
             ocg::NodeType::ReadImage, id++);
     std::cout << "read_op=" << &read_op << std::endl;
@@ -52,7 +51,7 @@ int test_c() {
         auto read_path1 = read_op->get_attr_string(read_attr);
         std::cout << "read_path1=" << read_path1 << std::endl;
 
-        read_op->set_attr(read_attr, "/path/to/image.exr");
+        read_op->set_attr(read_attr, "tests/data/checker_8x8.png");
         auto read_path2 = read_op->get_attr_string(read_attr);
         std::cout << "read_path2=" << read_path2 << std::endl;
     }
@@ -99,7 +98,6 @@ int test_c() {
             ocg::NodeType::WriteImage, id++);
     std::cout << "write_op=" << &write_op << std::endl;
 
-
     auto write_id2 = write_op->get_id();
     std::cout << "write_id2=" << write_id2 << std::endl;
 
@@ -116,7 +114,7 @@ int test_c() {
         auto write_path1 = write_op->get_attr_string(write_attr);
         std::cout << "write_path1=" << write_path1 << std::endl;
 
-        write_op->set_attr(write_attr, "/path/to/image_out.jpg");
+        write_op->set_attr(write_attr, "image_out.jpg");
         auto write_path2 = write_op->get_attr_string(write_attr);
         std::cout << "write_path2=" << write_path2 << std::endl;
     }

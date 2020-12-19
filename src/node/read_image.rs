@@ -1,4 +1,8 @@
+use std::path::Path;
 use std::string::String;
+
+use image;
+use image::GenericImageView;
 
 use crate::cxxbridge::ffi::AttrState;
 use crate::cxxbridge::ffi::NodeStatus;
@@ -53,6 +57,24 @@ impl Compute for ReadImageCompute {
         println!("AttrBlock: {:?}", attr_block);
         println!("Inputs: {:?}", inputs);
         println!("Output: {:?}", output);
+
+        let file_path = attr_block.get_attr_string("file_path");
+        println!("file_path {:?}", file_path);
+
+        let path = match Path::new(&file_path).canonicalize() {
+            Ok(full_path) => full_path,
+            Err(_) => return NodeStatus::Error,
+        };
+        println!("Opening... {:?}", path);
+        if path.is_file() == true {
+            let img = image::open(path).unwrap();
+
+            // The dimensions method returns the images width and height.
+            println!("dimensions {:?}", img.dimensions());
+
+            // The color method returns the image's `ColorType`.
+            println!("{:?}", img.color());
+        }
 
         // virtual void compute() {
         //     // This is the fallback node output.
