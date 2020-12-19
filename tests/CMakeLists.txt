@@ -8,6 +8,7 @@ add_executable(${target_test_exe}
   test_b.cpp
   test_c.cpp
   test_d.cpp
+  test_e.cpp
   ${opencompgraph_source_files})
 target_link_libraries(${target_test_exe} ${target_lib})
 target_include_directories(${target_test_exe}
