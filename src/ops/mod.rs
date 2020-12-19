@@ -1,5 +1,7 @@
+use crate::cxxbridge::ffi::AttrState;
+use crate::cxxbridge::ffi::OperationStatus;
 use crate::cxxbridge::ffi::OperationType;
-use crate::cxxbridge::ffi::{AttrState, OperationStatus};
+use crate::cxxbridge::ffi::OutputState;
 use crate::cxxbridge::Output;
 use crate::data::Identifier;
 use crate::data::{BoundingBox2D, Matrix4, PixelBlock};
@@ -46,16 +48,16 @@ impl OperationImpl {
 
     // This method is used to determine "has this operation changed?
     // If I re-compute this Operation, do I expect a different value?"
-    pub fn hash(&mut self) -> usize {
+    pub fn hash(&mut self, inputs: &Vec<Output>) -> usize {
         println!("Operation.hash() -> {}", self.id);
         let id = self.get_id();
         let op_type_id = self.get_op_type_id();
-        self.compute.hash(id, op_type_id, &self.attr_block)
+        self.compute.hash(id, op_type_id, &self.attr_block, inputs)
     }
 
-
-    pub fn compute(&mut self) -> OperationStatus {
-        self.compute.compute(&self.attr_block, &mut self.output)
+    pub fn compute(&mut self, inputs: &Vec<Output>) -> OperationStatus {
+        self.compute
+            .compute(&self.attr_block, inputs, &mut self.output)
     }
 
     pub fn attr_exists(&self, name: &str) -> AttrState {

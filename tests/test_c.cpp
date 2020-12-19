@@ -79,10 +79,11 @@ int test_c() {
     //     std::cout << "read_y2=" << read_y2 << std::endl;
     // }
 
-    auto read_op_hash = read_op->hash();
+    auto inputs = rust::Vec<ocg::internal::Output>();
+    auto read_op_hash = read_op->hash(inputs);
     std::cout << "read_op_hash=" << read_op_hash << std::endl;
 
-    read_op->compute();
+    read_op->compute(inputs);
     auto read_status = read_op->get_status_id();
     std::cout << "read_status=" << read_status << std::endl;
 
@@ -97,7 +98,6 @@ int test_c() {
             ocg::OperationType::WriteImage, id++);
     std::cout << "write_op=" << &write_op << std::endl;
 
-    // write_op->set_input(0, read_op);
 
     auto write_id2 = write_op->get_id();
     std::cout << "write_id2=" << write_id2 << std::endl;
@@ -120,7 +120,7 @@ int test_c() {
         std::cout << "write_path2=" << write_path2 << std::endl;
     }
 
-    write_op->compute();
+    write_op->compute(inputs);
     auto write_status = write_op->get_status_id();
     std::cout << "write_status=" << write_status << std::endl;
     // auto write_result = ocg::get_op_result(write_op);

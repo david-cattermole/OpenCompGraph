@@ -68,6 +68,14 @@ pub mod ffi {
         Exists = 1,
     }
 
+    #[repr(u8)]
+    #[derive(Debug, Copy, Clone, Hash)]
+    #[namespace = "opencompgraph"]
+    pub(crate) enum OutputState {
+        Invalid = 0,
+        Valid = 1,
+    }
+
     // ThingC
     #[namespace = "opencompgraph::cpp"]
     unsafe extern "C++" {
@@ -105,6 +113,17 @@ pub mod ffi {
         type Matrix4;
     }
 
+    // Operation Outputs
+    #[namespace = "opencompgraph::internal"]
+    extern "Rust" {
+        type Output;
+        fn get_hash(&self) -> usize;
+        fn get_pixel_block(&self) -> &Box<PixelBlock>;
+        fn get_bounding_box(&self) -> &Box<BoundingBox2D>;
+        fn get_color_matrix(&self) -> &Box<Matrix4>;
+        fn get_transform_matrix(&self) -> &Box<Matrix4>;
+    }
+
     // OperationImpl
     #[namespace = "opencompgraph::internal"]
     extern "Rust" {
@@ -116,8 +135,8 @@ pub mod ffi {
         fn get_status_id(&self) -> u8;
 
         // Compute
-        fn hash(&mut self) -> usize;
-        fn compute(&mut self) -> OperationStatus;
+        fn hash(&mut self, inputs: &Vec<Output>) -> usize;
+        fn compute(&mut self, inputs: &Vec<Output>) -> OperationStatus;
 
 
         // AttrBlock
@@ -132,7 +151,7 @@ pub mod ffi {
     extern "Rust" {
         type GraphImpl;
         fn add_op(&mut self, op_box: Box<OperationImpl>) -> usize;
-        fn connect(&mut self, src_index: usize, dst_index: usize);
+        fn connect(&mut self, src_index: usize, dst_index: usize, input_num: u8);
         fn execute(&mut self, start_index: usize) -> ExecuteStatus;
 
 
@@ -238,21 +257,27 @@ fn create_graph_box() -> Box<GraphImpl> {
 
 #[derive(Debug, Clone, Hash)]
 pub struct Output {
+    state: ffi::OutputState,
     hash: usize,
-    bbox: BoundingBox2D,
+    bbox: Box<BoundingBox2D>,
     pixel_block: Box<PixelBlock>,
-    color_matrix: Matrix4,
-    transform_matrix: Matrix4,
+    color_matrix: Box<Matrix4>,
+    transform_matrix: Box<Matrix4>,
 }
 
 impl Output {
     pub fn new() -> Output {
+        let state = ffi::OutputState::Invalid;
         let hash = 0;
-        let bbox = BoundingBox2D::default();
-        let pixel_block = Box::new(PixelBlock::default());
-        let color_matrix = Matrix4::default();
-        let transform_matrix = Matrix4::default();
+        let width = 2;
+        let height = 2;
+        let num_channels = 3;
+        let bbox = Box::new(BoundingBox2D::new());
+        let pixel_block = Box::new(PixelBlock::new(width, height, num_channels));
+        let color_matrix = Box::new(Matrix4::new());
+        let transform_matrix = Box::new(Matrix4::new());
         Output {
+            state,
             hash,
             bbox,
             pixel_block,
@@ -261,20 +286,28 @@ impl Output {
         }
     }
 
+    pub fn get_state(&self) -> ffi::OutputState {
+        self.state
+    }
+
     pub fn get_hash(&self) -> usize {
         self.hash
     }
-    pub fn get_bounding_box(&self) -> BoundingBox2D {
-        self.bbox
+
+    pub fn get_bounding_box(&self) -> &Box<BoundingBox2D> {
+        &self.bbox
     }
-    pub fn get_pixel_block(&self) -> &PixelBlock {
+
+    pub fn get_pixel_block(&self) -> &Box<PixelBlock> {
         &self.pixel_block
     }
-    pub fn get_color_matrix(&self) -> Matrix4 {
-        self.color_matrix
+
+    pub fn get_color_matrix(&self) -> &Box<Matrix4> {
+        &self.color_matrix
     }
-    pub fn get_transform_matrix(&self) -> Matrix4 {
-        self.transform_matrix
+
+    pub fn get_transform_matrix(&self) -> &Box<Matrix4> {
+        &self.transform_matrix
     }
 }
 

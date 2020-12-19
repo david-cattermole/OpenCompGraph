@@ -23,13 +23,13 @@ pub trait Compute: std::fmt::Debug {
         id: Identifier,
         op_type_id: u8,
         attr_block: &Box<dyn AttrBlock>,
-        // inputs: &Vec<Option<&Operation>>,
+        inputs: &Vec<Output>,
     ) -> usize;
 
     fn compute(
         &mut self,
-        // inputs: &[Input],
         attr_block: &Box<dyn AttrBlock>,
+        inputs: &Vec<Output>,
         output: &mut Box<Output>,
     ) -> OperationStatus;
 }

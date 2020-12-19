@@ -1,5 +1,6 @@
 #[allow(unused_imports)]
 use petgraph;
+use petgraph::visit::Bfs;
 use std::hash::{Hash, Hasher};
 
 use crate::cxxbridge::ffi::ExecuteStatus;
@@ -27,11 +28,13 @@ impl GraphImpl {
         index
     }
 
-    pub fn connect(&mut self, src_index: usize, dst_index: usize) {
-        println!("Connect {} to {}", src_index, dst_index);
+    pub fn connect(&mut self, src_index: usize, dst_index: usize, input_num: u8) {
+        println!("Connect {} to {}:{}", src_index, dst_index, input_num);
         let src = petgraph::graph::NodeIndex::new(src_index);
         let dst = petgraph::graph::NodeIndex::new(dst_index);
-        let index = self.graph.add_edge(src, dst, ()).index();
+        // TODO: Check there is no other edge from src to dst, with
+        // the same input_num value.
+        let index = self.graph.add_edge(src, dst, input_num).index();
     }
 
     // Compute The graph

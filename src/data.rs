@@ -6,7 +6,7 @@ use std::mem;
 pub type Identifier = u64;
 pub type GraphIdx = usize;
 pub type NodeWeight = u64;
-pub type EdgeWeight = ();
+pub type EdgeWeight = u8;
 pub type NodeIdx = petgraph::graph::NodeIndex<GraphIdx>;
 pub type EdgeIdx = petgraph::graph::EdgeIndex<GraphIdx>;
 
@@ -34,19 +34,52 @@ impl Distance32 {
     }
 }
 
-#[derive(Debug, Copy, Clone, Default, Hash)]
+#[derive(Debug, Clone)]
 pub struct PixelBlock {
     pub data: bool,
     pub width: u32,
     pub height: u32,
     pub num_channels: u8,
-    pub data_size: u8,
-    // pub pixels: Vec<f32>,
+    pub data_type: u8,
+    pub pixels: Vec<f32>,
+}
+
+impl PixelBlock {
+    pub fn new(width: u32, height: u32, num_channels: u8) -> PixelBlock {
+        let pixels = Vec::<f32>::new();
+        let data = true;
+        let data_type = 0;
+        PixelBlock {
+            data,
+            width,
+            height,
+            num_channels,
+            data_type,
+            pixels,
+        }
+    }
+}
+
+impl Hash for PixelBlock {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.data.hash(state);
+        self.width.hash(state);
+        self.height.hash(state);
+        self.num_channels.hash(state);
+        self.data_type.hash(state);
+        // Note: Skipping the 'pixels' data.
+    }
 }
 
 #[derive(Debug, Copy, Clone, Default, Hash)]
 pub struct Matrix4 {
     pub data: u32,
+}
+
+impl Matrix4 {
+    pub fn new() -> Matrix4 {
+        Matrix4 { data: 0 }
+    }
 }
 
 #[derive(Debug, Copy, Clone, Default)]
@@ -55,6 +88,17 @@ pub struct BoundingBox2D {
     pub ay: f32,
     pub bx: f32,
     pub by: f32,
+}
+
+impl BoundingBox2D {
+    pub fn new() -> BoundingBox2D {
+        BoundingBox2D {
+            ax: 0.0,
+            ay: 0.0,
+            bx: 0.0,
+            by: 0.0,
+        }
+    }
 }
 
 impl Hash for BoundingBox2D {
