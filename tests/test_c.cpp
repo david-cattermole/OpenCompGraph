@@ -17,12 +17,12 @@ int test_c() {
 
     /*
       // Disk-based cache.
-      ocg::DiskCache<ocg::Hash, ocg::BaseOperationResult> cacheB();
+      ocg::DiskCache<ocg::Hash, ocg::BaseNodeResult> cacheB();
       cacheB.setPath("/tmp/openCompGraph");
       cacheB.setCapacity(10 * GIGABYTES_TO_BYTES);
 
       // RAM-based cache.
-      ocg::MemoryCache<ocg::Hash, ocg::BaseOperationResult> cacheA();
+      ocg::MemoryCache<ocg::Hash, ocg::BaseNodeResult> cacheA();
       cacheA.setCapacity(1024 * MEGABYTES_TO_BYTES);
 
       std::vector<BaseCache> cacheList;
@@ -33,14 +33,14 @@ int test_c() {
     size_t id = 0;
 
 
-    auto read_op = ocg::internal::create_operation_box(
-            ocg::OperationType::ReadImage, id++);
+    auto read_op = ocg::internal::create_node_box(
+            ocg::NodeType::ReadImage, id++);
     std::cout << "read_op=" << &read_op << std::endl;
 
     auto read_id2 = read_op->get_id();
     std::cout << "read_id2=" << read_id2 << std::endl;
 
-    auto read_op_type = read_op->get_op_type() == ocg::OperationType::ReadImage;
+    auto read_op_type = read_op->get_op_type() == ocg::NodeType::ReadImage;
     std::cout << "read_op_type=" << read_op_type << std::endl;
 
     auto read_op_type_id = read_op->get_op_type_id();
@@ -95,8 +95,8 @@ int test_c() {
     // auto read_cmat = read_output->get_color_matrix();
     // auto read_tmat = read_output->get_transform_matrix();
 
-    auto write_op = ocg::internal::create_operation_box(
-            ocg::OperationType::WriteImage, id++);
+    auto write_op = ocg::internal::create_node_box(
+            ocg::NodeType::WriteImage, id++);
     std::cout << "write_op=" << &write_op << std::endl;
 
 
@@ -104,7 +104,7 @@ int test_c() {
     std::cout << "write_id2=" << write_id2 << std::endl;
 
     auto write_op_type =
-            write_op->get_op_type() == ocg::OperationType::ReadImage;
+            write_op->get_op_type() == ocg::NodeType::ReadImage;
     std::cout << "write_op_type=" << write_op_type << std::endl;
 
     auto write_op_type_id = write_op->get_op_type_id();
@@ -130,31 +130,5 @@ int test_c() {
     std::cout << "write_status=" << write_status << std::endl;
     // auto write_result = ocg::get_op_result(write_op);
     // auto write_hash = ocg::get_result_hash(read_result);
-
-    /*
-    // ocg::compile(mergeOp, cacheList);
-
-    OperationList opList {mergeOp};
-    while (true) {
-        OperationList tempList = opList;
-        for (const auto op : tempList) {
-            OperationList inputs = op->getNeededInputs();
-            for (const auto inOp : input) {
-                opList.push_back();
-            }
-        }
-        if (tempList.size() == opList.size()) {
-            // Nothing added
-            break;
-        }
-    }
-    // for (auto op : opList) {
-    for (auto it = opList.rbegin(); it != opList.rend(); ++it) {
-        Operation op = &it;
-        // op.getOutput(cacheList);
-        BaseOperationResult res = ocg::OperationHelper::getOpResult(op, cache);
-    }
-    */
-
     return 0;
 }

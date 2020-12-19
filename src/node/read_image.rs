@@ -1,18 +1,18 @@
 use std::string::String;
 
 use crate::cxxbridge::ffi::AttrState;
-use crate::cxxbridge::ffi::OperationStatus;
-use crate::cxxbridge::ffi::OperationType;
+use crate::cxxbridge::ffi::NodeStatus;
+use crate::cxxbridge::ffi::NodeType;
 use crate::cxxbridge::ffi::StreamDataImplShared;
 use crate::data::Identifier;
-use crate::ops::traits::{AttrBlock, Compute};
-use crate::ops::OperationImpl;
+use crate::node::traits::{AttrBlock, Compute};
+use crate::node::NodeImpl;
 
-pub fn new(id: Identifier) -> OperationImpl {
-    OperationImpl {
-        op_type: OperationType::ReadImage,
+pub fn new(id: Identifier) -> NodeImpl {
+    NodeImpl {
+        op_type: NodeType::ReadImage,
         id,
-        op_status: OperationStatus::Uninitialized,
+        op_status: NodeStatus::Uninitialized,
         compute: Box::new(ReadImageCompute {}),
         attr_block: Box::new(ReadImageAttrs {
             file_path: "".to_string(),
@@ -48,12 +48,43 @@ impl Compute for ReadImageCompute {
         attr_block: &Box<dyn AttrBlock>,
         inputs: &Vec<StreamDataImplShared>,
         output: &mut StreamDataImplShared,
-    ) -> OperationStatus {
+    ) -> NodeStatus {
         println!("ReadImageCompute.compute()");
         println!("AttrBlock: {:?}", attr_block);
         println!("Inputs: {:?}", inputs);
         println!("Output: {:?}", output);
-        OperationStatus::Valid
+
+        // virtual void compute() {
+        //     // This is the fallback node output.
+        //     Result res = ocg::NodeHelper::createEmptyResult();
+        //
+        //     // Read Image here.
+        //     if (m_path.find(".jpg") != -1) {
+        //         int image_width = 0;
+        //         int image_height = 0;
+        //         void *data = jpeg::read_file(
+        //             m_path.c_str(),
+        //             image_width,
+        //             image_height);
+        //
+        //         PixelBlock pixels;
+        //         pixels.data = data;
+        //
+        //         BoundingBox displayBox;
+        //         displayBox.min.x = 0;
+        //         displayBox.min.y = 0;
+        //         displayBox.max.x = image_width;
+        //         displayBox.max.y = image_height;
+        //
+        //         Image img;
+        //         img.pixelBlock = pixels;
+        //         img.displayWindow = displayBox;
+        //
+        //         m_result.setImage(img);
+        //     }
+        // };
+
+        NodeStatus::Valid
     }
 }
 

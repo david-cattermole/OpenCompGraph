@@ -8,13 +8,13 @@ int test_e() {
 
     auto g = ocg::Graph();
 
-    std::cout << "Operation() ===================================" << std::endl;
-    auto read_op = ocg::Operation(ocg::OperationType::ReadImage, "read");
-    auto null_op1 = ocg::Operation(ocg::OperationType::Null, "null1");
-    auto null_op2 = ocg::Operation(ocg::OperationType::Null, "null2");
-    auto null_op3 = ocg::Operation(ocg::OperationType::Null, "null3");
-    auto null_op4 = ocg::Operation(ocg::OperationType::Null, "null4");
-    auto write_op = ocg::Operation(ocg::OperationType::WriteImage, "write");
+    std::cout << "Node() ===================================" << std::endl;
+    auto read_op = ocg::Node(ocg::NodeType::ReadImage, "read");
+    auto null_op1 = ocg::Node(ocg::NodeType::Null, "null1");
+    auto null_op2 = ocg::Node(ocg::NodeType::Null, "null2");
+    auto null_op3 = ocg::Node(ocg::NodeType::Null, "null3");
+    auto null_op4 = ocg::Node(ocg::NodeType::Null, "null4");
+    auto write_op = ocg::Node(ocg::NodeType::WriteImage, "write");
     std::cout << "read_op=" << &read_op << std::endl;
     std::cout << "write_op=" << &write_op << std::endl;
     auto read_op_id = g.add_op(read_op);

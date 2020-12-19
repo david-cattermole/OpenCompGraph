@@ -9,8 +9,8 @@ use crate::data::Identifier;
 use crate::data::{BoundingBox2D, Matrix4, PixelBlock};
 use crate::graph::create_graph;
 use crate::graph::GraphImpl;
-use crate::ops::create_operation;
-use crate::ops::OperationImpl;
+use crate::node::create_node;
+use crate::node::NodeImpl;
 use crate::stream::StreamDataImpl;
 
 #[rustfmt::skip]
@@ -31,8 +31,8 @@ pub mod ffi {
 
     #[derive(Debug)]
     #[namespace = "opencompgraph::internal"]
-    pub(crate) struct OperationImplShared {
-        inner: Box<OperationImpl>,
+    pub(crate) struct NodeImplShared {
+        inner: Box<NodeImpl>,
     }
 
     #[derive(Debug)]
@@ -53,7 +53,7 @@ pub mod ffi {
     #[repr(u8)]
     #[derive(Debug, Copy, Clone, Hash)]
     #[namespace = "opencompgraph"]
-    pub(crate) enum OperationType {
+    pub(crate) enum NodeType {
         // Creation / Input / Output
         Null = 0,
         ReadImage = 1,
@@ -63,7 +63,7 @@ pub mod ffi {
     #[repr(u8)]
     #[derive(Debug, Copy, Clone, Hash)]
     #[namespace = "opencompgraph"]
-    pub(crate) enum OperationStatus {
+    pub(crate) enum NodeStatus {
         Error = 0,
         Warning = 1,
         Valid = 2,
@@ -134,19 +134,19 @@ pub mod ffi {
         fn get_transform_matrix(&self) -> &Box<Matrix4>;
     }
 
-    // OperationImpl
+    // NodeImpl
     #[namespace = "opencompgraph::internal"]
     extern "Rust" {
-        type OperationImpl;
+        type NodeImpl;
         fn get_id(&self) -> u64;
-        fn get_op_type(&self) -> OperationType;
+        fn get_op_type(&self) -> NodeType;
         fn get_op_type_id(&self) -> u8;
-        fn get_status(&self) -> OperationStatus;
+        fn get_status(&self) -> NodeStatus;
         fn get_status_id(&self) -> u8;
 
         // Compute
         fn hash(&mut self, inputs: &Vec<StreamDataImplShared>) -> usize;
-        fn compute(&mut self, inputs: &Vec<StreamDataImplShared>, output: &mut StreamDataImplShared) -> OperationStatus;
+        fn compute(&mut self, inputs: &Vec<StreamDataImplShared>, output: &mut StreamDataImplShared) -> NodeStatus;
 
 
         // AttrBlock
@@ -160,7 +160,7 @@ pub mod ffi {
     #[namespace = "opencompgraph::internal"]
     extern "Rust" {
         type GraphImpl;
-        fn add_op(&mut self, op_box: Box<OperationImpl>) -> usize;
+        fn add_op(&mut self, op_box: Box<NodeImpl>) -> usize;
         fn connect(&mut self, src_index: usize, dst_index: usize, input_num: u8);
         fn execute(&mut self, start_index: usize) -> ExecuteStatus;
 
@@ -170,19 +170,19 @@ pub mod ffi {
     // Struct Creation
     #[namespace = "opencompgraph::internal"]
     extern "Rust" {
-        #[cxx_name = "create_operation_box"]
-        fn create_operation_box(op_type: OperationType) -> Box<OperationImpl>;
-        #[cxx_name = "create_operation_box"]
-        fn create_operation_box_with_name(op_type: OperationType, name: &str) -> Box<OperationImpl>;
-        #[cxx_name = "create_operation_box"]
-        fn create_operation_box_with_id(op_type: OperationType, id: u64) -> Box<OperationImpl>;
+        #[cxx_name = "create_node_box"]
+        fn create_node_box(op_type: NodeType) -> Box<NodeImpl>;
+        #[cxx_name = "create_node_box"]
+        fn create_node_box_with_name(op_type: NodeType, name: &str) -> Box<NodeImpl>;
+        #[cxx_name = "create_node_box"]
+        fn create_node_box_with_id(op_type: NodeType, id: u64) -> Box<NodeImpl>;
 
-        #[cxx_name = "create_operation_shared"]
-        fn create_operation_shared(op_type: OperationType) -> OperationImplShared;
-        #[cxx_name = "create_operation_shared"]
-        fn create_operation_shared_with_name(op_type: OperationType, name: &str) -> OperationImplShared;
-        #[cxx_name = "create_operation_shared"]
-        fn create_operation_shared_with_id(op_type: OperationType, id: u64) -> OperationImplShared;
+        #[cxx_name = "create_node_shared"]
+        fn create_node_shared(op_type: NodeType) -> NodeImplShared;
+        #[cxx_name = "create_node_shared"]
+        fn create_node_shared_with_name(op_type: NodeType, name: &str) -> NodeImplShared;
+        #[cxx_name = "create_node_shared"]
+        fn create_node_shared_with_id(op_type: NodeType, id: u64) -> NodeImplShared;
 
         fn create_graph_box() -> Box<GraphImpl>;
         fn create_graph_shared() -> GraphImplShared;
@@ -210,25 +210,19 @@ fn my_test() {
     });
 }
 
-pub fn create_operation_box(op_type: ffi::OperationType) -> Box<OperationImpl> {
+pub fn create_node_box(op_type: ffi::NodeType) -> Box<NodeImpl> {
     let id = generate_random_id();
-    create_operation_box_with_id(op_type, id)
+    create_node_box_with_id(op_type, id)
 }
 
-pub fn create_operation_box_with_name(
-    op_type: ffi::OperationType,
-    name: &str,
-) -> Box<OperationImpl> {
+pub fn create_node_box_with_name(op_type: ffi::NodeType, name: &str) -> Box<NodeImpl> {
     let id = generate_id_from_name(name);
-    create_operation_box_with_id(op_type, id)
+    create_node_box_with_id(op_type, id)
 }
 
-pub fn create_operation_box_with_id(
-    op_type: ffi::OperationType,
-    id: Identifier,
-) -> Box<OperationImpl> {
-    println!("create_operation_box(op_type={:?}, id={:?})", op_type, id);
-    Box::new(create_operation(op_type, id))
+pub fn create_node_box_with_id(op_type: ffi::NodeType, id: Identifier) -> Box<NodeImpl> {
+    println!("create_node_box(op_type={:?}, id={:?})", op_type, id);
+    Box::new(create_node(op_type, id))
 }
 
 fn create_graph_shared() -> ffi::GraphImplShared {
@@ -238,29 +232,20 @@ fn create_graph_shared() -> ffi::GraphImplShared {
     }
 }
 
-fn create_operation_shared(op_type: ffi::OperationType) -> ffi::OperationImplShared {
+fn create_node_shared(op_type: ffi::NodeType) -> ffi::NodeImplShared {
     let id = generate_random_id();
-    create_operation_shared_with_id(op_type, id)
+    create_node_shared_with_id(op_type, id)
 }
 
-fn create_operation_shared_with_name(
-    op_type: ffi::OperationType,
-    name: &str,
-) -> ffi::OperationImplShared {
+fn create_node_shared_with_name(op_type: ffi::NodeType, name: &str) -> ffi::NodeImplShared {
     let id = generate_id_from_name(name);
-    create_operation_shared_with_id(op_type, id)
+    create_node_shared_with_id(op_type, id)
 }
 
-fn create_operation_shared_with_id(
-    op_type: ffi::OperationType,
-    id: Identifier,
-) -> ffi::OperationImplShared {
-    println!(
-        "create_operation_shared(op_type={:?}, id={:?})",
-        op_type, id,
-    );
-    ffi::OperationImplShared {
-        inner: create_operation_box_with_id(op_type, id),
+fn create_node_shared_with_id(op_type: ffi::NodeType, id: Identifier) -> ffi::NodeImplShared {
+    println!("create_node_shared(op_type={:?}, id={:?})", op_type, id,);
+    ffi::NodeImplShared {
+        inner: create_node_box_with_id(op_type, id),
     }
 }
 

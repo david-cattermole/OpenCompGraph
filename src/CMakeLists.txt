@@ -33,7 +33,7 @@ add_custom_command(
 set(opencompgraph_source_files
   ${CMAKE_CURRENT_SOURCE_DIR}/_cxxbridge.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/cpp.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/operation.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/node.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/graph.cpp)
 
 # Add 'opencompgraph' library as a C++ wrapper around the Rust

@@ -6,6 +6,6 @@
 #include <opencompgraph/_cxxbridge.h>
 #include <opencompgraph/cpp.h>
 #include <opencompgraph/graph.h>
-#include <opencompgraph/operation.h>
+#include <opencompgraph/node.h>
 
 #endif // OPENCOMPGRAPH_H

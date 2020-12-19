@@ -1,6 +1,6 @@
 use crate::cxxbridge::ffi::AttrState;
-use crate::cxxbridge::ffi::OperationStatus;
-use crate::cxxbridge::ffi::OperationType;
+use crate::cxxbridge::ffi::NodeStatus;
+use crate::cxxbridge::ffi::NodeType;
 use crate::cxxbridge::ffi::StreamDataImplShared;
 use crate::cxxbridge::ffi::StreamDataState;
 use crate::data::Identifier;
@@ -12,43 +12,43 @@ pub mod traits;
 pub mod write_image;
 
 #[derive(Debug)]
-pub struct OperationImpl {
-    op_type: OperationType,
+pub struct NodeImpl {
+    op_type: NodeType,
     id: Identifier,
-    op_status: OperationStatus,
+    op_status: NodeStatus,
     attr_block: Box<dyn traits::AttrBlock>,
     compute: Box<dyn traits::Compute>,
 }
 
-impl OperationImpl {
+impl NodeImpl {
     pub fn get_id(&self) -> Identifier {
         self.id
     }
 
-    pub fn get_op_type(&self) -> OperationType {
-        println!("Operation.get_op_type() -> {:?}", self.op_type);
+    pub fn get_op_type(&self) -> NodeType {
+        println!("Node.get_op_type() -> {:?}", self.op_type);
         self.op_type
     }
 
     pub fn get_op_type_id(&self) -> u8 {
-        println!("Operation.get_op_type_id() -> {}", self.op_type.repr);
+        println!("Node.get_op_type_id() -> {}", self.op_type.repr);
         self.op_type.repr
     }
 
-    pub fn get_status(&self) -> OperationStatus {
-        println!("Operation.get_status() -> {:?}", self.op_status);
+    pub fn get_status(&self) -> NodeStatus {
+        println!("Node.get_status() -> {:?}", self.op_status);
         self.op_status
     }
 
     pub fn get_status_id(&self) -> u8 {
-        println!("Operation.get_status_id() -> {}", self.op_status.repr);
+        println!("Node.get_status_id() -> {}", self.op_status.repr);
         self.op_status.repr
     }
 
-    // This method is used to determine "has this operation changed?
-    // If I re-compute this Operation, do I expect a different value?"
+    // This method is used to determine "has this node changed?
+    // If I re-compute this Node, do I expect a different value?"
     pub fn hash(&mut self, inputs: &Vec<StreamDataImplShared>) -> usize {
-        println!("Operation.hash() -> {}", self.id);
+        println!("Node.hash() -> {}", self.id);
         let id = self.get_id();
         let op_type_id = self.get_op_type_id();
         self.compute.hash(id, op_type_id, &self.attr_block, inputs)
@@ -58,7 +58,7 @@ impl OperationImpl {
         &mut self,
         inputs: &Vec<StreamDataImplShared>,
         output: &mut StreamDataImplShared,
-    ) -> OperationStatus {
+    ) -> NodeStatus {
         self.compute.compute(&self.attr_block, inputs, output)
     }
 
@@ -75,12 +75,12 @@ impl OperationImpl {
     }
 }
 
-pub fn create_operation(op_type: OperationType, id: Identifier) -> OperationImpl {
-    println!("create_operation(id={:?}, op_type={:?})", id, op_type);
+pub fn create_node(op_type: NodeType, id: Identifier) -> NodeImpl {
+    println!("create_node(id={:?}, op_type={:?})", id, op_type);
     match op_type {
-        OperationType::ReadImage => read_image::new(id),
-        OperationType::WriteImage => write_image::new(id),
-        OperationType::Null => null::new(id),
-        _ => panic!("Invalid OperationType: {:?}", op_type),
+        NodeType::ReadImage => read_image::new(id),
+        NodeType::WriteImage => write_image::new(id),
+        NodeType::Null => null::new(id),
+        _ => panic!("Invalid NodeType: {:?}", op_type),
     }
 }

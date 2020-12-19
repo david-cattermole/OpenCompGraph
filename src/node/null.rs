@@ -1,18 +1,18 @@
 use std::string::String;
 
 use crate::cxxbridge::ffi::AttrState;
-use crate::cxxbridge::ffi::OperationStatus;
-use crate::cxxbridge::ffi::OperationType;
+use crate::cxxbridge::ffi::NodeStatus;
+use crate::cxxbridge::ffi::NodeType;
 use crate::cxxbridge::ffi::StreamDataImplShared;
 use crate::data::Identifier;
-use crate::ops::traits::{AttrBlock, Compute};
-use crate::ops::OperationImpl;
+use crate::node::traits::{AttrBlock, Compute};
+use crate::node::NodeImpl;
 
-pub fn new(id: Identifier) -> OperationImpl {
-    OperationImpl {
-        op_type: OperationType::Null,
+pub fn new(id: Identifier) -> NodeImpl {
+    NodeImpl {
+        op_type: NodeType::Null,
         id,
-        op_status: OperationStatus::Uninitialized,
+        op_status: NodeStatus::Uninitialized,
         compute: Box::new(NullCompute {}),
         attr_block: Box::new(NullAttrs {}),
     }
@@ -40,12 +40,12 @@ impl Compute for NullCompute {
         attr_block: &Box<dyn AttrBlock>,
         inputs: &Vec<StreamDataImplShared>,
         output: &mut StreamDataImplShared,
-    ) -> OperationStatus {
+    ) -> NodeStatus {
         println!("NullCompute.compute()");
         println!("AttrBlock: {:?}", attr_block);
         println!("Inputs: {:?}", inputs);
         println!("Output: {:?}", output);
-        OperationStatus::Valid
+        NodeStatus::Valid
     }
 }
 

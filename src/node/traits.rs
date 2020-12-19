@@ -1,9 +1,9 @@
 #[allow(unused_imports)]
 use crate::cxxbridge::ffi::AttrState;
-use crate::cxxbridge::ffi::OperationStatus;
+use crate::cxxbridge::ffi::NodeStatus;
 use crate::cxxbridge::ffi::StreamDataImplShared;
 use crate::data::Identifier;
-use crate::ops::OperationImpl;
+use crate::node::NodeImpl;
 
 pub trait AttrBlock: std::fmt::Debug {
     fn attr_exists(&self, name: &str) -> AttrState;
@@ -25,5 +25,5 @@ pub trait Compute: std::fmt::Debug {
         attr_block: &Box<dyn AttrBlock>,
         inputs: &Vec<StreamDataImplShared>,
         output: &mut StreamDataImplShared,
-    ) -> OperationStatus;
+    ) -> NodeStatus;
 }

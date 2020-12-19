@@ -35,7 +35,7 @@ namespace cpp {
 
 /*
 
-    typedef int OperationType;
+    typedef int NodeType;
     typedef signed long long int Hash;  // 64-bit
     typedef std::size_t Identifier;
 
@@ -154,14 +154,14 @@ namespace cpp {
         virtual Identifier id() const = 0;
 
         // Define the type of this operation; pixel or point, for example.
-        virtual OperationType type() const = 0;
+        virtual NodeType type() const = 0;
 
         virtual Hash hash() const = 0;
         // defined by user, computes a unique integer based on the
         // inputs of the operation and the type of operation. Each
         // operation must have a unique seed value.
 
-        // Compute the Operation's result
+        // Compute the Node's result
         // - Get input data
         //
         // This method takes data from the input op stored
@@ -172,7 +172,7 @@ namespace cpp {
         // Define the type of each input, number of inputs.
         virtual int numInputs() const = 0;
 
-        // Operation may have more than one input Operation.
+        // Node may have more than one input Node.
         virtual OperationSPtr getInput(uint index) const = 0;
         virtual void setInput(uint index, OperationSPtr operation) = 0;
         virtual std::vector<OperationSPtr> getNeededInputs() const = 0;
@@ -287,7 +287,7 @@ namespace cpp {
     public:
 
         // Defines common functions and behavior to be used by
-        // default in a Operation object.
+        // default in a Node object.
         static bool doStuff(int arg) {};
 
         static BaseOperationResult createEmptyResult() {

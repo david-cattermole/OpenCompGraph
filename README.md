@@ -21,7 +21,7 @@ operations on images and their metadata.
   - STB (JPEG, PNG, TIFF, TARGA)
 - Real-time image reader for fast playback (60 fps)
 - Dump data to disk in compressed format (buffer compression file(s)).
-- Caching must be optional (for testing), the Operation object should
+- Caching must be optional (for testing), the Node object should
   know nothing about the Cache, it must function without the Cache.
 - Initial version of project will be single-threaded, but API design
   should be open for multi-threaded processing of the graph. Each

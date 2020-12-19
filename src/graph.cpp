@@ -13,18 +13,18 @@ Graph::~Graph() {
     std::cout << "done with Graph" << std::endl;
 }
 
-size_t Graph::add_op(rust::Box<opencompgraph::internal::OperationImpl> op_box) noexcept {
+size_t Graph::add_op(rust::Box<opencompgraph::internal::NodeImpl> op_box) noexcept {
     auto index = this->inner.inner->add_op(std::move(op_box));
     return index;
 }
 
-size_t Graph::add_op(Operation &op) noexcept {
+size_t Graph::add_op(Node &op) noexcept {
     auto op_box = op.get_box();
     return this->inner.inner->add_op(std::move(op_box));
 }
 
-size_t Graph::create_op(opencompgraph::OperationType op_type, size_t id) noexcept {
-    auto op = internal::create_operation_shared(op_type, id);
+size_t Graph::create_op(opencompgraph::NodeType op_type, size_t id) noexcept {
+    auto op = internal::create_node_shared(op_type, id);
     return this->inner.inner->add_op(std::move(op.inner));
 }
 

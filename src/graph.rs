@@ -6,25 +6,25 @@ use std::hash::{Hash, Hasher};
 use crate::cxxbridge::create_stream_data_shared;
 use crate::cxxbridge::ffi::AttrState;
 use crate::cxxbridge::ffi::ExecuteStatus;
-use crate::cxxbridge::ffi::OperationStatus;
+use crate::cxxbridge::ffi::NodeStatus;
 use crate::cxxbridge::ffi::StreamDataImplShared;
 use crate::data::{BoundingBox2D, Matrix4, PixelBlock};
 use crate::data::{EdgeIdx, EdgeWeight, GraphIdx, Identifier, NodeIdx, NodeWeight};
 use crate::graphiter::UpstreamEvalSearch;
-use crate::ops::OperationImpl;
+use crate::node::NodeImpl;
 
 type InnerGraph =
     petgraph::stable_graph::StableGraph<NodeWeight, EdgeWeight, petgraph::Directed, GraphIdx>;
 
 #[derive(Debug)]
 pub struct GraphImpl {
-    ops: Vec<Box<OperationImpl>>,
+    ops: Vec<Box<NodeImpl>>,
     graph: InnerGraph,
 }
 
 impl GraphImpl {
     // Add, Remove and Modify
-    pub fn add_op(&mut self, op_box: Box<OperationImpl>) -> usize {
+    pub fn add_op(&mut self, op_box: Box<NodeImpl>) -> usize {
         let id = op_box.get_id();
         let ops_index = self.ops.len();
         self.ops.push(op_box);
