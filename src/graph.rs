@@ -24,9 +24,12 @@ impl GraphImpl {
     // Add, Remove and Modify
     pub fn add_op(&mut self, op_box: Box<OperationImpl>) -> usize {
         let id = op_box.get_id();
+        let ops_index = self.ops.len();
         self.ops.push(op_box);
+
         let index = self.graph.add_node(id).index();
         println!("Add Op id={} index={}", id, index);
+        assert_eq!(index, ops_index);
         index
     }
 
@@ -47,11 +50,18 @@ impl GraphImpl {
             Dot::with_config(&self.graph, &[Config::EdgeNoLabel])
         );
 
+        let inputs = Vec::<Output>::new();
         let start = petgraph::graph::NodeIndex::new(start_index);
         let mut walker = UpstreamEvalSearch::new(&self.graph, start);
         while let Some(nx) = walker.next(&self.graph) {
             // we can access `graph` mutably here still
-            println!("walk nx: {}", nx.index());
+            let index = nx.index();
+            let node_weight = self.graph[nx];
+            let op = &mut self.ops[index];
+            assert_eq!(node_weight, op.get_id());
+            println!("walk index: {}", index);
+            // println!("op: {:?}", op);
+            op.compute(&inputs);
             // self.graph[nx] += 1;  // Modify the node weight.
         }
         ExecuteStatus::Success
