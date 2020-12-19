@@ -50,20 +50,31 @@ impl GraphImpl {
             Dot::with_config(&self.graph, &[Config::EdgeNoLabel])
         );
 
-        let inputs = Vec::<Output>::new();
+        let mut sorted_op_indexes = Vec::<usize>::new();
+
         let start = petgraph::graph::NodeIndex::new(start_index);
         let mut walker = UpstreamEvalSearch::new(&self.graph, start);
         while let Some(nx) = walker.next(&self.graph) {
-            // we can access `graph` mutably here still
             let index = nx.index();
             let node_weight = self.graph[nx];
-            let op = &mut self.ops[index];
+            let op = &self.ops[index];
+            sorted_op_indexes.push(index);
             assert_eq!(node_weight, op.get_id());
             println!("walk index: {}", index);
-            // println!("op: {:?}", op);
-            op.compute(&inputs);
+
+            // // We can access `graph` mutably here still
             // self.graph[nx] += 1;  // Modify the node weight.
         }
+
+        let inputs = Vec::<Output>::new();
+        for op_index in sorted_op_indexes.iter().rev() {
+            println!("op_index: {:?}", op_index);
+
+            let op = &mut self.ops[*op_index];
+            println!("op: {:#?}", op);
+            op.compute(&inputs);
+        }
+
         ExecuteStatus::Success
     }
 }
