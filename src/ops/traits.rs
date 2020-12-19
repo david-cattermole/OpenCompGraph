@@ -5,12 +5,6 @@ use crate::cxxbridge::Output;
 use crate::data::Identifier;
 use crate::ops::OperationImpl;
 
-// pub trait Input {
-//     fn get_input(&self, num: usize) -> Operation;
-//     fn set_input(&self, num: usize, op: Operation);
-//     fn get_num_input(&self) -> usize;
-// }
-
 pub trait AttrBlock: std::fmt::Debug {
     fn attr_exists(&self, name: &str) -> AttrState;
     fn get_attr_string(&self, name: &str) -> &str;
