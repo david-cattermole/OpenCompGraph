@@ -1,6 +1,6 @@
 #[allow(unused_imports)]
 use petgraph;
-use petgraph::visit::Bfs;
+use petgraph::dot::{Config, Dot};
 use std::hash::{Hash, Hasher};
 
 use crate::cxxbridge::ffi::ExecuteStatus;
@@ -8,6 +8,7 @@ use crate::cxxbridge::ffi::{AttrState, OperationStatus};
 use crate::cxxbridge::Output;
 use crate::data::{BoundingBox2D, Matrix4, PixelBlock};
 use crate::data::{EdgeIdx, EdgeWeight, GraphIdx, Identifier, NodeIdx, NodeWeight};
+use crate::graphiter::MyBfs;
 use crate::ops::OperationImpl;
 
 type InnerGraph =
@@ -20,6 +21,7 @@ pub struct GraphImpl {
 }
 
 impl GraphImpl {
+    // Add, Remove and Modify
     pub fn add_op(&mut self, op_box: Box<OperationImpl>) -> usize {
         let id = op_box.get_id();
         self.ops.push(op_box);
@@ -40,8 +42,13 @@ impl GraphImpl {
     // Compute The graph
     pub fn execute(&mut self, start_index: usize) -> ExecuteStatus {
         println!("Execute: {}", start_index);
+        println!(
+            "{:?}",
+            Dot::with_config(&self.graph, &[Config::EdgeNoLabel])
+        );
+
         let start = petgraph::graph::NodeIndex::new(start_index);
-        let mut walker = Bfs::new(&self.graph, start);
+        let mut walker = MyBfs::new(&self.graph, start);
         while let Some(nx) = walker.next(&self.graph) {
             // we can access `graph` mutably here still
             println!("walk nx: {}", nx.index());
