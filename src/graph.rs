@@ -8,7 +8,7 @@ use crate::cxxbridge::ffi::{AttrState, OperationStatus};
 use crate::cxxbridge::Output;
 use crate::data::{BoundingBox2D, Matrix4, PixelBlock};
 use crate::data::{EdgeIdx, EdgeWeight, GraphIdx, Identifier, NodeIdx, NodeWeight};
-use crate::graphiter::MyBfs;
+use crate::graphiter::UpstreamEvalSearch;
 use crate::ops::OperationImpl;
 
 type InnerGraph =
@@ -48,11 +48,11 @@ impl GraphImpl {
         );
 
         let start = petgraph::graph::NodeIndex::new(start_index);
-        let mut walker = MyBfs::new(&self.graph, start);
+        let mut walker = UpstreamEvalSearch::new(&self.graph, start);
         while let Some(nx) = walker.next(&self.graph) {
             // we can access `graph` mutably here still
             println!("walk nx: {}", nx.index());
-            self.graph[nx] += 1;
+            // self.graph[nx] += 1;  // Modify the node weight.
         }
         ExecuteStatus::Success
     }

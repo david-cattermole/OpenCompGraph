@@ -4,30 +4,18 @@ use petgraph::{Direction, Incoming};
 use std::collections::VecDeque;
 
 #[derive(Clone)]
-pub struct MyBfs<N, VM> {
+pub struct UpstreamEvalSearch<N, VM> {
     pub stack: VecDeque<N>, // The queue of nodes to visit
     pub discovered: VM,     // The map of discovered nodes
 }
 
-impl<N, VM> Default for MyBfs<N, VM>
-where
-    VM: Default,
-{
-    fn default() -> Self {
-        MyBfs {
-            stack: VecDeque::new(),
-            discovered: VM::default(),
-        }
-    }
-}
-
-impl<N, VM> MyBfs<N, VM>
+impl<N, VM> UpstreamEvalSearch<N, VM>
 where
     N: Copy + PartialEq,
     VM: VisitMap<N>,
 {
-    // Create a new **MyBfs**, using the graph's visitor map, and put
-    // **start** in the stack of nodes to visit.
+    // Create a new **UpstreamEvalSearch**, using the graph's visitor
+    // map, and put **start** in the stack of nodes to visit.
     pub fn new<G>(graph: G, start: N) -> Self
     where
         G: GraphRef + Visitable<NodeId = N, Map = VM>,
@@ -36,7 +24,7 @@ where
         discovered.visit(start);
         let mut stack = VecDeque::new();
         stack.push_front(start);
-        MyBfs { stack, discovered }
+        UpstreamEvalSearch { stack, discovered }
     }
 
     // Return the next node in the bfs, or **None** if the traversal
