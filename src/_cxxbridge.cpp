@@ -823,8 +823,8 @@ struct StreamDataImpl final : public ::rust::Opaque {
 #define CXXBRIDGE1_STRUCT_opencompgraph$internal$NodeImpl
 struct NodeImpl final : public ::rust::Opaque {
   ::std::uint64_t get_id() const noexcept;
-  ::opencompgraph::NodeType get_op_type() const noexcept;
-  ::std::uint8_t get_op_type_id() const noexcept;
+  ::opencompgraph::NodeType get_node_type() const noexcept;
+  ::std::uint8_t get_node_type_id() const noexcept;
   ::opencompgraph::NodeStatus get_status() const noexcept;
   ::std::uint8_t get_status_id() const noexcept;
   ::std::size_t hash(const ::rust::Vec<::opencompgraph::internal::StreamDataImplShared> &inputs) noexcept;
@@ -880,9 +880,9 @@ const ::rust::Box<::opencompgraph::internal::Matrix4> *opencompgraph$internal$cx
 
 ::std::uint64_t opencompgraph$internal$cxxbridge1$NodeImpl$get_id(const ::opencompgraph::internal::NodeImpl &self) noexcept;
 
-::opencompgraph::NodeType opencompgraph$internal$cxxbridge1$NodeImpl$get_op_type(const ::opencompgraph::internal::NodeImpl &self) noexcept;
+::opencompgraph::NodeType opencompgraph$internal$cxxbridge1$NodeImpl$get_node_type(const ::opencompgraph::internal::NodeImpl &self) noexcept;
 
-::std::uint8_t opencompgraph$internal$cxxbridge1$NodeImpl$get_op_type_id(const ::opencompgraph::internal::NodeImpl &self) noexcept;
+::std::uint8_t opencompgraph$internal$cxxbridge1$NodeImpl$get_node_type_id(const ::opencompgraph::internal::NodeImpl &self) noexcept;
 
 ::opencompgraph::NodeStatus opencompgraph$internal$cxxbridge1$NodeImpl$get_status(const ::opencompgraph::internal::NodeImpl &self) noexcept;
 
@@ -904,17 +904,17 @@ void opencompgraph$internal$cxxbridge1$GraphImpl$connect(::opencompgraph::intern
 
 ::opencompgraph::ExecuteStatus opencompgraph$internal$cxxbridge1$GraphImpl$execute(::opencompgraph::internal::GraphImpl &self, ::std::size_t start_index) noexcept;
 
-::opencompgraph::internal::NodeImpl *opencompgraph$internal$cxxbridge1$create_node_box(::opencompgraph::NodeType op_type) noexcept;
+::opencompgraph::internal::NodeImpl *opencompgraph$internal$cxxbridge1$create_node_box(::opencompgraph::NodeType node_type) noexcept;
 
-::opencompgraph::internal::NodeImpl *opencompgraph$internal$cxxbridge1$create_node_box_with_name(::opencompgraph::NodeType op_type, ::rust::repr::PtrLen name) noexcept;
+::opencompgraph::internal::NodeImpl *opencompgraph$internal$cxxbridge1$create_node_box_with_name(::opencompgraph::NodeType node_type, ::rust::repr::PtrLen name) noexcept;
 
-::opencompgraph::internal::NodeImpl *opencompgraph$internal$cxxbridge1$create_node_box_with_id(::opencompgraph::NodeType op_type, ::std::uint64_t id) noexcept;
+::opencompgraph::internal::NodeImpl *opencompgraph$internal$cxxbridge1$create_node_box_with_id(::opencompgraph::NodeType node_type, ::std::uint64_t id) noexcept;
 
-void opencompgraph$internal$cxxbridge1$create_node_shared(::opencompgraph::NodeType op_type, ::opencompgraph::internal::NodeImplShared *return$) noexcept;
+void opencompgraph$internal$cxxbridge1$create_node_shared(::opencompgraph::NodeType node_type, ::opencompgraph::internal::NodeImplShared *return$) noexcept;
 
-void opencompgraph$internal$cxxbridge1$create_node_shared_with_name(::opencompgraph::NodeType op_type, ::rust::repr::PtrLen name, ::opencompgraph::internal::NodeImplShared *return$) noexcept;
+void opencompgraph$internal$cxxbridge1$create_node_shared_with_name(::opencompgraph::NodeType node_type, ::rust::repr::PtrLen name, ::opencompgraph::internal::NodeImplShared *return$) noexcept;
 
-void opencompgraph$internal$cxxbridge1$create_node_shared_with_id(::opencompgraph::NodeType op_type, ::std::uint64_t id, ::opencompgraph::internal::NodeImplShared *return$) noexcept;
+void opencompgraph$internal$cxxbridge1$create_node_shared_with_id(::opencompgraph::NodeType node_type, ::std::uint64_t id, ::opencompgraph::internal::NodeImplShared *return$) noexcept;
 
 ::opencompgraph::internal::GraphImpl *opencompgraph$internal$cxxbridge1$create_graph_box() noexcept;
 
@@ -955,12 +955,12 @@ const ::rust::Box<::opencompgraph::internal::Matrix4> &StreamDataImpl::get_trans
   return opencompgraph$internal$cxxbridge1$NodeImpl$get_id(*this);
 }
 
-::opencompgraph::NodeType NodeImpl::get_op_type() const noexcept {
-  return opencompgraph$internal$cxxbridge1$NodeImpl$get_op_type(*this);
+::opencompgraph::NodeType NodeImpl::get_node_type() const noexcept {
+  return opencompgraph$internal$cxxbridge1$NodeImpl$get_node_type(*this);
 }
 
-::std::uint8_t NodeImpl::get_op_type_id() const noexcept {
-  return opencompgraph$internal$cxxbridge1$NodeImpl$get_op_type_id(*this);
+::std::uint8_t NodeImpl::get_node_type_id() const noexcept {
+  return opencompgraph$internal$cxxbridge1$NodeImpl$get_node_type_id(*this);
 }
 
 ::opencompgraph::NodeStatus NodeImpl::get_status() const noexcept {
@@ -1003,33 +1003,33 @@ void GraphImpl::connect(::std::size_t src_index, ::std::size_t dst_index, ::std:
   return opencompgraph$internal$cxxbridge1$GraphImpl$execute(*this, start_index);
 }
 
-::rust::Box<::opencompgraph::internal::NodeImpl> create_node_box(::opencompgraph::NodeType op_type) noexcept {
-  return ::rust::Box<::opencompgraph::internal::NodeImpl>::from_raw(opencompgraph$internal$cxxbridge1$create_node_box(op_type));
+::rust::Box<::opencompgraph::internal::NodeImpl> create_node_box(::opencompgraph::NodeType node_type) noexcept {
+  return ::rust::Box<::opencompgraph::internal::NodeImpl>::from_raw(opencompgraph$internal$cxxbridge1$create_node_box(node_type));
 }
 
-::rust::Box<::opencompgraph::internal::NodeImpl> create_node_box(::opencompgraph::NodeType op_type, ::rust::Str name) noexcept {
-  return ::rust::Box<::opencompgraph::internal::NodeImpl>::from_raw(opencompgraph$internal$cxxbridge1$create_node_box_with_name(op_type, ::rust::impl<::rust::Str>::repr(name)));
+::rust::Box<::opencompgraph::internal::NodeImpl> create_node_box(::opencompgraph::NodeType node_type, ::rust::Str name) noexcept {
+  return ::rust::Box<::opencompgraph::internal::NodeImpl>::from_raw(opencompgraph$internal$cxxbridge1$create_node_box_with_name(node_type, ::rust::impl<::rust::Str>::repr(name)));
 }
 
-::rust::Box<::opencompgraph::internal::NodeImpl> create_node_box(::opencompgraph::NodeType op_type, ::std::uint64_t id) noexcept {
-  return ::rust::Box<::opencompgraph::internal::NodeImpl>::from_raw(opencompgraph$internal$cxxbridge1$create_node_box_with_id(op_type, id));
+::rust::Box<::opencompgraph::internal::NodeImpl> create_node_box(::opencompgraph::NodeType node_type, ::std::uint64_t id) noexcept {
+  return ::rust::Box<::opencompgraph::internal::NodeImpl>::from_raw(opencompgraph$internal$cxxbridge1$create_node_box_with_id(node_type, id));
 }
 
-::opencompgraph::internal::NodeImplShared create_node_shared(::opencompgraph::NodeType op_type) noexcept {
+::opencompgraph::internal::NodeImplShared create_node_shared(::opencompgraph::NodeType node_type) noexcept {
   ::rust::MaybeUninit<::opencompgraph::internal::NodeImplShared> return$;
-  opencompgraph$internal$cxxbridge1$create_node_shared(op_type, &return$.value);
+  opencompgraph$internal$cxxbridge1$create_node_shared(node_type, &return$.value);
   return ::std::move(return$.value);
 }
 
-::opencompgraph::internal::NodeImplShared create_node_shared(::opencompgraph::NodeType op_type, ::rust::Str name) noexcept {
+::opencompgraph::internal::NodeImplShared create_node_shared(::opencompgraph::NodeType node_type, ::rust::Str name) noexcept {
   ::rust::MaybeUninit<::opencompgraph::internal::NodeImplShared> return$;
-  opencompgraph$internal$cxxbridge1$create_node_shared_with_name(op_type, ::rust::impl<::rust::Str>::repr(name), &return$.value);
+  opencompgraph$internal$cxxbridge1$create_node_shared_with_name(node_type, ::rust::impl<::rust::Str>::repr(name), &return$.value);
   return ::std::move(return$.value);
 }
 
-::opencompgraph::internal::NodeImplShared create_node_shared(::opencompgraph::NodeType op_type, ::std::uint64_t id) noexcept {
+::opencompgraph::internal::NodeImplShared create_node_shared(::opencompgraph::NodeType node_type, ::std::uint64_t id) noexcept {
   ::rust::MaybeUninit<::opencompgraph::internal::NodeImplShared> return$;
-  opencompgraph$internal$cxxbridge1$create_node_shared_with_id(op_type, id, &return$.value);
+  opencompgraph$internal$cxxbridge1$create_node_shared_with_id(node_type, id, &return$.value);
   return ::std::move(return$.value);
 }
 

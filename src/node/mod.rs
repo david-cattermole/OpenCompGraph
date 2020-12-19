@@ -13,7 +13,7 @@ pub mod write_image;
 
 #[derive(Debug)]
 pub struct NodeImpl {
-    op_type: NodeType,
+    node_type: NodeType,
     id: Identifier,
     op_status: NodeStatus,
     attr_block: Box<dyn traits::AttrBlock>,
@@ -25,14 +25,14 @@ impl NodeImpl {
         self.id
     }
 
-    pub fn get_op_type(&self) -> NodeType {
-        println!("Node.get_op_type() -> {:?}", self.op_type);
-        self.op_type
+    pub fn get_node_type(&self) -> NodeType {
+        println!("Node.get_node_type() -> {:?}", self.node_type);
+        self.node_type
     }
 
-    pub fn get_op_type_id(&self) -> u8 {
-        println!("Node.get_op_type_id() -> {}", self.op_type.repr);
-        self.op_type.repr
+    pub fn get_node_type_id(&self) -> u8 {
+        println!("Node.get_node_type_id() -> {}", self.node_type.repr);
+        self.node_type.repr
     }
 
     pub fn get_status(&self) -> NodeStatus {
@@ -50,8 +50,9 @@ impl NodeImpl {
     pub fn hash(&mut self, inputs: &Vec<StreamDataImplShared>) -> usize {
         println!("Node.hash() -> {}", self.id);
         let id = self.get_id();
-        let op_type_id = self.get_op_type_id();
-        self.compute.hash(id, op_type_id, &self.attr_block, inputs)
+        let node_type_id = self.get_node_type_id();
+        self.compute
+            .hash(id, node_type_id, &self.attr_block, inputs)
     }
 
     pub fn compute(
@@ -75,12 +76,12 @@ impl NodeImpl {
     }
 }
 
-pub fn create_node(op_type: NodeType, id: Identifier) -> NodeImpl {
-    println!("create_node(id={:?}, op_type={:?})", id, op_type);
-    match op_type {
+pub fn create_node(node_type: NodeType, id: Identifier) -> NodeImpl {
+    println!("create_node(id={:?}, node_type={:?})", id, node_type);
+    match node_type {
         NodeType::ReadImage => read_image::new(id),
         NodeType::WriteImage => write_image::new(id),
         NodeType::Null => null::new(id),
-        _ => panic!("Invalid NodeType: {:?}", op_type),
+        _ => panic!("Invalid NodeType: {:?}", node_type),
     }
 }

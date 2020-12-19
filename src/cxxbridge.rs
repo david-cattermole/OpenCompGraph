@@ -139,8 +139,8 @@ pub mod ffi {
     extern "Rust" {
         type NodeImpl;
         fn get_id(&self) -> u64;
-        fn get_op_type(&self) -> NodeType;
-        fn get_op_type_id(&self) -> u8;
+        fn get_node_type(&self) -> NodeType;
+        fn get_node_type_id(&self) -> u8;
         fn get_status(&self) -> NodeStatus;
         fn get_status_id(&self) -> u8;
 
@@ -171,18 +171,18 @@ pub mod ffi {
     #[namespace = "opencompgraph::internal"]
     extern "Rust" {
         #[cxx_name = "create_node_box"]
-        fn create_node_box(op_type: NodeType) -> Box<NodeImpl>;
+        fn create_node_box(node_type: NodeType) -> Box<NodeImpl>;
         #[cxx_name = "create_node_box"]
-        fn create_node_box_with_name(op_type: NodeType, name: &str) -> Box<NodeImpl>;
+        fn create_node_box_with_name(node_type: NodeType, name: &str) -> Box<NodeImpl>;
         #[cxx_name = "create_node_box"]
-        fn create_node_box_with_id(op_type: NodeType, id: u64) -> Box<NodeImpl>;
+        fn create_node_box_with_id(node_type: NodeType, id: u64) -> Box<NodeImpl>;
 
         #[cxx_name = "create_node_shared"]
-        fn create_node_shared(op_type: NodeType) -> NodeImplShared;
+        fn create_node_shared(node_type: NodeType) -> NodeImplShared;
         #[cxx_name = "create_node_shared"]
-        fn create_node_shared_with_name(op_type: NodeType, name: &str) -> NodeImplShared;
+        fn create_node_shared_with_name(node_type: NodeType, name: &str) -> NodeImplShared;
         #[cxx_name = "create_node_shared"]
-        fn create_node_shared_with_id(op_type: NodeType, id: u64) -> NodeImplShared;
+        fn create_node_shared_with_id(node_type: NodeType, id: u64) -> NodeImplShared;
 
         fn create_graph_box() -> Box<GraphImpl>;
         fn create_graph_shared() -> GraphImplShared;
@@ -210,19 +210,19 @@ fn my_test() {
     });
 }
 
-pub fn create_node_box(op_type: ffi::NodeType) -> Box<NodeImpl> {
+pub fn create_node_box(node_type: ffi::NodeType) -> Box<NodeImpl> {
     let id = generate_random_id();
-    create_node_box_with_id(op_type, id)
+    create_node_box_with_id(node_type, id)
 }
 
-pub fn create_node_box_with_name(op_type: ffi::NodeType, name: &str) -> Box<NodeImpl> {
+pub fn create_node_box_with_name(node_type: ffi::NodeType, name: &str) -> Box<NodeImpl> {
     let id = generate_id_from_name(name);
-    create_node_box_with_id(op_type, id)
+    create_node_box_with_id(node_type, id)
 }
 
-pub fn create_node_box_with_id(op_type: ffi::NodeType, id: Identifier) -> Box<NodeImpl> {
-    println!("create_node_box(op_type={:?}, id={:?})", op_type, id);
-    Box::new(create_node(op_type, id))
+pub fn create_node_box_with_id(node_type: ffi::NodeType, id: Identifier) -> Box<NodeImpl> {
+    println!("create_node_box(node_type={:?}, id={:?})", node_type, id);
+    Box::new(create_node(node_type, id))
 }
 
 fn create_graph_shared() -> ffi::GraphImplShared {
@@ -232,20 +232,20 @@ fn create_graph_shared() -> ffi::GraphImplShared {
     }
 }
 
-fn create_node_shared(op_type: ffi::NodeType) -> ffi::NodeImplShared {
+fn create_node_shared(node_type: ffi::NodeType) -> ffi::NodeImplShared {
     let id = generate_random_id();
-    create_node_shared_with_id(op_type, id)
+    create_node_shared_with_id(node_type, id)
 }
 
-fn create_node_shared_with_name(op_type: ffi::NodeType, name: &str) -> ffi::NodeImplShared {
+fn create_node_shared_with_name(node_type: ffi::NodeType, name: &str) -> ffi::NodeImplShared {
     let id = generate_id_from_name(name);
-    create_node_shared_with_id(op_type, id)
+    create_node_shared_with_id(node_type, id)
 }
 
-fn create_node_shared_with_id(op_type: ffi::NodeType, id: Identifier) -> ffi::NodeImplShared {
-    println!("create_node_shared(op_type={:?}, id={:?})", op_type, id,);
+fn create_node_shared_with_id(node_type: ffi::NodeType, id: Identifier) -> ffi::NodeImplShared {
+    println!("create_node_shared(node_type={:?}, id={:?})", node_type, id,);
     ffi::NodeImplShared {
-        inner: create_node_box_with_id(op_type, id),
+        inner: create_node_box_with_id(node_type, id),
     }
 }
 

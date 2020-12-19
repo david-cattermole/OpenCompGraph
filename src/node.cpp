@@ -5,24 +5,24 @@
 namespace opencompgraph {
 
 
-Node::Node(NodeType op_type) noexcept
-        : inner{internal::create_node_shared(op_type)} {
+Node::Node(NodeType node_type) noexcept
+        : inner{internal::create_node_shared(node_type)} {
     std::cout << "Node() with random id"
-              << " op_type=" << static_cast<uint32_t>(op_type)
+              << " node_type=" << static_cast<uint32_t>(node_type)
               << std::endl;
 }
 
-Node::Node(NodeType op_type, const char *name) noexcept
-        : inner{internal::create_node_shared(op_type, name)} {
+Node::Node(NodeType node_type, const char *name) noexcept
+        : inner{internal::create_node_shared(node_type, name)} {
     std::cout << "Node() with name"
-              << " op_type=" << static_cast<uint32_t>(op_type)
+              << " node_type=" << static_cast<uint32_t>(node_type)
               << std::endl;
 }
 
-Node::Node(opencompgraph::NodeType op_type, size_t id) noexcept
-        : inner{internal::create_node_shared(op_type, id)} {
+Node::Node(opencompgraph::NodeType node_type, size_t id) noexcept
+        : inner{internal::create_node_shared(node_type, id)} {
     std::cout << "Node() with id"
-              << " op_type=" << static_cast<uint32_t>(op_type)
+              << " node_type=" << static_cast<uint32_t>(node_type)
               << " id=" << id
               << std::endl;
 }

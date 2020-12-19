@@ -23,8 +23,8 @@ size_t Graph::add_op(Node &op) noexcept {
     return this->inner.inner->add_op(std::move(op_box));
 }
 
-size_t Graph::create_op(opencompgraph::NodeType op_type, size_t id) noexcept {
-    auto op = internal::create_node_shared(op_type, id);
+size_t Graph::create_op(opencompgraph::NodeType node_type, size_t id) noexcept {
+    auto op = internal::create_node_shared(node_type, id);
     return this->inner.inner->add_op(std::move(op.inner));
 }
 

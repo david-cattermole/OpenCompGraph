@@ -10,7 +10,7 @@ use crate::node::NodeImpl;
 
 pub fn new(id: Identifier) -> NodeImpl {
     NodeImpl {
-        op_type: NodeType::ReadImage,
+        node_type: NodeType::ReadImage,
         id,
         op_status: NodeStatus::Uninitialized,
         compute: Box::new(ReadImageCompute {}),
@@ -32,7 +32,7 @@ impl Compute for ReadImageCompute {
     fn hash(
         &mut self,
         id: Identifier,
-        op_type_id: u8,
+        node_type_id: u8,
         attr_block: &Box<dyn AttrBlock>,
         inputs: &Vec<StreamDataImplShared>,
     ) -> usize {

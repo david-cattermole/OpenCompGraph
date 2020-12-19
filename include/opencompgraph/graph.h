@@ -13,7 +13,7 @@ namespace opencompgraph {
 
         size_t add_op(rust::Box<opencompgraph::internal::NodeImpl> op_box) noexcept;
         size_t add_op(Node &op) noexcept;
-        size_t create_op(opencompgraph::NodeType op_type, size_t id) noexcept;
+        size_t create_op(opencompgraph::NodeType node_type, size_t id) noexcept;
         void connect(size_t src_index, size_t dst_index, uint8_t input_num) noexcept;
         void execute(size_t start_index) noexcept;
 

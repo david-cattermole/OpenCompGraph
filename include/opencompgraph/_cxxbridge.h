@@ -767,8 +767,8 @@ struct StreamDataImpl final : public ::rust::Opaque {
 #define CXXBRIDGE1_STRUCT_opencompgraph$internal$NodeImpl
 struct NodeImpl final : public ::rust::Opaque {
   ::std::uint64_t get_id() const noexcept;
-  ::opencompgraph::NodeType get_op_type() const noexcept;
-  ::std::uint8_t get_op_type_id() const noexcept;
+  ::opencompgraph::NodeType get_node_type() const noexcept;
+  ::std::uint8_t get_node_type_id() const noexcept;
   ::opencompgraph::NodeStatus get_status() const noexcept;
   ::std::uint8_t get_status_id() const noexcept;
   ::std::size_t hash(const ::rust::Vec<::opencompgraph::internal::StreamDataImplShared> &inputs) noexcept;
@@ -790,17 +790,17 @@ struct GraphImpl final : public ::rust::Opaque {
 
 void print_r(const ::opencompgraph::internal::ThingR &r) noexcept;
 
-::rust::Box<::opencompgraph::internal::NodeImpl> create_node_box(::opencompgraph::NodeType op_type) noexcept;
+::rust::Box<::opencompgraph::internal::NodeImpl> create_node_box(::opencompgraph::NodeType node_type) noexcept;
 
-::rust::Box<::opencompgraph::internal::NodeImpl> create_node_box(::opencompgraph::NodeType op_type, ::rust::Str name) noexcept;
+::rust::Box<::opencompgraph::internal::NodeImpl> create_node_box(::opencompgraph::NodeType node_type, ::rust::Str name) noexcept;
 
-::rust::Box<::opencompgraph::internal::NodeImpl> create_node_box(::opencompgraph::NodeType op_type, ::std::uint64_t id) noexcept;
+::rust::Box<::opencompgraph::internal::NodeImpl> create_node_box(::opencompgraph::NodeType node_type, ::std::uint64_t id) noexcept;
 
-::opencompgraph::internal::NodeImplShared create_node_shared(::opencompgraph::NodeType op_type) noexcept;
+::opencompgraph::internal::NodeImplShared create_node_shared(::opencompgraph::NodeType node_type) noexcept;
 
-::opencompgraph::internal::NodeImplShared create_node_shared(::opencompgraph::NodeType op_type, ::rust::Str name) noexcept;
+::opencompgraph::internal::NodeImplShared create_node_shared(::opencompgraph::NodeType node_type, ::rust::Str name) noexcept;
 
-::opencompgraph::internal::NodeImplShared create_node_shared(::opencompgraph::NodeType op_type, ::std::uint64_t id) noexcept;
+::opencompgraph::internal::NodeImplShared create_node_shared(::opencompgraph::NodeType node_type, ::std::uint64_t id) noexcept;
 
 ::rust::Box<::opencompgraph::internal::GraphImpl> create_graph_box() noexcept;
 

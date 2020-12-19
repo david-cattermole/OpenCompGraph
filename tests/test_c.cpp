@@ -40,11 +40,11 @@ int test_c() {
     auto read_id2 = read_op->get_id();
     std::cout << "read_id2=" << read_id2 << std::endl;
 
-    auto read_op_type = read_op->get_op_type() == ocg::NodeType::ReadImage;
-    std::cout << "read_op_type=" << read_op_type << std::endl;
+    auto read_node_type = read_op->get_node_type() == ocg::NodeType::ReadImage;
+    std::cout << "read_node_type=" << read_node_type << std::endl;
 
-    auto read_op_type_id = read_op->get_op_type_id();
-    std::cout << "read_op_type_id=" << std::hex << read_op_type_id << std::endl;
+    auto read_node_type_id = read_op->get_node_type_id();
+    std::cout << "read_node_type_id=" << std::hex << read_node_type_id << std::endl;
 
     // Set string attribute
     auto read_attr = "file_path";
@@ -103,12 +103,12 @@ int test_c() {
     auto write_id2 = write_op->get_id();
     std::cout << "write_id2=" << write_id2 << std::endl;
 
-    auto write_op_type =
-            write_op->get_op_type() == ocg::NodeType::ReadImage;
-    std::cout << "write_op_type=" << write_op_type << std::endl;
+    auto write_node_type =
+            write_op->get_node_type() == ocg::NodeType::ReadImage;
+    std::cout << "write_node_type=" << write_node_type << std::endl;
 
-    auto write_op_type_id = write_op->get_op_type_id();
-    std::cout << "write_op_type_id=" << std::hex << write_op_type_id
+    auto write_node_type_id = write_op->get_node_type_id();
+    std::cout << "write_node_type_id=" << std::hex << write_node_type_id
               << std::endl;
 
     auto write_attr = "file_path";
