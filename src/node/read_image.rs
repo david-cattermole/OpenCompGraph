@@ -55,12 +55,12 @@ impl Compute for ReadImageCompute {
         output: &mut StreamDataImplShared,
     ) -> NodeStatus {
         println!("ReadImageCompute.compute()");
-        println!("AttrBlock: {:?}", attr_block);
-        println!("Inputs: {:?}", inputs);
-        println!("Output: {:?}", output);
+        // println!("AttrBlock: {:?}", attr_block);
+        // println!("Inputs: {:?}", inputs);
+        // println!("Output: {:?}", output);
 
         let file_path = attr_block.get_attr_string("file_path");
-        println!("file_path {:?}", file_path);
+        // println!("file_path {:?}", file_path);
 
         let path = match Path::new(&file_path).canonicalize() {
             Ok(full_path) => full_path,
@@ -87,35 +87,18 @@ impl Compute for ReadImageCompute {
             output.inner.set_pixel_block(pixel_block);
         }
 
-        // virtual void compute() {
-        //     // This is the fallback node output.
-        //     Result res = ocg::NodeHelper::createEmptyResult();
-        //
-        //     // Read Image here.
-        //     if (m_path.find(".jpg") != -1) {
-        //         int image_width = 0;
-        //         int image_height = 0;
-        //         void *data = jpeg::read_file(
-        //             m_path.c_str(),
-        //             image_width,
-        //             image_height);
-        //
-        //         PixelBlock pixels;
-        //         pixels.data = data;
-        //
-        //         BoundingBox displayBox;
-        //         displayBox.min.x = 0;
-        //         displayBox.min.y = 0;
-        //         displayBox.max.x = image_width;
-        //         displayBox.max.y = image_height;
-        //
-        //         Image img;
-        //         img.pixelBlock = pixels;
-        //         img.displayWindow = displayBox;
-        //
-        //         m_result.setImage(img);
-        //     }
-        // };
+        // PixelBlock pixels;
+        // pixels.data = data;
+
+        // BoundingBox displayBox;
+        // displayBox.min.x = 0;
+        // displayBox.min.y = 0;
+        // displayBox.max.x = image_width;
+        // displayBox.max.y = image_height;
+
+        // Image img;
+        // img.pixelBlock = pixels;
+        // img.displayWindow = displayBox;
 
         NodeStatus::Valid
     }

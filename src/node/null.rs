@@ -42,9 +42,9 @@ impl Compute for NullCompute {
         output: &mut StreamDataImplShared,
     ) -> NodeStatus {
         println!("NullCompute.compute()");
-        println!("AttrBlock: {:?}", attr_block);
-        println!("Inputs: {:?}", inputs);
-        println!("Output: {:?}", output);
+        // println!("AttrBlock: {:?}", attr_block);
+        // println!("Inputs: {:?}", inputs);
+        // println!("Output: {:?}", output);
         NodeStatus::Valid
     }
 }

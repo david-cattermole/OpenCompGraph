@@ -48,16 +48,16 @@ impl Compute for WriteImageCompute {
         output: &mut StreamDataImplShared,
     ) -> NodeStatus {
         println!("WriteImageCompute.compute()");
-        println!("AttrBlock: {:?}", attr_block);
-        println!("Inputs: {:?}", inputs);
-        println!("Output: {:?}", output);
+        // println!("AttrBlock: {:?}", attr_block);
+        // println!("Inputs: {:?}", inputs);
+        // println!("Output: {:?}", output);
         match inputs.len() {
             0 => NodeStatus::Error,
             _ => {
                 let input = &inputs[0];
 
                 let file_path = attr_block.get_attr_string("file_path");
-                println!("file_path {:?}", file_path);
+                // println!("file_path {:?}", file_path);
 
                 let pixel_block = input.inner.get_pixel_block();
                 let img = &pixel_block.pixels;

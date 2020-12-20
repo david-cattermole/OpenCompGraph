@@ -47,10 +47,10 @@ impl GraphImpl {
     // Compute The graph
     pub fn execute(&mut self, start_index: usize) -> ExecuteStatus {
         println!("Execute: {}", start_index);
-        println!(
-            "{:?}",
-            Dot::with_config(&self.graph, &[Config::EdgeNoLabel])
-        );
+        // println!(
+        //     "{:?}",
+        //     Dot::with_config(&self.graph, &[Config::EdgeNoLabel])
+        // );
 
         let mut sorted_op_indexes = Vec::<usize>::new();
 
@@ -71,7 +71,7 @@ impl GraphImpl {
         let inputs = Vec::<StreamDataImplShared>::new();
         let mut output = create_stream_data_shared();
         for op_index in sorted_op_indexes.iter().rev() {
-            println!("op_index: {:?}", op_index);
+            println!("Compute Node Index: {:?}", op_index);
 
             let op = &mut self.ops[*op_index];
             // println!("op: {:#?}", op);
