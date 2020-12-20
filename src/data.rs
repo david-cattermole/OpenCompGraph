@@ -11,6 +11,21 @@ pub type EdgeWeight = u8;
 pub type NodeIdx = petgraph::graph::NodeIndex<GraphIdx>;
 pub type EdgeIdx = petgraph::graph::EdgeIndex<GraphIdx>;
 
+// https://stackoverflow.com/questions/39638363/how-can-i-use-a-hashmap-with-f64-as-key-in-rust
+fn integer_decode_f64(val: f64) -> (u64, i16, i8) {
+    let bits: u64 = unsafe { mem::transmute(val) };
+    let sign: i8 = if bits >> 63 == 0 { 1 } else { -1 };
+    let mut exponent: i16 = ((bits >> 52) & 0x7ff) as i16;
+    let mantissa = if exponent == 0 {
+        (bits & 0xfffffffffffff) << 1
+    } else {
+        (bits & 0xfffffffffffff) | 0x10000000000000
+    };
+
+    exponent -= 1023 + 52;
+    (mantissa, exponent, sign)
+}
+
 /// Returns the mantissa, exponent and sign as integers.
 fn integer_decode_f32(val: f32) -> (u64, i16, i8) {
     let bits: u32 = unsafe { mem::transmute(val) };
@@ -24,6 +39,15 @@ fn integer_decode_f32(val: f32) -> (u64, i16, i8) {
     // Exponent bias + mantissa shift
     exponent -= 127 + 23;
     (mantissa as u64, exponent, sign)
+}
+
+#[derive(Hash, Eq, PartialEq)]
+struct Distance64((u64, i16, i8));
+
+impl Distance64 {
+    fn new(val: f64) -> Distance64 {
+        Distance64(integer_decode_f64(val))
+    }
 }
 
 #[derive(Hash, Eq, PartialEq)]
