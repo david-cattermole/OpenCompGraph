@@ -13,8 +13,8 @@ pub fn new(id: Identifier) -> NodeImpl {
         node_type: NodeType::Null,
         id,
         op_status: NodeStatus::Uninitialized,
-        compute: Box::new(NullCompute {}),
-        attr_block: Box::new(NullAttrs {}),
+        compute: Box::new(NullCompute::new()),
+        attr_block: Box::new(NullAttrs::new()),
     }
 }
 
@@ -23,6 +23,18 @@ pub struct NullCompute {}
 
 #[derive(Debug, Clone, Default)]
 pub struct NullAttrs {}
+
+impl NullCompute {
+    pub fn new() -> NullCompute {
+        NullCompute {}
+    }
+}
+
+impl NullAttrs {
+    pub fn new() -> NullAttrs {
+        NullAttrs {}
+    }
+}
 
 impl Compute for NullCompute {
     fn hash(

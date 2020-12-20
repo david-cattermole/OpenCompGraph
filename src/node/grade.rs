@@ -13,8 +13,8 @@ pub fn new(id: Identifier) -> NodeImpl {
         node_type: NodeType::Grade,
         id,
         op_status: NodeStatus::Uninitialized,
-        compute: Box::new(GradeCompute {}),
-        attr_block: Box::new(GradeAttrs {}),
+        compute: Box::new(GradeCompute::new()),
+        attr_block: Box::new(GradeAttrs::new()),
     }
 }
 
@@ -24,6 +24,18 @@ pub struct GradeCompute {}
 #[derive(Debug, Clone, Default)]
 pub struct GradeAttrs {
     pub multiply: f32,
+}
+
+impl GradeCompute {
+    pub fn new() -> GradeCompute {
+        GradeCompute {}
+    }
+}
+
+impl GradeAttrs {
+    pub fn new() -> GradeAttrs {
+        GradeAttrs { multiply: 1.0 }
+    }
 }
 
 impl Compute for GradeCompute {

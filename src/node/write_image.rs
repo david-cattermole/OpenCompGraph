@@ -15,10 +15,8 @@ pub fn new(id: Identifier) -> NodeImpl {
         node_type: NodeType::WriteImage,
         id,
         op_status: NodeStatus::Uninitialized,
-        compute: Box::new(WriteImageCompute {}),
-        attr_block: Box::new(WriteImageAttrs {
-            file_path: "".to_string(),
-        }),
+        compute: Box::new(WriteImageCompute::new()),
+        attr_block: Box::new(WriteImageAttrs::new()),
     }
 }
 
@@ -28,6 +26,20 @@ pub struct WriteImageCompute {}
 #[derive(Debug, Clone, Default)]
 pub struct WriteImageAttrs {
     pub file_path: String,
+}
+
+impl WriteImageCompute {
+    pub fn new() -> WriteImageCompute {
+        WriteImageCompute {}
+    }
+}
+
+impl WriteImageAttrs {
+    pub fn new() -> WriteImageAttrs {
+        WriteImageAttrs {
+            file_path: "".to_string(),
+        }
+    }
 }
 
 impl Compute for WriteImageCompute {

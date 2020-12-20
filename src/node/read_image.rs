@@ -18,10 +18,8 @@ pub fn new(id: Identifier) -> NodeImpl {
         node_type: NodeType::ReadImage,
         id,
         op_status: NodeStatus::Uninitialized,
-        compute: Box::new(ReadImageCompute {}),
-        attr_block: Box::new(ReadImageAttrs {
-            file_path: "".to_string(),
-        }),
+        compute: Box::new(ReadImageCompute::new()),
+        attr_block: Box::new(ReadImageAttrs::new()),
     }
 }
 
@@ -31,6 +29,20 @@ pub struct ReadImageCompute {}
 #[derive(Debug, Clone, Default)]
 pub struct ReadImageAttrs {
     pub file_path: String,
+}
+
+impl ReadImageCompute {
+    pub fn new() -> ReadImageCompute {
+        ReadImageCompute {}
+    }
+}
+
+impl ReadImageAttrs {
+    pub fn new() -> ReadImageAttrs {
+        ReadImageAttrs {
+            file_path: "".to_string(),
+        }
+    }
 }
 
 impl Compute for ReadImageCompute {
