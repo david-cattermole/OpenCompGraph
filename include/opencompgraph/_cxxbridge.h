@@ -722,6 +722,7 @@ enum class NodeType : ::std::uint8_t {
   Null = 0,
   ReadImage = 1,
   WriteImage = 2,
+  Grade = 3,
 };
 #endif // CXXBRIDGE1_ENUM_opencompgraph$NodeType
 

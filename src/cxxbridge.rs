@@ -78,7 +78,7 @@ pub mod ffi {
 
         // // Color
         // ColorCorrect,
-        // Grade,
+        Grade = 3,
 
         // // Deform / Warp
         // LensDistort,

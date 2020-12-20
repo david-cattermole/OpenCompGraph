@@ -6,6 +6,7 @@ use crate::cxxbridge::ffi::StreamDataState;
 use crate::data::Identifier;
 use crate::data::{BoundingBox2D, Matrix4, PixelBlock};
 
+pub mod grade;
 pub mod null;
 pub mod read_image;
 pub mod traits;
@@ -98,6 +99,7 @@ pub fn create_node(node_type: NodeType, id: Identifier) -> NodeImpl {
         NodeType::ReadImage => read_image::new(id),
         NodeType::WriteImage => write_image::new(id),
         NodeType::Null => null::new(id),
+        NodeType::Grade => grade::new(id),
         _ => panic!("Invalid NodeType: {:?}", node_type),
     }
 }
