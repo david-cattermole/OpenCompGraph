@@ -18,13 +18,6 @@ int test_d() {
     auto write_node_id1 = g.add_node(write_node);
     g.connect(read_node_id1, write_node_id1, 0);
 
-    std::cout << "Graph.create_node() =============================" << std::endl;
-    auto read_node_id2 = g.create_node(ocg::NodeType::ReadImage, 0);
-    auto write_node_id2 = g.create_node(ocg::NodeType::WriteImage, 1);
-    std::cout << "read_node_id2=" << read_node_id2 << std::endl;
-    std::cout << "write_node_id2=" << write_node_id2 << std::endl;
-    g.connect(read_node_id2, write_node_id2, 0);
-
     std::cout << "Node.add_node(Box<NodeImpl>) ==========" << std::endl;
     auto read_node_box = ocg::internal::create_node_box(
             ocg::NodeType::ReadImage, 0);
@@ -37,7 +30,6 @@ int test_d() {
     g.connect(read_node_box_id, write_node_box_id, 0);
 
     g.execute(write_node_id1);
-    g.execute(write_node_id2);
     g.execute(write_node_box_id);
 
     return 0;

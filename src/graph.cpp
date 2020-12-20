@@ -23,11 +23,6 @@ size_t Graph::add_node(Node &node) noexcept {
     return this->inner.inner->add_node(std::move(node_box));
 }
 
-size_t Graph::create_node(opencompgraph::NodeType node_type, size_t id) noexcept {
-    auto node = internal::create_node_shared(node_type, id);
-    return this->inner.inner->add_node(std::move(node.inner));
-}
-
 void Graph::connect(size_t src_index, size_t dst_index, uint8_t input_num) noexcept {
     this->inner.inner->connect(src_index, dst_index, input_num);
 }
