@@ -24,13 +24,13 @@ pub struct GraphImpl {
 
 impl GraphImpl {
     // Add, Remove and Modify
-    pub fn add_node(&mut self, op_box: Box<NodeImpl>) -> usize {
-        let id = op_box.get_id();
+    pub fn add_node(&mut self, node_box: Box<NodeImpl>) -> usize {
+        let id = node_box.get_id();
         let nodes_index = self.nodes.len();
-        self.nodes.push(op_box);
+        self.nodes.push(node_box);
 
         let index = self.graph.add_node(id).index();
-        println!("Add Op id={} index={}", id, index);
+        println!("Add Node id={} index={}", id, index);
         assert_eq!(index, nodes_index);
         index
     }
@@ -59,9 +59,9 @@ impl GraphImpl {
         while let Some(nx) = walker.next(&self.graph) {
             let index = nx.index();
             let node_weight = self.graph[nx];
-            let op = &self.nodes[index];
+            let node = &self.nodes[index];
             sorted_node_indexes.push(index);
-            assert_eq!(node_weight, op.get_id());
+            assert_eq!(node_weight, node.get_id());
             // println!("walk index: {}", index);
 
             // // We can access `graph` mutably here still
@@ -70,12 +70,12 @@ impl GraphImpl {
 
         let inputs = Vec::<StreamDataImplShared>::new();
         let mut output = create_stream_data_shared();
-        for op_index in sorted_node_indexes.iter().rev() {
-            println!("Compute Node Index: {:?}", op_index);
+        for node_index in sorted_node_indexes.iter().rev() {
+            println!("Compute Node Index: {:?}", node_index);
 
-            let op = &mut self.nodes[*op_index];
-            // println!("op: {:#?}", op);
-            op.compute(&inputs, &mut output);
+            let node = &mut self.nodes[*node_index];
+            // println!("node: {:#?}", node);
+            node.compute(&inputs, &mut output);
         }
 
         ExecuteStatus::Success
