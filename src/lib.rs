@@ -1,4 +1,5 @@
-#[allow(unused_imports)]
+#![allow(unused_imports)]
+pub mod cache;
 pub mod cbindgen;
 pub mod cxxbridge;
 pub mod data;

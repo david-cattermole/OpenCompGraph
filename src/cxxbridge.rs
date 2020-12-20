@@ -1,10 +1,11 @@
-#[allow(unused_imports)]
 use cxx::{CxxString, UniquePtr};
 use rand::rngs::SmallRng;
 use rand::{Rng, SeedableRng};
+use rustc_hash::FxHasher;
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
 
+use crate::data::HashValue;
 use crate::data::Identifier;
 use crate::data::{BoundingBox2D, Matrix4, PixelBlock};
 use crate::graph::create_graph;
@@ -151,7 +152,7 @@ pub mod ffi {
     #[namespace = "opencompgraph::internal"]
     extern "Rust" {
         type StreamDataImpl;
-        fn get_hash(&self) -> usize;
+        fn get_hash(&self) -> u64;
         fn get_pixel_block(&self) -> &Box<PixelBlock>;
         fn get_bounding_box(&self) -> &Box<BoundingBox2D>;
         fn get_color_matrix(&self) -> &Box<Matrix4>;
@@ -169,7 +170,7 @@ pub mod ffi {
         fn get_status_id(&self) -> u8;
 
         // Compute
-        fn hash(&mut self, inputs: &Vec<StreamDataImplShared>) -> usize;
+        fn hash(&mut self, inputs: &Vec<StreamDataImplShared>) -> u64;
         fn compute(&mut self, inputs: &Vec<StreamDataImplShared>, output: &mut StreamDataImplShared) -> NodeStatus;
 
         // AttrBlock
@@ -295,17 +296,17 @@ pub fn create_stream_data_box() -> Box<StreamDataImpl> {
     Box::new(StreamDataImpl::new())
 }
 
-fn calculate_hash<T: Hash>(t: &T) -> Identifier {
-    let mut s = DefaultHasher::new();
+fn calculate_hash<T: Hash>(t: &T) -> HashValue {
+    let mut s = FxHasher::default();
     t.hash(&mut s);
     s.finish()
 }
 
-fn generate_id_from_name(name: &str) -> Identifier {
+fn generate_id_from_name(name: &str) -> HashValue {
     calculate_hash::<&str>(&name)
 }
 
-fn generate_random_id() -> Identifier {
+fn generate_random_id() -> HashValue {
     // Create small, cheap to initialize and fast RNG with a random seed.
     // The randomness is supplied by the operating system.
     let mut rng = SmallRng::from_entropy();

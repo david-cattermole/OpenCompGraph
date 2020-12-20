@@ -15,6 +15,7 @@ crate_type = ["staticlib"]
 [dependencies]
 cxx = "=1.0.19"
 libc = "0.2.0"
+rustc-hash = "1.1.0"
 
 [dependencies.rand]
 version = "0.7.3"

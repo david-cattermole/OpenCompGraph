@@ -1,6 +1,8 @@
 use image;
 use image::GenericImageView;
 use image::ImageBuffer;
+use rustc_hash::FxHasher;
+use std::hash::Hasher;
 use std::path::Path;
 use std::string::String;
 
@@ -8,6 +10,7 @@ use crate::cxxbridge::ffi::AttrState;
 use crate::cxxbridge::ffi::NodeStatus;
 use crate::cxxbridge::ffi::NodeType;
 use crate::cxxbridge::ffi::StreamDataImplShared;
+use crate::data::HashValue;
 use crate::data::Identifier;
 use crate::data::PixelBlock;
 use crate::node::traits::{AttrBlock, Compute};
@@ -52,12 +55,8 @@ impl Compute for ReadImageCompute {
         node_type_id: u8,
         attr_block: &Box<dyn AttrBlock>,
         inputs: &Vec<StreamDataImplShared>,
-    ) -> usize {
-        // virtual const Hash hash() {
-        //     return this->id * this->type * 123456789;
-        // };
-
-        0
+    ) -> HashValue {
+        node_type_id as u64 ^ 123456789 as u64
     }
 
     fn compute(

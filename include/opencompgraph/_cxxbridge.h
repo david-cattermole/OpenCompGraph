@@ -755,7 +755,7 @@ namespace internal {
 #ifndef CXXBRIDGE1_STRUCT_opencompgraph$internal$StreamDataImpl
 #define CXXBRIDGE1_STRUCT_opencompgraph$internal$StreamDataImpl
 struct StreamDataImpl final : public ::rust::Opaque {
-  ::std::size_t get_hash() const noexcept;
+  ::std::uint64_t get_hash() const noexcept;
   const ::rust::Box<::opencompgraph::internal::PixelBlock> &get_pixel_block() const noexcept;
   const ::rust::Box<::opencompgraph::internal::BoundingBox2D> &get_bounding_box() const noexcept;
   const ::rust::Box<::opencompgraph::internal::Matrix4> &get_color_matrix() const noexcept;
@@ -771,7 +771,7 @@ struct NodeImpl final : public ::rust::Opaque {
   ::std::uint8_t get_node_type_id() const noexcept;
   ::opencompgraph::NodeStatus get_status() const noexcept;
   ::std::uint8_t get_status_id() const noexcept;
-  ::std::size_t hash(const ::rust::Vec<::opencompgraph::internal::StreamDataImplShared> &inputs) noexcept;
+  ::std::uint64_t hash(const ::rust::Vec<::opencompgraph::internal::StreamDataImplShared> &inputs) noexcept;
   ::opencompgraph::NodeStatus compute(const ::rust::Vec<::opencompgraph::internal::StreamDataImplShared> &inputs, ::opencompgraph::internal::StreamDataImplShared &output) noexcept;
   ::opencompgraph::AttrState attr_exists(::rust::Str name) const noexcept;
   float get_attr_f32(::rust::Str name) const noexcept;

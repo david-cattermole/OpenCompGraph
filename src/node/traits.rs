@@ -2,6 +2,7 @@
 use crate::cxxbridge::ffi::AttrState;
 use crate::cxxbridge::ffi::NodeStatus;
 use crate::cxxbridge::ffi::StreamDataImplShared;
+use crate::data::HashValue;
 use crate::data::Identifier;
 use crate::node::NodeImpl;
 
@@ -25,7 +26,7 @@ pub trait Compute: std::fmt::Debug {
         node_type_id: u8,
         attr_block: &Box<dyn AttrBlock>,
         inputs: &Vec<StreamDataImplShared>,
-    ) -> usize;
+    ) -> HashValue;
 
     fn compute(
         &mut self,

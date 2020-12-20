@@ -4,12 +4,13 @@ use std::fmt;
 use std::hash::{Hash, Hasher};
 use std::mem;
 
-pub type Identifier = u64;
 pub type GraphIdx = usize;
 pub type NodeWeight = u64;
 pub type EdgeWeight = u8;
 pub type NodeIdx = petgraph::graph::NodeIndex<GraphIdx>;
 pub type EdgeIdx = petgraph::graph::EdgeIndex<GraphIdx>;
+pub type HashValue = u64;
+pub type Identifier = u64;
 
 // https://stackoverflow.com/questions/39638363/how-can-i-use-a-hashmap-with-f64-as-key-in-rust
 fn integer_decode_f64(val: f64) -> (u64, i16, i8) {

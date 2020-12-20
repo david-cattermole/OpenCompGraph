@@ -3,6 +3,7 @@ use crate::cxxbridge::ffi::NodeStatus;
 use crate::cxxbridge::ffi::NodeType;
 use crate::cxxbridge::ffi::StreamDataImplShared;
 use crate::cxxbridge::ffi::StreamDataState;
+use crate::data::HashValue;
 use crate::data::Identifier;
 use crate::data::{BoundingBox2D, Matrix4, PixelBlock};
 
@@ -48,7 +49,7 @@ impl NodeImpl {
 
     // This method is used to determine "has this node changed?
     // If I re-compute this Node, do I expect a different value?"
-    pub fn hash(&mut self, inputs: &Vec<StreamDataImplShared>) -> usize {
+    pub fn hash(&mut self, inputs: &Vec<StreamDataImplShared>) -> HashValue {
         println!("Node.hash() -> {}", self.id);
         let id = self.get_id();
         let node_type_id = self.get_node_type_id();

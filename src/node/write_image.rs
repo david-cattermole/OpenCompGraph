@@ -5,6 +5,7 @@ use crate::cxxbridge::ffi::AttrState;
 use crate::cxxbridge::ffi::NodeStatus;
 use crate::cxxbridge::ffi::NodeType;
 use crate::cxxbridge::ffi::StreamDataImplShared;
+use crate::data::HashValue;
 use crate::data::Identifier;
 use crate::node::traits::{AttrBlock, Compute};
 use crate::node::NodeImpl;
@@ -49,7 +50,7 @@ impl Compute for WriteImageCompute {
         node_type_id: u8,
         attr_block: &Box<dyn AttrBlock>,
         inputs: &Vec<StreamDataImplShared>,
-    ) -> usize {
+    ) -> HashValue {
         0
     }
 

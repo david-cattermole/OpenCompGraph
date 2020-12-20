@@ -1,12 +1,13 @@
 use image;
 
 use crate::cxxbridge::ffi::StreamDataState;
+use crate::data::HashValue;
 use crate::data::{BoundingBox2D, Matrix4, PixelBlock};
 
 #[derive(Debug, Clone, Hash)]
 pub struct StreamDataImpl {
     state: StreamDataState,
-    hash: usize,
+    hash: HashValue,
     bbox: Box<BoundingBox2D>,
     pixel_block: Box<PixelBlock>,
     color_matrix: Box<Matrix4>,
@@ -38,7 +39,7 @@ impl StreamDataImpl {
         self.state
     }
 
-    pub fn get_hash(&self) -> usize {
+    pub fn get_hash(&self) -> HashValue {
         self.hash
     }
 
