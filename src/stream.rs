@@ -1,3 +1,5 @@
+use image;
+
 use crate::cxxbridge::ffi::StreamDataState;
 use crate::data::{BoundingBox2D, Matrix4, PixelBlock};
 
@@ -46,6 +48,10 @@ impl StreamDataImpl {
 
     pub fn get_pixel_block(&self) -> &Box<PixelBlock> {
         &self.pixel_block
+    }
+
+    pub fn set_pixel_block(&mut self, pixel_block: Box<PixelBlock>) {
+        self.pixel_block = pixel_block;
     }
 
     pub fn get_color_matrix(&self) -> &Box<Matrix4> {

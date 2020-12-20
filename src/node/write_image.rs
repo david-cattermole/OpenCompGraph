@@ -1,3 +1,4 @@
+use std::path::Path;
 use std::string::String;
 
 use crate::cxxbridge::ffi::AttrState;
@@ -7,6 +8,7 @@ use crate::cxxbridge::ffi::StreamDataImplShared;
 use crate::data::Identifier;
 use crate::node::traits::{AttrBlock, Compute};
 use crate::node::NodeImpl;
+use image::RgbaImage;
 
 pub fn new(id: Identifier) -> NodeImpl {
     NodeImpl {
@@ -49,6 +51,21 @@ impl Compute for WriteImageCompute {
         println!("AttrBlock: {:?}", attr_block);
         println!("Inputs: {:?}", inputs);
         println!("Output: {:?}", output);
+
+        let file_path = attr_block.get_attr_string("file_path");
+        println!("file_path {:?}", file_path);
+
+        let img = image::DynamicImage::ImageRgba8(RgbaImage::new(8, 8));
+        let path = match Path::new(&file_path).canonicalize() {
+            Ok(full_path) => full_path,
+            Err(_) => return NodeStatus::Error,
+        };
+        println!("Writing... {:?}", path);
+        let ok = match img.save(path) {
+            Ok(value) => true,
+            Err(_) => false,
+        };
+        println!("Succcess: {}", ok);
         NodeStatus::Valid
     }
 }

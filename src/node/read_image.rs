@@ -1,14 +1,15 @@
-use std::path::Path;
-use std::string::String;
-
 use image;
 use image::GenericImageView;
+use image::ImageBuffer;
+use std::path::Path;
+use std::string::String;
 
 use crate::cxxbridge::ffi::AttrState;
 use crate::cxxbridge::ffi::NodeStatus;
 use crate::cxxbridge::ffi::NodeType;
 use crate::cxxbridge::ffi::StreamDataImplShared;
 use crate::data::Identifier;
+use crate::data::PixelBlock;
 use crate::node::traits::{AttrBlock, Compute};
 use crate::node::NodeImpl;
 
@@ -68,12 +69,22 @@ impl Compute for ReadImageCompute {
         println!("Opening... {:?}", path);
         if path.is_file() == true {
             let img = image::open(path).unwrap();
-
-            // The dimensions method returns the images width and height.
-            println!("dimensions {:?}", img.dimensions());
-
-            // The color method returns the image's `ColorType`.
-            println!("{:?}", img.color());
+            let (width, height) = img.dimensions();
+            let color_type = img.color();
+            println!("Resolution: {:?}x{:?}", width, height);
+            println!("Color Type: {:?}", color_type);
+            let num_channels = match color_type {
+                image::ColorType::Rgb8 => 3,
+                image::ColorType::Rgba8 => 3,
+                _ => 0,
+            };
+            println!("Num Channels: {:?}", num_channels);
+            // pixels: &image::DynamicImage
+            // let pixel_block = &mut output.inner.get_pixel_block();
+            let mut pixel_block =
+                Box::<PixelBlock>::new(PixelBlock::new(width, height, num_channels));
+            pixel_block.set_pixels(img);
+            output.inner.set_pixel_block(pixel_block);
         }
 
         // virtual void compute() {

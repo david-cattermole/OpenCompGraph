@@ -1,5 +1,6 @@
-#[allow(unused_imports)]
+use image;
 use petgraph;
+use std::fmt;
 use std::hash::{Hash, Hasher};
 use std::mem;
 
@@ -34,19 +35,19 @@ impl Distance32 {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub struct PixelBlock {
     pub data: bool,
     pub width: u32,
     pub height: u32,
     pub num_channels: u8,
     pub data_type: u8,
-    pub pixels: Vec<f32>,
+    pub pixels: image::DynamicImage,
 }
 
 impl PixelBlock {
     pub fn new(width: u32, height: u32, num_channels: u8) -> PixelBlock {
-        let pixels = Vec::<f32>::new();
+        let pixels = image::DynamicImage::new_rgba8(width, height);
         let data = true;
         let data_type = 0;
         PixelBlock {
@@ -58,6 +59,10 @@ impl PixelBlock {
             pixels,
         }
     }
+
+    pub fn set_pixels(&mut self, pixels: image::DynamicImage) {
+        self.pixels = pixels;
+    }
 }
 
 impl Hash for PixelBlock {
@@ -68,6 +73,18 @@ impl Hash for PixelBlock {
         self.num_channels.hash(state);
         self.data_type.hash(state);
         // Note: Skipping the 'pixels' data.
+    }
+}
+
+impl fmt::Debug for PixelBlock {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("PixelBlock")
+            .field("data", &self.data)
+            .field("width", &self.width)
+            .field("height", &self.height)
+            .field("num_channels", &self.num_channels)
+            .field("data_type", &self.data_type)
+            .finish()
     }
 }
 
