@@ -22,7 +22,9 @@ pub fn new(id: Identifier) -> NodeImpl {
 pub struct GradeCompute {}
 
 #[derive(Debug, Clone, Default)]
-pub struct GradeAttrs {}
+pub struct GradeAttrs {
+    pub multiply: f32,
+}
 
 impl Compute for GradeCompute {
     fn hash(
@@ -51,14 +53,17 @@ impl Compute for GradeCompute {
 
 impl AttrBlock for GradeAttrs {
     fn attr_exists(&self, name: &str) -> AttrState {
-        AttrState::Missing
+        match name {
+            "multiply" => AttrState::Exists,
+            _ => AttrState::Missing,
+        }
     }
 
-    fn get_attr_string(&self, name: &str) -> &str {
+    fn get_attr_str(&self, name: &str) -> &str {
         ""
     }
 
-    fn set_attr_string(&mut self, name: &str, value: &str) {
+    fn set_attr_str(&mut self, name: &str, value: &str) {
         ()
     }
 
@@ -71,10 +76,16 @@ impl AttrBlock for GradeAttrs {
     }
 
     fn get_attr_f32(&self, name: &str) -> f32 {
-        0.0
+        match name {
+            "multiply" => self.multiply,
+            _ => 0.0,
+        }
     }
 
     fn set_attr_f32(&mut self, name: &str, value: f32) {
-        ()
+        match name {
+            "multiply" => self.multiply = value,
+            _ => (),
+        }
     }
 }

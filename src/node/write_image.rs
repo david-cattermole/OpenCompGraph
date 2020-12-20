@@ -56,7 +56,7 @@ impl Compute for WriteImageCompute {
             _ => {
                 let input = &inputs[0];
 
-                let file_path = attr_block.get_attr_string("file_path");
+                let file_path = attr_block.get_attr_str("file_path");
                 // println!("file_path {:?}", file_path);
 
                 let pixel_block = input.inner.get_pixel_block();
@@ -81,14 +81,14 @@ impl AttrBlock for WriteImageAttrs {
         }
     }
 
-    fn get_attr_string(&self, name: &str) -> &str {
+    fn get_attr_str(&self, name: &str) -> &str {
         match name {
             "file_path" => &self.file_path,
             _ => "",
         }
     }
 
-    fn set_attr_string(&mut self, name: &str, value: &str) {
+    fn set_attr_str(&mut self, name: &str, value: &str) {
         match name {
             "file_path" => self.file_path = value.to_string(),
             _ => (),

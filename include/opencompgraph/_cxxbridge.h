@@ -777,10 +777,10 @@ struct NodeImpl final : public ::rust::Opaque {
   ::opencompgraph::AttrState attr_exists(::rust::Str name) const noexcept;
   float get_attr_f32(::rust::Str name) const noexcept;
   ::std::int32_t get_attr_i32(::rust::Str name) const noexcept;
-  ::rust::Str get_attr_string(::rust::Str name) const noexcept;
-  void set_attr(::rust::Str name, float value) noexcept;
-  void set_attr(::rust::Str name, ::std::int32_t value) noexcept;
-  void set_attr(::rust::Str name, ::rust::Str value) noexcept;
+  ::rust::Str get_attr_str(::rust::Str name) const noexcept;
+  void set_attr_f32(::rust::Str name, float value) noexcept;
+  void set_attr_i32(::rust::Str name, ::std::int32_t value) noexcept;
+  void set_attr_str(::rust::Str name, ::rust::Str value) noexcept;
 };
 #endif // CXXBRIDGE1_STRUCT_opencompgraph$internal$NodeImpl
 

@@ -54,11 +54,11 @@ impl AttrBlock for NullAttrs {
         AttrState::Missing
     }
 
-    fn get_attr_string(&self, name: &str) -> &str {
+    fn get_attr_str(&self, name: &str) -> &str {
         ""
     }
 
-    fn set_attr_string(&mut self, name: &str, value: &str) {
+    fn set_attr_str(&mut self, name: &str, value: &str) {
         ()
     }
 

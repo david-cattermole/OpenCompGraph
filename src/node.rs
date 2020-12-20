@@ -68,12 +68,12 @@ impl NodeImpl {
         self.attr_block.attr_exists(name)
     }
 
-    pub fn get_attr_string(&self, name: &str) -> &str {
-        self.attr_block.get_attr_string(name)
+    pub fn get_attr_str(&self, name: &str) -> &str {
+        self.attr_block.get_attr_str(name)
     }
 
-    pub fn set_attr_string(&mut self, name: &str, value: &str) {
-        self.attr_block.set_attr_string(name, value);
+    pub fn set_attr_str(&mut self, name: &str, value: &str) {
+        self.attr_block.set_attr_str(name, value);
     }
 
     pub fn get_attr_i32(&self, name: &str) -> i32 {

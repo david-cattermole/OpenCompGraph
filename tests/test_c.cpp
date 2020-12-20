@@ -48,11 +48,11 @@ int test_c() {
     // Set string attribute
     auto read_attr = "file_path";
     if (read_op->attr_exists(read_attr) == ocg::AttrState::Exists) {
-        auto read_path1 = read_op->get_attr_string(read_attr);
+        auto read_path1 = read_op->get_attr_str(read_attr);
         std::cout << "read_path1=" << read_path1 << std::endl;
 
-        read_op->set_attr(read_attr, "tests/data/checker_8bit_rgba_8x8.png");
-        auto read_path2 = read_op->get_attr_string(read_attr);
+        read_op->set_attr_str(read_attr, "tests/data/checker_8bit_rgba_8x8.png");
+        auto read_path2 = read_op->get_attr_str(read_attr);
         std::cout << "read_path2=" << read_path2 << std::endl;
     }
 
@@ -62,8 +62,7 @@ int test_c() {
         auto read_x = read_op->get_attr_f32(read_attr_x);
         std::cout << "read_x=" << read_x << std::endl;
 
-        float x = 3.147;
-        read_op->set_attr(read_attr_x, x);
+        read_op->set_attr_f32(read_attr_x, 3.147);
         auto read_x2 = read_op->get_attr_f32(read_attr_x);
         std::cout << "read_x2=" << read_x2 << std::endl;
     }
@@ -74,8 +73,7 @@ int test_c() {
         auto read_y = read_op->get_attr_f32(read_attr_y);
         std::cout << "read_y=" << read_y << std::endl;
 
-        int32_t y = 42;
-        read_op->set_attr(read_attr_y, y);
+        read_op->set_attr_i32(read_attr_y, 42);
         auto read_y2 = read_op->get_attr_f32(read_attr_y);
         std::cout << "read_y2=" << read_y2 << std::endl;
     }
@@ -113,11 +111,11 @@ int test_c() {
 
     auto write_attr = "file_path";
     if (write_op->attr_exists(write_attr) == ocg::AttrState::Exists) {
-        auto write_path1 = write_op->get_attr_string(write_attr);
+        auto write_path1 = write_op->get_attr_str(write_attr);
         std::cout << "write_path1=" << write_path1 << std::endl;
 
-        write_op->set_attr(write_attr, "./tests/data/out/image_out.png");
-        auto write_path2 = write_op->get_attr_string(write_attr);
+        write_op->set_attr_str(write_attr, "./tests/data/out/image_out.png");
+        auto write_path2 = write_op->get_attr_str(write_attr);
         std::cout << "write_path2=" << write_path2 << std::endl;
     }
 

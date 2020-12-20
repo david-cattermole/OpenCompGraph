@@ -176,13 +176,10 @@ pub mod ffi {
         fn attr_exists(&self, name: &str) -> AttrState;
         fn get_attr_f32(&self, name: &str) -> f32;
         fn get_attr_i32(&self, name: &str) -> i32;
-        unsafe fn get_attr_string<'a, 'b>(&'b self, name: &'a str) -> &'b str;
-        #[cxx_name = "set_attr"]
+        unsafe fn get_attr_str<'a, 'b>(&'b self, name: &'a str) -> &'b str;
         fn set_attr_f32(&mut self, name: &str, value: f32);
-        #[cxx_name = "set_attr"]
         fn set_attr_i32(&mut self, name: &str, value: i32);
-        #[cxx_name = "set_attr"]
-        fn set_attr_string(&mut self, name: &str, value: &str);
+        fn set_attr_str(&mut self, name: &str, value: &str);
     }
 
     // Graph

@@ -16,6 +16,16 @@ namespace opencompgraph {
         size_t get_id() noexcept;
         rust::Box<opencompgraph::internal::NodeImpl> get_box() noexcept;
 
+        AttrState attr_exists(rust::Str name) const noexcept;
+
+        float get_attr_f32(rust::Str name) const noexcept;
+        int32_t get_attr_i32(rust::Str name) const noexcept;
+        rust::Str get_attr_str(rust::Str name) const noexcept;
+
+        void set_attr_f32(rust::Str name, float value) noexcept;
+        void set_attr_i32(rust::Str name, int32_t value) noexcept;
+        void set_attr_str(rust::Str name, rust::Str value) noexcept;
+
     private:
         internal::NodeImplShared inner;
     };

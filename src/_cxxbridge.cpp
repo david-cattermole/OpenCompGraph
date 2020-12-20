@@ -833,10 +833,10 @@ struct NodeImpl final : public ::rust::Opaque {
   ::opencompgraph::AttrState attr_exists(::rust::Str name) const noexcept;
   float get_attr_f32(::rust::Str name) const noexcept;
   ::std::int32_t get_attr_i32(::rust::Str name) const noexcept;
-  ::rust::Str get_attr_string(::rust::Str name) const noexcept;
-  void set_attr(::rust::Str name, float value) noexcept;
-  void set_attr(::rust::Str name, ::std::int32_t value) noexcept;
-  void set_attr(::rust::Str name, ::rust::Str value) noexcept;
+  ::rust::Str get_attr_str(::rust::Str name) const noexcept;
+  void set_attr_f32(::rust::Str name, float value) noexcept;
+  void set_attr_i32(::rust::Str name, ::std::int32_t value) noexcept;
+  void set_attr_str(::rust::Str name, ::rust::Str value) noexcept;
 };
 #endif // CXXBRIDGE1_STRUCT_opencompgraph$internal$NodeImpl
 
@@ -903,13 +903,13 @@ float opencompgraph$internal$cxxbridge1$NodeImpl$get_attr_f32(const ::opencompgr
 
 ::std::int32_t opencompgraph$internal$cxxbridge1$NodeImpl$get_attr_i32(const ::opencompgraph::internal::NodeImpl &self, ::rust::repr::PtrLen name) noexcept;
 
-::rust::repr::PtrLen opencompgraph$internal$cxxbridge1$NodeImpl$get_attr_string(const ::opencompgraph::internal::NodeImpl &self, ::rust::repr::PtrLen name) noexcept;
+::rust::repr::PtrLen opencompgraph$internal$cxxbridge1$NodeImpl$get_attr_str(const ::opencompgraph::internal::NodeImpl &self, ::rust::repr::PtrLen name) noexcept;
 
 void opencompgraph$internal$cxxbridge1$NodeImpl$set_attr_f32(::opencompgraph::internal::NodeImpl &self, ::rust::repr::PtrLen name, float value) noexcept;
 
 void opencompgraph$internal$cxxbridge1$NodeImpl$set_attr_i32(::opencompgraph::internal::NodeImpl &self, ::rust::repr::PtrLen name, ::std::int32_t value) noexcept;
 
-void opencompgraph$internal$cxxbridge1$NodeImpl$set_attr_string(::opencompgraph::internal::NodeImpl &self, ::rust::repr::PtrLen name, ::rust::repr::PtrLen value) noexcept;
+void opencompgraph$internal$cxxbridge1$NodeImpl$set_attr_str(::opencompgraph::internal::NodeImpl &self, ::rust::repr::PtrLen name, ::rust::repr::PtrLen value) noexcept;
 
 ::std::size_t opencompgraph$internal$cxxbridge1$GraphImpl$add_op(::opencompgraph::internal::GraphImpl &self, ::opencompgraph::internal::NodeImpl *op_box) noexcept;
 
@@ -1004,20 +1004,20 @@ float NodeImpl::get_attr_f32(::rust::Str name) const noexcept {
   return opencompgraph$internal$cxxbridge1$NodeImpl$get_attr_i32(*this, ::rust::impl<::rust::Str>::repr(name));
 }
 
-::rust::Str NodeImpl::get_attr_string(::rust::Str name) const noexcept {
-  return ::rust::impl<::rust::Str>::new_unchecked(opencompgraph$internal$cxxbridge1$NodeImpl$get_attr_string(*this, ::rust::impl<::rust::Str>::repr(name)));
+::rust::Str NodeImpl::get_attr_str(::rust::Str name) const noexcept {
+  return ::rust::impl<::rust::Str>::new_unchecked(opencompgraph$internal$cxxbridge1$NodeImpl$get_attr_str(*this, ::rust::impl<::rust::Str>::repr(name)));
 }
 
-void NodeImpl::set_attr(::rust::Str name, float value) noexcept {
+void NodeImpl::set_attr_f32(::rust::Str name, float value) noexcept {
   opencompgraph$internal$cxxbridge1$NodeImpl$set_attr_f32(*this, ::rust::impl<::rust::Str>::repr(name), value);
 }
 
-void NodeImpl::set_attr(::rust::Str name, ::std::int32_t value) noexcept {
+void NodeImpl::set_attr_i32(::rust::Str name, ::std::int32_t value) noexcept {
   opencompgraph$internal$cxxbridge1$NodeImpl$set_attr_i32(*this, ::rust::impl<::rust::Str>::repr(name), value);
 }
 
-void NodeImpl::set_attr(::rust::Str name, ::rust::Str value) noexcept {
-  opencompgraph$internal$cxxbridge1$NodeImpl$set_attr_string(*this, ::rust::impl<::rust::Str>::repr(name), ::rust::impl<::rust::Str>::repr(value));
+void NodeImpl::set_attr_str(::rust::Str name, ::rust::Str value) noexcept {
+  opencompgraph$internal$cxxbridge1$NodeImpl$set_attr_str(*this, ::rust::impl<::rust::Str>::repr(name), ::rust::impl<::rust::Str>::repr(value));
 }
 
 ::std::size_t GraphImpl::add_op(::rust::Box<::opencompgraph::internal::NodeImpl> op_box) noexcept {
