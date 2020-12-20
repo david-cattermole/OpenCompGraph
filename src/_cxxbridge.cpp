@@ -843,7 +843,7 @@ struct NodeImpl final : public ::rust::Opaque {
 #ifndef CXXBRIDGE1_STRUCT_opencompgraph$internal$GraphImpl
 #define CXXBRIDGE1_STRUCT_opencompgraph$internal$GraphImpl
 struct GraphImpl final : public ::rust::Opaque {
-  ::std::size_t add_op(::rust::Box<::opencompgraph::internal::NodeImpl> op_box) noexcept;
+  ::std::size_t add_node(::rust::Box<::opencompgraph::internal::NodeImpl> op_box) noexcept;
   void connect(::std::size_t src_index, ::std::size_t dst_index, ::std::uint8_t input_num) noexcept;
   ::opencompgraph::ExecuteStatus execute(::std::size_t start_index) noexcept;
 };
@@ -911,7 +911,7 @@ void opencompgraph$internal$cxxbridge1$NodeImpl$set_attr_i32(::opencompgraph::in
 
 void opencompgraph$internal$cxxbridge1$NodeImpl$set_attr_str(::opencompgraph::internal::NodeImpl &self, ::rust::repr::PtrLen name, ::rust::repr::PtrLen value) noexcept;
 
-::std::size_t opencompgraph$internal$cxxbridge1$GraphImpl$add_op(::opencompgraph::internal::GraphImpl &self, ::opencompgraph::internal::NodeImpl *op_box) noexcept;
+::std::size_t opencompgraph$internal$cxxbridge1$GraphImpl$add_node(::opencompgraph::internal::GraphImpl &self, ::opencompgraph::internal::NodeImpl *op_box) noexcept;
 
 void opencompgraph$internal$cxxbridge1$GraphImpl$connect(::opencompgraph::internal::GraphImpl &self, ::std::size_t src_index, ::std::size_t dst_index, ::std::uint8_t input_num) noexcept;
 
@@ -1020,8 +1020,8 @@ void NodeImpl::set_attr_str(::rust::Str name, ::rust::Str value) noexcept {
   opencompgraph$internal$cxxbridge1$NodeImpl$set_attr_str(*this, ::rust::impl<::rust::Str>::repr(name), ::rust::impl<::rust::Str>::repr(value));
 }
 
-::std::size_t GraphImpl::add_op(::rust::Box<::opencompgraph::internal::NodeImpl> op_box) noexcept {
-  return opencompgraph$internal$cxxbridge1$GraphImpl$add_op(*this, op_box.into_raw());
+::std::size_t GraphImpl::add_node(::rust::Box<::opencompgraph::internal::NodeImpl> op_box) noexcept {
+  return opencompgraph$internal$cxxbridge1$GraphImpl$add_node(*this, op_box.into_raw());
 }
 
 void GraphImpl::connect(::std::size_t src_index, ::std::size_t dst_index, ::std::uint8_t input_num) noexcept {

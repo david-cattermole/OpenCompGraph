@@ -18,20 +18,20 @@ type InnerGraph =
 
 #[derive(Debug)]
 pub struct GraphImpl {
-    ops: Vec<Box<NodeImpl>>,
+    nodes: Vec<Box<NodeImpl>>,
     graph: InnerGraph,
 }
 
 impl GraphImpl {
     // Add, Remove and Modify
-    pub fn add_op(&mut self, op_box: Box<NodeImpl>) -> usize {
+    pub fn add_node(&mut self, op_box: Box<NodeImpl>) -> usize {
         let id = op_box.get_id();
-        let ops_index = self.ops.len();
-        self.ops.push(op_box);
+        let nodes_index = self.nodes.len();
+        self.nodes.push(op_box);
 
         let index = self.graph.add_node(id).index();
         println!("Add Op id={} index={}", id, index);
-        assert_eq!(index, ops_index);
+        assert_eq!(index, nodes_index);
         index
     }
 
@@ -52,15 +52,15 @@ impl GraphImpl {
         //     Dot::with_config(&self.graph, &[Config::EdgeNoLabel])
         // );
 
-        let mut sorted_op_indexes = Vec::<usize>::new();
+        let mut sorted_node_indexes = Vec::<usize>::new();
 
         let start = petgraph::graph::NodeIndex::new(start_index);
         let mut walker = UpstreamEvalSearch::new(&self.graph, start);
         while let Some(nx) = walker.next(&self.graph) {
             let index = nx.index();
             let node_weight = self.graph[nx];
-            let op = &self.ops[index];
-            sorted_op_indexes.push(index);
+            let op = &self.nodes[index];
+            sorted_node_indexes.push(index);
             assert_eq!(node_weight, op.get_id());
             // println!("walk index: {}", index);
 
@@ -70,10 +70,10 @@ impl GraphImpl {
 
         let inputs = Vec::<StreamDataImplShared>::new();
         let mut output = create_stream_data_shared();
-        for op_index in sorted_op_indexes.iter().rev() {
+        for op_index in sorted_node_indexes.iter().rev() {
             println!("Compute Node Index: {:?}", op_index);
 
-            let op = &mut self.ops[*op_index];
+            let op = &mut self.nodes[*op_index];
             // println!("op: {:#?}", op);
             op.compute(&inputs, &mut output);
         }
@@ -83,7 +83,7 @@ impl GraphImpl {
 }
 
 pub fn create_graph() -> GraphImpl {
-    let ops = Vec::new();
+    let nodes = Vec::new();
     let graph = InnerGraph::with_capacity(0, 0);
-    GraphImpl { ops, graph }
+    GraphImpl { nodes, graph }
 }

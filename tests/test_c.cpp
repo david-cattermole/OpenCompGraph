@@ -6,7 +6,6 @@
 #include <iostream>
 #include <sstream>
 #include <string>
-// #include "jpeg.h"  // Used as pseudo-code, this header doesn't exist.
 #include <opencompgraph.h>
 
 namespace ocg = opencompgraph;
@@ -32,101 +31,101 @@ int test_c() {
 
     size_t id = 0;
 
-    auto read_op = ocg::internal::create_node_box(
+    auto read_node = ocg::internal::create_node_box(
             ocg::NodeType::ReadImage, id++);
-    std::cout << "read_op=" << &read_op << std::endl;
+    std::cout << "read_node=" << &read_node << std::endl;
 
-    auto read_id2 = read_op->get_id();
+    auto read_id2 = read_node->get_id();
     std::cout << "read_id2=" << read_id2 << std::endl;
 
-    auto read_node_type = read_op->get_node_type() == ocg::NodeType::ReadImage;
+    auto read_node_type = read_node->get_node_type() == ocg::NodeType::ReadImage;
     std::cout << "read_node_type=" << read_node_type << std::endl;
 
-    auto read_node_type_id = read_op->get_node_type_id();
+    auto read_node_type_id = read_node->get_node_type_id();
     std::cout << "read_node_type_id=" << std::hex << read_node_type_id << std::endl;
 
     // Set string attribute
     auto read_attr = "file_path";
-    if (read_op->attr_exists(read_attr) == ocg::AttrState::Exists) {
-        auto read_path1 = read_op->get_attr_str(read_attr);
+    if (read_node->attr_exists(read_attr) == ocg::AttrState::Exists) {
+        auto read_path1 = read_node->get_attr_str(read_attr);
         std::cout << "read_path1=" << read_path1 << std::endl;
 
-        read_op->set_attr_str(read_attr, "tests/data/checker_8bit_rgba_8x8.png");
-        auto read_path2 = read_op->get_attr_str(read_attr);
+        read_node->set_attr_str(read_attr, "tests/data/checker_8bit_rgba_8x8.png");
+        auto read_path2 = read_node->get_attr_str(read_attr);
         std::cout << "read_path2=" << read_path2 << std::endl;
     }
 
     // Set float attribute
     auto read_attr_x = "x";
-    if (read_op->attr_exists(read_attr_x) == ocg::AttrState::Exists) {
-        auto read_x = read_op->get_attr_f32(read_attr_x);
+    if (read_node->attr_exists(read_attr_x) == ocg::AttrState::Exists) {
+        auto read_x = read_node->get_attr_f32(read_attr_x);
         std::cout << "read_x=" << read_x << std::endl;
 
-        read_op->set_attr_f32(read_attr_x, 3.147);
-        auto read_x2 = read_op->get_attr_f32(read_attr_x);
+        read_node->set_attr_f32(read_attr_x, 3.147);
+        auto read_x2 = read_node->get_attr_f32(read_attr_x);
         std::cout << "read_x2=" << read_x2 << std::endl;
     }
 
     // Set integer attribute
     auto read_attr_y = "y";
-    if (read_op->attr_exists(read_attr_y) == ocg::AttrState::Exists) {
-        auto read_y = read_op->get_attr_f32(read_attr_y);
+    if (read_node->attr_exists(read_attr_y) == ocg::AttrState::Exists) {
+        auto read_y = read_node->get_attr_f32(read_attr_y);
         std::cout << "read_y=" << read_y << std::endl;
 
-        read_op->set_attr_i32(read_attr_y, 42);
-        auto read_y2 = read_op->get_attr_f32(read_attr_y);
+        read_node->set_attr_i32(read_attr_y, 42);
+        auto read_y2 = read_node->get_attr_f32(read_attr_y);
         std::cout << "read_y2=" << read_y2 << std::endl;
     }
 
-    auto read_op_inputs = ocg::internal::create_vec_stream_data_shared();
-    auto read_op_hash = read_op->hash(read_op_inputs);
-    std::cout << "read_op_hash=" << read_op_hash << std::endl;
+    auto read_node_inputs = ocg::internal::create_vec_stream_data_shared();
+    auto read_node_hash = read_node->hash(read_node_inputs);
+    std::cout << "read_node_hash=" << read_node_hash << std::endl;
 
-    auto read_op_output = ocg::internal::create_stream_data_shared();
-    read_op->compute(read_op_inputs, read_op_output);
-    auto read_status = read_op->get_status_id();
+    auto read_node_output = ocg::internal::create_stream_data_shared();
+    read_node->compute(read_node_inputs, read_node_output);
+    auto read_status = read_node->get_status_id();
     std::cout << "read_status=" << read_status << std::endl;
 
-    // auto read_output = read_op->get_output();
+    // auto read_output = read_node->get_output();
     // auto read_hash = read_output->get_hash();
     // auto read_pixels = read_output->get_pixel_block();
     // auto read_bbox = read_output->get_bounding_box();
     // auto read_cmat = read_output->get_color_matrix();
     // auto read_tmat = read_output->get_transform_matrix();
 
-    auto write_op = ocg::internal::create_node_box(
+    auto write_node = ocg::internal::create_node_box(
             ocg::NodeType::WriteImage, id++);
-    std::cout << "write_op=" << &write_op << std::endl;
+    std::cout << "write_node=" << &write_node << std::endl;
 
-    auto write_id2 = write_op->get_id();
+    auto write_id2 = write_node->get_id();
     std::cout << "write_id2=" << write_id2 << std::endl;
 
     auto write_node_type =
-            write_op->get_node_type() == ocg::NodeType::ReadImage;
+            write_node->get_node_type() == ocg::NodeType::ReadImage;
     std::cout << "write_node_type=" << write_node_type << std::endl;
 
-    auto write_node_type_id = write_op->get_node_type_id();
+    auto write_node_type_id = write_node->get_node_type_id();
     std::cout << "write_node_type_id=" << std::hex << write_node_type_id
               << std::endl;
 
     auto write_attr = "file_path";
-    if (write_op->attr_exists(write_attr) == ocg::AttrState::Exists) {
-        auto write_path1 = write_op->get_attr_str(write_attr);
+    if (write_node->attr_exists(write_attr) == ocg::AttrState::Exists) {
+        auto write_path1 = write_node->get_attr_str(write_attr);
         std::cout << "write_path1=" << write_path1 << std::endl;
 
-        write_op->set_attr_str(write_attr, "./tests/data/out/image_out.png");
-        auto write_path2 = write_op->get_attr_str(write_attr);
+        write_node->set_attr_str(write_attr, "./tests/data/out/image_out.png");
+        auto write_path2 = write_node->get_attr_str(write_attr);
         std::cout << "write_path2=" << write_path2 << std::endl;
     }
 
-    auto write_op_inputs = ocg::internal::create_vec_stream_data_shared();
-    write_op_inputs.push_back(std::move(read_op_output));
+    auto write_node_inputs = ocg::internal::create_vec_stream_data_shared();
+    write_node_inputs.push_back(std::move(read_node_output));
 
-    auto write_op_output = ocg::internal::create_stream_data_shared();
-    write_op->compute(write_op_inputs, write_op_output);
-    auto write_status = write_op->get_status_id();
+    auto write_node_output = ocg::internal::create_stream_data_shared();
+    write_node->compute(write_node_inputs, write_node_output);
+    auto write_status = write_node->get_status_id();
     std::cout << "write_status=" << write_status << std::endl;
-    // auto write_result = ocg::get_op_result(write_op);
+    // auto write_result = ocg::get_node_result(write_node);
     // auto write_hash = ocg::get_result_hash(read_result);
     return 0;
 }

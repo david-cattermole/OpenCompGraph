@@ -787,7 +787,7 @@ struct NodeImpl final : public ::rust::Opaque {
 #ifndef CXXBRIDGE1_STRUCT_opencompgraph$internal$GraphImpl
 #define CXXBRIDGE1_STRUCT_opencompgraph$internal$GraphImpl
 struct GraphImpl final : public ::rust::Opaque {
-  ::std::size_t add_op(::rust::Box<::opencompgraph::internal::NodeImpl> op_box) noexcept;
+  ::std::size_t add_node(::rust::Box<::opencompgraph::internal::NodeImpl> op_box) noexcept;
   void connect(::std::size_t src_index, ::std::size_t dst_index, ::std::uint8_t input_num) noexcept;
   ::opencompgraph::ExecuteStatus execute(::std::size_t start_index) noexcept;
 };
