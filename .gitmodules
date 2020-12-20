@@ -1,0 +1,3 @@
+[submodule "tests/data/oiio-images"]
+	path = tests/data/oiio-images
+	url = https://github.com/OpenImageIO/oiio-images.git
