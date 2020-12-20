@@ -51,7 +51,7 @@ int test_c() {
         auto read_path1 = read_op->get_attr_string(read_attr);
         std::cout << "read_path1=" << read_path1 << std::endl;
 
-        read_op->set_attr(read_attr, "tests/data/checker_8x8.png");
+        read_op->set_attr(read_attr, "tests/data/checker_8bit_rgba_8x8.png");
         auto read_path2 = read_op->get_attr_string(read_attr);
         std::cout << "read_path2=" << read_path2 << std::endl;
     }
