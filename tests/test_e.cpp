@@ -17,6 +17,10 @@ int test_e() {
     auto write_node = ocg::Node(ocg::NodeType::WriteImage, "write");
     std::cout << "read_node=" << &read_node << std::endl;
     std::cout << "write_node=" << &write_node << std::endl;
+
+    read_node.set_attr_str("file_path", "tests/data/oiio-images/tahoe-gps.jpg");
+    write_node.set_attr_str("file_path", "./tests/data/out/test_e_out.png");
+
     auto read_node_id = g.add_node(read_node);
     auto null_node_id1 = g.add_node(null_node1);
     auto null_node_id2 = g.add_node(null_node2);

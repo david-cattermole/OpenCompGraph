@@ -1,6 +1,7 @@
 #[allow(unused_imports)]
 use petgraph;
 use petgraph::dot::{Config, Dot};
+use petgraph::Direction;
 use std::hash::{Hash, Hasher};
 
 use crate::cxxbridge::create_stream_data_shared;
@@ -52,15 +53,15 @@ impl GraphImpl {
         //     Dot::with_config(&self.graph, &[Config::EdgeNoLabel])
         // );
 
-        let mut sorted_node_indexes = Vec::<usize>::new();
+        let mut sorted_node_indexes = Vec::<NodeIdx>::new();
 
-        let start = petgraph::graph::NodeIndex::new(start_index);
+        let start = NodeIdx::new(start_index);
         let mut walker = UpstreamEvalSearch::new(&self.graph, start);
         while let Some(nx) = walker.next(&self.graph) {
             let index = nx.index();
             let node_weight = self.graph[nx];
             let node = &self.nodes[index];
-            sorted_node_indexes.push(index);
+            sorted_node_indexes.push(nx);
             assert_eq!(node_weight, node.get_id());
             // println!("walk index: {}", index);
 
@@ -68,14 +69,41 @@ impl GraphImpl {
             // self.graph[nx] += 1;  // Modify the node weight.
         }
 
-        let inputs = Vec::<StreamDataImplShared>::new();
-        let mut output = create_stream_data_shared();
-        for node_index in sorted_node_indexes.iter().rev() {
-            println!("Compute Node Index: {:?}", node_index);
+        let mut cache = Vec::<StreamDataImplShared>::new();
+        for nx in sorted_node_indexes.iter().rev() {
+            println!("Compute Node Index: {:?}", nx);
 
-            let node = &mut self.nodes[*node_index];
+            let node_index = nx.index();
+            let node = &mut self.nodes[node_index];
             // println!("node: {:#?}", node);
-            node.compute(&inputs, &mut output);
+            let graph_node = self.graph[*nx];
+
+            let mut inputs = Vec::<StreamDataImplShared>::new();
+            let parents = self.graph.neighbors_directed(*nx, Direction::Incoming);
+            for parent_node_index in parents {
+                let parent_index = parent_node_index.index();
+                println!("parent node index: {}", parent_index);
+                let mut stream_data = create_stream_data_shared();
+                stream_data.inner = cache[parent_index].inner.clone();
+                inputs.push(stream_data);
+            }
+
+            let mut output = create_stream_data_shared();
+            match node.compute(&inputs, &mut output) {
+                NodeStatus::Valid => cache.push(output),
+                NodeStatus::Uninitialized => {
+                    println!("Node is uninitialized: node_index={}", node_index);
+                    break;
+                }
+                NodeStatus::Error => {
+                    println!("Failed to compute node: node_index={}", node_index);
+                    break;
+                }
+                _ => {
+                    println!("Unknown error: node_index={}", node_index);
+                    break;
+                }
+            }
         }
 
         ExecuteStatus::Success

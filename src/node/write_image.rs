@@ -66,13 +66,27 @@ impl Compute for WriteImageCompute {
         match inputs.len() {
             0 => NodeStatus::Error,
             _ => {
-                let input = &inputs[0];
+                let input = &inputs[0].inner;
 
                 let file_path = attr_block.get_attr_str("file_path");
                 // println!("file_path {:?}", file_path);
 
-                let pixel_block = input.inner.get_pixel_block();
-                let img = &pixel_block.pixels;
+                let pixel_block = input.get_pixel_block();
+                let width = pixel_block.width;
+                let height = pixel_block.height;
+                let pixels = &pixel_block.pixels;
+
+                // Convert f32 pixel image to u8 ImageBuffer.
+                let pixels_u8: Vec<u8> = pixels
+                    .iter()
+                    .map(|x| (*x as f32 / u8::max_value() as f32) as u8)
+                    .collect();
+                let img: image::ImageBuffer<image::Rgba<u8>, Vec<u8>> =
+                    match image::ImageBuffer::from_raw(width, height, pixels_u8) {
+                        Some(data) => data,
+                        _ => panic!("invalid image."),
+                    };
+
                 println!("Writing... {:?}", file_path);
                 let ok = match img.save(file_path) {
                     Ok(value) => true,

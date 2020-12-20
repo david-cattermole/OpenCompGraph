@@ -61,41 +61,35 @@ impl Distance32 {
 
 #[derive(Clone)]
 pub struct PixelBlock {
-    pub data: bool,
     pub width: u32,
     pub height: u32,
     pub num_channels: u8,
-    pub data_type: u8,
-    pub pixels: image::DynamicImage,
+    pub pixels: Vec<f32>,
 }
 
 impl PixelBlock {
     pub fn new(width: u32, height: u32, num_channels: u8) -> PixelBlock {
-        let pixels = image::DynamicImage::new_rgba8(width, height);
-        let data = true;
+        let size = (width * height * num_channels as u32) as usize;
+        let pixels = vec![0.0 as f32; size];
         let data_type = 0;
         PixelBlock {
-            data,
             width,
             height,
             num_channels,
-            data_type,
             pixels,
         }
     }
 
-    pub fn set_pixels(&mut self, pixels: image::DynamicImage) {
+    pub fn set_pixels(&mut self, pixels: Vec<f32>) {
         self.pixels = pixels;
     }
 }
 
 impl Hash for PixelBlock {
     fn hash<H: Hasher>(&self, state: &mut H) {
-        self.data.hash(state);
         self.width.hash(state);
         self.height.hash(state);
         self.num_channels.hash(state);
-        self.data_type.hash(state);
         // Note: Skipping the 'pixels' data.
     }
 }
@@ -103,11 +97,9 @@ impl Hash for PixelBlock {
 impl fmt::Debug for PixelBlock {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("PixelBlock")
-            .field("data", &self.data)
             .field("width", &self.width)
             .field("height", &self.height)
             .field("num_channels", &self.num_channels)
-            .field("data_type", &self.data_type)
             .finish()
     }
 }

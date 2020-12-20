@@ -59,6 +59,7 @@ impl Compute for GradeCompute {
         // println!("AttrBlock: {:?}", attr_block);
         // println!("Inputs: {:?}", inputs);
         // println!("Output: {:?}", output);
+        output.inner = inputs[0].inner.clone();
         NodeStatus::Valid
     }
 }

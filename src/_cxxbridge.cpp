@@ -786,9 +786,8 @@ enum class NodeType : ::std::uint8_t {
 #define CXXBRIDGE1_ENUM_opencompgraph$NodeStatus
 enum class NodeStatus : ::std::uint8_t {
   Error = 0,
-  Warning = 1,
-  Valid = 2,
-  Uninitialized = 3,
+  Valid = 1,
+  Uninitialized = 2,
 };
 #endif // CXXBRIDGE1_ENUM_opencompgraph$NodeStatus
 

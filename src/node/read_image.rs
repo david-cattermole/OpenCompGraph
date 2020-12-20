@@ -91,16 +91,21 @@ impl Compute for ReadImageCompute {
                 _ => 0,
             };
             println!("Num Channels: {:?}", num_channels);
-            // pixels: &image::DynamicImage
-            // let pixel_block = &mut output.inner.get_pixel_block();
+
+            // Convert the image to f32 values
+            let rgba_img = img.into_rgba8();
+            let flat_samples = rgba_img.into_flat_samples();
+            let pixels: Vec<f32> = flat_samples
+                .as_slice()
+                .into_iter()
+                .map(|x| (*x as f32) * u8::max_value() as f32)
+                .collect();
+
             let mut pixel_block =
                 Box::<PixelBlock>::new(PixelBlock::new(width, height, num_channels));
-            pixel_block.set_pixels(img);
+            let pixels = pixel_block.set_pixels(pixels);
             output.inner.set_pixel_block(pixel_block);
         }
-
-        // PixelBlock pixels;
-        // pixels.data = data;
 
         // BoundingBox displayBox;
         // displayBox.min.x = 0;

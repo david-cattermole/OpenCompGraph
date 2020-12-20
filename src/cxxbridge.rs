@@ -89,9 +89,9 @@ pub mod ffi {
     #[namespace = "opencompgraph"]
     pub(crate) enum NodeStatus {
         Error = 0,
-        Warning = 1,
-        Valid = 2,
-        Uninitialized = 3,
+        Valid = 1,
+        Uninitialized = 2,
+        // Warning = 2,
     }
 
     #[repr(u8)]

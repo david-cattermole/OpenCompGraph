@@ -113,7 +113,7 @@ int test_c() {
         auto write_path1 = write_node->get_attr_str(write_attr);
         std::cout << "write_path1=" << write_path1 << std::endl;
 
-        write_node->set_attr_str(write_attr, "./tests/data/out/image_out.png");
+        write_node->set_attr_str(write_attr, "./tests/data/out/test_c_out.png");
         auto write_path2 = write_node->get_attr_str(write_attr);
         std::cout << "write_path2=" << write_path2 << std::endl;
     }
@@ -125,7 +125,5 @@ int test_c() {
     write_node->compute(write_node_inputs, write_node_output);
     auto write_status = write_node->get_status_id();
     std::cout << "write_status=" << write_status << std::endl;
-    // auto write_result = ocg::get_node_result(write_node);
-    // auto write_hash = ocg::get_result_hash(read_result);
     return 0;
 }
