@@ -30,7 +30,7 @@ int test_f() {
     read_node.set_attr_str("file_path", "tests/data/oiio-images/tahoe-gps.jpg");
     grade_overexpose_node.set_attr_f32("multiply", 2.0f);
     grade_underexpose_node.set_attr_f32("multiply", 0.5f);
-    grade_dark_node.set_attr_f32("multiply", 0.01f);
+    grade_dark_node.set_attr_f32("multiply", 0.1f);
     write1_node.set_attr_str("file_path", "./tests/data/out/test_f_out1.png");
     write2_node.set_attr_str("file_path", "./tests/data/out/test_f_out2.png");
 

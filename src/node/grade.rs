@@ -60,7 +60,23 @@ impl Compute for GradeCompute {
         // println!("AttrBlock: {:?}", attr_block);
         // println!("Inputs: {:?}", inputs);
         // println!("Output: {:?}", output);
-        output.inner = inputs[0].inner.clone();
+        let mut copy = inputs[0].inner.clone();
+
+        let multiply = attr_block.get_attr_f32("multiply");
+        let pixel_block = copy.get_pixel_block_as_mut();
+        // let mut i = 0;
+        for v in &mut pixel_block.pixels {
+            // if i < 5 {
+            //     println!("a={}", *v);
+            // }
+            *v *= multiply;
+            // if i < 5 {
+            //     println!("b={}", *v);
+            // }
+            // i += 1;
+        }
+
+        output.inner = copy;
         NodeStatus::Valid
     }
 }

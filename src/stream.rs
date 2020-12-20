@@ -51,6 +51,10 @@ impl StreamDataImpl {
         &self.pixel_block
     }
 
+    pub fn get_pixel_block_as_mut(&mut self) -> &mut Box<PixelBlock> {
+        &mut self.pixel_block
+    }
+
     pub fn set_pixel_block(&mut self, pixel_block: Box<PixelBlock>) {
         self.pixel_block = pixel_block;
     }
