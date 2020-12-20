@@ -51,22 +51,25 @@ impl Compute for WriteImageCompute {
         println!("AttrBlock: {:?}", attr_block);
         println!("Inputs: {:?}", inputs);
         println!("Output: {:?}", output);
+        match inputs.len() {
+            0 => NodeStatus::Error,
+            _ => {
+                let input = &inputs[0];
 
-        let file_path = attr_block.get_attr_string("file_path");
-        println!("file_path {:?}", file_path);
+                let file_path = attr_block.get_attr_string("file_path");
+                println!("file_path {:?}", file_path);
 
-        let img = image::DynamicImage::ImageRgba8(RgbaImage::new(8, 8));
-        let path = match Path::new(&file_path).canonicalize() {
-            Ok(full_path) => full_path,
-            Err(_) => return NodeStatus::Error,
-        };
-        println!("Writing... {:?}", path);
-        let ok = match img.save(path) {
-            Ok(value) => true,
-            Err(_) => false,
-        };
-        println!("Succcess: {}", ok);
-        NodeStatus::Valid
+                let pixel_block = input.inner.get_pixel_block();
+                let img = &pixel_block.pixels;
+                println!("Writing... {:?}", file_path);
+                let ok = match img.save(file_path) {
+                    Ok(value) => true,
+                    Err(_) => false,
+                };
+                println!("Succcess: {}", ok);
+                NodeStatus::Valid
+            }
+        }
     }
 }
 

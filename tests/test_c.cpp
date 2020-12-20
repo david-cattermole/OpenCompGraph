@@ -114,7 +114,7 @@ int test_c() {
         auto write_path1 = write_op->get_attr_string(write_attr);
         std::cout << "write_path1=" << write_path1 << std::endl;
 
-        write_op->set_attr(write_attr, "image_out.jpg");
+        write_op->set_attr(write_attr, "./image_out.png");
         auto write_path2 = write_op->get_attr_string(write_attr);
         std::cout << "write_path2=" << write_path2 << std::endl;
     }
