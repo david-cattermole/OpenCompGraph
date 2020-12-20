@@ -7,5 +7,6 @@
 #include <opencompgraph/cpp.h>
 #include <opencompgraph/graph.h>
 #include <opencompgraph/node.h>
+#include <opencompgraph/debug.h>
 
 #endif // OPENCOMPGRAPH_H

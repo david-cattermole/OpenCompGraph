@@ -4,11 +4,12 @@
 namespace ocg = opencompgraph;
 
 int test_f() {
-    std::cout << "====================================== test_f()" << std::endl;
+    std::cout << "====================================== test_f()" << '\n';
+    auto bench = ocg::internal::BenchmarkTime();
 
     auto g = ocg::Graph();
 
-    std::cout << "Node() ========================================" << std::endl;
+    std::cout << "Node() ========================================" << '\n';
     auto read_node = ocg::Node(ocg::NodeType::ReadImage, "readimage1");
     auto grade_overexpose_node = ocg::Node(ocg::NodeType::Grade, "grade1");
     auto grade_underexpose_node = ocg::Node(ocg::NodeType::Grade, "grade2");
@@ -20,16 +21,16 @@ int test_f() {
     auto write2_node = ocg::Node(ocg::NodeType::WriteImage, "writeimage2");
     auto write3_node = ocg::Node(ocg::NodeType::WriteImage, "writeimage3");
 
-    std::cout << "read_node=" << &read_node << std::endl;
-    std::cout << "grade_overexpose_node=" << &grade_overexpose_node << std::endl;
-    std::cout << "grade_underexpose_node=" << &grade_underexpose_node << std::endl;
-    std::cout << "grade_dark_node=" << &grade_dark_node << std::endl;
-    std::cout << "grade_light_node=" << &grade_light_node << std::endl;
-    std::cout << "null1_node=" << &null1_node << std::endl;
-    std::cout << "null2_node=" << &null2_node << std::endl;
-    std::cout << "write1_node=" << &write1_node << std::endl;
-    std::cout << "write2_node=" << &write2_node << std::endl;
-    std::cout << "write3_node=" << &write3_node << std::endl;
+    std::cout << "read_node=" << &read_node << '\n';
+    std::cout << "grade_overexpose_node=" << &grade_overexpose_node << '\n';
+    std::cout << "grade_underexpose_node=" << &grade_underexpose_node << '\n';
+    std::cout << "grade_dark_node=" << &grade_dark_node << '\n';
+    std::cout << "grade_light_node=" << &grade_light_node << '\n';
+    std::cout << "null1_node=" << &null1_node << '\n';
+    std::cout << "null2_node=" << &null2_node << '\n';
+    std::cout << "write1_node=" << &write1_node << '\n';
+    std::cout << "write2_node=" << &write2_node << '\n';
+    std::cout << "write3_node=" << &write3_node << '\n';
 
     read_node.set_attr_str("file_path", "tests/data/oiio-images/tahoe-gps.jpg");
     grade_overexpose_node.set_attr_f32("multiply", 2.0f);
@@ -70,6 +71,9 @@ int test_f() {
     g.execute(write1_id);
     g.execute(write2_id);
     g.execute(write3_id);
+
+    bench.stop();
+    bench.print("Test F:");
 
     return 0;
 }
