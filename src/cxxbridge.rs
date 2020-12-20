@@ -58,6 +58,30 @@ pub mod ffi {
         Null = 0,
         ReadImage = 1,
         WriteImage = 2,
+        // ColorBars,
+        // Constant,
+
+        // // Pattern
+        // Checkerboard,
+        // Noise,
+
+        // // Time????
+        // FrameHold,
+
+        // // Transform
+        // TransformImage,
+        // CropImage,
+        // ReformatImage,
+
+        // // Merges
+        // MergeImage,
+
+        // // Color
+        // ColorCorrect,
+        // Grade,
+
+        // // Deform / Warp
+        // LensDistort,
     }
 
     #[repr(u8)]
