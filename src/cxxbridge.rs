@@ -148,10 +148,15 @@ pub mod ffi {
         fn hash(&mut self, inputs: &Vec<StreamDataImplShared>) -> usize;
         fn compute(&mut self, inputs: &Vec<StreamDataImplShared>, output: &mut StreamDataImplShared) -> NodeStatus;
 
-
         // AttrBlock
         fn attr_exists(&self, name: &str) -> AttrState;
+        fn get_attr_f32(&self, name: &str) -> f32;
+        fn get_attr_i32(&self, name: &str) -> i32;
         unsafe fn get_attr_string<'a, 'b>(&'b self, name: &'a str) -> &'b str;
+        #[cxx_name = "set_attr"]
+        fn set_attr_f32(&mut self, name: &str, value: f32);
+        #[cxx_name = "set_attr"]
+        fn set_attr_i32(&mut self, name: &str, value: i32);
         #[cxx_name = "set_attr"]
         fn set_attr_string(&mut self, name: &str, value: &str);
     }
@@ -163,8 +168,6 @@ pub mod ffi {
         fn add_op(&mut self, op_box: Box<NodeImpl>) -> usize;
         fn connect(&mut self, src_index: usize, dst_index: usize, input_num: u8);
         fn execute(&mut self, start_index: usize) -> ExecuteStatus;
-
-
     }
 
     // Struct Creation

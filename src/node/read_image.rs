@@ -142,4 +142,20 @@ impl AttrBlock for ReadImageAttrs {
             _ => (),
         };
     }
+
+    fn get_attr_i32(&self, name: &str) -> i32 {
+        0
+    }
+
+    fn set_attr_i32(&mut self, name: &str, value: i32) {
+        ()
+    }
+
+    fn get_attr_f32(&self, name: &str) -> f32 {
+        0.0
+    }
+
+    fn set_attr_f32(&mut self, name: &str, value: f32) {
+        ()
+    }
 }

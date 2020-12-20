@@ -74,6 +74,22 @@ impl NodeImpl {
     pub fn set_attr_string(&mut self, name: &str, value: &str) {
         self.attr_block.set_attr_string(name, value);
     }
+
+    pub fn get_attr_i32(&self, name: &str) -> i32 {
+        self.attr_block.get_attr_i32(name)
+    }
+
+    pub fn set_attr_i32(&mut self, name: &str, value: i32) {
+        self.attr_block.set_attr_i32(name, value);
+    }
+
+    pub fn get_attr_f32(&self, name: &str) -> f32 {
+        self.attr_block.get_attr_f32(name)
+    }
+
+    pub fn set_attr_f32(&mut self, name: &str, value: f32) {
+        self.attr_block.set_attr_f32(name, value);
+    }
 }
 
 pub fn create_node(node_type: NodeType, id: Identifier) -> NodeImpl {

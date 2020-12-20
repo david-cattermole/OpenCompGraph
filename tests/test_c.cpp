@@ -56,27 +56,29 @@ int test_c() {
         std::cout << "read_path2=" << read_path2 << std::endl;
     }
 
-    // // Set float attribute
-    // auto read_attr_x = "x";
-    // if (read_op->attr_exists(read_attr_x) == ocg::AttrState::Exists) {
-    //     auto read_x = read_op->get_attr_f32(read_attr_x);
-    //     std::cout << "read_x=" << read_path1 << std::endl;
+    // Set float attribute
+    auto read_attr_x = "x";
+    if (read_op->attr_exists(read_attr_x) == ocg::AttrState::Exists) {
+        auto read_x = read_op->get_attr_f32(read_attr_x);
+        std::cout << "read_x=" << read_x << std::endl;
 
-    //     read_op->set_attr(read_attr_x, 3.147);
-    //     auto read_x2 = read_op->get_attr_f32(read_attr_x);
-    //     std::cout << "read_x2=" << read_x2 << std::endl;
-    // }
+        float x = 3.147;
+        read_op->set_attr(read_attr_x, x);
+        auto read_x2 = read_op->get_attr_f32(read_attr_x);
+        std::cout << "read_x2=" << read_x2 << std::endl;
+    }
 
-    // // Set integer attribute
-    // auto read_attr_y = "y";
-    // if (read_op->attr_exists(read_attr_y) == ocg::AttrState::Exists) {
-    //     auto read_y = read_op->get_attr_f32(read_attr_y);
-    //     std::cout << "read_y=" << read_path1 << std::endl;
+    // Set integer attribute
+    auto read_attr_y = "y";
+    if (read_op->attr_exists(read_attr_y) == ocg::AttrState::Exists) {
+        auto read_y = read_op->get_attr_f32(read_attr_y);
+        std::cout << "read_y=" << read_y << std::endl;
 
-    //     read_op->set_attr(read_attr_y, 42);
-    //     auto read_y2 = read_op->get_attr_f32(read_attr_y);
-    //     std::cout << "read_y2=" << read_y2 << std::endl;
-    // }
+        int32_t y = 42;
+        read_op->set_attr(read_attr_y, y);
+        auto read_y2 = read_op->get_attr_f32(read_attr_y);
+        std::cout << "read_y2=" << read_y2 << std::endl;
+    }
 
     auto read_op_inputs = ocg::internal::create_vec_stream_data_shared();
     auto read_op_hash = read_op->hash(read_op_inputs);
