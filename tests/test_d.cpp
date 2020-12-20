@@ -8,7 +8,7 @@ int test_d() {
 
     auto g = ocg::Graph();
 
-    std::cout << "Node() ===================================" << std::endl;
+    std::cout << "Node() ========================================" << std::endl;
     auto read_op = ocg::Node(ocg::NodeType::ReadImage);
     auto write_op = ocg::Node(
             ocg::NodeType::WriteImage, "my_write_node");

@@ -8,7 +8,7 @@ int test_e() {
 
     auto g = ocg::Graph();
 
-    std::cout << "Node() ===================================" << std::endl;
+    std::cout << "Node() ========================================" << std::endl;
     auto read_op = ocg::Node(ocg::NodeType::ReadImage, "read");
     auto null_op1 = ocg::Node(ocg::NodeType::Null, "null1");
     auto null_op2 = ocg::Node(ocg::NodeType::Null, "null2");
