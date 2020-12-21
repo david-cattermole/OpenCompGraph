@@ -708,12 +708,14 @@ namespace opencompgraph {
     struct GraphImplShared;
     struct NodeImplShared;
     struct StreamDataImplShared;
+    struct CacheImplShared;
     struct ThingR;
     struct PixelBlock;
     struct BoundingBox2D;
     struct Matrix4;
     struct StreamDataImpl;
     struct NodeImpl;
+    struct CacheImpl;
     struct GraphImpl;
   }
   namespace cpp {
@@ -762,6 +764,15 @@ struct StreamDataImplShared final {
   using IsRelocatable = ::std::true_type;
 };
 #endif // CXXBRIDGE1_STRUCT_opencompgraph$internal$StreamDataImplShared
+
+#ifndef CXXBRIDGE1_STRUCT_opencompgraph$internal$CacheImplShared
+#define CXXBRIDGE1_STRUCT_opencompgraph$internal$CacheImplShared
+struct CacheImplShared final {
+  ::rust::Box<::opencompgraph::internal::CacheImpl> inner;
+
+  using IsRelocatable = ::std::true_type;
+};
+#endif // CXXBRIDGE1_STRUCT_opencompgraph$internal$CacheImplShared
 } // namespace internal
 
 #ifndef CXXBRIDGE1_ENUM_opencompgraph$ExecuteStatus
@@ -839,12 +850,19 @@ struct NodeImpl final : public ::rust::Opaque {
 };
 #endif // CXXBRIDGE1_STRUCT_opencompgraph$internal$NodeImpl
 
+#ifndef CXXBRIDGE1_STRUCT_opencompgraph$internal$CacheImpl
+#define CXXBRIDGE1_STRUCT_opencompgraph$internal$CacheImpl
+struct CacheImpl final : public ::rust::Opaque {
+  ::std::uint64_t get_id() const noexcept;
+};
+#endif // CXXBRIDGE1_STRUCT_opencompgraph$internal$CacheImpl
+
 #ifndef CXXBRIDGE1_STRUCT_opencompgraph$internal$GraphImpl
 #define CXXBRIDGE1_STRUCT_opencompgraph$internal$GraphImpl
 struct GraphImpl final : public ::rust::Opaque {
   ::std::size_t add_node(::rust::Box<::opencompgraph::internal::NodeImpl> op_box) noexcept;
   void connect(::std::size_t src_index, ::std::size_t dst_index, ::std::uint8_t input_num) noexcept;
-  ::opencompgraph::ExecuteStatus execute(::std::size_t start_index) noexcept;
+  ::opencompgraph::ExecuteStatus execute(::std::size_t start_index, ::rust::Box<::opencompgraph::internal::CacheImpl> &cache) noexcept;
 };
 #endif // CXXBRIDGE1_STRUCT_opencompgraph$internal$GraphImpl
 } // namespace internal
@@ -910,11 +928,13 @@ void opencompgraph$internal$cxxbridge1$NodeImpl$set_attr_i32(::opencompgraph::in
 
 void opencompgraph$internal$cxxbridge1$NodeImpl$set_attr_str(::opencompgraph::internal::NodeImpl &self, ::rust::repr::PtrLen name, ::rust::repr::PtrLen value) noexcept;
 
+::std::uint64_t opencompgraph$internal$cxxbridge1$CacheImpl$get_id(const ::opencompgraph::internal::CacheImpl &self) noexcept;
+
 ::std::size_t opencompgraph$internal$cxxbridge1$GraphImpl$add_node(::opencompgraph::internal::GraphImpl &self, ::opencompgraph::internal::NodeImpl *op_box) noexcept;
 
 void opencompgraph$internal$cxxbridge1$GraphImpl$connect(::opencompgraph::internal::GraphImpl &self, ::std::size_t src_index, ::std::size_t dst_index, ::std::uint8_t input_num) noexcept;
 
-::opencompgraph::ExecuteStatus opencompgraph$internal$cxxbridge1$GraphImpl$execute(::opencompgraph::internal::GraphImpl &self, ::std::size_t start_index) noexcept;
+::opencompgraph::ExecuteStatus opencompgraph$internal$cxxbridge1$GraphImpl$execute(::opencompgraph::internal::GraphImpl &self, ::std::size_t start_index, ::rust::Box<::opencompgraph::internal::CacheImpl> &cache) noexcept;
 
 ::opencompgraph::internal::NodeImpl *opencompgraph$internal$cxxbridge1$create_node_box(::opencompgraph::NodeType node_type) noexcept;
 
@@ -927,6 +947,10 @@ void opencompgraph$internal$cxxbridge1$create_node_shared(::opencompgraph::NodeT
 void opencompgraph$internal$cxxbridge1$create_node_shared_with_name(::opencompgraph::NodeType node_type, ::rust::repr::PtrLen name, ::opencompgraph::internal::NodeImplShared *return$) noexcept;
 
 void opencompgraph$internal$cxxbridge1$create_node_shared_with_id(::opencompgraph::NodeType node_type, ::std::uint64_t id, ::opencompgraph::internal::NodeImplShared *return$) noexcept;
+
+::opencompgraph::internal::CacheImpl *opencompgraph$internal$cxxbridge1$create_cache_box() noexcept;
+
+void opencompgraph$internal$cxxbridge1$create_cache_shared(::opencompgraph::internal::CacheImplShared *return$) noexcept;
 
 ::opencompgraph::internal::GraphImpl *opencompgraph$internal$cxxbridge1$create_graph_box() noexcept;
 
@@ -1019,6 +1043,10 @@ void NodeImpl::set_attr_str(::rust::Str name, ::rust::Str value) noexcept {
   opencompgraph$internal$cxxbridge1$NodeImpl$set_attr_str(*this, ::rust::impl<::rust::Str>::repr(name), ::rust::impl<::rust::Str>::repr(value));
 }
 
+::std::uint64_t CacheImpl::get_id() const noexcept {
+  return opencompgraph$internal$cxxbridge1$CacheImpl$get_id(*this);
+}
+
 ::std::size_t GraphImpl::add_node(::rust::Box<::opencompgraph::internal::NodeImpl> op_box) noexcept {
   return opencompgraph$internal$cxxbridge1$GraphImpl$add_node(*this, op_box.into_raw());
 }
@@ -1027,8 +1055,8 @@ void GraphImpl::connect(::std::size_t src_index, ::std::size_t dst_index, ::std:
   opencompgraph$internal$cxxbridge1$GraphImpl$connect(*this, src_index, dst_index, input_num);
 }
 
-::opencompgraph::ExecuteStatus GraphImpl::execute(::std::size_t start_index) noexcept {
-  return opencompgraph$internal$cxxbridge1$GraphImpl$execute(*this, start_index);
+::opencompgraph::ExecuteStatus GraphImpl::execute(::std::size_t start_index, ::rust::Box<::opencompgraph::internal::CacheImpl> &cache) noexcept {
+  return opencompgraph$internal$cxxbridge1$GraphImpl$execute(*this, start_index, cache);
 }
 
 ::rust::Box<::opencompgraph::internal::NodeImpl> create_node_box(::opencompgraph::NodeType node_type) noexcept {
@@ -1058,6 +1086,16 @@ void GraphImpl::connect(::std::size_t src_index, ::std::size_t dst_index, ::std:
 ::opencompgraph::internal::NodeImplShared create_node_shared(::opencompgraph::NodeType node_type, ::std::uint64_t id) noexcept {
   ::rust::MaybeUninit<::opencompgraph::internal::NodeImplShared> return$;
   opencompgraph$internal$cxxbridge1$create_node_shared_with_id(node_type, id, &return$.value);
+  return ::std::move(return$.value);
+}
+
+::rust::Box<::opencompgraph::internal::CacheImpl> create_cache_box() noexcept {
+  return ::rust::Box<::opencompgraph::internal::CacheImpl>::from_raw(opencompgraph$internal$cxxbridge1$create_cache_box());
+}
+
+::opencompgraph::internal::CacheImplShared create_cache_shared() noexcept {
+  ::rust::MaybeUninit<::opencompgraph::internal::CacheImplShared> return$;
+  opencompgraph$internal$cxxbridge1$create_cache_shared(&return$.value);
   return ::std::move(return$.value);
 }
 
@@ -1151,6 +1189,13 @@ void cxxbridge1$rust_vec$opencompgraph$internal$StreamDataImplShared$reserve_tot
 void cxxbridge1$rust_vec$opencompgraph$internal$StreamDataImplShared$set_len(::rust::Vec<::opencompgraph::internal::StreamDataImplShared> *ptr, ::std::size_t len) noexcept;
 ::std::size_t cxxbridge1$rust_vec$opencompgraph$internal$StreamDataImplShared$stride() noexcept;
 #endif // CXXBRIDGE1_RUST_VEC_opencompgraph$internal$StreamDataImplShared
+
+#ifndef CXXBRIDGE1_RUST_BOX_opencompgraph$internal$CacheImpl
+#define CXXBRIDGE1_RUST_BOX_opencompgraph$internal$CacheImpl
+::opencompgraph::internal::CacheImpl *cxxbridge1$box$opencompgraph$internal$CacheImpl$alloc() noexcept;
+void cxxbridge1$box$opencompgraph$internal$CacheImpl$dealloc(::opencompgraph::internal::CacheImpl *) noexcept;
+void cxxbridge1$box$opencompgraph$internal$CacheImpl$drop(::rust::Box<::opencompgraph::internal::CacheImpl> *ptr) noexcept;
+#endif // CXXBRIDGE1_RUST_BOX_opencompgraph$internal$CacheImpl
 
 #ifndef CXXBRIDGE1_RUST_BOX_opencompgraph$internal$BoundingBox2D
 #define CXXBRIDGE1_RUST_BOX_opencompgraph$internal$BoundingBox2D
@@ -1248,6 +1293,18 @@ void Vec<::opencompgraph::internal::StreamDataImplShared>::set_len(::std::size_t
 template <>
 ::std::size_t Vec<::opencompgraph::internal::StreamDataImplShared>::stride() noexcept {
   return cxxbridge1$rust_vec$opencompgraph$internal$StreamDataImplShared$stride();
+}
+template <>
+::opencompgraph::internal::CacheImpl *Box<::opencompgraph::internal::CacheImpl>::allocation::alloc() noexcept {
+  return cxxbridge1$box$opencompgraph$internal$CacheImpl$alloc();
+}
+template <>
+void Box<::opencompgraph::internal::CacheImpl>::allocation::dealloc(::opencompgraph::internal::CacheImpl *ptr) noexcept {
+  cxxbridge1$box$opencompgraph$internal$CacheImpl$dealloc(ptr);
+}
+template <>
+void Box<::opencompgraph::internal::CacheImpl>::drop() noexcept {
+  cxxbridge1$box$opencompgraph$internal$CacheImpl$drop(this);
 }
 template <>
 ::opencompgraph::internal::BoundingBox2D *Box<::opencompgraph::internal::BoundingBox2D>::allocation::alloc() noexcept {

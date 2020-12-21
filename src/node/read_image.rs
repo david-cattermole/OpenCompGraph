@@ -84,13 +84,13 @@ impl Compute for ReadImageCompute {
             let (width, height) = img.dimensions();
             let color_type = img.color();
             println!("Resolution: {:?}x{:?}", width, height);
-            println!("Color Type: {:?}", color_type);
+            // println!("Color Type: {:?}", color_type);
             let num_channels = match color_type {
                 image::ColorType::Rgb8 => 3,
                 image::ColorType::Rgba8 => 3,
                 _ => 0,
             };
-            println!("Num Channels: {:?}", num_channels);
+            // println!("Num Channels: {:?}", num_channels);
 
             // Convert the image to f32 values
             let rgba_img = img.into_rgba8();

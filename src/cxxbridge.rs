@@ -5,12 +5,12 @@ use rustc_hash::FxHasher;
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
 
+use crate::cache::CacheImpl;
 use crate::data::BoundingBox2D;
 use crate::data::HashValue;
 use crate::data::Identifier;
 use crate::data::Matrix4;
 use crate::data::PixelBlock;
-use crate::graph::create_graph;
 use crate::graph::GraphImpl;
 use crate::node::create_node;
 use crate::node::NodeImpl;
@@ -44,6 +44,12 @@ pub mod ffi {
         inner: Box<StreamDataImpl>,
     }
     impl Vec<StreamDataImplShared> {}
+
+    #[derive(Debug)]
+    #[namespace = "opencompgraph::internal"]
+    pub(crate) struct CacheImplShared {
+        inner: Box<CacheImpl>,
+    }
 
     #[repr(u8)]
     #[derive(Debug, Copy, Clone, Hash)]
@@ -150,7 +156,7 @@ pub mod ffi {
         type Matrix4;
     }
 
-    // StreamDataImpl
+    // StreamData
     #[namespace = "opencompgraph::internal"]
     extern "Rust" {
         type StreamDataImpl;
@@ -161,7 +167,7 @@ pub mod ffi {
         fn get_pixel_block(&self) -> &PixelBlock;
     }
 
-    // NodeImpl
+    // Node
     #[namespace = "opencompgraph::internal"]
     extern "Rust" {
         type NodeImpl;
@@ -185,13 +191,20 @@ pub mod ffi {
         fn set_attr_str(&mut self, name: &str, value: &str);
     }
 
+    // Cache
+    #[namespace = "opencompgraph::internal"]
+    extern "Rust" {
+        type CacheImpl;
+        fn get_id(&self) -> u64;
+    }
+
     // Graph
     #[namespace = "opencompgraph::internal"]
     extern "Rust" {
         type GraphImpl;
         fn add_node(&mut self, op_box: Box<NodeImpl>) -> usize;
         fn connect(&mut self, src_index: usize, dst_index: usize, input_num: u8);
-        fn execute(&mut self, start_index: usize) -> ExecuteStatus;
+        fn execute(&mut self, start_index: usize, cache: &mut Box<CacheImpl>) -> ExecuteStatus;
     }
 
     // Struct Creation
@@ -210,6 +223,9 @@ pub mod ffi {
         fn create_node_shared_with_name(node_type: NodeType, name: &str) -> NodeImplShared;
         #[cxx_name = "create_node_shared"]
         fn create_node_shared_with_id(node_type: NodeType, id: u64) -> NodeImplShared;
+
+        fn create_cache_box() -> Box<CacheImpl>;
+        fn create_cache_shared() -> CacheImplShared;
 
         fn create_graph_box() -> Box<GraphImpl>;
         fn create_graph_shared() -> GraphImplShared;
@@ -248,15 +264,8 @@ pub fn create_node_box_with_name(node_type: ffi::NodeType, name: &str) -> Box<No
 }
 
 pub fn create_node_box_with_id(node_type: ffi::NodeType, id: Identifier) -> Box<NodeImpl> {
-    println!("create_node_box(node_type={:?}, id={:?})", node_type, id);
+    // println!("create_node_box(node_type={:?}, id={:?})", node_type, id);
     Box::new(create_node(node_type, id))
-}
-
-fn create_graph_shared() -> ffi::GraphImplShared {
-    println!("create_graph_shared()");
-    ffi::GraphImplShared {
-        inner: create_graph_box(),
-    }
 }
 
 fn create_node_shared(node_type: ffi::NodeType) -> ffi::NodeImplShared {
@@ -270,31 +279,50 @@ fn create_node_shared_with_name(node_type: ffi::NodeType, name: &str) -> ffi::No
 }
 
 fn create_node_shared_with_id(node_type: ffi::NodeType, id: Identifier) -> ffi::NodeImplShared {
-    println!("create_node_shared(node_type={:?}, id={:?})", node_type, id,);
+    // println!("create_node_shared(node_type={:?}, id={:?})", node_type, id,);
     ffi::NodeImplShared {
         inner: create_node_box_with_id(node_type, id),
     }
 }
 
+fn create_cache_shared() -> ffi::CacheImplShared {
+    // println!("create_cache_shared()");
+    ffi::CacheImplShared {
+        inner: create_cache_box(),
+    }
+}
+
+pub fn create_cache_box() -> Box<CacheImpl> {
+    // println!("create_cache_box()");
+    Box::new(CacheImpl::new())
+}
+
+fn create_graph_shared() -> ffi::GraphImplShared {
+    // println!("create_graph_shared()");
+    ffi::GraphImplShared {
+        inner: create_graph_box(),
+    }
+}
+
 fn create_graph_box() -> Box<GraphImpl> {
-    println!("create_graph_box()");
-    Box::new(create_graph())
+    // println!("create_graph_box()");
+    Box::new(GraphImpl::new())
 }
 
 pub fn create_vec_stream_data_shared() -> Vec<ffi::StreamDataImplShared> {
-    println!("create_stream_data_shared()");
+    // println!("create_stream_data_shared()");
     Vec::<ffi::StreamDataImplShared>::new()
 }
 
 pub fn create_stream_data_shared() -> ffi::StreamDataImplShared {
-    println!("create_stream_data_shared()");
+    // println!("create_stream_data_shared()");
     ffi::StreamDataImplShared {
         inner: create_stream_data_box(),
     }
 }
 
 pub fn create_stream_data_box() -> Box<StreamDataImpl> {
-    println!("create_stream_data_box()");
+    // println!("create_stream_data_box()");
     Box::new(StreamDataImpl::new())
 }
 

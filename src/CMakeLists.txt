@@ -33,6 +33,7 @@ add_custom_command(
 set(opencompgraph_source_files
   ${CMAKE_CURRENT_SOURCE_DIR}/_cxxbridge.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/cpp.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/cache.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/node.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/graph.cpp)
 

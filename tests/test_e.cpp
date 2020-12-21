@@ -34,7 +34,8 @@ int test_e() {
     g.connect(null_node_id3, null_node_id4, 0);
     g.connect(null_node_id4, write_node_id, 0);
 
-    g.execute(write_node_id);
+    auto cache = ocg::make_shared_cache();
+    g.execute(write_node_id, cache);
 
     bench.stop();
     bench.print("Test E:");

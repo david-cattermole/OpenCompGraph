@@ -1,4 +1,3 @@
-#[allow(unused_imports)]
 use petgraph;
 use petgraph::dot::{Config, Dot};
 use petgraph::Direction;
@@ -7,6 +6,7 @@ use std::hash::{Hash, Hasher};
 use crate::cache::CacheImpl;
 use crate::cxxbridge::create_stream_data_shared;
 use crate::cxxbridge::ffi::AttrState;
+use crate::cxxbridge::ffi::CacheImplShared;
 use crate::cxxbridge::ffi::ExecuteStatus;
 use crate::cxxbridge::ffi::NodeStatus;
 use crate::cxxbridge::ffi::StreamDataImplShared;
@@ -30,6 +30,12 @@ pub struct GraphImpl {
 }
 
 impl GraphImpl {
+    pub fn new() -> GraphImpl {
+        let nodes = Vec::new();
+        let graph = InnerGraph::with_capacity(0, 0);
+        GraphImpl { nodes, graph }
+    }
+
     // Add, Remove and Modify
     pub fn add_node(&mut self, node_box: Box<NodeImpl>) -> usize {
         let id = node_box.get_id();
@@ -52,7 +58,7 @@ impl GraphImpl {
     }
 
     /// Compute the graph!
-    pub fn execute(&mut self, start_index: usize) -> ExecuteStatus {
+    pub fn execute(&mut self, start_index: usize, cache: &mut Box<CacheImpl>) -> ExecuteStatus {
         println!("Execute: {}", start_index);
         // println!(
         //     "{:?}",
@@ -75,22 +81,21 @@ impl GraphImpl {
             // self.graph[nx] += 1;  // Modify the node weight.
         }
 
-        // let mut cache = Vec::<StreamDataImplShared>::new();
-        let mut cache = CacheImpl::new();
+        // let mut cache = CacheImpl::new();
         for nx in sorted_node_indexes.iter().rev() {
-            println!("Compute Node Index: {:?}", nx);
+            // println!("Compute Node Index: {:?}", nx);
 
             let mut inputs = Vec::<StreamDataImplShared>::new();
             let parents = self.graph.neighbors_directed(*nx, Direction::Incoming);
             for parent_node_index in parents {
                 let parent_index = parent_node_index.index();
-                println!("parent index: {}", parent_index);
+                // println!("parent index: {}", parent_index);
                 let parent_node = &self.nodes[parent_index];
                 let parent_hash = parent_node.get_id();
 
                 match cache.get(&parent_hash) {
                     Some(value) => {
-                        println!("Got hash: {}", parent_hash);
+                        // println!("Got hash: {}", parent_hash);
                         let mut stream_data = create_stream_data_shared();
                         stream_data.inner = value.inner.clone();
                         inputs.push(stream_data);
@@ -126,10 +131,4 @@ impl GraphImpl {
 
         ExecuteStatus::Success
     }
-}
-
-pub fn create_graph() -> GraphImpl {
-    let nodes = Vec::new();
-    let graph = InnerGraph::with_capacity(0, 0);
-    GraphImpl { nodes, graph }
 }

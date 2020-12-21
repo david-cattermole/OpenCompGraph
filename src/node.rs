@@ -34,29 +34,29 @@ impl NodeImpl {
     }
 
     pub fn get_node_type(&self) -> NodeType {
-        println!("Node.get_node_type() -> {:?}", self.node_type);
+        // println!("Node.get_node_type() -> {:?}", self.node_type);
         self.node_type
     }
 
     pub fn get_node_type_id(&self) -> u8 {
-        println!("Node.get_node_type_id() -> {}", self.node_type.repr);
+        // println!("Node.get_node_type_id() -> {}", self.node_type.repr);
         self.node_type.repr
     }
 
     pub fn get_status(&self) -> NodeStatus {
-        println!("Node.get_status() -> {:?}", self.op_status);
+        // println!("Node.get_status() -> {:?}", self.op_status);
         self.op_status
     }
 
     pub fn get_status_id(&self) -> u8 {
-        println!("Node.get_status_id() -> {}", self.op_status.repr);
+        // println!("Node.get_status_id() -> {}", self.op_status.repr);
         self.op_status.repr
     }
 
     // This method is used to determine "has this node changed?
     // If I re-compute this Node, do I expect a different value?"
     pub fn hash(&mut self, inputs: &Vec<StreamDataImplShared>) -> HashValue {
-        println!("Node.hash() -> {}", self.id);
+        // println!("Node.hash() -> {}", self.id);
         let id = self.get_id();
         let node_type_id = self.get_node_type_id();
         self.compute
@@ -101,7 +101,7 @@ impl NodeImpl {
 }
 
 pub fn create_node(node_type: NodeType, id: Identifier) -> NodeImpl {
-    println!("create_node(id={:?}, node_type={:?})", id, node_type);
+    // println!("create_node(id={:?}, node_type={:?})", id, node_type);
     match node_type {
         NodeType::ReadImage => read_image::new(id),
         NodeType::WriteImage => write_image::new(id),

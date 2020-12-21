@@ -652,12 +652,14 @@ namespace opencompgraph {
     struct GraphImplShared;
     struct NodeImplShared;
     struct StreamDataImplShared;
+    struct CacheImplShared;
     struct ThingR;
     struct PixelBlock;
     struct BoundingBox2D;
     struct Matrix4;
     struct StreamDataImpl;
     struct NodeImpl;
+    struct CacheImpl;
     struct GraphImpl;
   }
   namespace cpp {
@@ -706,6 +708,15 @@ struct StreamDataImplShared final {
   using IsRelocatable = ::std::true_type;
 };
 #endif // CXXBRIDGE1_STRUCT_opencompgraph$internal$StreamDataImplShared
+
+#ifndef CXXBRIDGE1_STRUCT_opencompgraph$internal$CacheImplShared
+#define CXXBRIDGE1_STRUCT_opencompgraph$internal$CacheImplShared
+struct CacheImplShared final {
+  ::rust::Box<::opencompgraph::internal::CacheImpl> inner;
+
+  using IsRelocatable = ::std::true_type;
+};
+#endif // CXXBRIDGE1_STRUCT_opencompgraph$internal$CacheImplShared
 } // namespace internal
 
 #ifndef CXXBRIDGE1_ENUM_opencompgraph$ExecuteStatus
@@ -783,12 +794,19 @@ struct NodeImpl final : public ::rust::Opaque {
 };
 #endif // CXXBRIDGE1_STRUCT_opencompgraph$internal$NodeImpl
 
+#ifndef CXXBRIDGE1_STRUCT_opencompgraph$internal$CacheImpl
+#define CXXBRIDGE1_STRUCT_opencompgraph$internal$CacheImpl
+struct CacheImpl final : public ::rust::Opaque {
+  ::std::uint64_t get_id() const noexcept;
+};
+#endif // CXXBRIDGE1_STRUCT_opencompgraph$internal$CacheImpl
+
 #ifndef CXXBRIDGE1_STRUCT_opencompgraph$internal$GraphImpl
 #define CXXBRIDGE1_STRUCT_opencompgraph$internal$GraphImpl
 struct GraphImpl final : public ::rust::Opaque {
   ::std::size_t add_node(::rust::Box<::opencompgraph::internal::NodeImpl> op_box) noexcept;
   void connect(::std::size_t src_index, ::std::size_t dst_index, ::std::uint8_t input_num) noexcept;
-  ::opencompgraph::ExecuteStatus execute(::std::size_t start_index) noexcept;
+  ::opencompgraph::ExecuteStatus execute(::std::size_t start_index, ::rust::Box<::opencompgraph::internal::CacheImpl> &cache) noexcept;
 };
 #endif // CXXBRIDGE1_STRUCT_opencompgraph$internal$GraphImpl
 
@@ -805,6 +823,10 @@ void print_r(const ::opencompgraph::internal::ThingR &r) noexcept;
 ::opencompgraph::internal::NodeImplShared create_node_shared(::opencompgraph::NodeType node_type, ::rust::Str name) noexcept;
 
 ::opencompgraph::internal::NodeImplShared create_node_shared(::opencompgraph::NodeType node_type, ::std::uint64_t id) noexcept;
+
+::rust::Box<::opencompgraph::internal::CacheImpl> create_cache_box() noexcept;
+
+::opencompgraph::internal::CacheImplShared create_cache_shared() noexcept;
 
 ::rust::Box<::opencompgraph::internal::GraphImpl> create_graph_box() noexcept;
 

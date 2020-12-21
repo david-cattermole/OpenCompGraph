@@ -29,7 +29,6 @@ Node::Node(opencompgraph::NodeType node_type, size_t id) noexcept
 
 Node::~Node() {
     std::cout << "~Node()" << std::endl;
-    std::cout << "done with Node" << std::endl;
 }
 
 size_t Node::get_id() noexcept {

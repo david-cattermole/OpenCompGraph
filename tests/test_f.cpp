@@ -68,9 +68,10 @@ int test_f() {
     g.connect(null1_id, grade_light_id, 0);
     g.connect(grade_light_id, write3_id, 0);
 
-    g.execute(write1_id);
-    g.execute(write2_id);
-    g.execute(write3_id);
+    auto cache = ocg::make_shared_cache();
+    g.execute(write1_id, cache);
+    g.execute(write2_id, cache);
+    g.execute(write3_id, cache);
 
     bench.stop();
     bench.print("Test F:");

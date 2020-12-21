@@ -24,9 +24,9 @@ int test_d() {
 
     // std::cout << "Node.add_node(Box<NodeImpl>) ==========" << '\n';
     // auto read_node_box = ocg::internal::create_node_box(
-    //         ocg::NodeType::ReadImage, 0);
+    //     ocg::NodeType::ReadImage, 0);
     // auto write_node_box = ocg::internal::create_node_box(
-    //         ocg::NodeType::WriteImage, 1);
+    //     ocg::NodeType::WriteImage, 1);
     // std::cout << "read_node_box=" << &read_node_box << '\n';
     // std::cout << "write_node_box=" << &write_node_box << '\n';
     // read_node_box->set_attr_str("file_path", "./tests/data/checker_8bit_rgba_3840x2160.png");
@@ -35,8 +35,9 @@ int test_d() {
     // auto write_node_box_id = g.add_node(std::move(write_node_box));
     // g.connect(read_node_box_id, write_node_box_id, 0);
 
-    g.execute(write_node_id1);
-    // g.execute(write_node_box_id);
+    auto cache = ocg::make_shared_cache();
+    g.execute(write_node_id1, cache);
+    // g.execute(write_node_box_id, cache);
 
     bench.stop();
     bench.print("Test D:");
