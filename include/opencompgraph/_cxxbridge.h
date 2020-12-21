@@ -756,10 +756,10 @@ namespace internal {
 #define CXXBRIDGE1_STRUCT_opencompgraph$internal$StreamDataImpl
 struct StreamDataImpl final : public ::rust::Opaque {
   ::std::uint64_t get_hash() const noexcept;
-  const ::rust::Box<::opencompgraph::internal::PixelBlock> &get_pixel_block() const noexcept;
   const ::rust::Box<::opencompgraph::internal::BoundingBox2D> &get_bounding_box() const noexcept;
   const ::rust::Box<::opencompgraph::internal::Matrix4> &get_color_matrix() const noexcept;
   const ::rust::Box<::opencompgraph::internal::Matrix4> &get_transform_matrix() const noexcept;
+  const ::opencompgraph::internal::PixelBlock &get_pixel_block() const noexcept;
 };
 #endif // CXXBRIDGE1_STRUCT_opencompgraph$internal$StreamDataImpl
 

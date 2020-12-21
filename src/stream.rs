@@ -1,42 +1,52 @@
 use image;
+use std::rc::Rc;
 
 use crate::cxxbridge::ffi::StreamDataState;
+use crate::data::BoundingBox2D;
 use crate::data::HashValue;
-use crate::data::{BoundingBox2D, Matrix4, PixelBlock};
+use crate::data::Matrix4;
+use crate::data::PixelBlock;
 
 #[derive(Debug, Clone, Hash)]
 pub struct StreamDataImpl {
     state: StreamDataState,
     hash: HashValue,
     bbox: Box<BoundingBox2D>,
-    pixel_block: Box<PixelBlock>,
     color_matrix: Box<Matrix4>,
     transform_matrix: Box<Matrix4>,
+    pixel_block: Rc<PixelBlock>,
 }
 
 impl StreamDataImpl {
     pub fn new() -> StreamDataImpl {
         let state = StreamDataState::Invalid;
         let hash = 0;
+
         let width = 2;
         let height = 2;
         let num_channels = 3;
+        let pixel_block = Rc::new(PixelBlock::new(width, height, num_channels));
+
         let bbox = Box::new(BoundingBox2D::new());
-        let pixel_block = Box::new(PixelBlock::new(width, height, num_channels));
         let color_matrix = Box::new(Matrix4::new());
         let transform_matrix = Box::new(Matrix4::new());
+
         StreamDataImpl {
             state,
             hash,
             bbox,
-            pixel_block,
             color_matrix,
             transform_matrix,
+            pixel_block,
         }
     }
 
     pub fn get_state(&self) -> StreamDataState {
         self.state
+    }
+
+    pub fn get_state_id(&self) -> u8 {
+        self.state.repr
     }
 
     pub fn get_hash(&self) -> HashValue {
@@ -47,16 +57,20 @@ impl StreamDataImpl {
         &self.bbox
     }
 
-    pub fn get_pixel_block(&self) -> &Box<PixelBlock> {
+    pub fn get_pixel_block(&self) -> &PixelBlock {
         &self.pixel_block
     }
 
-    pub fn get_pixel_block_as_mut(&mut self) -> &mut Box<PixelBlock> {
-        &mut self.pixel_block
+    pub fn get_pixel_block_as_mut(&mut self) -> &mut PixelBlock {
+        Rc::make_mut(&mut self.pixel_block)
     }
 
-    pub fn set_pixel_block(&mut self, pixel_block: Box<PixelBlock>) {
-        self.pixel_block = pixel_block;
+    pub fn set_pixel_block(&mut self, pixel_block: PixelBlock) {
+        // when the "old" Rc goes out of scope it will be cleaned up
+        // if there are no more references to the underlying
+        // allocation.
+        let old_data = Rc::clone(&self.pixel_block);
+        self.pixel_block = Rc::new(pixel_block);
     }
 
     pub fn get_color_matrix(&self) -> &Box<Matrix4> {

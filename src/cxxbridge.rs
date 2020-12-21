@@ -155,10 +155,10 @@ pub mod ffi {
     extern "Rust" {
         type StreamDataImpl;
         fn get_hash(&self) -> u64;
-        fn get_pixel_block(&self) -> &Box<PixelBlock>;
         fn get_bounding_box(&self) -> &Box<BoundingBox2D>;
         fn get_color_matrix(&self) -> &Box<Matrix4>;
         fn get_transform_matrix(&self) -> &Box<Matrix4>;
+        fn get_pixel_block(&self) -> &PixelBlock;
     }
 
     // NodeImpl

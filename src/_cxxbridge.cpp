@@ -812,10 +812,10 @@ namespace internal {
 #define CXXBRIDGE1_STRUCT_opencompgraph$internal$StreamDataImpl
 struct StreamDataImpl final : public ::rust::Opaque {
   ::std::uint64_t get_hash() const noexcept;
-  const ::rust::Box<::opencompgraph::internal::PixelBlock> &get_pixel_block() const noexcept;
   const ::rust::Box<::opencompgraph::internal::BoundingBox2D> &get_bounding_box() const noexcept;
   const ::rust::Box<::opencompgraph::internal::Matrix4> &get_color_matrix() const noexcept;
   const ::rust::Box<::opencompgraph::internal::Matrix4> &get_transform_matrix() const noexcept;
+  const ::opencompgraph::internal::PixelBlock &get_pixel_block() const noexcept;
 };
 #endif // CXXBRIDGE1_STRUCT_opencompgraph$internal$StreamDataImpl
 
@@ -874,13 +874,13 @@ void opencompgraph$internal$cxxbridge1$print_r(const ::opencompgraph::internal::
 
 ::std::uint64_t opencompgraph$internal$cxxbridge1$StreamDataImpl$get_hash(const ::opencompgraph::internal::StreamDataImpl &self) noexcept;
 
-const ::rust::Box<::opencompgraph::internal::PixelBlock> *opencompgraph$internal$cxxbridge1$StreamDataImpl$get_pixel_block(const ::opencompgraph::internal::StreamDataImpl &self) noexcept;
-
 const ::rust::Box<::opencompgraph::internal::BoundingBox2D> *opencompgraph$internal$cxxbridge1$StreamDataImpl$get_bounding_box(const ::opencompgraph::internal::StreamDataImpl &self) noexcept;
 
 const ::rust::Box<::opencompgraph::internal::Matrix4> *opencompgraph$internal$cxxbridge1$StreamDataImpl$get_color_matrix(const ::opencompgraph::internal::StreamDataImpl &self) noexcept;
 
 const ::rust::Box<::opencompgraph::internal::Matrix4> *opencompgraph$internal$cxxbridge1$StreamDataImpl$get_transform_matrix(const ::opencompgraph::internal::StreamDataImpl &self) noexcept;
+
+const ::opencompgraph::internal::PixelBlock *opencompgraph$internal$cxxbridge1$StreamDataImpl$get_pixel_block(const ::opencompgraph::internal::StreamDataImpl &self) noexcept;
 
 ::std::uint64_t opencompgraph$internal$cxxbridge1$NodeImpl$get_id(const ::opencompgraph::internal::NodeImpl &self) noexcept;
 
@@ -947,10 +947,6 @@ void print_r(const ::opencompgraph::internal::ThingR &r) noexcept {
   return opencompgraph$internal$cxxbridge1$StreamDataImpl$get_hash(*this);
 }
 
-const ::rust::Box<::opencompgraph::internal::PixelBlock> &StreamDataImpl::get_pixel_block() const noexcept {
-  return *opencompgraph$internal$cxxbridge1$StreamDataImpl$get_pixel_block(*this);
-}
-
 const ::rust::Box<::opencompgraph::internal::BoundingBox2D> &StreamDataImpl::get_bounding_box() const noexcept {
   return *opencompgraph$internal$cxxbridge1$StreamDataImpl$get_bounding_box(*this);
 }
@@ -961,6 +957,10 @@ const ::rust::Box<::opencompgraph::internal::Matrix4> &StreamDataImpl::get_color
 
 const ::rust::Box<::opencompgraph::internal::Matrix4> &StreamDataImpl::get_transform_matrix() const noexcept {
   return *opencompgraph$internal$cxxbridge1$StreamDataImpl$get_transform_matrix(*this);
+}
+
+const ::opencompgraph::internal::PixelBlock &StreamDataImpl::get_pixel_block() const noexcept {
+  return *opencompgraph$internal$cxxbridge1$StreamDataImpl$get_pixel_block(*this);
 }
 
 ::std::uint64_t NodeImpl::get_id() const noexcept {
@@ -1152,13 +1152,6 @@ void cxxbridge1$rust_vec$opencompgraph$internal$StreamDataImplShared$set_len(::r
 ::std::size_t cxxbridge1$rust_vec$opencompgraph$internal$StreamDataImplShared$stride() noexcept;
 #endif // CXXBRIDGE1_RUST_VEC_opencompgraph$internal$StreamDataImplShared
 
-#ifndef CXXBRIDGE1_RUST_BOX_opencompgraph$internal$PixelBlock
-#define CXXBRIDGE1_RUST_BOX_opencompgraph$internal$PixelBlock
-::opencompgraph::internal::PixelBlock *cxxbridge1$box$opencompgraph$internal$PixelBlock$alloc() noexcept;
-void cxxbridge1$box$opencompgraph$internal$PixelBlock$dealloc(::opencompgraph::internal::PixelBlock *) noexcept;
-void cxxbridge1$box$opencompgraph$internal$PixelBlock$drop(::rust::Box<::opencompgraph::internal::PixelBlock> *ptr) noexcept;
-#endif // CXXBRIDGE1_RUST_BOX_opencompgraph$internal$PixelBlock
-
 #ifndef CXXBRIDGE1_RUST_BOX_opencompgraph$internal$BoundingBox2D
 #define CXXBRIDGE1_RUST_BOX_opencompgraph$internal$BoundingBox2D
 ::opencompgraph::internal::BoundingBox2D *cxxbridge1$box$opencompgraph$internal$BoundingBox2D$alloc() noexcept;
@@ -1255,18 +1248,6 @@ void Vec<::opencompgraph::internal::StreamDataImplShared>::set_len(::std::size_t
 template <>
 ::std::size_t Vec<::opencompgraph::internal::StreamDataImplShared>::stride() noexcept {
   return cxxbridge1$rust_vec$opencompgraph$internal$StreamDataImplShared$stride();
-}
-template <>
-::opencompgraph::internal::PixelBlock *Box<::opencompgraph::internal::PixelBlock>::allocation::alloc() noexcept {
-  return cxxbridge1$box$opencompgraph$internal$PixelBlock$alloc();
-}
-template <>
-void Box<::opencompgraph::internal::PixelBlock>::allocation::dealloc(::opencompgraph::internal::PixelBlock *ptr) noexcept {
-  cxxbridge1$box$opencompgraph$internal$PixelBlock$dealloc(ptr);
-}
-template <>
-void Box<::opencompgraph::internal::PixelBlock>::drop() noexcept {
-  cxxbridge1$box$opencompgraph$internal$PixelBlock$drop(this);
 }
 template <>
 ::opencompgraph::internal::BoundingBox2D *Box<::opencompgraph::internal::BoundingBox2D>::allocation::alloc() noexcept {

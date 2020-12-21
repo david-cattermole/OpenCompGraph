@@ -101,8 +101,7 @@ impl Compute for ReadImageCompute {
                 .map(|x| (*x as f32) * u8::max_value() as f32)
                 .collect();
 
-            let mut pixel_block =
-                Box::<PixelBlock>::new(PixelBlock::new(width, height, num_channels));
+            let mut pixel_block = PixelBlock::new(width, height, num_channels);
             let pixels = pixel_block.set_pixels(pixels);
             output.inner.set_pixel_block(pixel_block);
         }
