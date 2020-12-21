@@ -7,7 +7,7 @@
 namespace opencompgraph {
     class Node {
     public:
-        Node(NodeType node_type) noexcept;
+        explicit Node(NodeType node_type) noexcept;
         Node(NodeType node_type, const char *name) noexcept;
         Node(NodeType node_type, size_t id) noexcept;
 
