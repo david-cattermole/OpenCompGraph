@@ -10,9 +10,13 @@ use crate::cxxbridge::ffi::AttrState;
 use crate::cxxbridge::ffi::ExecuteStatus;
 use crate::cxxbridge::ffi::NodeStatus;
 use crate::cxxbridge::ffi::StreamDataImplShared;
+use crate::data::BoundingBox2D;
+use crate::data::EdgeIdx;
+use crate::data::EdgeWeight;
+use crate::data::GraphIdx;
 use crate::data::Identifier;
-use crate::data::{BoundingBox2D, Matrix4, PixelBlock};
-use crate::data::{EdgeIdx, EdgeWeight, GraphIdx, NodeIdx, NodeWeight};
+use crate::data::NodeIdx;
+use crate::data::NodeWeight;
 use crate::graphiter::UpstreamEvalSearch;
 use crate::node::NodeImpl;
 

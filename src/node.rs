@@ -3,9 +3,15 @@ use crate::cxxbridge::ffi::NodeStatus;
 use crate::cxxbridge::ffi::NodeType;
 use crate::cxxbridge::ffi::StreamDataImplShared;
 use crate::cxxbridge::ffi::StreamDataState;
+use crate::data::BoundingBox2D;
+use crate::data::EdgeIdx;
+use crate::data::EdgeWeight;
+use crate::data::GraphIdx;
 use crate::data::HashValue;
 use crate::data::Identifier;
-use crate::data::{BoundingBox2D, Matrix4, PixelBlock};
+use crate::data::NodeIdx;
+use crate::data::NodeWeight;
+use crate::data::PixelBlock;
 
 pub mod grade;
 pub mod null;

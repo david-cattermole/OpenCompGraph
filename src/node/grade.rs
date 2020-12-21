@@ -6,7 +6,8 @@ use crate::cxxbridge::ffi::NodeType;
 use crate::cxxbridge::ffi::StreamDataImplShared;
 use crate::data::HashValue;
 use crate::data::Identifier;
-use crate::node::traits::{AttrBlock, Compute};
+use crate::node::traits::AttrBlock;
+use crate::node::traits::Compute;
 use crate::node::NodeImpl;
 
 pub fn new(id: Identifier) -> NodeImpl {

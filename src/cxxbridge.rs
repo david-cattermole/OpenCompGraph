@@ -5,9 +5,11 @@ use rustc_hash::FxHasher;
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
 
+use crate::data::BoundingBox2D;
 use crate::data::HashValue;
 use crate::data::Identifier;
-use crate::data::{BoundingBox2D, Matrix4, PixelBlock};
+use crate::data::Matrix4;
+use crate::data::PixelBlock;
 use crate::graph::create_graph;
 use crate::graph::GraphImpl;
 use crate::node::create_node;
