@@ -10,7 +10,6 @@ int test_d(std::shared_ptr<ocg::Cache> cache) {
     auto g = ocg::Graph();
 
     std::cout << "Node() ========================================" << '\n';
-    auto read_node = ocg::Node(ocg::NodeType::ReadImage);
     auto read_node = ocg::Node(ocg::NodeType::ReadImage, "my_read_node");
     auto write_node = ocg::Node(
             ocg::NodeType::WriteImage, "my_write_node");
