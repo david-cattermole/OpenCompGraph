@@ -15,9 +15,9 @@ message(STATUS "Rust Library: " ${rust_linktime_file})
 # Generate CXX Bridge files.
 find_program(CXXBRIDGE cxxbridge REQUIRED PATHS $ENV{HOME}/.cargo/bin)
 message(STATUS "Using cxxbridge: ${CXXBRIDGE}")
-set(cxxbridge_in ${CMAKE_SOURCE_DIR}/src/cxxbridge.rs)
-set(cxxbridge_source_out ${CMAKE_SOURCE_DIR}/src/_cxxbridge.cpp)
-set(cxxbridge_header_out ${CMAKE_SOURCE_DIR}/include/opencompgraph/_cxxbridge.h)
+set(cxxbridge_in ${CMAKE_CURRENT_SOURCE_DIR}/cxxbridge.rs)
+set(cxxbridge_source_out ${CMAKE_CURRENT_SOURCE_DIR}/_cxxbridge.cpp)
+set(cxxbridge_header_out ${CMAKE_CURRENT_SOURCE_DIR}/../include/opencompgraph/_cxxbridge.h)
 if (MSVC)
   set(cxxbridge_args "--cxx-impl-annotations \"__declspec(dllexport)\"")
 elseif (UNIX) # GCC
@@ -43,7 +43,7 @@ add_library(${target_lib} SHARED ${opencompgraph_source_files})
 target_link_libraries(${target_lib}
   ${rust_linktime_file})
 target_include_directories(${target_lib}
-  PUBLIC ${CMAKE_SOURCE_DIR}/include
+  PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../include
   PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/ )
 target_include_directories(${target_lib} PUBLIC ${RUST_INCLUDE_DIR})
 if (MSVC)
