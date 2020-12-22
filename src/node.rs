@@ -76,27 +76,60 @@ impl NodeImpl {
     }
 
     pub fn get_attr_str(&self, name: &str) -> &str {
-        self.attr_block.get_attr_str(name)
+        match self.attr_block.attr_exists(name) {
+            AttrState::Exists => self.attr_block.get_attr_str(name),
+            AttrState::Missing => {
+                println!("Missing attribute: {}", name);
+                ""
+            }
+            _ => panic!("Incorrect AttrState"),
+        }
     }
 
     pub fn set_attr_str(&mut self, name: &str, value: &str) {
-        self.attr_block.set_attr_str(name, value);
+        match self.attr_block.attr_exists(name) {
+            AttrState::Exists => self.attr_block.set_attr_str(name, value),
+            AttrState::Missing => println!("Missing attribute: {}", name),
+            _ => panic!("Incorrect AttrState"),
+        }
     }
 
     pub fn get_attr_i32(&self, name: &str) -> i32 {
-        self.attr_block.get_attr_i32(name)
+        match self.attr_block.attr_exists(name) {
+            AttrState::Exists => self.attr_block.get_attr_i32(name),
+            AttrState::Missing => {
+                println!("Missing attribute: {}", name);
+                0
+            }
+            _ => panic!("Incorrect AttrState"),
+        }
     }
 
     pub fn set_attr_i32(&mut self, name: &str, value: i32) {
-        self.attr_block.set_attr_i32(name, value);
+        match self.attr_block.attr_exists(name) {
+            AttrState::Exists => self.attr_block.set_attr_i32(name, value),
+            AttrState::Missing => println!("Missing attribute: {}", name),
+            _ => panic!("Incorrect AttrState"),
+        }
     }
 
     pub fn get_attr_f32(&self, name: &str) -> f32 {
-        self.attr_block.get_attr_f32(name)
+        match self.attr_block.attr_exists(name) {
+            AttrState::Exists => self.attr_block.get_attr_f32(name),
+            AttrState::Missing => {
+                println!("Missing attribute: {}", name);
+                0.0
+            }
+            _ => panic!("Incorrect AttrState"),
+        }
     }
 
     pub fn set_attr_f32(&mut self, name: &str, value: f32) {
-        self.attr_block.set_attr_f32(name, value);
+        match self.attr_block.attr_exists(name) {
+            AttrState::Exists => self.attr_block.set_attr_f32(name, value),
+            AttrState::Missing => println!("Missing attribute: {}", name),
+            _ => panic!("Incorrect AttrState"),
+        }
     }
 }
 
