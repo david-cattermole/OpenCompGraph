@@ -5,7 +5,7 @@
 #include <cstdlib>
 #include <new>
 
-namespace opencompgraph {
+namespace open_comp_graph {
 namespace cbindgen {
 
 /// The Scene Graph.
@@ -22,4 +22,4 @@ SceneGraph *scene_graph_new(int id);
 } // extern "C"
 
 } // namespace cbindgen
-} // namespace opencompgraph
+} // namespace open_comp_graph

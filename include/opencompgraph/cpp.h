@@ -10,7 +10,7 @@
 #include <functional>
 #include <algorithm>
 
-namespace opencompgraph {
+namespace open_comp_graph {
 
 namespace shared {
     struct SharedThing;
@@ -34,6 +34,6 @@ namespace cpp {
     void run_sharedthing(shared::SharedThing state);
 
 } // namespace cpp
-} // namespace opencompgraph
+} // namespace open_comp_graph
 
 #endif // OPENCOMPGRAPH_CPP_H

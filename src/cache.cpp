@@ -3,7 +3,7 @@
 #include <rust/cxx.h>
 #include <opencompgraph/cache.h>
 
-namespace opencompgraph {
+namespace open_comp_graph {
 
 Cache::Cache() noexcept
         : inner{internal::create_cache_shared()} {
@@ -14,11 +14,11 @@ Cache::~Cache() {
     std::cout << "~Cache()" << '\n';
 }
 
-rust::Box<opencompgraph::internal::CacheImpl> Cache::get_box() noexcept {
+rust::Box<open_comp_graph::internal::CacheImpl> Cache::get_box() noexcept {
     return std::move(this->inner.inner);
 }
 
-void Cache::set_box(rust::Box<opencompgraph::internal::CacheImpl> box) noexcept {
+void Cache::set_box(rust::Box<open_comp_graph::internal::CacheImpl> box) noexcept {
     this->inner.inner = std::move(box);
 }
 
@@ -32,4 +32,4 @@ std::shared_ptr<Cache> make_shared_cache() {
     return std::make_shared<Cache>();
 }
 
-} // namespace opencompgraph
+} // namespace open_comp_graph

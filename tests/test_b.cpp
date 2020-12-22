@@ -2,7 +2,7 @@
 #include <string>
 #include "opencompgraph.h"
 
-namespace ocg = opencompgraph;
+namespace ocg = open_comp_graph;
 
 int test_b() {
     std::cout << "====================================== test_b()" << '\n';

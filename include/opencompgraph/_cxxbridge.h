@@ -639,7 +639,7 @@ public:
 } // namespace cxxbridge1
 } // namespace rust
 
-namespace opencompgraph {
+namespace open_comp_graph {
   enum class ExecuteStatus : ::std::uint8_t;
   enum class NodeType : ::std::uint8_t;
   enum class NodeStatus : ::std::uint8_t;
@@ -663,128 +663,128 @@ namespace opencompgraph {
     struct GraphImpl;
   }
   namespace cpp {
-    using ThingC = ::opencompgraph::cpp::ThingC;
+    using ThingC = ::open_comp_graph::cpp::ThingC;
   }
 }
 
-namespace opencompgraph {
+namespace open_comp_graph {
 namespace shared {
-#ifndef CXXBRIDGE1_STRUCT_opencompgraph$shared$SharedThing
-#define CXXBRIDGE1_STRUCT_opencompgraph$shared$SharedThing
+#ifndef CXXBRIDGE1_STRUCT_open_comp_graph$shared$SharedThing
+#define CXXBRIDGE1_STRUCT_open_comp_graph$shared$SharedThing
 struct SharedThing final {
   ::std::int32_t z;
-  ::rust::Box<::opencompgraph::internal::ThingR> y;
-  ::std::unique_ptr<::opencompgraph::cpp::ThingC> x;
+  ::rust::Box<::open_comp_graph::internal::ThingR> y;
+  ::std::unique_ptr<::open_comp_graph::cpp::ThingC> x;
 
   using IsRelocatable = ::std::true_type;
 };
-#endif // CXXBRIDGE1_STRUCT_opencompgraph$shared$SharedThing
+#endif // CXXBRIDGE1_STRUCT_open_comp_graph$shared$SharedThing
 } // namespace shared
 
 namespace internal {
-#ifndef CXXBRIDGE1_STRUCT_opencompgraph$internal$GraphImplShared
-#define CXXBRIDGE1_STRUCT_opencompgraph$internal$GraphImplShared
+#ifndef CXXBRIDGE1_STRUCT_open_comp_graph$internal$GraphImplShared
+#define CXXBRIDGE1_STRUCT_open_comp_graph$internal$GraphImplShared
 struct GraphImplShared final {
-  ::rust::Box<::opencompgraph::internal::GraphImpl> inner;
+  ::rust::Box<::open_comp_graph::internal::GraphImpl> inner;
 
   using IsRelocatable = ::std::true_type;
 };
-#endif // CXXBRIDGE1_STRUCT_opencompgraph$internal$GraphImplShared
+#endif // CXXBRIDGE1_STRUCT_open_comp_graph$internal$GraphImplShared
 
-#ifndef CXXBRIDGE1_STRUCT_opencompgraph$internal$NodeImplShared
-#define CXXBRIDGE1_STRUCT_opencompgraph$internal$NodeImplShared
+#ifndef CXXBRIDGE1_STRUCT_open_comp_graph$internal$NodeImplShared
+#define CXXBRIDGE1_STRUCT_open_comp_graph$internal$NodeImplShared
 struct NodeImplShared final {
-  ::rust::Box<::opencompgraph::internal::NodeImpl> inner;
+  ::rust::Box<::open_comp_graph::internal::NodeImpl> inner;
 
   using IsRelocatable = ::std::true_type;
 };
-#endif // CXXBRIDGE1_STRUCT_opencompgraph$internal$NodeImplShared
+#endif // CXXBRIDGE1_STRUCT_open_comp_graph$internal$NodeImplShared
 
-#ifndef CXXBRIDGE1_STRUCT_opencompgraph$internal$StreamDataImplShared
-#define CXXBRIDGE1_STRUCT_opencompgraph$internal$StreamDataImplShared
+#ifndef CXXBRIDGE1_STRUCT_open_comp_graph$internal$StreamDataImplShared
+#define CXXBRIDGE1_STRUCT_open_comp_graph$internal$StreamDataImplShared
 struct StreamDataImplShared final {
-  ::rust::Box<::opencompgraph::internal::StreamDataImpl> inner;
+  ::rust::Box<::open_comp_graph::internal::StreamDataImpl> inner;
 
   using IsRelocatable = ::std::true_type;
 };
-#endif // CXXBRIDGE1_STRUCT_opencompgraph$internal$StreamDataImplShared
+#endif // CXXBRIDGE1_STRUCT_open_comp_graph$internal$StreamDataImplShared
 
-#ifndef CXXBRIDGE1_STRUCT_opencompgraph$internal$CacheImplShared
-#define CXXBRIDGE1_STRUCT_opencompgraph$internal$CacheImplShared
+#ifndef CXXBRIDGE1_STRUCT_open_comp_graph$internal$CacheImplShared
+#define CXXBRIDGE1_STRUCT_open_comp_graph$internal$CacheImplShared
 struct CacheImplShared final {
-  ::rust::Box<::opencompgraph::internal::CacheImpl> inner;
+  ::rust::Box<::open_comp_graph::internal::CacheImpl> inner;
 
   using IsRelocatable = ::std::true_type;
 };
-#endif // CXXBRIDGE1_STRUCT_opencompgraph$internal$CacheImplShared
+#endif // CXXBRIDGE1_STRUCT_open_comp_graph$internal$CacheImplShared
 } // namespace internal
 
-#ifndef CXXBRIDGE1_ENUM_opencompgraph$ExecuteStatus
-#define CXXBRIDGE1_ENUM_opencompgraph$ExecuteStatus
+#ifndef CXXBRIDGE1_ENUM_open_comp_graph$ExecuteStatus
+#define CXXBRIDGE1_ENUM_open_comp_graph$ExecuteStatus
 enum class ExecuteStatus : ::std::uint8_t {
   Error = 0,
   Success = 1,
 };
-#endif // CXXBRIDGE1_ENUM_opencompgraph$ExecuteStatus
+#endif // CXXBRIDGE1_ENUM_open_comp_graph$ExecuteStatus
 
-#ifndef CXXBRIDGE1_ENUM_opencompgraph$NodeType
-#define CXXBRIDGE1_ENUM_opencompgraph$NodeType
+#ifndef CXXBRIDGE1_ENUM_open_comp_graph$NodeType
+#define CXXBRIDGE1_ENUM_open_comp_graph$NodeType
 enum class NodeType : ::std::uint8_t {
   Null = 0,
   ReadImage = 1,
   WriteImage = 2,
   Grade = 3,
 };
-#endif // CXXBRIDGE1_ENUM_opencompgraph$NodeType
+#endif // CXXBRIDGE1_ENUM_open_comp_graph$NodeType
 
-#ifndef CXXBRIDGE1_ENUM_opencompgraph$NodeStatus
-#define CXXBRIDGE1_ENUM_opencompgraph$NodeStatus
+#ifndef CXXBRIDGE1_ENUM_open_comp_graph$NodeStatus
+#define CXXBRIDGE1_ENUM_open_comp_graph$NodeStatus
 enum class NodeStatus : ::std::uint8_t {
   Error = 0,
   Valid = 1,
   Uninitialized = 2,
 };
-#endif // CXXBRIDGE1_ENUM_opencompgraph$NodeStatus
+#endif // CXXBRIDGE1_ENUM_open_comp_graph$NodeStatus
 
-#ifndef CXXBRIDGE1_ENUM_opencompgraph$AttrState
-#define CXXBRIDGE1_ENUM_opencompgraph$AttrState
+#ifndef CXXBRIDGE1_ENUM_open_comp_graph$AttrState
+#define CXXBRIDGE1_ENUM_open_comp_graph$AttrState
 enum class AttrState : ::std::uint8_t {
   Missing = 0,
   Exists = 1,
 };
-#endif // CXXBRIDGE1_ENUM_opencompgraph$AttrState
+#endif // CXXBRIDGE1_ENUM_open_comp_graph$AttrState
 
-#ifndef CXXBRIDGE1_ENUM_opencompgraph$StreamDataState
-#define CXXBRIDGE1_ENUM_opencompgraph$StreamDataState
+#ifndef CXXBRIDGE1_ENUM_open_comp_graph$StreamDataState
+#define CXXBRIDGE1_ENUM_open_comp_graph$StreamDataState
 enum class StreamDataState : ::std::uint8_t {
   Invalid = 0,
   Valid = 1,
 };
-#endif // CXXBRIDGE1_ENUM_opencompgraph$StreamDataState
+#endif // CXXBRIDGE1_ENUM_open_comp_graph$StreamDataState
 
 namespace internal {
-#ifndef CXXBRIDGE1_STRUCT_opencompgraph$internal$StreamDataImpl
-#define CXXBRIDGE1_STRUCT_opencompgraph$internal$StreamDataImpl
+#ifndef CXXBRIDGE1_STRUCT_open_comp_graph$internal$StreamDataImpl
+#define CXXBRIDGE1_STRUCT_open_comp_graph$internal$StreamDataImpl
 struct StreamDataImpl final : public ::rust::Opaque {
   ::std::uint64_t get_hash() const noexcept;
-  const ::rust::Box<::opencompgraph::internal::BoundingBox2D> &get_bounding_box() const noexcept;
-  const ::rust::Box<::opencompgraph::internal::Matrix4> &get_color_matrix() const noexcept;
-  const ::rust::Box<::opencompgraph::internal::Matrix4> &get_transform_matrix() const noexcept;
-  const ::opencompgraph::internal::PixelBlock &get_pixel_block() const noexcept;
+  const ::rust::Box<::open_comp_graph::internal::BoundingBox2D> &get_bounding_box() const noexcept;
+  const ::rust::Box<::open_comp_graph::internal::Matrix4> &get_color_matrix() const noexcept;
+  const ::rust::Box<::open_comp_graph::internal::Matrix4> &get_transform_matrix() const noexcept;
+  const ::open_comp_graph::internal::PixelBlock &get_pixel_block() const noexcept;
 };
-#endif // CXXBRIDGE1_STRUCT_opencompgraph$internal$StreamDataImpl
+#endif // CXXBRIDGE1_STRUCT_open_comp_graph$internal$StreamDataImpl
 
-#ifndef CXXBRIDGE1_STRUCT_opencompgraph$internal$NodeImpl
-#define CXXBRIDGE1_STRUCT_opencompgraph$internal$NodeImpl
+#ifndef CXXBRIDGE1_STRUCT_open_comp_graph$internal$NodeImpl
+#define CXXBRIDGE1_STRUCT_open_comp_graph$internal$NodeImpl
 struct NodeImpl final : public ::rust::Opaque {
   ::std::uint64_t get_id() const noexcept;
-  ::opencompgraph::NodeType get_node_type() const noexcept;
+  ::open_comp_graph::NodeType get_node_type() const noexcept;
   ::std::uint8_t get_node_type_id() const noexcept;
-  ::opencompgraph::NodeStatus get_status() const noexcept;
+  ::open_comp_graph::NodeStatus get_status() const noexcept;
   ::std::uint8_t get_status_id() const noexcept;
-  ::std::uint64_t hash(const ::rust::Vec<::opencompgraph::internal::StreamDataImplShared> &inputs) noexcept;
-  ::opencompgraph::NodeStatus compute(const ::rust::Vec<::opencompgraph::internal::StreamDataImplShared> &inputs, ::opencompgraph::internal::StreamDataImplShared &output) noexcept;
-  ::opencompgraph::AttrState attr_exists(::rust::Str name) const noexcept;
+  ::std::uint64_t hash(const ::rust::Vec<::open_comp_graph::internal::StreamDataImplShared> &inputs) noexcept;
+  ::open_comp_graph::NodeStatus compute(const ::rust::Vec<::open_comp_graph::internal::StreamDataImplShared> &inputs, ::open_comp_graph::internal::StreamDataImplShared &output) noexcept;
+  ::open_comp_graph::AttrState attr_exists(::rust::Str name) const noexcept;
   float get_attr_f32(::rust::Str name) const noexcept;
   ::std::int32_t get_attr_i32(::rust::Str name) const noexcept;
   ::rust::Str get_attr_str(::rust::Str name) const noexcept;
@@ -792,50 +792,50 @@ struct NodeImpl final : public ::rust::Opaque {
   void set_attr_i32(::rust::Str name, ::std::int32_t value) noexcept;
   void set_attr_str(::rust::Str name, ::rust::Str value) noexcept;
 };
-#endif // CXXBRIDGE1_STRUCT_opencompgraph$internal$NodeImpl
+#endif // CXXBRIDGE1_STRUCT_open_comp_graph$internal$NodeImpl
 
-#ifndef CXXBRIDGE1_STRUCT_opencompgraph$internal$CacheImpl
-#define CXXBRIDGE1_STRUCT_opencompgraph$internal$CacheImpl
+#ifndef CXXBRIDGE1_STRUCT_open_comp_graph$internal$CacheImpl
+#define CXXBRIDGE1_STRUCT_open_comp_graph$internal$CacheImpl
 struct CacheImpl final : public ::rust::Opaque {
   ::std::uint64_t get_id() const noexcept;
 };
-#endif // CXXBRIDGE1_STRUCT_opencompgraph$internal$CacheImpl
+#endif // CXXBRIDGE1_STRUCT_open_comp_graph$internal$CacheImpl
 
-#ifndef CXXBRIDGE1_STRUCT_opencompgraph$internal$GraphImpl
-#define CXXBRIDGE1_STRUCT_opencompgraph$internal$GraphImpl
+#ifndef CXXBRIDGE1_STRUCT_open_comp_graph$internal$GraphImpl
+#define CXXBRIDGE1_STRUCT_open_comp_graph$internal$GraphImpl
 struct GraphImpl final : public ::rust::Opaque {
-  ::std::size_t add_node(::rust::Box<::opencompgraph::internal::NodeImpl> op_box) noexcept;
+  ::std::size_t add_node(::rust::Box<::open_comp_graph::internal::NodeImpl> op_box) noexcept;
   void connect(::std::size_t src_index, ::std::size_t dst_index, ::std::uint8_t input_num) noexcept;
-  ::opencompgraph::ExecuteStatus execute(::std::size_t start_index, ::rust::Box<::opencompgraph::internal::CacheImpl> &cache) noexcept;
+  ::open_comp_graph::ExecuteStatus execute(::std::size_t start_index, ::rust::Box<::open_comp_graph::internal::CacheImpl> &cache) noexcept;
 };
-#endif // CXXBRIDGE1_STRUCT_opencompgraph$internal$GraphImpl
+#endif // CXXBRIDGE1_STRUCT_open_comp_graph$internal$GraphImpl
 
-void print_r(const ::opencompgraph::internal::ThingR &r) noexcept;
+void print_r(const ::open_comp_graph::internal::ThingR &r) noexcept;
 
-::rust::Box<::opencompgraph::internal::NodeImpl> create_node_box(::opencompgraph::NodeType node_type) noexcept;
+::rust::Box<::open_comp_graph::internal::NodeImpl> create_node_box(::open_comp_graph::NodeType node_type) noexcept;
 
-::rust::Box<::opencompgraph::internal::NodeImpl> create_node_box(::opencompgraph::NodeType node_type, ::rust::Str name) noexcept;
+::rust::Box<::open_comp_graph::internal::NodeImpl> create_node_box(::open_comp_graph::NodeType node_type, ::rust::Str name) noexcept;
 
-::rust::Box<::opencompgraph::internal::NodeImpl> create_node_box(::opencompgraph::NodeType node_type, ::std::uint64_t id) noexcept;
+::rust::Box<::open_comp_graph::internal::NodeImpl> create_node_box(::open_comp_graph::NodeType node_type, ::std::uint64_t id) noexcept;
 
-::opencompgraph::internal::NodeImplShared create_node_shared(::opencompgraph::NodeType node_type) noexcept;
+::open_comp_graph::internal::NodeImplShared create_node_shared(::open_comp_graph::NodeType node_type) noexcept;
 
-::opencompgraph::internal::NodeImplShared create_node_shared(::opencompgraph::NodeType node_type, ::rust::Str name) noexcept;
+::open_comp_graph::internal::NodeImplShared create_node_shared(::open_comp_graph::NodeType node_type, ::rust::Str name) noexcept;
 
-::opencompgraph::internal::NodeImplShared create_node_shared(::opencompgraph::NodeType node_type, ::std::uint64_t id) noexcept;
+::open_comp_graph::internal::NodeImplShared create_node_shared(::open_comp_graph::NodeType node_type, ::std::uint64_t id) noexcept;
 
-::rust::Box<::opencompgraph::internal::CacheImpl> create_cache_box() noexcept;
+::rust::Box<::open_comp_graph::internal::CacheImpl> create_cache_box() noexcept;
 
-::opencompgraph::internal::CacheImplShared create_cache_shared() noexcept;
+::open_comp_graph::internal::CacheImplShared create_cache_shared() noexcept;
 
-::rust::Box<::opencompgraph::internal::GraphImpl> create_graph_box() noexcept;
+::rust::Box<::open_comp_graph::internal::GraphImpl> create_graph_box() noexcept;
 
-::opencompgraph::internal::GraphImplShared create_graph_shared() noexcept;
+::open_comp_graph::internal::GraphImplShared create_graph_shared() noexcept;
 
-::rust::Box<::opencompgraph::internal::StreamDataImpl> create_stream_data_box() noexcept;
+::rust::Box<::open_comp_graph::internal::StreamDataImpl> create_stream_data_box() noexcept;
 
-::opencompgraph::internal::StreamDataImplShared create_stream_data_shared() noexcept;
+::open_comp_graph::internal::StreamDataImplShared create_stream_data_shared() noexcept;
 
-::rust::Vec<::opencompgraph::internal::StreamDataImplShared> create_vec_stream_data_shared() noexcept;
+::rust::Vec<::open_comp_graph::internal::StreamDataImplShared> create_vec_stream_data_shared() noexcept;
 } // namespace internal
-} // namespace opencompgraph
+} // namespace open_comp_graph

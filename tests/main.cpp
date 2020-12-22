@@ -9,11 +9,11 @@
 
 int main() {
     std::cout << "Starting Tests..." << '\n';
-    auto bench = opencompgraph::internal::BenchmarkTime();
+    auto bench = open_comp_graph::internal::BenchmarkTime();
     bench.start();
 
     // Run tests.
-    auto count = 4;
+    auto count = 20;
     for (auto i = 0; i < count; ++i) {
         test_a();
         test_b();

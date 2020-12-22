@@ -10,7 +10,7 @@
 #include <string>   // string
 #include <chrono>   // high_resolution_clock, time_point, duration, duration_cast
 
-namespace opencompgraph {
+namespace open_comp_graph {
 namespace internal {
 
 // Wrapper class around 'get_timestamp' timer.
@@ -57,7 +57,7 @@ public:
 };
 
 } // namespace internal
-} // namespace opencompgraph
+} // namespace open_comp_graph
 
 
 #endif // OPENCOMPGRAPH_DEBUG_H

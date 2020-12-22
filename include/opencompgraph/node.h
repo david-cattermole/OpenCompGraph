@@ -4,7 +4,7 @@
 #include <rust/cxx.h>
 #include <opencompgraph/_cxxbridge.h>
 
-namespace opencompgraph {
+namespace open_comp_graph {
     class Node {
     public:
         explicit Node(NodeType node_type) noexcept;
@@ -14,7 +14,7 @@ namespace opencompgraph {
         ~Node();
 
         size_t get_id() noexcept;
-        rust::Box<opencompgraph::internal::NodeImpl> get_box() noexcept;
+        rust::Box<open_comp_graph::internal::NodeImpl> get_box() noexcept;
 
         AttrState attr_exists(rust::Str name) const noexcept;
 

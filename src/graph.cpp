@@ -2,7 +2,7 @@
 #include <opencompgraph/graph.h>
 
 
-namespace opencompgraph {
+namespace open_comp_graph {
 
 Graph::Graph() noexcept : inner{internal::create_graph_shared()} {
     std::cout << "Graph()" << '\n';
@@ -12,7 +12,7 @@ Graph::~Graph() {
     std::cout << "~Graph()" << '\n';
 }
 
-size_t Graph::add_node(rust::Box<opencompgraph::internal::NodeImpl> node_box) noexcept {
+size_t Graph::add_node(rust::Box<open_comp_graph::internal::NodeImpl> node_box) noexcept {
     auto index = this->inner.inner->add_node(std::move(node_box));
     return index;
 }
@@ -32,4 +32,4 @@ void Graph::execute(size_t start_index, std::shared_ptr<Cache> &cache) noexcept 
     cache->set_box(std::move(cache_box));  // Return the cache to it's owner.
 }
 
-} // namespace opencompgraph
+} // namespace open_comp_graph

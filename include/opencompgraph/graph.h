@@ -7,13 +7,13 @@
 #include <opencompgraph/cache.h>
 #include <opencompgraph/node.h>
 
-namespace opencompgraph {
+namespace open_comp_graph {
     class Graph {
     public:
         Graph() noexcept;
         ~Graph();
 
-        size_t add_node(rust::Box<opencompgraph::internal::NodeImpl> node_box) noexcept;
+        size_t add_node(rust::Box<open_comp_graph::internal::NodeImpl> node_box) noexcept;
         size_t add_node(Node &node) noexcept;
         void connect(size_t src_index, size_t dst_index, uint8_t input_num) noexcept;
         void execute(size_t start_index, std::shared_ptr<Cache> &cache) noexcept;

@@ -1,7 +1,7 @@
 #include <iostream>
 #include <opencompgraph.h>
 
-namespace ocg = opencompgraph;
+namespace ocg = open_comp_graph;
 
 int test_f() {
     std::cout << "====================================== test_f()" << '\n';

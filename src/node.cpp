@@ -2,7 +2,7 @@
 #include <rust/cxx.h>
 #include <opencompgraph/node.h>
 
-namespace opencompgraph {
+namespace open_comp_graph {
 
 
 Node::Node(NodeType node_type) noexcept
@@ -19,7 +19,7 @@ Node::Node(NodeType node_type, const char *name) noexcept
               << std::endl;
 }
 
-Node::Node(opencompgraph::NodeType node_type, size_t id) noexcept
+Node::Node(open_comp_graph::NodeType node_type, size_t id) noexcept
         : inner{internal::create_node_shared(node_type, id)} {
     std::cout << "Node() with id"
               << " node_type=" << static_cast<uint32_t>(node_type)
@@ -35,7 +35,7 @@ size_t Node::get_id() noexcept {
     return this->inner.inner->get_id();
 }
 
-rust::Box<opencompgraph::internal::NodeImpl> Node::get_box() noexcept {
+rust::Box<open_comp_graph::internal::NodeImpl> Node::get_box() noexcept {
     return std::move(this->inner.inner);
 }
 
@@ -67,4 +67,4 @@ void Node::set_attr_str(rust::Str name, rust::Str value) noexcept {
     return this->inner.inner->set_attr_str(name, value);
 }
 
-} // namespace opencompgraph
+} // namespace open_comp_graph

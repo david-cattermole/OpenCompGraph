@@ -1,5 +1,5 @@
 /*
- * Example usage of opencompgraph.h
+ * Example usage of open_comp_graph.h
  */
 
 #include <cstdint>
@@ -8,7 +8,7 @@
 #include <string>
 #include <opencompgraph.h>
 
-namespace ocg = opencompgraph;
+namespace ocg = open_comp_graph;
 
 
 int test_c() {

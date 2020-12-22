@@ -2,7 +2,7 @@
 #include <rust/cxx.h>
 #include <opencompgraph.h>
 
-namespace opencompgraph {
+namespace open_comp_graph {
 namespace cpp {
 
 ThingC::ThingC(std::string appname) : appname(std::move(appname)) {
@@ -30,4 +30,4 @@ void run_sharedthing(shared::SharedThing state) {
 }
 
 } // namespace cpp
-} // namespace opencompgraph
+} // namespace open_comp_graph

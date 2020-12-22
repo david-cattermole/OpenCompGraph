@@ -17,9 +17,9 @@ use crate::node::NodeImpl;
 use crate::stream::StreamDataImpl;
 
 #[rustfmt::skip]
-#[cxx::bridge(namespace = "opencompgraph")]
+#[cxx::bridge(namespace = "open_comp_graph")]
 pub mod ffi {
-    #[namespace = "opencompgraph::shared"]
+    #[namespace = "open_comp_graph::shared"]
     struct SharedThing {
         z: i32,
         y: Box<ThingR>,
@@ -27,33 +27,33 @@ pub mod ffi {
     }
 
     #[derive(Debug)]
-    #[namespace = "opencompgraph::internal"]
+    #[namespace = "open_comp_graph::internal"]
     pub(crate) struct GraphImplShared {
         inner: Box<GraphImpl>,
     }
 
     #[derive(Debug)]
-    #[namespace = "opencompgraph::internal"]
+    #[namespace = "open_comp_graph::internal"]
     pub(crate) struct NodeImplShared {
         inner: Box<NodeImpl>,
     }
 
     #[derive(Debug)]
-    #[namespace = "opencompgraph::internal"]
+    #[namespace = "open_comp_graph::internal"]
     pub(crate) struct StreamDataImplShared {
         inner: Box<StreamDataImpl>,
     }
     impl Vec<StreamDataImplShared> {}
 
     #[derive(Debug)]
-    #[namespace = "opencompgraph::internal"]
+    #[namespace = "open_comp_graph::internal"]
     pub(crate) struct CacheImplShared {
         inner: Box<CacheImpl>,
     }
 
     #[repr(u8)]
     #[derive(Debug, Copy, Clone, Hash)]
-    #[namespace = "opencompgraph"]
+    #[namespace = "open_comp_graph"]
     pub(crate) enum ExecuteStatus {
         Error = 0,
         Success = 1,
@@ -61,7 +61,7 @@ pub mod ffi {
 
     #[repr(u8)]
     #[derive(Debug, Copy, Clone, Hash)]
-    #[namespace = "opencompgraph"]
+    #[namespace = "open_comp_graph"]
     pub(crate) enum NodeType {
         // Creation / Input / Output
         Null = 0,
@@ -95,7 +95,7 @@ pub mod ffi {
 
     #[repr(u8)]
     #[derive(Debug, Copy, Clone, Hash)]
-    #[namespace = "opencompgraph"]
+    #[namespace = "open_comp_graph"]
     pub(crate) enum NodeStatus {
         Error = 0,
         Valid = 1,
@@ -105,7 +105,7 @@ pub mod ffi {
 
     #[repr(u8)]
     #[derive(Debug, Copy, Clone, Hash)]
-    #[namespace = "opencompgraph"]
+    #[namespace = "open_comp_graph"]
     pub(crate) enum AttrState {
         Missing = 0,
         Exists = 1,
@@ -113,14 +113,14 @@ pub mod ffi {
 
     #[repr(u8)]
     #[derive(Debug, Copy, Clone, Hash)]
-    #[namespace = "opencompgraph"]
+    #[namespace = "open_comp_graph"]
     pub(crate) enum StreamDataState {
         Invalid = 0,
         Valid = 1,
     }
 
     // ThingC
-    #[namespace = "opencompgraph::cpp"]
+    #[namespace = "open_comp_graph::cpp"]
     unsafe extern "C++" {
         include!("rust/cxx.h");
         include!("opencompgraph/cpp.h");
@@ -132,32 +132,32 @@ pub mod ffi {
     }
 
     // ThingR
-    #[namespace = "opencompgraph::internal"]
+    #[namespace = "open_comp_graph::internal"]
     extern "Rust" {
         type ThingR;
         fn print_r(r: &ThingR);
     }
 
     // PixelBlock
-    #[namespace = "opencompgraph::internal"]
+    #[namespace = "open_comp_graph::internal"]
     extern "Rust" {
         type PixelBlock;
     }
 
     // BoundingBox2D
-    #[namespace = "opencompgraph::internal"]
+    #[namespace = "open_comp_graph::internal"]
     extern "Rust" {
         type BoundingBox2D;
     }
 
     // Matrix4
-    #[namespace = "opencompgraph::internal"]
+    #[namespace = "open_comp_graph::internal"]
     extern "Rust" {
         type Matrix4;
     }
 
     // StreamData
-    #[namespace = "opencompgraph::internal"]
+    #[namespace = "open_comp_graph::internal"]
     extern "Rust" {
         type StreamDataImpl;
         fn get_hash(&self) -> u64;
@@ -168,7 +168,7 @@ pub mod ffi {
     }
 
     // Node
-    #[namespace = "opencompgraph::internal"]
+    #[namespace = "open_comp_graph::internal"]
     extern "Rust" {
         type NodeImpl;
         fn get_id(&self) -> u64;
@@ -192,14 +192,14 @@ pub mod ffi {
     }
 
     // Cache
-    #[namespace = "opencompgraph::internal"]
+    #[namespace = "open_comp_graph::internal"]
     extern "Rust" {
         type CacheImpl;
         fn get_id(&self) -> u64;
     }
 
     // Graph
-    #[namespace = "opencompgraph::internal"]
+    #[namespace = "open_comp_graph::internal"]
     extern "Rust" {
         type GraphImpl;
         fn add_node(&mut self, op_box: Box<NodeImpl>) -> usize;
@@ -208,7 +208,7 @@ pub mod ffi {
     }
 
     // Struct Creation
-    #[namespace = "opencompgraph::internal"]
+    #[namespace = "open_comp_graph::internal"]
     extern "Rust" {
         #[cxx_name = "create_node_box"]
         fn create_node_box(node_type: NodeType) -> Box<NodeImpl>;

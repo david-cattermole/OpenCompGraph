@@ -5,15 +5,15 @@
 #include <rust/cxx.h>
 #include <opencompgraph/_cxxbridge.h>
 
-namespace opencompgraph {
+namespace open_comp_graph {
 
 class Cache {
     public:
         Cache() noexcept;
         ~Cache();
 
-        rust::Box<opencompgraph::internal::CacheImpl> get_box() noexcept;
-        void set_box(rust::Box<opencompgraph::internal::CacheImpl> box) noexcept;
+        rust::Box<open_comp_graph::internal::CacheImpl> get_box() noexcept;
+        void set_box(rust::Box<open_comp_graph::internal::CacheImpl> box) noexcept;
 
     private:
 
