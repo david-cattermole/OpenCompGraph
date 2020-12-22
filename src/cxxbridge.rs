@@ -196,6 +196,7 @@ pub mod ffi {
     extern "Rust" {
         type CacheImpl;
         fn get_id(&self) -> u64;
+        fn len(&self) -> usize;
     }
 
     // Graph

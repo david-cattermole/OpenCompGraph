@@ -20,6 +20,12 @@ impl CacheImpl {
         42
     }
 
+    pub fn len(&self) -> usize {
+        let value = self.map.len();
+        // println!("count value: {}", value);
+        value
+    }
+
     pub fn insert(&mut self, key: CacheKey, value: CacheValue) {
         // println!("Insert into Cache: key={}", key);
         self.map.insert(key, value);
@@ -29,3 +35,18 @@ impl CacheImpl {
         self.map.get(key)
     }
 }
+
+/*
+ * // Disk-based cache.
+ * ocg::DiskCache<ocg::Hash, ocg::BaseNodeResult> cacheB();
+ * cacheB.setPath("/tmp/openCompGraph");
+ * cacheB.setCapacity(10 * GIGABYTES_TO_BYTES);
+ *
+ * // RAM-based cache.
+ * ocg::MemoryCache<ocg::Hash, ocg::BaseNodeResult> cacheA();
+ * cacheA.setCapacity(1024 * MEGABYTES_TO_BYTES);
+ *
+ * std::vector<BaseCache> cacheList;
+ * cacheList.push_back(cacheA);
+ * cacheList.push_back(cacheB);
+ */

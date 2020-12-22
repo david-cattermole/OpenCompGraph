@@ -3,7 +3,7 @@
 
 namespace ocg = open_comp_graph;
 
-int test_d() {
+int test_d(std::shared_ptr<ocg::Cache> cache) {
     std::cout << "====================================== test_d()" << '\n';
     auto bench = ocg::internal::BenchmarkTime();
 
@@ -35,7 +35,6 @@ int test_d() {
     // auto write_node_box_id = g.add_node(std::move(write_node_box));
     // g.connect(read_node_box_id, write_node_box_id, 0);
 
-    auto cache = ocg::make_shared_cache();
     g.execute(write_node_id1, cache);
     // g.execute(write_node_box_id, cache);
 

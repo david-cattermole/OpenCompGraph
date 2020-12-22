@@ -3,7 +3,7 @@
 
 namespace ocg = open_comp_graph;
 
-int test_f() {
+int test_f(std::shared_ptr<ocg::Cache> cache) {
     std::cout << "====================================== test_f()" << '\n';
     auto bench = ocg::internal::BenchmarkTime();
 
@@ -68,7 +68,6 @@ int test_f() {
     g.connect(null1_id, grade_light_id, 0);
     g.connect(grade_light_id, write3_id, 0);
 
-    auto cache = ocg::make_shared_cache();
     g.execute(write1_id, cache);
     g.execute(write2_id, cache);
     g.execute(write3_id, cache);

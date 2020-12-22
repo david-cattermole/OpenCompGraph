@@ -22,6 +22,10 @@ void Cache::set_box(rust::Box<open_comp_graph::internal::CacheImpl> box) noexcep
     this->inner.inner = std::move(box);
 }
 
+std::size_t Cache::count() noexcept {
+    return this->inner.inner->len();
+}
+
 std::unique_ptr<Cache> make_unique_cache() {
     // std::cout << "make_unique_cache()" << '\n';
     return std::unique_ptr<Cache>(new Cache());

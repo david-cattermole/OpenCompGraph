@@ -108,23 +108,32 @@ impl GraphImpl {
             let node = &mut self.nodes[node_index];
             let node_hash = node.get_id();
             // println!("node: {:#?}", node);
-            let graph_node = self.graph[*nx];
+            // let graph_node = self.graph[*nx];
 
             // Compute the node
-            let mut output = create_stream_data_shared();
-            match node.compute(&inputs, &mut output) {
-                NodeStatus::Valid => cache.insert(node_hash, output),
-                NodeStatus::Uninitialized => {
-                    println!("Node is uninitialized: node_index={}", node_index);
-                    break;
+
+            let mut cached_output = cache.get(&node_hash);
+            match cached_output {
+                Some(value) => {
+                    // println!("Reuse Hash: {}", node_hash);
                 }
-                NodeStatus::Error => {
-                    println!("Failed to compute node: node_index={}", node_index);
-                    break;
-                }
-                _ => {
-                    println!("Unknown error: node_index={}", node_index);
-                    break;
+                None => {
+                    let mut output = create_stream_data_shared();
+                    match node.compute(&inputs, &mut output) {
+                        NodeStatus::Valid => cache.insert(node_hash, output),
+                        NodeStatus::Uninitialized => {
+                            println!("Node is uninitialized: node_index={}", node_index);
+                            break;
+                        }
+                        NodeStatus::Error => {
+                            println!("Failed to compute node: node_index={}", node_index);
+                            break;
+                        }
+                        _ => {
+                            println!("Unknown error: node_index={}", node_index);
+                            break;
+                        }
+                    }
                 }
             }
         }

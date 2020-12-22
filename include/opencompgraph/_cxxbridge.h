@@ -798,6 +798,7 @@ struct NodeImpl final : public ::rust::Opaque {
 #define CXXBRIDGE1_STRUCT_open_comp_graph$internal$CacheImpl
 struct CacheImpl final : public ::rust::Opaque {
   ::std::uint64_t get_id() const noexcept;
+  ::std::size_t len() const noexcept;
 };
 #endif // CXXBRIDGE1_STRUCT_open_comp_graph$internal$CacheImpl
 

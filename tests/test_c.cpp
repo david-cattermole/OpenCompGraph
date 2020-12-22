@@ -15,21 +15,6 @@ int test_c() {
     std::cout << "====================================== test_c()" << '\n';
     auto bench = ocg::internal::BenchmarkTime();
 
-    /*
-      // Disk-based cache.
-      ocg::DiskCache<ocg::Hash, ocg::BaseNodeResult> cacheB();
-      cacheB.setPath("/tmp/openCompGraph");
-      cacheB.setCapacity(10 * GIGABYTES_TO_BYTES);
-
-      // RAM-based cache.
-      ocg::MemoryCache<ocg::Hash, ocg::BaseNodeResult> cacheA();
-      cacheA.setCapacity(1024 * MEGABYTES_TO_BYTES);
-
-      std::vector<BaseCache> cacheList;
-      cacheList.push_back(cacheA);
-      cacheList.push_back(cacheB);
-    */
-
     size_t id = 0;
 
     auto read_node = ocg::internal::create_node_box(

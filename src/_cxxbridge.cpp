@@ -854,6 +854,7 @@ struct NodeImpl final : public ::rust::Opaque {
 #define CXXBRIDGE1_STRUCT_open_comp_graph$internal$CacheImpl
 struct CacheImpl final : public ::rust::Opaque {
   ::std::uint64_t get_id() const noexcept;
+  ::std::size_t len() const noexcept;
 };
 #endif // CXXBRIDGE1_STRUCT_open_comp_graph$internal$CacheImpl
 
@@ -929,6 +930,8 @@ void open_comp_graph$internal$cxxbridge1$NodeImpl$set_attr_i32(::open_comp_graph
 void open_comp_graph$internal$cxxbridge1$NodeImpl$set_attr_str(::open_comp_graph::internal::NodeImpl &self, ::rust::repr::PtrLen name, ::rust::repr::PtrLen value) noexcept;
 
 ::std::uint64_t open_comp_graph$internal$cxxbridge1$CacheImpl$get_id(const ::open_comp_graph::internal::CacheImpl &self) noexcept;
+
+::std::size_t open_comp_graph$internal$cxxbridge1$CacheImpl$len(const ::open_comp_graph::internal::CacheImpl &self) noexcept;
 
 ::std::size_t open_comp_graph$internal$cxxbridge1$GraphImpl$add_node(::open_comp_graph::internal::GraphImpl &self, ::open_comp_graph::internal::NodeImpl *op_box) noexcept;
 
@@ -1045,6 +1048,10 @@ void NodeImpl::set_attr_str(::rust::Str name, ::rust::Str value) noexcept {
 
 ::std::uint64_t CacheImpl::get_id() const noexcept {
   return open_comp_graph$internal$cxxbridge1$CacheImpl$get_id(*this);
+}
+
+::std::size_t CacheImpl::len() const noexcept {
+  return open_comp_graph$internal$cxxbridge1$CacheImpl$len(*this);
 }
 
 ::std::size_t GraphImpl::add_node(::rust::Box<::open_comp_graph::internal::NodeImpl> op_box) noexcept {
