@@ -4,6 +4,7 @@
 #include <array>
 #include <cstddef>
 #include <cstdint>
+#include <functional>
 #include <initializer_list>
 #include <iterator>
 #include <memory>
@@ -838,7 +839,7 @@ struct NodeImpl final : public ::rust::Opaque {
   ::std::uint8_t get_node_type_id() const noexcept;
   ::open_comp_graph::NodeStatus get_status() const noexcept;
   ::std::uint8_t get_status_id() const noexcept;
-  ::std::uint64_t hash(const ::rust::Vec<::open_comp_graph::internal::StreamDataImplShared> &inputs) noexcept;
+  ::std::uint64_t hash(const ::rust::Vec<::open_comp_graph::internal::StreamDataImplShared> &inputs) const noexcept;
   ::open_comp_graph::NodeStatus compute(const ::rust::Vec<::open_comp_graph::internal::StreamDataImplShared> &inputs, ::open_comp_graph::internal::StreamDataImplShared &output) noexcept;
   ::open_comp_graph::AttrState attr_exists(::rust::Str name) const noexcept;
   float get_attr_f32(::rust::Str name) const noexcept;
@@ -866,6 +867,10 @@ struct GraphImpl final : public ::rust::Opaque {
   ::open_comp_graph::ExecuteStatus execute(::std::size_t start_index, ::rust::Box<::open_comp_graph::internal::CacheImpl> &cache) noexcept;
 };
 #endif // CXXBRIDGE1_STRUCT_open_comp_graph$internal$GraphImpl
+
+extern "C" {
+::std::size_t open_comp_graph$internal$cxxbridge1$StreamDataImplShared$operator$hash(const StreamDataImplShared &) noexcept;
+} // extern "C"
 } // namespace internal
 
 namespace cpp {
@@ -911,7 +916,7 @@ const ::open_comp_graph::internal::PixelBlock *open_comp_graph$internal$cxxbridg
 
 ::std::uint8_t open_comp_graph$internal$cxxbridge1$NodeImpl$get_status_id(const ::open_comp_graph::internal::NodeImpl &self) noexcept;
 
-::std::uint64_t open_comp_graph$internal$cxxbridge1$NodeImpl$hash(::open_comp_graph::internal::NodeImpl &self, const ::rust::Vec<::open_comp_graph::internal::StreamDataImplShared> &inputs) noexcept;
+::std::uint64_t open_comp_graph$internal$cxxbridge1$NodeImpl$hash(const ::open_comp_graph::internal::NodeImpl &self, const ::rust::Vec<::open_comp_graph::internal::StreamDataImplShared> &inputs) noexcept;
 
 ::open_comp_graph::NodeStatus open_comp_graph$internal$cxxbridge1$NodeImpl$compute(::open_comp_graph::internal::NodeImpl &self, const ::rust::Vec<::open_comp_graph::internal::StreamDataImplShared> &inputs, ::open_comp_graph::internal::StreamDataImplShared &output) noexcept;
 
@@ -965,7 +970,19 @@ void open_comp_graph$internal$cxxbridge1$create_stream_data_shared(::open_comp_g
 
 void open_comp_graph$internal$cxxbridge1$create_vec_stream_data_shared(::rust::Vec<::open_comp_graph::internal::StreamDataImplShared> *return$) noexcept;
 } // extern "C"
+} // namespace internal
+} // namespace open_comp_graph
 
+namespace std {
+template <> struct hash<::open_comp_graph::internal::StreamDataImplShared> {
+  ::std::size_t operator()(const ::open_comp_graph::internal::StreamDataImplShared &self) const noexcept {
+    return ::open_comp_graph::internal::open_comp_graph$internal$cxxbridge1$StreamDataImplShared$operator$hash(self);
+  }
+};
+} // namespace std
+
+namespace open_comp_graph {
+namespace internal {
 void print_r(const ::open_comp_graph::internal::ThingR &r) noexcept {
   open_comp_graph$internal$cxxbridge1$print_r(r);
 }
@@ -1010,7 +1027,7 @@ const ::open_comp_graph::internal::PixelBlock &StreamDataImpl::get_pixel_block()
   return open_comp_graph$internal$cxxbridge1$NodeImpl$get_status_id(*this);
 }
 
-::std::uint64_t NodeImpl::hash(const ::rust::Vec<::open_comp_graph::internal::StreamDataImplShared> &inputs) noexcept {
+::std::uint64_t NodeImpl::hash(const ::rust::Vec<::open_comp_graph::internal::StreamDataImplShared> &inputs) const noexcept {
   return open_comp_graph$internal$cxxbridge1$NodeImpl$hash(*this, inputs);
 }
 

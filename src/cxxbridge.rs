@@ -38,7 +38,7 @@ pub mod ffi {
         inner: Box<NodeImpl>,
     }
 
-    #[derive(Debug)]
+    #[derive(Debug, Hash, Clone)]
     #[namespace = "open_comp_graph::internal"]
     pub(crate) struct StreamDataImplShared {
         inner: Box<StreamDataImpl>,
@@ -178,7 +178,7 @@ pub mod ffi {
         fn get_status_id(&self) -> u8;
 
         // Compute
-        fn hash(&mut self, inputs: &Vec<StreamDataImplShared>) -> u64;
+        fn hash(&self, inputs: &Vec<StreamDataImplShared>) -> u64;
         fn compute(&mut self, inputs: &Vec<StreamDataImplShared>, output: &mut StreamDataImplShared) -> NodeStatus;
 
         // AttrBlock

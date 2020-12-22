@@ -67,6 +67,8 @@ impl GraphImpl {
 
         let mut sorted_node_indexes = Vec::<NodeIdx>::new();
 
+        // Get the stack of indices to be computed, going upstream
+        // from the starting index.
         let start = NodeIdx::new(start_index);
         let mut walker = UpstreamEvalSearch::new(&self.graph, start);
         while let Some(nx) = walker.next(&self.graph) {
@@ -81,7 +83,7 @@ impl GraphImpl {
             // self.graph[nx] += 1;  // Modify the node weight.
         }
 
-        // let mut cache = CacheImpl::new();
+        let mut parent_inputs = Vec::<StreamDataImplShared>::new();
         for nx in sorted_node_indexes.iter().rev() {
             // println!("Compute Node Index: {:?}", nx);
 
@@ -91,7 +93,7 @@ impl GraphImpl {
                 let parent_index = parent_node_index.index();
                 // println!("parent index: {}", parent_index);
                 let parent_node = &self.nodes[parent_index];
-                let parent_hash = parent_node.get_id();
+                let parent_hash = parent_node.hash(&parent_inputs);
 
                 match cache.get(&parent_hash) {
                     Some(value) => {
@@ -103,15 +105,14 @@ impl GraphImpl {
                     _ => println!("Missing from cache: {}", parent_hash),
                 }
             }
+            parent_inputs = inputs.to_vec();
 
             let node_index = nx.index();
             let node = &mut self.nodes[node_index];
-            let node_hash = node.get_id();
             // println!("node: {:#?}", node);
-            // let graph_node = self.graph[*nx];
+            let node_hash = node.hash(&inputs);
 
             // Compute the node
-
             let mut cached_output = cache.get(&node_hash);
             match cached_output {
                 Some(value) => {

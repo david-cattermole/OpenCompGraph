@@ -1,12 +1,16 @@
-#[allow(unused_imports)]
 use crate::cxxbridge::ffi::AttrState;
 use crate::cxxbridge::ffi::NodeStatus;
 use crate::cxxbridge::ffi::StreamDataImplShared;
 use crate::data::HashValue;
 use crate::data::Identifier;
 use crate::node::NodeImpl;
+use std::collections::hash_map::DefaultHasher;
+use std::hash::Hash;
+use std::hash::Hasher;
 
 pub trait AttrBlock: std::fmt::Debug {
+    fn attr_hash(&self, state: &mut DefaultHasher);
+
     fn attr_exists(&self, name: &str) -> AttrState;
 
     fn get_attr_str(&self, name: &str) -> &str;
@@ -20,13 +24,20 @@ pub trait AttrBlock: std::fmt::Debug {
 }
 
 pub trait Compute: std::fmt::Debug {
-    fn hash(
-        &mut self,
-        id: Identifier,
+    fn cache_hash(
+        &self,
         node_type_id: u8,
         attr_block: &Box<dyn AttrBlock>,
         inputs: &Vec<StreamDataImplShared>,
-    ) -> HashValue;
+    ) -> HashValue {
+        let mut state = DefaultHasher::new();
+        node_type_id.hash(&mut state);
+        attr_block.attr_hash(&mut state);
+        for input in inputs {
+            input.hash(&mut state);
+        }
+        state.finish()
+    }
 
     fn compute(
         &mut self,

@@ -782,7 +782,7 @@ struct NodeImpl final : public ::rust::Opaque {
   ::std::uint8_t get_node_type_id() const noexcept;
   ::open_comp_graph::NodeStatus get_status() const noexcept;
   ::std::uint8_t get_status_id() const noexcept;
-  ::std::uint64_t hash(const ::rust::Vec<::open_comp_graph::internal::StreamDataImplShared> &inputs) noexcept;
+  ::std::uint64_t hash(const ::rust::Vec<::open_comp_graph::internal::StreamDataImplShared> &inputs) const noexcept;
   ::open_comp_graph::NodeStatus compute(const ::rust::Vec<::open_comp_graph::internal::StreamDataImplShared> &inputs, ::open_comp_graph::internal::StreamDataImplShared &output) noexcept;
   ::open_comp_graph::AttrState attr_exists(::rust::Str name) const noexcept;
   float get_attr_f32(::rust::Str name) const noexcept;

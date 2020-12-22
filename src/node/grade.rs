@@ -4,11 +4,15 @@ use crate::cxxbridge::ffi::AttrState;
 use crate::cxxbridge::ffi::NodeStatus;
 use crate::cxxbridge::ffi::NodeType;
 use crate::cxxbridge::ffi::StreamDataImplShared;
+use crate::data::Distance32;
 use crate::data::HashValue;
 use crate::data::Identifier;
 use crate::node::traits::AttrBlock;
 use crate::node::traits::Compute;
 use crate::node::NodeImpl;
+use std::collections::hash_map::DefaultHasher;
+use std::hash;
+use std::hash::Hash;
 
 pub fn new(id: Identifier) -> NodeImpl {
     NodeImpl {
@@ -28,6 +32,12 @@ pub struct GradeAttrs {
     pub multiply: f32,
 }
 
+impl hash::Hash for GradeAttrs {
+    fn hash<H: hash::Hasher>(&self, state: &mut H) {
+        Distance32::new(self.multiply).hash(state);
+    }
+}
+
 impl GradeCompute {
     pub fn new() -> GradeCompute {
         GradeCompute {}
@@ -41,16 +51,6 @@ impl GradeAttrs {
 }
 
 impl Compute for GradeCompute {
-    fn hash(
-        &mut self,
-        id: Identifier,
-        node_type_id: u8,
-        attr_block: &Box<dyn AttrBlock>,
-        inputs: &Vec<StreamDataImplShared>,
-    ) -> HashValue {
-        0
-    }
-
     fn compute(
         &mut self,
         attr_block: &Box<dyn AttrBlock>,
@@ -83,6 +83,10 @@ impl Compute for GradeCompute {
 }
 
 impl AttrBlock for GradeAttrs {
+    fn attr_hash(&self, state: &mut DefaultHasher) {
+        self.hash(state)
+    }
+
     fn attr_exists(&self, name: &str) -> AttrState {
         match name {
             "multiply" => AttrState::Exists,

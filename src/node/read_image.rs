@@ -2,7 +2,9 @@ use image;
 use image::GenericImageView;
 use image::ImageBuffer;
 use rustc_hash::FxHasher;
-use std::hash::Hasher;
+use std::collections::hash_map::DefaultHasher;
+use std::hash;
+use std::hash::Hash;
 use std::path::Path;
 use std::string::String;
 
@@ -30,7 +32,7 @@ pub fn new(id: Identifier) -> NodeImpl {
 #[derive(Debug, Clone, Default)]
 pub struct ReadImageCompute {}
 
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Default, hash::Hash)]
 pub struct ReadImageAttrs {
     pub file_path: String,
 }
@@ -50,16 +52,6 @@ impl ReadImageAttrs {
 }
 
 impl Compute for ReadImageCompute {
-    fn hash(
-        &mut self,
-        id: Identifier,
-        node_type_id: u8,
-        attr_block: &Box<dyn AttrBlock>,
-        inputs: &Vec<StreamDataImplShared>,
-    ) -> HashValue {
-        node_type_id as u64 ^ 123456789 as u64
-    }
-
     fn compute(
         &mut self,
         attr_block: &Box<dyn AttrBlock>,
@@ -121,6 +113,10 @@ impl Compute for ReadImageCompute {
 }
 
 impl AttrBlock for ReadImageAttrs {
+    fn attr_hash(&self, state: &mut DefaultHasher) {
+        self.hash(state)
+    }
+
     fn attr_exists(&self, name: &str) -> AttrState {
         match name {
             "file_path" => AttrState::Exists,

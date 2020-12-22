@@ -52,10 +52,10 @@ impl Distance64 {
 }
 
 #[derive(Hash, Eq, PartialEq)]
-struct Distance32((u64, i16, i8));
+pub struct Distance32((u64, i16, i8));
 
 impl Distance32 {
-    fn new(val: f32) -> Distance32 {
+    pub fn new(val: f32) -> Distance32 {
         Distance32(integer_decode_f32(val))
     }
 }

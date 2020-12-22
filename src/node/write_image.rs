@@ -11,6 +11,9 @@ use crate::node::traits::AttrBlock;
 use crate::node::traits::Compute;
 use crate::node::NodeImpl;
 use image::RgbaImage;
+use std::collections::hash_map::DefaultHasher;
+use std::hash;
+use std::hash::Hash;
 
 pub fn new(id: Identifier) -> NodeImpl {
     NodeImpl {
@@ -25,7 +28,7 @@ pub fn new(id: Identifier) -> NodeImpl {
 #[derive(Debug, Clone, Default)]
 pub struct WriteImageCompute {}
 
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Default, Hash)]
 pub struct WriteImageAttrs {
     pub file_path: String,
 }
@@ -45,16 +48,6 @@ impl WriteImageAttrs {
 }
 
 impl Compute for WriteImageCompute {
-    fn hash(
-        &mut self,
-        id: Identifier,
-        node_type_id: u8,
-        attr_block: &Box<dyn AttrBlock>,
-        inputs: &Vec<StreamDataImplShared>,
-    ) -> HashValue {
-        0
-    }
-
     fn compute(
         &mut self,
         attr_block: &Box<dyn AttrBlock>,
@@ -102,6 +95,10 @@ impl Compute for WriteImageCompute {
 }
 
 impl AttrBlock for WriteImageAttrs {
+    fn attr_hash(&self, state: &mut DefaultHasher) {
+        self.hash(state)
+    }
+
     fn attr_exists(&self, name: &str) -> AttrState {
         match name {
             "file_path" => AttrState::Exists,
