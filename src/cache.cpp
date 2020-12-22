@@ -26,14 +26,4 @@ std::size_t Cache::count() noexcept {
     return this->inner.inner->len();
 }
 
-std::unique_ptr<Cache> make_unique_cache() {
-    // std::cout << "make_unique_cache()" << '\n';
-    return std::unique_ptr<Cache>(new Cache());
-}
-
-std::shared_ptr<Cache> make_shared_cache() {
-    // std::cout << "make_shared_cache()" << '\n';
-    return std::make_shared<Cache>();
-}
-
 } // namespace open_comp_graph

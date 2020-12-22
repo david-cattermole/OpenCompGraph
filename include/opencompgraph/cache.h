@@ -21,9 +21,6 @@ private:
 
 };
 
-std::unique_ptr<Cache> make_unique_cache();
-std::shared_ptr<Cache> make_shared_cache();
-
-}
+}  // namespace open_comp_graph
 
 #endif //OPENCOMPGRAPH_CACHE_H

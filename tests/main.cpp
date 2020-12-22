@@ -15,9 +15,9 @@ int main() {
     bench.start();
 
     // Create a cache.
-    auto cache_d = ocg::make_shared_cache();
-    auto cache_e = ocg::make_shared_cache();
-    auto cache_f = ocg::make_shared_cache();
+    auto cache_d = std::make_shared<ocg::Cache>();
+    auto cache_e = std::make_shared<ocg::Cache>();
+    auto cache_f = std::make_shared<ocg::Cache>();
 
     // Run tests.
     auto count = 20;
