@@ -18,13 +18,13 @@ int test_c() {
     size_t id = 0;
 
     auto read_node = ocg::internal::create_node_box(
-            ocg::NodeType::ReadImage, id++);
+            ocg::NodeType::kReadImage, id++);
     std::cout << "read_node=" << &read_node << '\n';
 
     auto read_id2 = read_node->get_id();
     std::cout << "read_id2=" << read_id2 << '\n';
 
-    auto read_node_type = read_node->get_node_type() == ocg::NodeType::ReadImage;
+    auto read_node_type = read_node->get_node_type() == ocg::NodeType::kReadImage;
     std::cout << "read_node_type=" << read_node_type << '\n';
 
     auto read_node_type_id = read_node->get_node_type_id();
@@ -32,7 +32,7 @@ int test_c() {
 
     // Set string attribute
     auto read_attr = "file_path";
-    if (read_node->attr_exists(read_attr) == ocg::AttrState::Exists) {
+    if (read_node->attr_exists(read_attr) == ocg::AttrState::kExists) {
         auto read_path1 = read_node->get_attr_str(read_attr);
         std::cout << "read_path1=" << read_path1 << '\n';
 
@@ -43,18 +43,18 @@ int test_c() {
 
     // Set float attribute
     auto read_attr_x = "x";
-    if (read_node->attr_exists(read_attr_x) == ocg::AttrState::Exists) {
+    if (read_node->attr_exists(read_attr_x) == ocg::AttrState::kExists) {
         auto read_x = read_node->get_attr_f32(read_attr_x);
         std::cout << "read_x=" << read_x << '\n';
 
-        read_node->set_attr_f32(read_attr_x, 3.147);
+        read_node->set_attr_f32(read_attr_x, 3.147f);
         auto read_x2 = read_node->get_attr_f32(read_attr_x);
         std::cout << "read_x2=" << read_x2 << '\n';
     }
 
     // Set integer attribute
     auto read_attr_y = "y";
-    if (read_node->attr_exists(read_attr_y) == ocg::AttrState::Exists) {
+    if (read_node->attr_exists(read_attr_y) == ocg::AttrState::kExists) {
         auto read_y = read_node->get_attr_f32(read_attr_y);
         std::cout << "read_y=" << read_y << '\n';
 
@@ -80,14 +80,14 @@ int test_c() {
     // auto read_tmat = read_output->get_transform_matrix();
 
     auto write_node = ocg::internal::create_node_box(
-            ocg::NodeType::WriteImage, id++);
+            ocg::NodeType::kWriteImage, id++);
     std::cout << "write_node=" << &write_node << '\n';
 
     auto write_id2 = write_node->get_id();
     std::cout << "write_id2=" << write_id2 << '\n';
 
     auto write_node_type =
-            write_node->get_node_type() == ocg::NodeType::ReadImage;
+            write_node->get_node_type() == ocg::NodeType::kReadImage;
     std::cout << "write_node_type=" << write_node_type << '\n';
 
     auto write_node_type_id = write_node->get_node_type_id();
@@ -95,7 +95,7 @@ int test_c() {
               << '\n';
 
     auto write_attr = "file_path";
-    if (write_node->attr_exists(write_attr) == ocg::AttrState::Exists) {
+    if (write_node->attr_exists(write_attr) == ocg::AttrState::kExists) {
         auto write_path1 = write_node->get_attr_str(write_attr);
         std::cout << "write_path1=" << write_path1 << '\n';
 

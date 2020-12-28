@@ -55,7 +55,9 @@ pub mod ffi {
     #[derive(Debug, Copy, Clone, Hash)]
     #[namespace = "open_comp_graph"]
     pub(crate) enum ExecuteStatus {
+        #[cxx_name = "kError"]
         Error = 0,
+        #[cxx_name = "kSuccess"]
         Success = 1,
     }
 
@@ -64,8 +66,11 @@ pub mod ffi {
     #[namespace = "open_comp_graph"]
     pub(crate) enum NodeType {
         // Creation / Input / Output
+        #[cxx_name = "kNull"]
         Null = 0,
+        #[cxx_name = "kReadImage"]
         ReadImage = 1,
+        #[cxx_name = "kWriteImage"]
         WriteImage = 2,
         // ColorBars,
         // Constant,
@@ -87,6 +92,7 @@ pub mod ffi {
 
         // // Color
         // ColorCorrect,
+        #[cxx_name = "kGrade"]
         Grade = 3,
 
         // // Deform / Warp
@@ -97,8 +103,11 @@ pub mod ffi {
     #[derive(Debug, Copy, Clone, Hash)]
     #[namespace = "open_comp_graph"]
     pub(crate) enum NodeStatus {
+        #[cxx_name = "kError"]
         Error = 0,
+        #[cxx_name = "kValid"]
         Valid = 1,
+        #[cxx_name = "kUninitialized"]
         Uninitialized = 2,
         // Warning = 2,
     }
@@ -107,7 +116,9 @@ pub mod ffi {
     #[derive(Debug, Copy, Clone, Hash)]
     #[namespace = "open_comp_graph"]
     pub(crate) enum AttrState {
+        #[cxx_name = "kMissing"]
         Missing = 0,
+        #[cxx_name = "kExists"]
         Exists = 1,
     }
 
@@ -115,7 +126,9 @@ pub mod ffi {
     #[derive(Debug, Copy, Clone, Hash)]
     #[namespace = "open_comp_graph"]
     pub(crate) enum StreamDataState {
+        #[cxx_name = "kInvalid"]
         Invalid = 0,
+        #[cxx_name = "kValid"]
         Valid = 1,
     }
 

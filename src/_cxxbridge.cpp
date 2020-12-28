@@ -272,13 +272,13 @@ public:
 
   const T &operator[](std::size_t n) const noexcept;
   const T &at(std::size_t n) const;
-  const T &front() const;
-  const T &back() const;
+  const T &front() const noexcept;
+  const T &back() const noexcept;
 
   T &operator[](std::size_t n) noexcept;
   T &at(std::size_t n);
-  T &front();
-  T &back();
+  T &front() noexcept;
+  T &back() noexcept;
 
   void reserve(std::size_t new_cap);
   void push_back(const T &value);
@@ -388,7 +388,7 @@ Vec<T> &Vec<T>::operator=(const Vec &other) {
 
 template <typename T>
 bool Vec<T>::empty() const noexcept {
-  return size() == 0;
+  return this->size() == 0;
 }
 
 template <typename T>
@@ -398,6 +398,7 @@ T *Vec<T>::data() noexcept {
 
 template <typename T>
 const T &Vec<T>::operator[](std::size_t n) const noexcept {
+  assert(n < this->size());
   auto data = reinterpret_cast<const char *>(this->data());
   return *reinterpret_cast<const T *>(data + n * this->stride());
 }
@@ -411,17 +412,20 @@ const T &Vec<T>::at(std::size_t n) const {
 }
 
 template <typename T>
-const T &Vec<T>::front() const {
+const T &Vec<T>::front() const noexcept {
+  assert(!this->empty());
   return (*this)[0];
 }
 
 template <typename T>
-const T &Vec<T>::back() const {
+const T &Vec<T>::back() const noexcept {
+  assert(!this->empty());
   return (*this)[this->size() - 1];
 }
 
 template <typename T>
 T &Vec<T>::operator[](std::size_t n) noexcept {
+  assert(n < this->size());
   auto data = reinterpret_cast<char *>(this->data());
   return *reinterpret_cast<T *>(data + n * this->stride());
 }
@@ -435,12 +439,14 @@ T &Vec<T>::at(std::size_t n) {
 }
 
 template <typename T>
-T &Vec<T>::front() {
+T &Vec<T>::front() noexcept {
+  assert(!this->empty());
   return (*this)[0];
 }
 
 template <typename T>
-T &Vec<T>::back() {
+T &Vec<T>::back() noexcept {
+  assert(!this->empty());
   return (*this)[this->size() - 1];
 }
 
@@ -779,43 +785,43 @@ struct CacheImplShared final {
 #ifndef CXXBRIDGE1_ENUM_open_comp_graph$ExecuteStatus
 #define CXXBRIDGE1_ENUM_open_comp_graph$ExecuteStatus
 enum class ExecuteStatus : ::std::uint8_t {
-  Error = 0,
-  Success = 1,
+  kError = 0,
+  kSuccess = 1,
 };
 #endif // CXXBRIDGE1_ENUM_open_comp_graph$ExecuteStatus
 
 #ifndef CXXBRIDGE1_ENUM_open_comp_graph$NodeType
 #define CXXBRIDGE1_ENUM_open_comp_graph$NodeType
 enum class NodeType : ::std::uint8_t {
-  Null = 0,
-  ReadImage = 1,
-  WriteImage = 2,
-  Grade = 3,
+  kNull = 0,
+  kReadImage = 1,
+  kWriteImage = 2,
+  kGrade = 3,
 };
 #endif // CXXBRIDGE1_ENUM_open_comp_graph$NodeType
 
 #ifndef CXXBRIDGE1_ENUM_open_comp_graph$NodeStatus
 #define CXXBRIDGE1_ENUM_open_comp_graph$NodeStatus
 enum class NodeStatus : ::std::uint8_t {
-  Error = 0,
-  Valid = 1,
-  Uninitialized = 2,
+  kError = 0,
+  kValid = 1,
+  kUninitialized = 2,
 };
 #endif // CXXBRIDGE1_ENUM_open_comp_graph$NodeStatus
 
 #ifndef CXXBRIDGE1_ENUM_open_comp_graph$AttrState
 #define CXXBRIDGE1_ENUM_open_comp_graph$AttrState
 enum class AttrState : ::std::uint8_t {
-  Missing = 0,
-  Exists = 1,
+  kMissing = 0,
+  kExists = 1,
 };
 #endif // CXXBRIDGE1_ENUM_open_comp_graph$AttrState
 
 #ifndef CXXBRIDGE1_ENUM_open_comp_graph$StreamDataState
 #define CXXBRIDGE1_ENUM_open_comp_graph$StreamDataState
 enum class StreamDataState : ::std::uint8_t {
-  Invalid = 0,
-  Valid = 1,
+  kInvalid = 0,
+  kValid = 1,
 };
 #endif // CXXBRIDGE1_ENUM_open_comp_graph$StreamDataState
 

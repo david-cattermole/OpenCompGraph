@@ -10,12 +10,12 @@ int test_e(std::shared_ptr<ocg::Cache> cache) {
     auto g = ocg::Graph();
 
     std::cout << "Node() ========================================" << '\n';
-    auto read_node = ocg::Node(ocg::NodeType::ReadImage, "read");
-    auto null_node1 = ocg::Node(ocg::NodeType::Null, "null1");
-    auto null_node2 = ocg::Node(ocg::NodeType::Null, "null2");
-    auto null_node3 = ocg::Node(ocg::NodeType::Null, "null3");
-    auto null_node4 = ocg::Node(ocg::NodeType::Null, "null4");
-    auto write_node = ocg::Node(ocg::NodeType::WriteImage, "write");
+    auto read_node = ocg::Node(ocg::NodeType::kReadImage, "read");
+    auto null_node1 = ocg::Node(ocg::NodeType::kNull, "null1");
+    auto null_node2 = ocg::Node(ocg::NodeType::kNull, "null2");
+    auto null_node3 = ocg::Node(ocg::NodeType::kNull, "null3");
+    auto null_node4 = ocg::Node(ocg::NodeType::kNull, "null4");
+    auto write_node = ocg::Node(ocg::NodeType::kWriteImage, "write");
     std::cout << "read_node=" << &read_node << '\n';
     std::cout << "write_node=" << &write_node << '\n';
 

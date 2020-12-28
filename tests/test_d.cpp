@@ -10,9 +10,9 @@ int test_d(std::shared_ptr<ocg::Cache> cache) {
     auto g = ocg::Graph();
 
     std::cout << "Node() ========================================" << '\n';
-    auto read_node = ocg::Node(ocg::NodeType::ReadImage, "my_read_node");
+    auto read_node = ocg::Node(ocg::NodeType::kReadImage, "my_read_node");
     auto write_node = ocg::Node(
-            ocg::NodeType::WriteImage, "my_write_node");
+            ocg::NodeType::kWriteImage, "my_write_node");
     std::cout << "read_node=" << &read_node << '\n';
     std::cout << "write_node=" << &write_node << '\n';
     // read_node.set_attr_str("file_path", "./tests/data/checker_8bit_rgba_3840x2160.png");
@@ -24,9 +24,9 @@ int test_d(std::shared_ptr<ocg::Cache> cache) {
 
     // std::cout << "Node.add_node(Box<NodeImpl>) ==========" << '\n';
     // auto read_node_box = ocg::internal::create_node_box(
-    //     ocg::NodeType::ReadImage, 0);
+    //     ocg::NodeType::kReadImage, 0);
     // auto write_node_box = ocg::internal::create_node_box(
-    //     ocg::NodeType::WriteImage, 1);
+    //     ocg::NodeType::kWriteImage, 1);
     // std::cout << "read_node_box=" << &read_node_box << '\n';
     // std::cout << "write_node_box=" << &write_node_box << '\n';
     // read_node_box->set_attr_str("file_path", "./tests/data/checker_8bit_rgba_3840x2160.png");

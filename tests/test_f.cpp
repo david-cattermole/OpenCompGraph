@@ -10,16 +10,16 @@ int test_f(std::shared_ptr<ocg::Cache> cache) {
     auto g = ocg::Graph();
 
     std::cout << "Node() ========================================" << '\n';
-    auto read_node = ocg::Node(ocg::NodeType::ReadImage, "readimage1");
-    auto grade_overexpose_node = ocg::Node(ocg::NodeType::Grade, "grade1");
-    auto grade_underexpose_node = ocg::Node(ocg::NodeType::Grade, "grade2");
-    auto grade_dark_node = ocg::Node(ocg::NodeType::Grade, "grade3");
-    auto grade_light_node = ocg::Node(ocg::NodeType::Grade, "grade4");
-    auto null1_node = ocg::Node(ocg::NodeType::Null, "null1");
-    auto null2_node = ocg::Node(ocg::NodeType::Null, "null2");
-    auto write1_node = ocg::Node(ocg::NodeType::WriteImage, "writeimage1");
-    auto write2_node = ocg::Node(ocg::NodeType::WriteImage, "writeimage2");
-    auto write3_node = ocg::Node(ocg::NodeType::WriteImage, "writeimage3");
+    auto read_node = ocg::Node(ocg::NodeType::kReadImage, "readimage1");
+    auto grade_overexpose_node = ocg::Node(ocg::NodeType::kGrade, "grade1");
+    auto grade_underexpose_node = ocg::Node(ocg::NodeType::kGrade, "grade2");
+    auto grade_dark_node = ocg::Node(ocg::NodeType::kGrade, "grade3");
+    auto grade_light_node = ocg::Node(ocg::NodeType::kGrade, "grade4");
+    auto null1_node = ocg::Node(ocg::NodeType::kNull, "null1");
+    auto null2_node = ocg::Node(ocg::NodeType::kNull, "null2");
+    auto write1_node = ocg::Node(ocg::NodeType::kWriteImage, "writeimage1");
+    auto write2_node = ocg::Node(ocg::NodeType::kWriteImage, "writeimage2");
+    auto write3_node = ocg::Node(ocg::NodeType::kWriteImage, "writeimage3");
 
     std::cout << "read_node=" << &read_node << '\n';
     std::cout << "grade_overexpose_node=" << &grade_overexpose_node << '\n';
