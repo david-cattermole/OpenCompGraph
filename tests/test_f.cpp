@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cassert>
 #include <opencompgraph.h>
 
 namespace ocg = open_comp_graph;
@@ -68,9 +69,14 @@ int test_f(std::shared_ptr<ocg::Cache> cache) {
     g.connect(null1_id, grade_light_id, 0);
     g.connect(grade_light_id, write3_id, 0);
 
-    g.execute(write1_id, cache);
-    g.execute(write2_id, cache);
-    g.execute(write3_id, cache);
+    auto status1 = g.execute(write1_id, cache);
+    assert(status1 == ocg::ExecuteStatus::kSuccess);
+
+    auto status2 = g.execute(write2_id, cache);
+    assert(status2 == ocg::ExecuteStatus::kSuccess);
+
+    auto status3 = g.execute(write3_id, cache);
+    assert(status3 == ocg::ExecuteStatus::kSuccess);
 
     bench.stop();
     bench.print("Test F:");

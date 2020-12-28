@@ -26,10 +26,13 @@ void Graph::connect(size_t src_index, size_t dst_index, uint8_t input_num) noexc
     this->inner.inner->connect(src_index, dst_index, input_num);
 }
 
-void Graph::execute(size_t start_index, std::shared_ptr<Cache> &cache) noexcept {
+ExecuteStatus Graph::execute(size_t start_node_index,
+                             std::shared_ptr<Cache> &cache) noexcept {
     auto cache_box = cache->get_box();  // Borrow the underlying cache object.
-    this->inner.inner->execute(start_index, cache_box);
+    auto status = this->inner.inner->execute(start_node_index, cache_box);
     cache->set_box(std::move(cache_box));  // Return the cache to it's owner.
+    return status;
+}
 }
 
 } // namespace open_comp_graph

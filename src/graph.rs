@@ -27,13 +27,18 @@ type InnerGraph =
 pub struct GraphImpl {
     nodes: Vec<Box<NodeImpl>>,
     graph: InnerGraph,
+    status: ExecuteStatus,
 }
 
 impl GraphImpl {
     pub fn new() -> GraphImpl {
         let nodes = Vec::new();
         let graph = InnerGraph::with_capacity(0, 0);
-        GraphImpl { nodes, graph }
+        let status = ExecuteStatus::Error;
+        GraphImpl {
+            nodes,
+            graph,
+            status,
     }
 
     // Add, Remove and Modify
@@ -58,8 +63,14 @@ impl GraphImpl {
     }
 
     /// Compute the graph!
-    pub fn execute(&mut self, start_index: usize, cache: &mut Box<CacheImpl>) -> ExecuteStatus {
-        println!("Execute: {}", start_index);
+    // TODO: Add an "executor" variable to this method to explain how
+    // we wish to execute the graph.
+    pub fn execute(
+        &mut self,
+        start_node_index: usize,
+        cache: &mut Box<CacheImpl>,
+    ) -> ExecuteStatus {
+        println!("Execute: {}", start_node_index);
         // println!(
         //     "{:?}",
         //     Dot::with_config(&self.graph, &[Config::EdgeNoLabel])
@@ -69,7 +80,7 @@ impl GraphImpl {
 
         // Get the stack of indices to be computed, going upstream
         // from the starting index.
-        let start = NodeIdx::new(start_index);
+        let start = NodeIdx::new(start_node_index);
         let mut walker = UpstreamEvalSearch::new(&self.graph, start);
         while let Some(nx) = walker.next(&self.graph) {
             let index = nx.index();
@@ -139,6 +150,7 @@ impl GraphImpl {
             }
         }
 
-        ExecuteStatus::Success
+        self.status = ExecuteStatus::Success;
+        self.status
     }
 }

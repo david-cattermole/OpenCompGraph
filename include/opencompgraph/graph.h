@@ -16,7 +16,7 @@ namespace open_comp_graph {
         size_t add_node(rust::Box<open_comp_graph::internal::NodeImpl> node_box) noexcept;
         size_t add_node(Node &node) noexcept;
         void connect(size_t src_index, size_t dst_index, uint8_t input_num) noexcept;
-        void execute(size_t start_index, std::shared_ptr<Cache> &cache) noexcept;
+        ExecuteStatus execute(size_t start_node_index, std::shared_ptr<Cache> &cache) noexcept;
 
     private:
         internal::GraphImplShared inner;
