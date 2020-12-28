@@ -43,8 +43,12 @@ add_library(${target_lib} SHARED ${opencompgraph_source_files})
 target_link_libraries(${target_lib}
   ${rust_linktime_file})
 target_include_directories(${target_lib}
-  PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../include
-  PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/ )
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include>
+        $<INSTALL_INTERFACE:include>
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}
+)
 target_include_directories(${target_lib} PUBLIC ${RUST_INCLUDE_DIR})
 if (MSVC)
   target_link_libraries(${target_lib} ws2_32 userenv advapi32 shell32)
