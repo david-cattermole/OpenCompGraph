@@ -93,6 +93,14 @@ impl Compute for ReadImageCompute {
                 .map(|x| (*x as f32) / (u8::max_value() as f32))
                 .collect();
 
+            // Get pixel statistics
+            let min = pixels.iter().fold(f32::INFINITY, |a, &b| a.min(b));
+            let max = pixels.iter().fold(f32::NEG_INFINITY, |a, &b| a.max(b));
+            let avg = pixels.iter().sum::<f32>() / (pixels.len() as f32);
+            println!("Min value: {}", min);
+            println!("Max value: {}", max);
+            println!("Avg value: {}", avg);
+
             let mut pixel_block = PixelBlock::new(width, height, num_channels);
             let pixels = pixel_block.set_pixels(pixels);
             output.inner.set_pixel_block(pixel_block);

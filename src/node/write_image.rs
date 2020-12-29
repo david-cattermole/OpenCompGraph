@@ -71,6 +71,14 @@ impl Compute for WriteImageCompute {
                 let height = pixel_block.height;
                 let pixels = &pixel_block.pixels;
 
+                // Get pixel statistics
+                let min = pixels.iter().fold(f32::INFINITY, |a, &b| a.min(b));
+                let max = pixels.iter().fold(f32::NEG_INFINITY, |a, &b| a.max(b));
+                let avg = pixels.iter().sum::<f32>() / (pixels.len() as f32);
+                println!("Min value: {}", min);
+                println!("Max value: {}", max);
+                println!("Avg value: {}", avg);
+
                 // Convert f32 pixel image to u8 ImageBuffer.
                 let pixels_u8: Vec<u8> = pixels
                     .iter()
