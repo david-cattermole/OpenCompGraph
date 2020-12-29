@@ -871,6 +871,7 @@ struct GraphImpl final : public ::rust::Opaque {
   ::std::size_t add_node(::rust::Box<::open_comp_graph::internal::NodeImpl> op_box) noexcept;
   void connect(::std::size_t src_index, ::std::size_t dst_index, ::std::uint8_t input_num) noexcept;
   ::open_comp_graph::ExecuteStatus execute(::std::size_t start_index, ::rust::Box<::open_comp_graph::internal::CacheImpl> &cache) noexcept;
+  ::open_comp_graph::internal::StreamDataImplShared query_stream_output() const noexcept;
 };
 #endif // CXXBRIDGE1_STRUCT_open_comp_graph$internal$GraphImpl
 
@@ -949,6 +950,8 @@ void open_comp_graph$internal$cxxbridge1$NodeImpl$set_attr_str(::open_comp_graph
 void open_comp_graph$internal$cxxbridge1$GraphImpl$connect(::open_comp_graph::internal::GraphImpl &self, ::std::size_t src_index, ::std::size_t dst_index, ::std::uint8_t input_num) noexcept;
 
 ::open_comp_graph::ExecuteStatus open_comp_graph$internal$cxxbridge1$GraphImpl$execute(::open_comp_graph::internal::GraphImpl &self, ::std::size_t start_index, ::rust::Box<::open_comp_graph::internal::CacheImpl> &cache) noexcept;
+
+void open_comp_graph$internal$cxxbridge1$GraphImpl$query_stream_output(const ::open_comp_graph::internal::GraphImpl &self, ::open_comp_graph::internal::StreamDataImplShared *return$) noexcept;
 
 ::open_comp_graph::internal::NodeImpl *open_comp_graph$internal$cxxbridge1$create_node_box(::open_comp_graph::NodeType node_type) noexcept;
 
@@ -1087,6 +1090,12 @@ void GraphImpl::connect(::std::size_t src_index, ::std::size_t dst_index, ::std:
 
 ::open_comp_graph::ExecuteStatus GraphImpl::execute(::std::size_t start_index, ::rust::Box<::open_comp_graph::internal::CacheImpl> &cache) noexcept {
   return open_comp_graph$internal$cxxbridge1$GraphImpl$execute(*this, start_index, cache);
+}
+
+::open_comp_graph::internal::StreamDataImplShared GraphImpl::query_stream_output() const noexcept {
+  ::rust::MaybeUninit<::open_comp_graph::internal::StreamDataImplShared> return$;
+  open_comp_graph$internal$cxxbridge1$GraphImpl$query_stream_output(*this, &return$.value);
+  return ::std::move(return$.value);
 }
 
 ::rust::Box<::open_comp_graph::internal::NodeImpl> create_node_box(::open_comp_graph::NodeType node_type) noexcept {

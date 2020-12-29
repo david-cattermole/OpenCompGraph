@@ -814,6 +814,7 @@ struct GraphImpl final : public ::rust::Opaque {
   ::std::size_t add_node(::rust::Box<::open_comp_graph::internal::NodeImpl> op_box) noexcept;
   void connect(::std::size_t src_index, ::std::size_t dst_index, ::std::uint8_t input_num) noexcept;
   ::open_comp_graph::ExecuteStatus execute(::std::size_t start_index, ::rust::Box<::open_comp_graph::internal::CacheImpl> &cache) noexcept;
+  ::open_comp_graph::internal::StreamDataImplShared query_stream_output() const noexcept;
 };
 #endif // CXXBRIDGE1_STRUCT_open_comp_graph$internal$GraphImpl
 

@@ -17,6 +17,7 @@ namespace open_comp_graph {
         size_t add_node(Node &node) noexcept;
         void connect(size_t src_index, size_t dst_index, uint8_t input_num) noexcept;
         ExecuteStatus execute(size_t start_node_index, std::shared_ptr<Cache> &cache) noexcept;
+        internal::StreamDataImplShared query_stream_output() noexcept;
 
     private:
         internal::GraphImplShared inner;

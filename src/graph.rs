@@ -19,6 +19,7 @@ use crate::data::NodeIdx;
 use crate::data::NodeWeight;
 use crate::graphiter::UpstreamEvalSearch;
 use crate::node::NodeImpl;
+use crate::stream::StreamDataImpl;
 
 type InnerGraph =
     petgraph::stable_graph::StableGraph<NodeWeight, EdgeWeight, petgraph::Directed, GraphIdx>;
@@ -27,6 +28,7 @@ type InnerGraph =
 pub struct GraphImpl {
     nodes: Vec<Box<NodeImpl>>,
     graph: InnerGraph,
+    output: StreamDataImplShared,
     status: ExecuteStatus,
 }
 
@@ -34,11 +36,14 @@ impl GraphImpl {
     pub fn new() -> GraphImpl {
         let nodes = Vec::new();
         let graph = InnerGraph::with_capacity(0, 0);
+        let output = create_stream_data_shared();
         let status = ExecuteStatus::Error;
         GraphImpl {
             nodes,
             graph,
+            output,
             status,
+        }
     }
 
     // Add, Remove and Modify
@@ -132,7 +137,7 @@ impl GraphImpl {
                 None => {
                     let mut output = create_stream_data_shared();
                     match node.compute(&inputs, &mut output) {
-                        NodeStatus::Valid => cache.insert(node_hash, output),
+                        NodeStatus::Valid => cache.insert(node_hash, output.clone()),
                         NodeStatus::Uninitialized => {
                             println!("Node is uninitialized: node_index={}", node_index);
                             break;
@@ -146,11 +151,18 @@ impl GraphImpl {
                             break;
                         }
                     }
+                    self.output = output;
                 }
             }
         }
 
         self.status = ExecuteStatus::Success;
         self.status
+    }
+
+    pub fn query_stream_output(&self) -> StreamDataImplShared {
+        println!("Query Stream Output...");
+        assert_eq!(self.status, ExecuteStatus::Success);
+        self.output.clone()
     }
 }

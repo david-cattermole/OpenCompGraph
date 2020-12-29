@@ -33,6 +33,10 @@ ExecuteStatus Graph::execute(size_t start_node_index,
     cache->set_box(std::move(cache_box));  // Return the cache to it's owner.
     return status;
 }
+
+internal::StreamDataImplShared Graph::query_stream_output() noexcept {
+    auto stream_data = this->inner.inner->query_stream_output();
+    return stream_data;
 }
 
 } // namespace open_comp_graph

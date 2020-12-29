@@ -219,6 +219,7 @@ pub mod ffi {
         fn add_node(&mut self, op_box: Box<NodeImpl>) -> usize;
         fn connect(&mut self, src_index: usize, dst_index: usize, input_num: u8);
         fn execute(&mut self, start_index: usize, cache: &mut Box<CacheImpl>) -> ExecuteStatus;
+        fn query_stream_output(&self) -> StreamDataImplShared;
     }
 
     // Struct Creation

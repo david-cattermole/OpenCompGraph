@@ -71,12 +71,15 @@ int test_f(std::shared_ptr<ocg::Cache> cache) {
 
     auto status1 = g.execute(write1_id, cache);
     assert(status1 == ocg::ExecuteStatus::kSuccess);
+    auto stream_data1 = g.query_stream_output();
 
     auto status2 = g.execute(write2_id, cache);
     assert(status2 == ocg::ExecuteStatus::kSuccess);
+    auto stream_data2 = g.query_stream_output();
 
     auto status3 = g.execute(write3_id, cache);
     assert(status3 == ocg::ExecuteStatus::kSuccess);
+    auto stream_data3 = g.query_stream_output();
 
     bench.stop();
     bench.print("Test F:");
