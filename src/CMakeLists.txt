@@ -35,7 +35,8 @@ set(opencompgraph_source_files
   ${CMAKE_CURRENT_SOURCE_DIR}/cpp.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/cache.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/node.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/graph.cpp)
+  ${CMAKE_CURRENT_SOURCE_DIR}/graph.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/stream.cpp)
 
 # Add 'opencompgraph' library as a C++ wrapper around the Rust
 # library.

@@ -1,0 +1,30 @@
+#include <iostream>
+#include <utility>
+#include <rust/cxx.h>
+#include <opencompgraph/stream.h>
+
+namespace open_comp_graph {
+
+StreamData::StreamData() noexcept
+        : inner{internal::create_stream_data_shared()} {
+    std::cout << "StreamData()" << '\n';
+}
+
+StreamData::StreamData(rust::Box<internal::StreamDataImpl> box) noexcept
+        : inner{internal::create_stream_data_shared_box(std::move(box))} {
+    std::cout << "StreamData(box)" << '\n';
+}
+
+StreamData::~StreamData() {
+    std::cout << "~StreamData()" << '\n';
+}
+
+rust::Box<internal::StreamDataImpl> StreamData::get_box() noexcept {
+    return std::move(this->inner.inner);
+}
+
+void StreamData::set_box(rust::Box<internal::StreamDataImpl> box) noexcept {
+    this->inner.inner = std::move(box);
+}
+
+} // namespace open_comp_graph

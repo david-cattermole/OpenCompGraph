@@ -9,5 +9,6 @@
 #include <opencompgraph/debug.h>
 #include <opencompgraph/graph.h>
 #include <opencompgraph/node.h>
+#include <opencompgraph/stream.h>
 
 #endif // OPENCOMPGRAPH_H

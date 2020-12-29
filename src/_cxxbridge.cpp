@@ -829,6 +829,8 @@ namespace internal {
 #ifndef CXXBRIDGE1_STRUCT_open_comp_graph$internal$StreamDataImpl
 #define CXXBRIDGE1_STRUCT_open_comp_graph$internal$StreamDataImpl
 struct StreamDataImpl final : public ::rust::Opaque {
+  ::open_comp_graph::StreamDataState get_state() const noexcept;
+  ::std::uint8_t get_state_id() const noexcept;
   ::std::uint64_t get_hash() const noexcept;
   const ::rust::Box<::open_comp_graph::internal::BoundingBox2D> &get_bounding_box() const noexcept;
   const ::rust::Box<::open_comp_graph::internal::Matrix4> &get_color_matrix() const noexcept;
@@ -871,7 +873,7 @@ struct GraphImpl final : public ::rust::Opaque {
   ::std::size_t add_node(::rust::Box<::open_comp_graph::internal::NodeImpl> op_box) noexcept;
   void connect(::std::size_t src_index, ::std::size_t dst_index, ::std::uint8_t input_num) noexcept;
   ::open_comp_graph::ExecuteStatus execute(::std::size_t start_index, ::rust::Box<::open_comp_graph::internal::CacheImpl> &cache) noexcept;
-  ::open_comp_graph::internal::StreamDataImplShared query_stream_output() const noexcept;
+  ::open_comp_graph::internal::StreamDataImplShared output_stream() const noexcept;
 };
 #endif // CXXBRIDGE1_STRUCT_open_comp_graph$internal$GraphImpl
 
@@ -902,6 +904,10 @@ __declspec(dllexport) void open_comp_graph$cpp$cxxbridge1$run_sharedthing(::open
 namespace internal {
 extern "C" {
 void open_comp_graph$internal$cxxbridge1$print_r(const ::open_comp_graph::internal::ThingR &r) noexcept;
+
+::open_comp_graph::StreamDataState open_comp_graph$internal$cxxbridge1$StreamDataImpl$get_state(const ::open_comp_graph::internal::StreamDataImpl &self) noexcept;
+
+::std::uint8_t open_comp_graph$internal$cxxbridge1$StreamDataImpl$get_state_id(const ::open_comp_graph::internal::StreamDataImpl &self) noexcept;
 
 ::std::uint64_t open_comp_graph$internal$cxxbridge1$StreamDataImpl$get_hash(const ::open_comp_graph::internal::StreamDataImpl &self) noexcept;
 
@@ -951,7 +957,7 @@ void open_comp_graph$internal$cxxbridge1$GraphImpl$connect(::open_comp_graph::in
 
 ::open_comp_graph::ExecuteStatus open_comp_graph$internal$cxxbridge1$GraphImpl$execute(::open_comp_graph::internal::GraphImpl &self, ::std::size_t start_index, ::rust::Box<::open_comp_graph::internal::CacheImpl> &cache) noexcept;
 
-void open_comp_graph$internal$cxxbridge1$GraphImpl$query_stream_output(const ::open_comp_graph::internal::GraphImpl &self, ::open_comp_graph::internal::StreamDataImplShared *return$) noexcept;
+void open_comp_graph$internal$cxxbridge1$GraphImpl$output_stream(const ::open_comp_graph::internal::GraphImpl &self, ::open_comp_graph::internal::StreamDataImplShared *return$) noexcept;
 
 ::open_comp_graph::internal::NodeImpl *open_comp_graph$internal$cxxbridge1$create_node_box(::open_comp_graph::NodeType node_type) noexcept;
 
@@ -977,6 +983,8 @@ void open_comp_graph$internal$cxxbridge1$create_graph_shared(::open_comp_graph::
 
 void open_comp_graph$internal$cxxbridge1$create_stream_data_shared(::open_comp_graph::internal::StreamDataImplShared *return$) noexcept;
 
+void open_comp_graph$internal$cxxbridge1$create_stream_data_shared_box(::open_comp_graph::internal::StreamDataImpl *data, ::open_comp_graph::internal::StreamDataImplShared *return$) noexcept;
+
 void open_comp_graph$internal$cxxbridge1$create_vec_stream_data_shared(::rust::Vec<::open_comp_graph::internal::StreamDataImplShared> *return$) noexcept;
 } // extern "C"
 } // namespace internal
@@ -994,6 +1002,14 @@ namespace open_comp_graph {
 namespace internal {
 void print_r(const ::open_comp_graph::internal::ThingR &r) noexcept {
   open_comp_graph$internal$cxxbridge1$print_r(r);
+}
+
+::open_comp_graph::StreamDataState StreamDataImpl::get_state() const noexcept {
+  return open_comp_graph$internal$cxxbridge1$StreamDataImpl$get_state(*this);
+}
+
+::std::uint8_t StreamDataImpl::get_state_id() const noexcept {
+  return open_comp_graph$internal$cxxbridge1$StreamDataImpl$get_state_id(*this);
 }
 
 ::std::uint64_t StreamDataImpl::get_hash() const noexcept {
@@ -1092,9 +1108,9 @@ void GraphImpl::connect(::std::size_t src_index, ::std::size_t dst_index, ::std:
   return open_comp_graph$internal$cxxbridge1$GraphImpl$execute(*this, start_index, cache);
 }
 
-::open_comp_graph::internal::StreamDataImplShared GraphImpl::query_stream_output() const noexcept {
+::open_comp_graph::internal::StreamDataImplShared GraphImpl::output_stream() const noexcept {
   ::rust::MaybeUninit<::open_comp_graph::internal::StreamDataImplShared> return$;
-  open_comp_graph$internal$cxxbridge1$GraphImpl$query_stream_output(*this, &return$.value);
+  open_comp_graph$internal$cxxbridge1$GraphImpl$output_stream(*this, &return$.value);
   return ::std::move(return$.value);
 }
 
@@ -1155,6 +1171,12 @@ void GraphImpl::connect(::std::size_t src_index, ::std::size_t dst_index, ::std:
 ::open_comp_graph::internal::StreamDataImplShared create_stream_data_shared() noexcept {
   ::rust::MaybeUninit<::open_comp_graph::internal::StreamDataImplShared> return$;
   open_comp_graph$internal$cxxbridge1$create_stream_data_shared(&return$.value);
+  return ::std::move(return$.value);
+}
+
+::open_comp_graph::internal::StreamDataImplShared create_stream_data_shared_box(::rust::Box<::open_comp_graph::internal::StreamDataImpl> data) noexcept {
+  ::rust::MaybeUninit<::open_comp_graph::internal::StreamDataImplShared> return$;
+  open_comp_graph$internal$cxxbridge1$create_stream_data_shared_box(data.into_raw(), &return$.value);
   return ::std::move(return$.value);
 }
 

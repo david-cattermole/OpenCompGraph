@@ -772,6 +772,8 @@ namespace internal {
 #ifndef CXXBRIDGE1_STRUCT_open_comp_graph$internal$StreamDataImpl
 #define CXXBRIDGE1_STRUCT_open_comp_graph$internal$StreamDataImpl
 struct StreamDataImpl final : public ::rust::Opaque {
+  ::open_comp_graph::StreamDataState get_state() const noexcept;
+  ::std::uint8_t get_state_id() const noexcept;
   ::std::uint64_t get_hash() const noexcept;
   const ::rust::Box<::open_comp_graph::internal::BoundingBox2D> &get_bounding_box() const noexcept;
   const ::rust::Box<::open_comp_graph::internal::Matrix4> &get_color_matrix() const noexcept;
@@ -814,7 +816,7 @@ struct GraphImpl final : public ::rust::Opaque {
   ::std::size_t add_node(::rust::Box<::open_comp_graph::internal::NodeImpl> op_box) noexcept;
   void connect(::std::size_t src_index, ::std::size_t dst_index, ::std::uint8_t input_num) noexcept;
   ::open_comp_graph::ExecuteStatus execute(::std::size_t start_index, ::rust::Box<::open_comp_graph::internal::CacheImpl> &cache) noexcept;
-  ::open_comp_graph::internal::StreamDataImplShared query_stream_output() const noexcept;
+  ::open_comp_graph::internal::StreamDataImplShared output_stream() const noexcept;
 };
 #endif // CXXBRIDGE1_STRUCT_open_comp_graph$internal$GraphImpl
 
@@ -843,6 +845,8 @@ void print_r(const ::open_comp_graph::internal::ThingR &r) noexcept;
 ::rust::Box<::open_comp_graph::internal::StreamDataImpl> create_stream_data_box() noexcept;
 
 ::open_comp_graph::internal::StreamDataImplShared create_stream_data_shared() noexcept;
+
+::open_comp_graph::internal::StreamDataImplShared create_stream_data_shared_box(::rust::Box<::open_comp_graph::internal::StreamDataImpl> data) noexcept;
 
 ::rust::Vec<::open_comp_graph::internal::StreamDataImplShared> create_vec_stream_data_shared() noexcept;
 } // namespace internal

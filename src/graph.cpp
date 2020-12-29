@@ -1,5 +1,6 @@
 #include <iostream>
 #include <opencompgraph/graph.h>
+#include <opencompgraph/stream.h>
 
 
 namespace open_comp_graph {
@@ -34,9 +35,9 @@ ExecuteStatus Graph::execute(size_t start_node_index,
     return status;
 }
 
-internal::StreamDataImplShared Graph::output_stream() noexcept {
-    auto stream_data = this->inner.inner->output_stream();
-    return stream_data;
+StreamData Graph::output_stream() noexcept {
+    auto data = this->inner.inner->output_stream();
+    return StreamData(std::move(data.inner));
 }
 
 } // namespace open_comp_graph
