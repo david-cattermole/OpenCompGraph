@@ -180,7 +180,11 @@ pub mod ffi {
         fn get_color_matrix(&self) -> &Box<Matrix4>;
         fn get_transform_matrix(&self) -> &Box<Matrix4>;
         fn get_pixel_block(&self) -> &PixelBlock;
+        fn get_pixel_buffer(&self) -> &[f32];
+        fn get_pixel_width(&self) -> u32;
+        fn get_pixel_height(&self) -> u32;
     }
+
 
     // Node
     #[namespace = "open_comp_graph::internal"]

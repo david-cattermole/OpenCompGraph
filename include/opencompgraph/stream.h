@@ -20,6 +20,9 @@ public:
     uint8_t state_id() noexcept;
     uint64_t hash() noexcept;
     const internal::PixelBlock& pixel_block() noexcept;
+    rust::Slice<const float> pixel_buffer() noexcept;
+    uint32_t pixel_width() noexcept;
+    uint32_t pixel_height() noexcept;
 
 private:
     internal::StreamDataImplShared inner;

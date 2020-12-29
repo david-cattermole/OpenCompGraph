@@ -78,6 +78,138 @@ inline std::size_t Str::size() const noexcept { return this->len; }
 inline std::size_t Str::length() const noexcept { return this->len; }
 #endif // CXXBRIDGE1_RUST_STR
 
+#ifndef CXXBRIDGE1_RUST_SLICE
+#define CXXBRIDGE1_RUST_SLICE
+namespace detail {
+template <bool>
+struct copy_assignable_if {};
+
+template <>
+struct copy_assignable_if<false> {
+  copy_assignable_if() noexcept = default;
+  copy_assignable_if(const copy_assignable_if &) noexcept = default;
+  copy_assignable_if &operator=(const copy_assignable_if &) noexcept = delete;
+  copy_assignable_if &operator=(copy_assignable_if &&) noexcept = default;
+};
+} // namespace detail
+
+template <typename T>
+class Slice final
+    : private detail::copy_assignable_if<std::is_const<T>::value> {
+public:
+  Slice() noexcept;
+  Slice(T *, std::size_t count) noexcept;
+
+  Slice &operator=(const Slice<T> &) noexcept = default;
+  Slice &operator=(Slice<T> &&) noexcept = default;
+
+  T *data() const noexcept;
+  std::size_t size() const noexcept;
+  std::size_t length() const noexcept;
+
+  Slice(const Slice<T> &) noexcept = default;
+  ~Slice() noexcept = default;
+
+  class iterator;
+  iterator begin() const noexcept;
+  iterator end() const noexcept;
+
+private:
+  friend impl<Slice>;
+  T *ptr;
+  std::size_t len;
+};
+
+template <typename T>
+class Slice<T>::iterator final {
+public:
+  using difference_type = std::ptrdiff_t;
+  using value_type = T;
+  using pointer = typename std::add_pointer<T>::type;
+  using reference = typename std::add_lvalue_reference<T>::type;
+  using iterator_category = std::forward_iterator_tag;
+
+  T &operator*() const noexcept;
+  T *operator->() const noexcept;
+  iterator &operator++() noexcept;
+  iterator operator++(int) noexcept;
+  bool operator==(const iterator &) const noexcept;
+  bool operator!=(const iterator &) const noexcept;
+
+private:
+  friend class Slice;
+  T *pos;
+};
+
+template <typename T>
+Slice<T>::Slice() noexcept : ptr(reinterpret_cast<T *>(alignof(T))), len(0) {}
+
+template <typename T>
+Slice<T>::Slice(T *s, std::size_t count) noexcept : ptr(s), len(count) {}
+
+template <typename T>
+T *Slice<T>::data() const noexcept {
+  return this->ptr;
+}
+
+template <typename T>
+std::size_t Slice<T>::size() const noexcept {
+  return this->len;
+}
+
+template <typename T>
+std::size_t Slice<T>::length() const noexcept {
+  return this->len;
+}
+
+template <typename T>
+T &Slice<T>::iterator::operator*() const noexcept {
+  return *this->pos;
+}
+
+template <typename T>
+T *Slice<T>::iterator::operator->() const noexcept {
+  return this->pos;
+}
+
+template <typename T>
+typename Slice<T>::iterator &Slice<T>::iterator::operator++() noexcept {
+  ++this->pos;
+  return *this;
+}
+
+template <typename T>
+typename Slice<T>::iterator Slice<T>::iterator::operator++(int) noexcept {
+  auto ret = iterator(*this);
+  ++this->pos;
+  return ret;
+}
+
+template <typename T>
+bool Slice<T>::iterator::operator==(const iterator &other) const noexcept {
+  return this->pos == other.pos;
+}
+
+template <typename T>
+bool Slice<T>::iterator::operator!=(const iterator &other) const noexcept {
+  return this->pos != other.pos;
+}
+
+template <typename T>
+typename Slice<T>::iterator Slice<T>::begin() const noexcept {
+  iterator it;
+  it.pos = this->ptr;
+  return it;
+}
+
+template <typename T>
+typename Slice<T>::iterator Slice<T>::end() const noexcept {
+  iterator it = this->begin();
+  it.pos += this->len;
+  return it;
+}
+#endif // CXXBRIDGE1_RUST_SLICE
+
 #ifndef CXXBRIDGE1_RUST_BOX
 #define CXXBRIDGE1_RUST_BOX
 template <typename T>
@@ -685,6 +817,14 @@ public:
   }
 };
 
+template <typename T>
+class impl<Slice<T>> final {
+public:
+  static Slice<T> slice(repr::PtrLen repr) noexcept {
+    return {static_cast<T *>(repr.ptr), repr.len};
+  }
+};
+
 template <typename T, typename = ::std::size_t>
 struct is_complete : std::false_type {};
 
@@ -836,6 +976,9 @@ struct StreamDataImpl final : public ::rust::Opaque {
   const ::rust::Box<::open_comp_graph::internal::Matrix4> &get_color_matrix() const noexcept;
   const ::rust::Box<::open_comp_graph::internal::Matrix4> &get_transform_matrix() const noexcept;
   const ::open_comp_graph::internal::PixelBlock &get_pixel_block() const noexcept;
+  ::rust::Slice<const float> get_pixel_buffer() const noexcept;
+  ::std::uint32_t get_pixel_width() const noexcept;
+  ::std::uint32_t get_pixel_height() const noexcept;
 };
 #endif // CXXBRIDGE1_STRUCT_open_comp_graph$internal$StreamDataImpl
 
@@ -918,6 +1061,12 @@ const ::rust::Box<::open_comp_graph::internal::Matrix4> *open_comp_graph$interna
 const ::rust::Box<::open_comp_graph::internal::Matrix4> *open_comp_graph$internal$cxxbridge1$StreamDataImpl$get_transform_matrix(const ::open_comp_graph::internal::StreamDataImpl &self) noexcept;
 
 const ::open_comp_graph::internal::PixelBlock *open_comp_graph$internal$cxxbridge1$StreamDataImpl$get_pixel_block(const ::open_comp_graph::internal::StreamDataImpl &self) noexcept;
+
+::rust::repr::PtrLen open_comp_graph$internal$cxxbridge1$StreamDataImpl$get_pixel_buffer(const ::open_comp_graph::internal::StreamDataImpl &self) noexcept;
+
+::std::uint32_t open_comp_graph$internal$cxxbridge1$StreamDataImpl$get_pixel_width(const ::open_comp_graph::internal::StreamDataImpl &self) noexcept;
+
+::std::uint32_t open_comp_graph$internal$cxxbridge1$StreamDataImpl$get_pixel_height(const ::open_comp_graph::internal::StreamDataImpl &self) noexcept;
 
 ::std::uint64_t open_comp_graph$internal$cxxbridge1$NodeImpl$get_id(const ::open_comp_graph::internal::NodeImpl &self) noexcept;
 
@@ -1030,6 +1179,18 @@ const ::rust::Box<::open_comp_graph::internal::Matrix4> &StreamDataImpl::get_tra
 
 const ::open_comp_graph::internal::PixelBlock &StreamDataImpl::get_pixel_block() const noexcept {
   return *open_comp_graph$internal$cxxbridge1$StreamDataImpl$get_pixel_block(*this);
+}
+
+::rust::Slice<const float> StreamDataImpl::get_pixel_buffer() const noexcept {
+  return ::rust::impl<::rust::Slice<const float>>::slice(open_comp_graph$internal$cxxbridge1$StreamDataImpl$get_pixel_buffer(*this));
+}
+
+::std::uint32_t StreamDataImpl::get_pixel_width() const noexcept {
+  return open_comp_graph$internal$cxxbridge1$StreamDataImpl$get_pixel_width(*this);
+}
+
+::std::uint32_t StreamDataImpl::get_pixel_height() const noexcept {
+  return open_comp_graph$internal$cxxbridge1$StreamDataImpl$get_pixel_height(*this);
 }
 
 ::std::uint64_t NodeImpl::get_id() const noexcept {

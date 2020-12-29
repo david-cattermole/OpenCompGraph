@@ -77,16 +77,40 @@ int test_f(std::shared_ptr<ocg::Cache> cache) {
     std::cout << "state_id1=" << state_id1 << '\n';
     std::cout << "hash1=" << hash1 << '\n';
     const ocg::internal::PixelBlock &pixel_block1 = stream_data1.pixel_block();
+    auto pixel_buffer1 = stream_data1.pixel_buffer();
+    std::cout << "pixel_buffer1"
+              << " data=" << &pixel_buffer1
+              << " size=" << pixel_buffer1.size() << '\n';
+    auto width1 = stream_data1.pixel_width();
+    auto height1 = stream_data1.pixel_height();
+    std::cout << "width1=" << width1 << '\n';
+    std::cout << "height1=" << height1 << '\n';
 
     auto status2 = g.execute(write2_id, cache);
     assert(status2 == ocg::ExecuteStatus::kSuccess);
     auto stream_data2 = g.output_stream();
     const ocg::internal::PixelBlock &pixel_block2 = stream_data2.pixel_block();
+    auto pixel_buffer2 = stream_data2.pixel_buffer();
+    std::cout << "pixel_buffer2"
+              << " data=" << &pixel_buffer2
+              << " size=" << pixel_buffer2.size() << '\n';
+    auto width2 = stream_data2.pixel_width();
+    auto height2 = stream_data2.pixel_height();
+    std::cout << "width2=" << width2 << '\n';
+    std::cout << "height2=" << height2 << '\n';
 
     auto status3 = g.execute(write3_id, cache);
     assert(status3 == ocg::ExecuteStatus::kSuccess);
     auto stream_data3 = g.output_stream();
     const ocg::internal::PixelBlock &pixel_block3 = stream_data3.pixel_block();
+    auto pixel_buffer3 = stream_data3.pixel_buffer();
+    std::cout << "pixel_buffer3"
+              << " data=" << &pixel_buffer3
+              << " size=" << pixel_buffer3.size() << '\n';
+    auto width3 = stream_data3.pixel_width();
+    auto height3 = stream_data3.pixel_height();
+    std::cout << "width3=" << width3 << '\n';
+    std::cout << "height3=" << height3 << '\n';
 
     bench.stop();
     bench.print("Test F:");

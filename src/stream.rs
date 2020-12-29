@@ -73,6 +73,18 @@ impl StreamDataImpl {
         self.pixel_block = Rc::new(pixel_block);
     }
 
+    pub fn get_pixel_buffer(&self) -> &[f32] {
+        &self.pixel_block.pixels.as_slice()
+    }
+
+    pub fn get_pixel_width(&self) -> u32 {
+        self.pixel_block.width
+    }
+
+    pub fn get_pixel_height(&self) -> u32 {
+        self.pixel_block.height
+    }
+
     pub fn get_color_matrix(&self) -> &Box<Matrix4> {
         &self.color_matrix
     }
