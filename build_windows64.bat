@@ -18,11 +18,7 @@ SET RUST_INCLUDE_DIR="%OCG_ROOT%\include"
 :: Build Rust
 ::
 :: Assumes 'cxxbridge-cmd' and 'cbindgen' is installed.
-cxxbridge --header --output "%OCG_ROOT%\include\rust\cxx.h"
-cbindgen --config cbindgen.toml ^
-         --crate opencompgraph ^
-         --output "%OCG_ROOT%\include\opencompgraph\_cbindgen.h"
-cargo build --release
+call %OCG_ROOT%\scripts\build_rust_windows64.bat
 
 :: Build C++
 MKDIR build_windows
