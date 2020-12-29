@@ -133,6 +133,7 @@ impl GraphImpl {
             match cached_output {
                 Some(value) => {
                     // println!("Reuse Hash: {}", node_hash);
+                    self.output = value.clone();
                 }
                 None => {
                     let mut output = create_stream_data_shared();
