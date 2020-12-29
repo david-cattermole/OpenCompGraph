@@ -1,4 +1,7 @@
 #![allow(unused_imports)]
+#![allow(unused_variables)]
+#![allow(dead_code)]
+#![allow(unused_mut)]
 pub mod cache;
 pub mod cbindgen;
 pub mod cxxbridge;
