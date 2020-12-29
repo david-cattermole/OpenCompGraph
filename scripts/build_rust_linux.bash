@@ -15,7 +15,7 @@ ROOT=`readlink -f ${THIS_DIR}`
 echo "Generating C++ Headers..."
 cxxbridge --header --output "${ROOT}/include/rust/cxx.h"
 cbindgen --config cbindgen.toml \
-         --crate opencompgraph \
+         --crate "opencompgraph-rs" \
          --output "${ROOT}/include/opencompgraph/_cbindgen.h"
 echo "Building Rust crate..."
 cargo build --release

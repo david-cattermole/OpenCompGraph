@@ -14,7 +14,7 @@ CHDIR %ROOT%
 ECHO Generating C++ Headers...
 cxxbridge --header --output "%ROOT%\include\rust\cxx.h"
 cbindgen --config cbindgen.toml ^
-         --crate opencompgraph ^
+         --crate "opencompgraph-rs" ^
          --output "%ROOT%\include\opencompgraph\_cbindgen.h"
 ECHO Building Rust crate...
 cargo build --release
