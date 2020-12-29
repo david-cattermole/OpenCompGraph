@@ -28,7 +28,7 @@ int test_c() {
     std::cout << "read_node_type=" << read_node_type << '\n';
 
     auto read_node_type_id = read_node->get_node_type_id();
-    std::cout << "read_node_type_id=" << std::hex << read_node_type_id << '\n';
+    std::cout << "read_node_type_id=" << static_cast<uint32_t>(read_node_type_id) << '\n';
 
     // Set string attribute
     auto read_attr = "file_path";
@@ -70,7 +70,7 @@ int test_c() {
     auto read_node_output = ocg::internal::create_stream_data_shared();
     read_node->compute(read_node_inputs, read_node_output);
     auto read_status = read_node->get_status_id();
-    std::cout << "read_status=" << read_status << '\n';
+    std::cout << "read_status=" << static_cast<uint32_t>(read_status) << '\n';
 
     // auto read_output = read_node->get_output();
     // auto read_hash = read_output->get_hash();
@@ -91,7 +91,7 @@ int test_c() {
     std::cout << "write_node_type=" << write_node_type << '\n';
 
     auto write_node_type_id = write_node->get_node_type_id();
-    std::cout << "write_node_type_id=" << std::hex << write_node_type_id
+    std::cout << "write_node_type_id=" << static_cast<uint32_t>(write_node_type_id)
               << '\n';
 
     auto write_attr = "file_path";
