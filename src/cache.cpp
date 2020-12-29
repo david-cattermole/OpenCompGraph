@@ -14,11 +14,11 @@ Cache::~Cache() {
     std::cout << "~Cache()" << '\n';
 }
 
-rust::Box<open_comp_graph::internal::CacheImpl> Cache::get_box() noexcept {
+rust::Box<internal::CacheImpl> Cache::get_box() noexcept {
     return std::move(this->inner.inner);
 }
 
-void Cache::set_box(rust::Box<open_comp_graph::internal::CacheImpl> box) noexcept {
+void Cache::set_box(rust::Box<internal::CacheImpl> box) noexcept {
     this->inner.inner = std::move(box);
 }
 

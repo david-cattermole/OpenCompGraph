@@ -12,8 +12,8 @@ public:
     Cache() noexcept;
     ~Cache();
 
-    rust::Box<open_comp_graph::internal::CacheImpl> get_box() noexcept;
-    void set_box(rust::Box<open_comp_graph::internal::CacheImpl> box) noexcept;
+    rust::Box<internal::CacheImpl> get_box() noexcept;
+    void set_box(rust::Box<internal::CacheImpl> box) noexcept;
     std::uint64_t count() noexcept;
 
 private:
