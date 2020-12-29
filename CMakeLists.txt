@@ -20,6 +20,7 @@ set_cxx_standard_cpp_11()
 
 set(target_lib "opencompgraph")
 set(target_test_exe "opencompgraph_tests")
+set(OpenCompGraph_INSTALL_PREFIX "" CACHE STRING "String added to the install path for libraries and binaries.")
 
 add_subdirectory(src)
 add_subdirectory(include)
