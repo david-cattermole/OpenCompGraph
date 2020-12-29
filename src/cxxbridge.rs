@@ -136,6 +136,7 @@ pub mod ffi {
     #[namespace = "open_comp_graph::cpp"]
     unsafe extern "C++" {
         include!("rust/cxx.h");
+        include!("opencompgraph/symbol_export.h");
         include!("opencompgraph/cpp.h");
 
         type ThingC;

@@ -1,4 +1,5 @@
 #include "rust/cxx.h"
+#include "opencompgraph/symbol_export.h"
 #include "opencompgraph/cpp.h"
 #include <algorithm>
 #include <array>
@@ -1063,16 +1064,16 @@ private:
 #ifndef CXXBRIDGE1_STRUCT_open_comp_graph$internal$StreamDataImpl
 #define CXXBRIDGE1_STRUCT_open_comp_graph$internal$StreamDataImpl
 struct StreamDataImpl final : public ::rust::Opaque {
-  __declspec(dllexport) ::open_comp_graph::StreamDataState get_state() const noexcept;
-  __declspec(dllexport) ::std::uint8_t get_state_id() const noexcept;
-  __declspec(dllexport) ::std::uint64_t get_hash() const noexcept;
-  __declspec(dllexport) const ::rust::Box<::open_comp_graph::internal::BoundingBox2D> &get_bounding_box() const noexcept;
-  __declspec(dllexport) const ::rust::Box<::open_comp_graph::internal::Matrix4> &get_color_matrix() const noexcept;
-  __declspec(dllexport) const ::rust::Box<::open_comp_graph::internal::Matrix4> &get_transform_matrix() const noexcept;
-  __declspec(dllexport) const ::open_comp_graph::internal::PixelBlock &get_pixel_block() const noexcept;
-  __declspec(dllexport) ::rust::Slice<const float> get_pixel_buffer() const noexcept;
-  __declspec(dllexport) ::std::uint32_t get_pixel_width() const noexcept;
-  __declspec(dllexport) ::std::uint32_t get_pixel_height() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::StreamDataState get_state() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint8_t get_state_id() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint64_t get_hash() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT const ::rust::Box<::open_comp_graph::internal::BoundingBox2D> &get_bounding_box() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT const ::rust::Box<::open_comp_graph::internal::Matrix4> &get_color_matrix() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT const ::rust::Box<::open_comp_graph::internal::Matrix4> &get_transform_matrix() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT const ::open_comp_graph::internal::PixelBlock &get_pixel_block() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::rust::Slice<const float> get_pixel_buffer() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint32_t get_pixel_width() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint32_t get_pixel_height() const noexcept;
 
 private:
   friend ::rust::layout;
@@ -1086,20 +1087,20 @@ private:
 #ifndef CXXBRIDGE1_STRUCT_open_comp_graph$internal$NodeImpl
 #define CXXBRIDGE1_STRUCT_open_comp_graph$internal$NodeImpl
 struct NodeImpl final : public ::rust::Opaque {
-  __declspec(dllexport) ::std::uint64_t get_id() const noexcept;
-  __declspec(dllexport) ::open_comp_graph::NodeType get_node_type() const noexcept;
-  __declspec(dllexport) ::std::uint8_t get_node_type_id() const noexcept;
-  __declspec(dllexport) ::open_comp_graph::NodeStatus get_status() const noexcept;
-  __declspec(dllexport) ::std::uint8_t get_status_id() const noexcept;
-  __declspec(dllexport) ::std::uint64_t hash(const ::rust::Vec<::open_comp_graph::internal::StreamDataImplShared> &inputs) const noexcept;
-  __declspec(dllexport) ::open_comp_graph::NodeStatus compute(const ::rust::Vec<::open_comp_graph::internal::StreamDataImplShared> &inputs, ::open_comp_graph::internal::StreamDataImplShared &output) noexcept;
-  __declspec(dllexport) ::open_comp_graph::AttrState attr_exists(::rust::Str name) const noexcept;
-  __declspec(dllexport) float get_attr_f32(::rust::Str name) const noexcept;
-  __declspec(dllexport) ::std::int32_t get_attr_i32(::rust::Str name) const noexcept;
-  __declspec(dllexport) ::rust::Str get_attr_str(::rust::Str name) const noexcept;
-  __declspec(dllexport) void set_attr_f32(::rust::Str name, float value) noexcept;
-  __declspec(dllexport) void set_attr_i32(::rust::Str name, ::std::int32_t value) noexcept;
-  __declspec(dllexport) void set_attr_str(::rust::Str name, ::rust::Str value) noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint64_t get_id() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::NodeType get_node_type() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint8_t get_node_type_id() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::NodeStatus get_status() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint8_t get_status_id() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint64_t hash(const ::rust::Vec<::open_comp_graph::internal::StreamDataImplShared> &inputs) const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::NodeStatus compute(const ::rust::Vec<::open_comp_graph::internal::StreamDataImplShared> &inputs, ::open_comp_graph::internal::StreamDataImplShared &output) noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::AttrState attr_exists(::rust::Str name) const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT float get_attr_f32(::rust::Str name) const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::std::int32_t get_attr_i32(::rust::Str name) const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::rust::Str get_attr_str(::rust::Str name) const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT void set_attr_f32(::rust::Str name, float value) noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT void set_attr_i32(::rust::Str name, ::std::int32_t value) noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT void set_attr_str(::rust::Str name, ::rust::Str value) noexcept;
 
 private:
   friend ::rust::layout;
@@ -1113,8 +1114,8 @@ private:
 #ifndef CXXBRIDGE1_STRUCT_open_comp_graph$internal$CacheImpl
 #define CXXBRIDGE1_STRUCT_open_comp_graph$internal$CacheImpl
 struct CacheImpl final : public ::rust::Opaque {
-  __declspec(dllexport) ::std::uint64_t get_id() const noexcept;
-  __declspec(dllexport) ::std::size_t len() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint64_t get_id() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t len() const noexcept;
 
 private:
   friend ::rust::layout;
@@ -1128,10 +1129,10 @@ private:
 #ifndef CXXBRIDGE1_STRUCT_open_comp_graph$internal$GraphImpl
 #define CXXBRIDGE1_STRUCT_open_comp_graph$internal$GraphImpl
 struct GraphImpl final : public ::rust::Opaque {
-  __declspec(dllexport) ::std::size_t add_node(::rust::Box<::open_comp_graph::internal::NodeImpl> op_box) noexcept;
-  __declspec(dllexport) void connect(::std::size_t src_index, ::std::size_t dst_index, ::std::uint8_t input_num) noexcept;
-  __declspec(dllexport) ::open_comp_graph::ExecuteStatus execute(::std::size_t start_index, ::rust::Box<::open_comp_graph::internal::CacheImpl> &cache) noexcept;
-  __declspec(dllexport) ::open_comp_graph::internal::StreamDataImplShared output_stream() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t add_node(::rust::Box<::open_comp_graph::internal::NodeImpl> op_box) noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT void connect(::std::size_t src_index, ::std::size_t dst_index, ::std::uint8_t input_num) noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::ExecuteStatus execute(::std::size_t start_index, ::rust::Box<::open_comp_graph::internal::CacheImpl> &cache) noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::internal::StreamDataImplShared output_stream() const noexcept;
 
 private:
   friend ::rust::layout;
@@ -1149,17 +1150,17 @@ extern "C" {
 
 namespace cpp {
 extern "C" {
-__declspec(dllexport) ::open_comp_graph::cpp::ThingC *open_comp_graph$cpp$cxxbridge1$make_thingc(::rust::repr::PtrLen appname) noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::cpp::ThingC *open_comp_graph$cpp$cxxbridge1$make_thingc(::rust::repr::PtrLen appname) noexcept {
   ::std::unique_ptr<::open_comp_graph::cpp::ThingC> (*make_thingc$)(::rust::Str) = ::open_comp_graph::cpp::make_thingc;
   return make_thingc$(::rust::impl<::rust::Str>::new_unchecked(appname)).release();
 }
 
-__declspec(dllexport) const ::std::string *open_comp_graph$cpp$cxxbridge1$get_name(const ::open_comp_graph::cpp::ThingC &thing) noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT const ::std::string *open_comp_graph$cpp$cxxbridge1$get_name(const ::open_comp_graph::cpp::ThingC &thing) noexcept {
   const ::std::string &(*get_name$)(const ::open_comp_graph::cpp::ThingC &) = ::open_comp_graph::cpp::get_name;
   return &get_name$(thing);
 }
 
-__declspec(dllexport) void open_comp_graph$cpp$cxxbridge1$run_sharedthing(::open_comp_graph::shared::SharedThing *state) noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT void open_comp_graph$cpp$cxxbridge1$run_sharedthing(::open_comp_graph::shared::SharedThing *state) noexcept {
   void (*run_sharedthing$)(::open_comp_graph::shared::SharedThing) = ::open_comp_graph::cpp::run_sharedthing;
   run_sharedthing$(::std::move(*state));
 }
@@ -1296,7 +1297,7 @@ namespace internal {
   return open_comp_graph$internal$cxxbridge1$ThingR$operator$alignof();
 }
 
-__declspec(dllexport) void print_r(const ::open_comp_graph::internal::ThingR &r) noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT void print_r(const ::open_comp_graph::internal::ThingR &r) noexcept {
   open_comp_graph$internal$cxxbridge1$print_r(r);
 }
 
@@ -1332,43 +1333,43 @@ __declspec(dllexport) void print_r(const ::open_comp_graph::internal::ThingR &r)
   return open_comp_graph$internal$cxxbridge1$StreamDataImpl$operator$alignof();
 }
 
-__declspec(dllexport) ::open_comp_graph::StreamDataState StreamDataImpl::get_state() const noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::StreamDataState StreamDataImpl::get_state() const noexcept {
   return open_comp_graph$internal$cxxbridge1$StreamDataImpl$get_state(*this);
 }
 
-__declspec(dllexport) ::std::uint8_t StreamDataImpl::get_state_id() const noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint8_t StreamDataImpl::get_state_id() const noexcept {
   return open_comp_graph$internal$cxxbridge1$StreamDataImpl$get_state_id(*this);
 }
 
-__declspec(dllexport) ::std::uint64_t StreamDataImpl::get_hash() const noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint64_t StreamDataImpl::get_hash() const noexcept {
   return open_comp_graph$internal$cxxbridge1$StreamDataImpl$get_hash(*this);
 }
 
-__declspec(dllexport) const ::rust::Box<::open_comp_graph::internal::BoundingBox2D> &StreamDataImpl::get_bounding_box() const noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT const ::rust::Box<::open_comp_graph::internal::BoundingBox2D> &StreamDataImpl::get_bounding_box() const noexcept {
   return *open_comp_graph$internal$cxxbridge1$StreamDataImpl$get_bounding_box(*this);
 }
 
-__declspec(dllexport) const ::rust::Box<::open_comp_graph::internal::Matrix4> &StreamDataImpl::get_color_matrix() const noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT const ::rust::Box<::open_comp_graph::internal::Matrix4> &StreamDataImpl::get_color_matrix() const noexcept {
   return *open_comp_graph$internal$cxxbridge1$StreamDataImpl$get_color_matrix(*this);
 }
 
-__declspec(dllexport) const ::rust::Box<::open_comp_graph::internal::Matrix4> &StreamDataImpl::get_transform_matrix() const noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT const ::rust::Box<::open_comp_graph::internal::Matrix4> &StreamDataImpl::get_transform_matrix() const noexcept {
   return *open_comp_graph$internal$cxxbridge1$StreamDataImpl$get_transform_matrix(*this);
 }
 
-__declspec(dllexport) const ::open_comp_graph::internal::PixelBlock &StreamDataImpl::get_pixel_block() const noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT const ::open_comp_graph::internal::PixelBlock &StreamDataImpl::get_pixel_block() const noexcept {
   return *open_comp_graph$internal$cxxbridge1$StreamDataImpl$get_pixel_block(*this);
 }
 
-__declspec(dllexport) ::rust::Slice<const float> StreamDataImpl::get_pixel_buffer() const noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT ::rust::Slice<const float> StreamDataImpl::get_pixel_buffer() const noexcept {
   return ::rust::impl<::rust::Slice<const float>>::slice(open_comp_graph$internal$cxxbridge1$StreamDataImpl$get_pixel_buffer(*this));
 }
 
-__declspec(dllexport) ::std::uint32_t StreamDataImpl::get_pixel_width() const noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint32_t StreamDataImpl::get_pixel_width() const noexcept {
   return open_comp_graph$internal$cxxbridge1$StreamDataImpl$get_pixel_width(*this);
 }
 
-__declspec(dllexport) ::std::uint32_t StreamDataImpl::get_pixel_height() const noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint32_t StreamDataImpl::get_pixel_height() const noexcept {
   return open_comp_graph$internal$cxxbridge1$StreamDataImpl$get_pixel_height(*this);
 }
 
@@ -1380,59 +1381,59 @@ __declspec(dllexport) ::std::uint32_t StreamDataImpl::get_pixel_height() const n
   return open_comp_graph$internal$cxxbridge1$NodeImpl$operator$alignof();
 }
 
-__declspec(dllexport) ::std::uint64_t NodeImpl::get_id() const noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint64_t NodeImpl::get_id() const noexcept {
   return open_comp_graph$internal$cxxbridge1$NodeImpl$get_id(*this);
 }
 
-__declspec(dllexport) ::open_comp_graph::NodeType NodeImpl::get_node_type() const noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::NodeType NodeImpl::get_node_type() const noexcept {
   return open_comp_graph$internal$cxxbridge1$NodeImpl$get_node_type(*this);
 }
 
-__declspec(dllexport) ::std::uint8_t NodeImpl::get_node_type_id() const noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint8_t NodeImpl::get_node_type_id() const noexcept {
   return open_comp_graph$internal$cxxbridge1$NodeImpl$get_node_type_id(*this);
 }
 
-__declspec(dllexport) ::open_comp_graph::NodeStatus NodeImpl::get_status() const noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::NodeStatus NodeImpl::get_status() const noexcept {
   return open_comp_graph$internal$cxxbridge1$NodeImpl$get_status(*this);
 }
 
-__declspec(dllexport) ::std::uint8_t NodeImpl::get_status_id() const noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint8_t NodeImpl::get_status_id() const noexcept {
   return open_comp_graph$internal$cxxbridge1$NodeImpl$get_status_id(*this);
 }
 
-__declspec(dllexport) ::std::uint64_t NodeImpl::hash(const ::rust::Vec<::open_comp_graph::internal::StreamDataImplShared> &inputs) const noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint64_t NodeImpl::hash(const ::rust::Vec<::open_comp_graph::internal::StreamDataImplShared> &inputs) const noexcept {
   return open_comp_graph$internal$cxxbridge1$NodeImpl$hash(*this, inputs);
 }
 
-__declspec(dllexport) ::open_comp_graph::NodeStatus NodeImpl::compute(const ::rust::Vec<::open_comp_graph::internal::StreamDataImplShared> &inputs, ::open_comp_graph::internal::StreamDataImplShared &output) noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::NodeStatus NodeImpl::compute(const ::rust::Vec<::open_comp_graph::internal::StreamDataImplShared> &inputs, ::open_comp_graph::internal::StreamDataImplShared &output) noexcept {
   return open_comp_graph$internal$cxxbridge1$NodeImpl$compute(*this, inputs, output);
 }
 
-__declspec(dllexport) ::open_comp_graph::AttrState NodeImpl::attr_exists(::rust::Str name) const noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::AttrState NodeImpl::attr_exists(::rust::Str name) const noexcept {
   return open_comp_graph$internal$cxxbridge1$NodeImpl$attr_exists(*this, ::rust::impl<::rust::Str>::repr(name));
 }
 
-__declspec(dllexport) float NodeImpl::get_attr_f32(::rust::Str name) const noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT float NodeImpl::get_attr_f32(::rust::Str name) const noexcept {
   return open_comp_graph$internal$cxxbridge1$NodeImpl$get_attr_f32(*this, ::rust::impl<::rust::Str>::repr(name));
 }
 
-__declspec(dllexport) ::std::int32_t NodeImpl::get_attr_i32(::rust::Str name) const noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT ::std::int32_t NodeImpl::get_attr_i32(::rust::Str name) const noexcept {
   return open_comp_graph$internal$cxxbridge1$NodeImpl$get_attr_i32(*this, ::rust::impl<::rust::Str>::repr(name));
 }
 
-__declspec(dllexport) ::rust::Str NodeImpl::get_attr_str(::rust::Str name) const noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT ::rust::Str NodeImpl::get_attr_str(::rust::Str name) const noexcept {
   return ::rust::impl<::rust::Str>::new_unchecked(open_comp_graph$internal$cxxbridge1$NodeImpl$get_attr_str(*this, ::rust::impl<::rust::Str>::repr(name)));
 }
 
-__declspec(dllexport) void NodeImpl::set_attr_f32(::rust::Str name, float value) noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT void NodeImpl::set_attr_f32(::rust::Str name, float value) noexcept {
   open_comp_graph$internal$cxxbridge1$NodeImpl$set_attr_f32(*this, ::rust::impl<::rust::Str>::repr(name), value);
 }
 
-__declspec(dllexport) void NodeImpl::set_attr_i32(::rust::Str name, ::std::int32_t value) noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT void NodeImpl::set_attr_i32(::rust::Str name, ::std::int32_t value) noexcept {
   open_comp_graph$internal$cxxbridge1$NodeImpl$set_attr_i32(*this, ::rust::impl<::rust::Str>::repr(name), value);
 }
 
-__declspec(dllexport) void NodeImpl::set_attr_str(::rust::Str name, ::rust::Str value) noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT void NodeImpl::set_attr_str(::rust::Str name, ::rust::Str value) noexcept {
   open_comp_graph$internal$cxxbridge1$NodeImpl$set_attr_str(*this, ::rust::impl<::rust::Str>::repr(name), ::rust::impl<::rust::Str>::repr(value));
 }
 
@@ -1444,11 +1445,11 @@ __declspec(dllexport) void NodeImpl::set_attr_str(::rust::Str name, ::rust::Str 
   return open_comp_graph$internal$cxxbridge1$CacheImpl$operator$alignof();
 }
 
-__declspec(dllexport) ::std::uint64_t CacheImpl::get_id() const noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint64_t CacheImpl::get_id() const noexcept {
   return open_comp_graph$internal$cxxbridge1$CacheImpl$get_id(*this);
 }
 
-__declspec(dllexport) ::std::size_t CacheImpl::len() const noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t CacheImpl::len() const noexcept {
   return open_comp_graph$internal$cxxbridge1$CacheImpl$len(*this);
 }
 
@@ -1460,91 +1461,91 @@ __declspec(dllexport) ::std::size_t CacheImpl::len() const noexcept {
   return open_comp_graph$internal$cxxbridge1$GraphImpl$operator$alignof();
 }
 
-__declspec(dllexport) ::std::size_t GraphImpl::add_node(::rust::Box<::open_comp_graph::internal::NodeImpl> op_box) noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t GraphImpl::add_node(::rust::Box<::open_comp_graph::internal::NodeImpl> op_box) noexcept {
   return open_comp_graph$internal$cxxbridge1$GraphImpl$add_node(*this, op_box.into_raw());
 }
 
-__declspec(dllexport) void GraphImpl::connect(::std::size_t src_index, ::std::size_t dst_index, ::std::uint8_t input_num) noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT void GraphImpl::connect(::std::size_t src_index, ::std::size_t dst_index, ::std::uint8_t input_num) noexcept {
   open_comp_graph$internal$cxxbridge1$GraphImpl$connect(*this, src_index, dst_index, input_num);
 }
 
-__declspec(dllexport) ::open_comp_graph::ExecuteStatus GraphImpl::execute(::std::size_t start_index, ::rust::Box<::open_comp_graph::internal::CacheImpl> &cache) noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::ExecuteStatus GraphImpl::execute(::std::size_t start_index, ::rust::Box<::open_comp_graph::internal::CacheImpl> &cache) noexcept {
   return open_comp_graph$internal$cxxbridge1$GraphImpl$execute(*this, start_index, cache);
 }
 
-__declspec(dllexport) ::open_comp_graph::internal::StreamDataImplShared GraphImpl::output_stream() const noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::internal::StreamDataImplShared GraphImpl::output_stream() const noexcept {
   ::rust::MaybeUninit<::open_comp_graph::internal::StreamDataImplShared> return$;
   open_comp_graph$internal$cxxbridge1$GraphImpl$output_stream(*this, &return$.value);
   return ::std::move(return$.value);
 }
 
-__declspec(dllexport) ::rust::Box<::open_comp_graph::internal::NodeImpl> create_node_box(::open_comp_graph::NodeType node_type) noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT ::rust::Box<::open_comp_graph::internal::NodeImpl> create_node_box(::open_comp_graph::NodeType node_type) noexcept {
   return ::rust::Box<::open_comp_graph::internal::NodeImpl>::from_raw(open_comp_graph$internal$cxxbridge1$create_node_box(node_type));
 }
 
-__declspec(dllexport) ::rust::Box<::open_comp_graph::internal::NodeImpl> create_node_box(::open_comp_graph::NodeType node_type, ::rust::Str name) noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT ::rust::Box<::open_comp_graph::internal::NodeImpl> create_node_box(::open_comp_graph::NodeType node_type, ::rust::Str name) noexcept {
   return ::rust::Box<::open_comp_graph::internal::NodeImpl>::from_raw(open_comp_graph$internal$cxxbridge1$create_node_box_with_name(node_type, ::rust::impl<::rust::Str>::repr(name)));
 }
 
-__declspec(dllexport) ::rust::Box<::open_comp_graph::internal::NodeImpl> create_node_box(::open_comp_graph::NodeType node_type, ::std::uint64_t id) noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT ::rust::Box<::open_comp_graph::internal::NodeImpl> create_node_box(::open_comp_graph::NodeType node_type, ::std::uint64_t id) noexcept {
   return ::rust::Box<::open_comp_graph::internal::NodeImpl>::from_raw(open_comp_graph$internal$cxxbridge1$create_node_box_with_id(node_type, id));
 }
 
-__declspec(dllexport) ::open_comp_graph::internal::NodeImplShared create_node_shared(::open_comp_graph::NodeType node_type) noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::internal::NodeImplShared create_node_shared(::open_comp_graph::NodeType node_type) noexcept {
   ::rust::MaybeUninit<::open_comp_graph::internal::NodeImplShared> return$;
   open_comp_graph$internal$cxxbridge1$create_node_shared(node_type, &return$.value);
   return ::std::move(return$.value);
 }
 
-__declspec(dllexport) ::open_comp_graph::internal::NodeImplShared create_node_shared(::open_comp_graph::NodeType node_type, ::rust::Str name) noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::internal::NodeImplShared create_node_shared(::open_comp_graph::NodeType node_type, ::rust::Str name) noexcept {
   ::rust::MaybeUninit<::open_comp_graph::internal::NodeImplShared> return$;
   open_comp_graph$internal$cxxbridge1$create_node_shared_with_name(node_type, ::rust::impl<::rust::Str>::repr(name), &return$.value);
   return ::std::move(return$.value);
 }
 
-__declspec(dllexport) ::open_comp_graph::internal::NodeImplShared create_node_shared(::open_comp_graph::NodeType node_type, ::std::uint64_t id) noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::internal::NodeImplShared create_node_shared(::open_comp_graph::NodeType node_type, ::std::uint64_t id) noexcept {
   ::rust::MaybeUninit<::open_comp_graph::internal::NodeImplShared> return$;
   open_comp_graph$internal$cxxbridge1$create_node_shared_with_id(node_type, id, &return$.value);
   return ::std::move(return$.value);
 }
 
-__declspec(dllexport) ::rust::Box<::open_comp_graph::internal::CacheImpl> create_cache_box() noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT ::rust::Box<::open_comp_graph::internal::CacheImpl> create_cache_box() noexcept {
   return ::rust::Box<::open_comp_graph::internal::CacheImpl>::from_raw(open_comp_graph$internal$cxxbridge1$create_cache_box());
 }
 
-__declspec(dllexport) ::open_comp_graph::internal::CacheImplShared create_cache_shared() noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::internal::CacheImplShared create_cache_shared() noexcept {
   ::rust::MaybeUninit<::open_comp_graph::internal::CacheImplShared> return$;
   open_comp_graph$internal$cxxbridge1$create_cache_shared(&return$.value);
   return ::std::move(return$.value);
 }
 
-__declspec(dllexport) ::rust::Box<::open_comp_graph::internal::GraphImpl> create_graph_box() noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT ::rust::Box<::open_comp_graph::internal::GraphImpl> create_graph_box() noexcept {
   return ::rust::Box<::open_comp_graph::internal::GraphImpl>::from_raw(open_comp_graph$internal$cxxbridge1$create_graph_box());
 }
 
-__declspec(dllexport) ::open_comp_graph::internal::GraphImplShared create_graph_shared() noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::internal::GraphImplShared create_graph_shared() noexcept {
   ::rust::MaybeUninit<::open_comp_graph::internal::GraphImplShared> return$;
   open_comp_graph$internal$cxxbridge1$create_graph_shared(&return$.value);
   return ::std::move(return$.value);
 }
 
-__declspec(dllexport) ::rust::Box<::open_comp_graph::internal::StreamDataImpl> create_stream_data_box() noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT ::rust::Box<::open_comp_graph::internal::StreamDataImpl> create_stream_data_box() noexcept {
   return ::rust::Box<::open_comp_graph::internal::StreamDataImpl>::from_raw(open_comp_graph$internal$cxxbridge1$create_stream_data_box());
 }
 
-__declspec(dllexport) ::open_comp_graph::internal::StreamDataImplShared create_stream_data_shared() noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::internal::StreamDataImplShared create_stream_data_shared() noexcept {
   ::rust::MaybeUninit<::open_comp_graph::internal::StreamDataImplShared> return$;
   open_comp_graph$internal$cxxbridge1$create_stream_data_shared(&return$.value);
   return ::std::move(return$.value);
 }
 
-__declspec(dllexport) ::open_comp_graph::internal::StreamDataImplShared create_stream_data_shared_box(::rust::Box<::open_comp_graph::internal::StreamDataImpl> data) noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::internal::StreamDataImplShared create_stream_data_shared_box(::rust::Box<::open_comp_graph::internal::StreamDataImpl> data) noexcept {
   ::rust::MaybeUninit<::open_comp_graph::internal::StreamDataImplShared> return$;
   open_comp_graph$internal$cxxbridge1$create_stream_data_shared_box(data.into_raw(), &return$.value);
   return ::std::move(return$.value);
 }
 
-__declspec(dllexport) ::rust::Vec<::open_comp_graph::internal::StreamDataImplShared> create_vec_stream_data_shared() noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT ::rust::Vec<::open_comp_graph::internal::StreamDataImplShared> create_vec_stream_data_shared() noexcept {
   ::rust::MaybeUninit<::rust::Vec<::open_comp_graph::internal::StreamDataImplShared>> return$;
   open_comp_graph$internal$cxxbridge1$create_vec_stream_data_shared(&return$.value);
   return ::std::move(return$.value);
@@ -1612,115 +1613,115 @@ void cxxbridge1$box$open_comp_graph$internal$Matrix4$drop(::rust::Box<::open_com
 namespace rust {
 inline namespace cxxbridge1 {
 template <>
-__declspec(dllexport) ::open_comp_graph::internal::ThingR *Box<::open_comp_graph::internal::ThingR>::allocation::alloc() noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::internal::ThingR *Box<::open_comp_graph::internal::ThingR>::allocation::alloc() noexcept {
   return cxxbridge1$box$open_comp_graph$internal$ThingR$alloc();
 }
 template <>
-__declspec(dllexport) void Box<::open_comp_graph::internal::ThingR>::allocation::dealloc(::open_comp_graph::internal::ThingR *ptr) noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT void Box<::open_comp_graph::internal::ThingR>::allocation::dealloc(::open_comp_graph::internal::ThingR *ptr) noexcept {
   cxxbridge1$box$open_comp_graph$internal$ThingR$dealloc(ptr);
 }
 template <>
-__declspec(dllexport) void Box<::open_comp_graph::internal::ThingR>::drop() noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT void Box<::open_comp_graph::internal::ThingR>::drop() noexcept {
   cxxbridge1$box$open_comp_graph$internal$ThingR$drop(this);
 }
 template <>
-__declspec(dllexport) ::open_comp_graph::internal::GraphImpl *Box<::open_comp_graph::internal::GraphImpl>::allocation::alloc() noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::internal::GraphImpl *Box<::open_comp_graph::internal::GraphImpl>::allocation::alloc() noexcept {
   return cxxbridge1$box$open_comp_graph$internal$GraphImpl$alloc();
 }
 template <>
-__declspec(dllexport) void Box<::open_comp_graph::internal::GraphImpl>::allocation::dealloc(::open_comp_graph::internal::GraphImpl *ptr) noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT void Box<::open_comp_graph::internal::GraphImpl>::allocation::dealloc(::open_comp_graph::internal::GraphImpl *ptr) noexcept {
   cxxbridge1$box$open_comp_graph$internal$GraphImpl$dealloc(ptr);
 }
 template <>
-__declspec(dllexport) void Box<::open_comp_graph::internal::GraphImpl>::drop() noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT void Box<::open_comp_graph::internal::GraphImpl>::drop() noexcept {
   cxxbridge1$box$open_comp_graph$internal$GraphImpl$drop(this);
 }
 template <>
-__declspec(dllexport) ::open_comp_graph::internal::NodeImpl *Box<::open_comp_graph::internal::NodeImpl>::allocation::alloc() noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::internal::NodeImpl *Box<::open_comp_graph::internal::NodeImpl>::allocation::alloc() noexcept {
   return cxxbridge1$box$open_comp_graph$internal$NodeImpl$alloc();
 }
 template <>
-__declspec(dllexport) void Box<::open_comp_graph::internal::NodeImpl>::allocation::dealloc(::open_comp_graph::internal::NodeImpl *ptr) noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT void Box<::open_comp_graph::internal::NodeImpl>::allocation::dealloc(::open_comp_graph::internal::NodeImpl *ptr) noexcept {
   cxxbridge1$box$open_comp_graph$internal$NodeImpl$dealloc(ptr);
 }
 template <>
-__declspec(dllexport) void Box<::open_comp_graph::internal::NodeImpl>::drop() noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT void Box<::open_comp_graph::internal::NodeImpl>::drop() noexcept {
   cxxbridge1$box$open_comp_graph$internal$NodeImpl$drop(this);
 }
 template <>
-__declspec(dllexport) ::open_comp_graph::internal::StreamDataImpl *Box<::open_comp_graph::internal::StreamDataImpl>::allocation::alloc() noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::internal::StreamDataImpl *Box<::open_comp_graph::internal::StreamDataImpl>::allocation::alloc() noexcept {
   return cxxbridge1$box$open_comp_graph$internal$StreamDataImpl$alloc();
 }
 template <>
-__declspec(dllexport) void Box<::open_comp_graph::internal::StreamDataImpl>::allocation::dealloc(::open_comp_graph::internal::StreamDataImpl *ptr) noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT void Box<::open_comp_graph::internal::StreamDataImpl>::allocation::dealloc(::open_comp_graph::internal::StreamDataImpl *ptr) noexcept {
   cxxbridge1$box$open_comp_graph$internal$StreamDataImpl$dealloc(ptr);
 }
 template <>
-__declspec(dllexport) void Box<::open_comp_graph::internal::StreamDataImpl>::drop() noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT void Box<::open_comp_graph::internal::StreamDataImpl>::drop() noexcept {
   cxxbridge1$box$open_comp_graph$internal$StreamDataImpl$drop(this);
 }
 template <>
-__declspec(dllexport) Vec<::open_comp_graph::internal::StreamDataImplShared>::Vec() noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT Vec<::open_comp_graph::internal::StreamDataImplShared>::Vec() noexcept {
   cxxbridge1$rust_vec$open_comp_graph$internal$StreamDataImplShared$new(this);
 }
 template <>
-__declspec(dllexport) void Vec<::open_comp_graph::internal::StreamDataImplShared>::drop() noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT void Vec<::open_comp_graph::internal::StreamDataImplShared>::drop() noexcept {
   return cxxbridge1$rust_vec$open_comp_graph$internal$StreamDataImplShared$drop(this);
 }
 template <>
-__declspec(dllexport) ::std::size_t Vec<::open_comp_graph::internal::StreamDataImplShared>::size() const noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t Vec<::open_comp_graph::internal::StreamDataImplShared>::size() const noexcept {
   return cxxbridge1$rust_vec$open_comp_graph$internal$StreamDataImplShared$len(this);
 }
 template <>
-__declspec(dllexport) ::std::size_t Vec<::open_comp_graph::internal::StreamDataImplShared>::capacity() const noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t Vec<::open_comp_graph::internal::StreamDataImplShared>::capacity() const noexcept {
   return cxxbridge1$rust_vec$open_comp_graph$internal$StreamDataImplShared$capacity(this);
 }
 template <>
-__declspec(dllexport) const ::open_comp_graph::internal::StreamDataImplShared *Vec<::open_comp_graph::internal::StreamDataImplShared>::data() const noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT const ::open_comp_graph::internal::StreamDataImplShared *Vec<::open_comp_graph::internal::StreamDataImplShared>::data() const noexcept {
   return cxxbridge1$rust_vec$open_comp_graph$internal$StreamDataImplShared$data(this);
 }
 template <>
-__declspec(dllexport) void Vec<::open_comp_graph::internal::StreamDataImplShared>::reserve_total(::std::size_t cap) noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT void Vec<::open_comp_graph::internal::StreamDataImplShared>::reserve_total(::std::size_t cap) noexcept {
   return cxxbridge1$rust_vec$open_comp_graph$internal$StreamDataImplShared$reserve_total(this, cap);
 }
 template <>
-__declspec(dllexport) void Vec<::open_comp_graph::internal::StreamDataImplShared>::set_len(::std::size_t len) noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT void Vec<::open_comp_graph::internal::StreamDataImplShared>::set_len(::std::size_t len) noexcept {
   return cxxbridge1$rust_vec$open_comp_graph$internal$StreamDataImplShared$set_len(this, len);
 }
 template <>
-__declspec(dllexport) ::open_comp_graph::internal::CacheImpl *Box<::open_comp_graph::internal::CacheImpl>::allocation::alloc() noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::internal::CacheImpl *Box<::open_comp_graph::internal::CacheImpl>::allocation::alloc() noexcept {
   return cxxbridge1$box$open_comp_graph$internal$CacheImpl$alloc();
 }
 template <>
-__declspec(dllexport) void Box<::open_comp_graph::internal::CacheImpl>::allocation::dealloc(::open_comp_graph::internal::CacheImpl *ptr) noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT void Box<::open_comp_graph::internal::CacheImpl>::allocation::dealloc(::open_comp_graph::internal::CacheImpl *ptr) noexcept {
   cxxbridge1$box$open_comp_graph$internal$CacheImpl$dealloc(ptr);
 }
 template <>
-__declspec(dllexport) void Box<::open_comp_graph::internal::CacheImpl>::drop() noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT void Box<::open_comp_graph::internal::CacheImpl>::drop() noexcept {
   cxxbridge1$box$open_comp_graph$internal$CacheImpl$drop(this);
 }
 template <>
-__declspec(dllexport) ::open_comp_graph::internal::BoundingBox2D *Box<::open_comp_graph::internal::BoundingBox2D>::allocation::alloc() noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::internal::BoundingBox2D *Box<::open_comp_graph::internal::BoundingBox2D>::allocation::alloc() noexcept {
   return cxxbridge1$box$open_comp_graph$internal$BoundingBox2D$alloc();
 }
 template <>
-__declspec(dllexport) void Box<::open_comp_graph::internal::BoundingBox2D>::allocation::dealloc(::open_comp_graph::internal::BoundingBox2D *ptr) noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT void Box<::open_comp_graph::internal::BoundingBox2D>::allocation::dealloc(::open_comp_graph::internal::BoundingBox2D *ptr) noexcept {
   cxxbridge1$box$open_comp_graph$internal$BoundingBox2D$dealloc(ptr);
 }
 template <>
-__declspec(dllexport) void Box<::open_comp_graph::internal::BoundingBox2D>::drop() noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT void Box<::open_comp_graph::internal::BoundingBox2D>::drop() noexcept {
   cxxbridge1$box$open_comp_graph$internal$BoundingBox2D$drop(this);
 }
 template <>
-__declspec(dllexport) ::open_comp_graph::internal::Matrix4 *Box<::open_comp_graph::internal::Matrix4>::allocation::alloc() noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::internal::Matrix4 *Box<::open_comp_graph::internal::Matrix4>::allocation::alloc() noexcept {
   return cxxbridge1$box$open_comp_graph$internal$Matrix4$alloc();
 }
 template <>
-__declspec(dllexport) void Box<::open_comp_graph::internal::Matrix4>::allocation::dealloc(::open_comp_graph::internal::Matrix4 *ptr) noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT void Box<::open_comp_graph::internal::Matrix4>::allocation::dealloc(::open_comp_graph::internal::Matrix4 *ptr) noexcept {
   cxxbridge1$box$open_comp_graph$internal$Matrix4$dealloc(ptr);
 }
 template <>
-__declspec(dllexport) void Box<::open_comp_graph::internal::Matrix4>::drop() noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT void Box<::open_comp_graph::internal::Matrix4>::drop() noexcept {
   cxxbridge1$box$open_comp_graph$internal$Matrix4$drop(this);
 }
 } // namespace cxxbridge1

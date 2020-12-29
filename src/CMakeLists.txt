@@ -17,11 +17,7 @@ message(STATUS "Using cxxbridge: ${CXXBRIDGE}")
 set(cxxbridge_in ${CMAKE_CURRENT_SOURCE_DIR}/cxxbridge.rs)
 set(cxxbridge_source_out ${CMAKE_CURRENT_SOURCE_DIR}/_cxxbridge.cpp)
 set(cxxbridge_header_out ${CMAKE_CURRENT_SOURCE_DIR}/../include/opencompgraph/_cxxbridge.h)
-if (MSVC)
-  set(cxxbridge_args "--cxx-impl-annotations \"__declspec(dllexport)\"")
-elseif (UNIX) # GCC
-  set(cxxbridge_args "--cxx-impl-annotations" "\"__attribute__((visibility(\\\"default\\\")))\"")
-endif()
+set(cxxbridge_args "--cxx-impl-annotations" "OPENCOMPGRAPH_SYMBOL_EXPORT")
 add_custom_command(
   OUTPUT ${cxxbridge_source_out} ${cxxbridge_header_out}
   COMMAND ${CXXBRIDGE} ${cxxbridge_in} ${cxxbridge_args} --header --output ${cxxbridge_header_out}
