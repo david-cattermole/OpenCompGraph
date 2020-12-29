@@ -15,6 +15,7 @@ target_include_directories(${target_test_exe}
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../include/
   PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../src/
   )
+# Required on Linux and MacOS, does nothing on Windows.
 set_relative_library_rpath(${target_test_exe} "../lib/")
 
 install(FILES
