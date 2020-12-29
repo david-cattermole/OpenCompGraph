@@ -20,6 +20,7 @@ pub struct SceneGraph {
     id: c_int,
 }
 
+/// cbindgen:prefix=OPENCOMPGRAPH_SYMBOL_EXPORT
 #[no_mangle]
 pub extern "C" fn scene_graph_new(id: c_int) -> *mut SceneGraph {
     println!("SCENEGRAPH: Add SceneGraph {:?}", id);
@@ -27,6 +28,7 @@ pub extern "C" fn scene_graph_new(id: c_int) -> *mut SceneGraph {
     Box::into_raw(scene_graph)
 }
 
+/// cbindgen:prefix=OPENCOMPGRAPH_SYMBOL_EXPORT
 #[no_mangle]
 pub extern "C" fn scene_graph_delete(scene_graph_ptr: *mut SceneGraph) {
     println!("SCENEGRAPH: Remove SceneGraph {:?}", scene_graph_ptr);
