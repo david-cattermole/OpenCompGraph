@@ -71,7 +71,6 @@ pub struct PixelBlock {
 impl PixelBlock {
     pub fn new(width: u32, height: u32, num_channels: u8) -> PixelBlock {
         let size = (width * height * num_channels as u32) as usize;
-        let data_type = 0;
         let pixels = vec![0.5 as f32; size];
         PixelBlock {
             width,
