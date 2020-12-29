@@ -9,6 +9,7 @@
 #include <map>
 #include <functional>
 #include <algorithm>
+#include "symbol_export.h"
 
 namespace open_comp_graph {
 
@@ -20,18 +21,18 @@ namespace cpp {
 
     class ThingC {
     public:
-        __declspec(dllexport) ThingC(std::string appname);
+        OPENCOMPGRAPH_SYMBOL_EXPORT ThingC(std::string appname);
 
-        __declspec(dllexport) ~ThingC();
+        OPENCOMPGRAPH_SYMBOL_EXPORT ~ThingC();
 
         std::string appname;
     };
 
-    __declspec(dllexport) std::unique_ptr <ThingC> make_thingc(rust::Str appname);
+    OPENCOMPGRAPH_SYMBOL_EXPORT std::unique_ptr <ThingC> make_thingc(rust::Str appname);
 
-    __declspec(dllexport) const std::string &get_name(const ThingC &thing);
+    OPENCOMPGRAPH_SYMBOL_EXPORT const std::string &get_name(const ThingC &thing);
 
-    __declspec(dllexport) void run_sharedthing(shared::SharedThing state);
+    OPENCOMPGRAPH_SYMBOL_EXPORT void run_sharedthing(shared::SharedThing state);
 
 } // namespace cpp
 } // namespace open_comp_graph
