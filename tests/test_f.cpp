@@ -83,8 +83,10 @@ int test_f(std::shared_ptr<ocg::Cache> cache) {
               << " size=" << pixel_buffer1.size() << '\n';
     auto width1 = stream_data1.pixel_width();
     auto height1 = stream_data1.pixel_height();
+    auto num_channels1 = stream_data1.pixel_num_channels();
     std::cout << "width1=" << width1 << '\n';
     std::cout << "height1=" << height1 << '\n';
+    std::cout << "num_channels1=" << static_cast<uint32_t>(num_channels1) << '\n';
 
     auto status2 = g.execute(write2_id, cache);
     assert(status2 == ocg::ExecuteStatus::kSuccess);
@@ -96,8 +98,10 @@ int test_f(std::shared_ptr<ocg::Cache> cache) {
               << " size=" << pixel_buffer2.size() << '\n';
     auto width2 = stream_data2.pixel_width();
     auto height2 = stream_data2.pixel_height();
+    auto num_channels2 = stream_data2.pixel_num_channels();
     std::cout << "width2=" << width2 << '\n';
     std::cout << "height2=" << height2 << '\n';
+    std::cout << "num_channels2=" << static_cast<uint32_t>(num_channels2) << '\n';
 
     auto status3 = g.execute(write3_id, cache);
     assert(status3 == ocg::ExecuteStatus::kSuccess);
@@ -109,8 +113,10 @@ int test_f(std::shared_ptr<ocg::Cache> cache) {
               << " size=" << pixel_buffer3.size() << '\n';
     auto width3 = stream_data3.pixel_width();
     auto height3 = stream_data3.pixel_height();
+    auto num_channels3 = stream_data3.pixel_num_channels();
     std::cout << "width3=" << width3 << '\n';
     std::cout << "height3=" << height3 << '\n';
+    std::cout << "num_channels3=" << static_cast<uint32_t>(num_channels3) << '\n';
 
     bench.stop();
     bench.print("Test F:");
