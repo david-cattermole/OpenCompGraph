@@ -20,18 +20,18 @@ namespace cpp {
 
     class ThingC {
     public:
-        ThingC(std::string appname);
+        __declspec(dllexport) ThingC(std::string appname);
 
-        ~ThingC();
+        __declspec(dllexport) ~ThingC();
 
         std::string appname;
     };
 
-    std::unique_ptr <ThingC> make_thingc(rust::Str appname);
+    __declspec(dllexport) std::unique_ptr <ThingC> make_thingc(rust::Str appname);
 
-    const std::string &get_name(const ThingC &thing);
+    __declspec(dllexport) const std::string &get_name(const ThingC &thing);
 
-    void run_sharedthing(shared::SharedThing state);
+    __declspec(dllexport) void run_sharedthing(shared::SharedThing state);
 
 } // namespace cpp
 } // namespace open_comp_graph

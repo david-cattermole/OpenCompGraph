@@ -9,20 +9,20 @@ namespace open_comp_graph {
 
 class StreamData {
 public:
-    StreamData() noexcept;
-    StreamData(rust::Box<internal::StreamDataImpl> box) noexcept;
-    ~StreamData();
+    __declspec(dllexport) StreamData() noexcept;
+    __declspec(dllexport) StreamData(rust::Box<internal::StreamDataImpl> box) noexcept;
+    __declspec(dllexport) ~StreamData();
 
-    rust::Box<internal::StreamDataImpl> get_box() noexcept;
-    void set_box(rust::Box<internal::StreamDataImpl> box) noexcept;
+    __declspec(dllexport) rust::Box<internal::StreamDataImpl> get_box() noexcept;
+    __declspec(dllexport) void set_box(rust::Box<internal::StreamDataImpl> box) noexcept;
 
-    StreamDataState state() noexcept;
-    uint8_t state_id() noexcept;
-    uint64_t hash() noexcept;
-    const internal::PixelBlock& pixel_block() noexcept;
-    rust::Slice<const float> pixel_buffer() noexcept;
-    uint32_t pixel_width() noexcept;
-    uint32_t pixel_height() noexcept;
+    __declspec(dllexport) StreamDataState state() noexcept;
+    __declspec(dllexport) uint8_t state_id() noexcept;
+    __declspec(dllexport) uint64_t hash() noexcept;
+    __declspec(dllexport) const internal::PixelBlock& pixel_block() noexcept;
+    __declspec(dllexport) rust::Slice<const float> pixel_buffer() noexcept;
+    __declspec(dllexport) uint32_t pixel_width() noexcept;
+    __declspec(dllexport) uint32_t pixel_height() noexcept;
 
 private:
     internal::StreamDataImplShared inner;

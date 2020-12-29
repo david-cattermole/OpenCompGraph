@@ -15,9 +15,9 @@ struct SceneGraph {
 
 extern "C" {
 
-void scene_graph_delete(SceneGraph *scene_graph_ptr);
+__declspec(dllexport) void scene_graph_delete(SceneGraph *scene_graph_ptr);
 
-SceneGraph *scene_graph_new(int id);
+__declspec(dllexport) SceneGraph *scene_graph_new(int id);
 
 } // extern "C"
 

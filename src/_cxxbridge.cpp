@@ -30,6 +30,11 @@ class impl;
 
 class String;
 
+template <typename T>
+::std::size_t size_of();
+template <typename T>
+::std::size_t align_of();
+
 #ifndef CXXBRIDGE1_RUST_STR
 #define CXXBRIDGE1_RUST_STR
 class Str final {
@@ -97,6 +102,8 @@ template <typename T>
 class Slice final
     : private detail::copy_assignable_if<std::is_const<T>::value> {
 public:
+  using value_type = T;
+
   Slice() noexcept;
   Slice(T *, std::size_t count) noexcept;
 
@@ -106,6 +113,12 @@ public:
   T *data() const noexcept;
   std::size_t size() const noexcept;
   std::size_t length() const noexcept;
+  bool empty() const noexcept;
+
+  T &operator[](std::size_t n) const noexcept;
+  T &at(std::size_t n) const;
+  T &front() const noexcept;
+  T &back() const noexcept;
 
   Slice(const Slice<T> &) noexcept = default;
   ~Slice() noexcept = default;
@@ -116,40 +129,58 @@ public:
 
 private:
   friend impl<Slice>;
-  T *ptr;
+  void *ptr;
   std::size_t len;
 };
 
 template <typename T>
 class Slice<T>::iterator final {
 public:
-  using difference_type = std::ptrdiff_t;
+  using iterator_category = std::random_access_iterator_tag;
   using value_type = T;
+  using difference_type = std::ptrdiff_t;
   using pointer = typename std::add_pointer<T>::type;
   using reference = typename std::add_lvalue_reference<T>::type;
-  using iterator_category = std::forward_iterator_tag;
 
-  T &operator*() const noexcept;
-  T *operator->() const noexcept;
+  reference operator*() const noexcept;
+  pointer operator->() const noexcept;
+  reference operator[](difference_type) const noexcept;
+
   iterator &operator++() noexcept;
   iterator operator++(int) noexcept;
+  iterator &operator--() noexcept;
+  iterator operator--(int) noexcept;
+
+  iterator &operator+=(difference_type) noexcept;
+  iterator &operator-=(difference_type) noexcept;
+  iterator operator+(difference_type) const noexcept;
+  iterator operator-(difference_type) const noexcept;
+  difference_type operator-(const iterator &) const noexcept;
+
   bool operator==(const iterator &) const noexcept;
   bool operator!=(const iterator &) const noexcept;
+  bool operator<(const iterator &) const noexcept;
+  bool operator<=(const iterator &) const noexcept;
+  bool operator>(const iterator &) const noexcept;
+  bool operator>=(const iterator &) const noexcept;
 
 private:
   friend class Slice;
-  T *pos;
+  void *pos;
+  std::size_t stride;
 };
 
 template <typename T>
-Slice<T>::Slice() noexcept : ptr(reinterpret_cast<T *>(alignof(T))), len(0) {}
+Slice<T>::Slice() noexcept
+    : ptr(reinterpret_cast<void *>(align_of<T>())), len(0) {}
 
 template <typename T>
-Slice<T>::Slice(T *s, std::size_t count) noexcept : ptr(s), len(count) {}
+Slice<T>::Slice(T *s, std::size_t count) noexcept
+    : ptr(const_cast<typename std::remove_const<T>::type *>(s)), len(count) {}
 
 template <typename T>
 T *Slice<T>::data() const noexcept {
-  return this->ptr;
+  return reinterpret_cast<T *>(this->ptr);
 }
 
 template <typename T>
@@ -163,26 +194,118 @@ std::size_t Slice<T>::length() const noexcept {
 }
 
 template <typename T>
-T &Slice<T>::iterator::operator*() const noexcept {
-  return *this->pos;
+bool Slice<T>::empty() const noexcept {
+  return this->len == 0;
 }
 
 template <typename T>
-T *Slice<T>::iterator::operator->() const noexcept {
-  return this->pos;
+T &Slice<T>::operator[](std::size_t n) const noexcept {
+  assert(n < this->size());
+  auto pos = static_cast<char *>(this->ptr) + size_of<T>() * n;
+  return *reinterpret_cast<T *>(pos);
+}
+
+template <typename T>
+T &Slice<T>::at(std::size_t n) const {
+  if (n >= this->size()) {
+    panic<std::out_of_range>("rust::Slice index out of range");
+  }
+  return (*this)[n];
+}
+
+template <typename T>
+T &Slice<T>::front() const noexcept {
+  assert(!this->empty());
+  return (*this)[0];
+}
+
+template <typename T>
+T &Slice<T>::back() const noexcept {
+  assert(!this->empty());
+  return (*this)[this->len - 1];
+}
+
+template <typename T>
+typename Slice<T>::iterator::reference
+Slice<T>::iterator::operator*() const noexcept {
+  return *static_cast<T *>(this->pos);
+}
+
+template <typename T>
+typename Slice<T>::iterator::pointer
+Slice<T>::iterator::operator->() const noexcept {
+  return static_cast<T *>(this->pos);
+}
+
+template <typename T>
+typename Slice<T>::iterator::reference Slice<T>::iterator::operator[](
+    typename Slice<T>::iterator::difference_type n) const noexcept {
+  auto pos = static_cast<char *>(this->pos) + this->stride * n;
+  return *static_cast<T *>(pos);
 }
 
 template <typename T>
 typename Slice<T>::iterator &Slice<T>::iterator::operator++() noexcept {
-  ++this->pos;
+  this->pos = static_cast<char *>(this->pos) + this->stride;
   return *this;
 }
 
 template <typename T>
 typename Slice<T>::iterator Slice<T>::iterator::operator++(int) noexcept {
   auto ret = iterator(*this);
-  ++this->pos;
+  this->pos = static_cast<char *>(this->pos) + this->stride;
   return ret;
+}
+
+template <typename T>
+typename Slice<T>::iterator &Slice<T>::iterator::operator--() noexcept {
+  this->pos = static_cast<char *>(this->pos) - this->stride;
+  return *this;
+}
+
+template <typename T>
+typename Slice<T>::iterator Slice<T>::iterator::operator--(int) noexcept {
+  auto ret = iterator(*this);
+  this->pos = static_cast<char *>(this->pos) - this->stride;
+  return ret;
+}
+
+template <typename T>
+typename Slice<T>::iterator &Slice<T>::iterator::operator+=(
+    typename Slice<T>::iterator::difference_type n) noexcept {
+  this->pos = static_cast<char *>(this->pos) + this->stride * n;
+  return *this;
+}
+
+template <typename T>
+typename Slice<T>::iterator &Slice<T>::iterator::operator-=(
+    typename Slice<T>::iterator::difference_type n) noexcept {
+  this->pos = static_cast<char *>(this->pos) - this->stride * n;
+  return *this;
+}
+
+template <typename T>
+typename Slice<T>::iterator Slice<T>::iterator::operator+(
+    typename Slice<T>::iterator::difference_type n) const noexcept {
+  auto ret = iterator(*this);
+  ret.pos = static_cast<char *>(this->pos) + this->stride * n;
+  return ret;
+}
+
+template <typename T>
+typename Slice<T>::iterator Slice<T>::iterator::operator-(
+    typename Slice<T>::iterator::difference_type n) const noexcept {
+  auto ret = iterator(*this);
+  ret.pos = static_cast<char *>(this->pos) - this->stride * n;
+  return ret;
+}
+
+template <typename T>
+typename Slice<T>::iterator::difference_type
+Slice<T>::iterator::operator-(const iterator &other) const noexcept {
+  auto diff = std::distance(static_cast<char *>(other.pos),
+                            static_cast<char *>(this->pos));
+  return diff / this->stride;
 }
 
 template <typename T>
@@ -196,16 +319,37 @@ bool Slice<T>::iterator::operator!=(const iterator &other) const noexcept {
 }
 
 template <typename T>
+bool Slice<T>::iterator::operator<(const iterator &other) const noexcept {
+  return this->pos < other.pos;
+}
+
+template <typename T>
+bool Slice<T>::iterator::operator<=(const iterator &other) const noexcept {
+  return this->pos <= other.pos;
+}
+
+template <typename T>
+bool Slice<T>::iterator::operator>(const iterator &other) const noexcept {
+  return this->pos > other.pos;
+}
+
+template <typename T>
+bool Slice<T>::iterator::operator>=(const iterator &other) const noexcept {
+  return this->pos >= other.pos;
+}
+
+template <typename T>
 typename Slice<T>::iterator Slice<T>::begin() const noexcept {
   iterator it;
   it.pos = this->ptr;
+  it.stride = size_of<T>();
   return it;
 }
 
 template <typename T>
 typename Slice<T>::iterator Slice<T>::end() const noexcept {
   iterator it = this->begin();
-  it.pos += this->len;
+  it.pos = static_cast<char *>(it.pos) + it.stride * this->len;
   return it;
 }
 #endif // CXXBRIDGE1_RUST_SLICE
@@ -215,7 +359,7 @@ typename Slice<T>::iterator Slice<T>::end() const noexcept {
 template <typename T>
 class Box final {
 public:
-  using value_type = T;
+  using element_type = T;
   using const_pointer =
       typename std::add_pointer<typename std::add_const<T>::type>::type;
   using pointer = typename std::add_pointer<T>::type;
@@ -242,6 +386,8 @@ public:
   static Box from_raw(T *) noexcept;
 
   T *into_raw() noexcept;
+
+  /* Deprecated */ using value_type = element_type;
 
 private:
   class uninit;
@@ -418,11 +564,11 @@ public:
   template <typename... Args>
   void emplace_back(Args &&... args);
 
-  class iterator;
+  using iterator = typename Slice<T>::iterator;
   iterator begin() noexcept;
   iterator end() noexcept;
 
-  using const_iterator = typename Vec<const T>::iterator;
+  using const_iterator = typename Slice<const T>::iterator;
   const_iterator begin() const noexcept;
   const_iterator end() const noexcept;
   const_iterator cbegin() const noexcept;
@@ -431,50 +577,11 @@ public:
   Vec(unsafe_bitcopy_t, const Vec &) noexcept;
 
 private:
-  static std::size_t stride() noexcept;
   void reserve_total(std::size_t cap) noexcept;
   void set_len(std::size_t len) noexcept;
   void drop() noexcept;
 
   std::array<std::uintptr_t, 3> repr;
-};
-
-template <typename T>
-class Vec<T>::iterator final {
-public:
-  using iterator_category = std::random_access_iterator_tag;
-  using value_type = T;
-  using difference_type = std::ptrdiff_t;
-  using pointer = typename std::add_pointer<T>::type;
-  using reference = typename std::add_lvalue_reference<T>::type;
-
-  reference operator*() const noexcept;
-  pointer operator->() const noexcept;
-  reference operator[](difference_type) const noexcept;
-
-  iterator &operator++() noexcept;
-  iterator operator++(int) noexcept;
-  iterator &operator--() noexcept;
-  iterator operator--(int) noexcept;
-
-  iterator &operator+=(difference_type) noexcept;
-  iterator &operator-=(difference_type) noexcept;
-  iterator operator+(difference_type) const noexcept;
-  iterator operator-(difference_type) const noexcept;
-  difference_type operator-(const iterator &) const noexcept;
-
-  bool operator==(const iterator &) const noexcept;
-  bool operator!=(const iterator &) const noexcept;
-  bool operator<(const iterator &) const noexcept;
-  bool operator>(const iterator &) const noexcept;
-  bool operator<=(const iterator &) const noexcept;
-  bool operator>=(const iterator &) const noexcept;
-
-private:
-  friend class Vec;
-  friend class Vec<typename std::remove_const<T>::type>;
-  void *pos;
-  std::size_t stride;
 };
 
 template <typename T>
@@ -532,7 +639,7 @@ template <typename T>
 const T &Vec<T>::operator[](std::size_t n) const noexcept {
   assert(n < this->size());
   auto data = reinterpret_cast<const char *>(this->data());
-  return *reinterpret_cast<const T *>(data + n * this->stride());
+  return *reinterpret_cast<const T *>(data + n * size_of<T>());
 }
 
 template <typename T>
@@ -559,7 +666,7 @@ template <typename T>
 T &Vec<T>::operator[](std::size_t n) noexcept {
   assert(n < this->size());
   auto data = reinterpret_cast<char *>(this->data());
-  return *reinterpret_cast<T *>(data + n * this->stride());
+  return *reinterpret_cast<T *>(data + n * size_of<T>());
 }
 
 template <typename T>
@@ -603,137 +710,19 @@ void Vec<T>::emplace_back(Args &&... args) {
   auto size = this->size();
   this->reserve_total(size + 1);
   ::new (reinterpret_cast<T *>(reinterpret_cast<char *>(this->data()) +
-                               size * this->stride()))
+                               size * size_of<T>()))
       T(std::forward<Args>(args)...);
   this->set_len(size + 1);
 }
 
 template <typename T>
-typename Vec<T>::iterator::reference
-Vec<T>::iterator::operator*() const noexcept {
-  return *static_cast<T *>(this->pos);
-}
-
-template <typename T>
-typename Vec<T>::iterator::pointer
-Vec<T>::iterator::operator->() const noexcept {
-  return static_cast<T *>(this->pos);
-}
-
-template <typename T>
-typename Vec<T>::iterator::reference Vec<T>::iterator::operator[](
-    typename Vec<T>::iterator::difference_type n) const noexcept {
-  auto pos = static_cast<char *>(this->pos) + this->stride * n;
-  return *static_cast<T *>(pos);
-}
-
-template <typename T>
-typename Vec<T>::iterator &Vec<T>::iterator::operator++() noexcept {
-  this->pos = static_cast<char *>(this->pos) + this->stride;
-  return *this;
-}
-
-template <typename T>
-typename Vec<T>::iterator Vec<T>::iterator::operator++(int) noexcept {
-  auto ret = iterator(*this);
-  this->pos = static_cast<char *>(this->pos) + this->stride;
-  return ret;
-}
-
-template <typename T>
-typename Vec<T>::iterator &Vec<T>::iterator::operator--() noexcept {
-  this->pos = static_cast<char *>(this->pos) - this->stride;
-  return *this;
-}
-
-template <typename T>
-typename Vec<T>::iterator Vec<T>::iterator::operator--(int) noexcept {
-  auto ret = iterator(*this);
-  this->pos = static_cast<char *>(this->pos) - this->stride;
-  return ret;
-}
-
-template <typename T>
-typename Vec<T>::iterator &Vec<T>::iterator::operator+=(
-    typename Vec<T>::iterator::difference_type n) noexcept {
-  this->pos = static_cast<char *>(this->pos) + this->stride * n;
-  return *this;
-}
-
-template <typename T>
-typename Vec<T>::iterator &Vec<T>::iterator::operator-=(
-    typename Vec<T>::iterator::difference_type n) noexcept {
-  this->pos = static_cast<char *>(this->pos) - this->stride * n;
-  return *this;
-}
-
-template <typename T>
-typename Vec<T>::iterator Vec<T>::iterator::operator+(
-    typename Vec<T>::iterator::difference_type n) const noexcept {
-  auto ret = iterator(*this);
-  ret.pos = static_cast<char *>(this->pos) + this->stride * n;
-  return ret;
-}
-
-template <typename T>
-typename Vec<T>::iterator Vec<T>::iterator::operator-(
-    typename Vec<T>::iterator::difference_type n) const noexcept {
-  auto ret = iterator(*this);
-  ret.pos = static_cast<char *>(this->pos) - this->stride * n;
-  return ret;
-}
-
-template <typename T>
-typename Vec<T>::iterator::difference_type
-Vec<T>::iterator::operator-(const iterator &other) const noexcept {
-  auto diff = std::distance(static_cast<char *>(other.pos),
-                            static_cast<char *>(this->pos));
-  return diff / this->stride;
-}
-
-template <typename T>
-bool Vec<T>::iterator::operator==(const iterator &other) const noexcept {
-  return this->pos == other.pos;
-}
-
-template <typename T>
-bool Vec<T>::iterator::operator!=(const iterator &other) const noexcept {
-  return this->pos != other.pos;
-}
-
-template <typename T>
-bool Vec<T>::iterator::operator>(const iterator &other) const noexcept {
-  return this->pos > other.pos;
-}
-
-template <typename T>
-bool Vec<T>::iterator::operator<(const iterator &other) const noexcept {
-  return this->pos < other.pos;
-}
-
-template <typename T>
-bool Vec<T>::iterator::operator>=(const iterator &other) const noexcept {
-  return this->pos >= other.pos;
-}
-
-template <typename T>
-bool Vec<T>::iterator::operator<=(const iterator &other) const noexcept {
-  return this->pos <= other.pos;
-}
-
-template <typename T>
 typename Vec<T>::iterator Vec<T>::begin() noexcept {
-  iterator it;
-  it.pos = const_cast<typename std::remove_const<T>::type *>(this->data());
-  it.stride = this->stride();
-  return it;
+  return Slice<T>(this->data(), this->size()).begin();
 }
 
 template <typename T>
 typename Vec<T>::iterator Vec<T>::end() noexcept {
-  iterator it = this->begin();
-  it.pos = static_cast<char *>(it.pos) + it.stride * this->size();
-  return it;
+  return Slice<T>(this->data(), this->size()).end();
 }
 
 template <typename T>
@@ -748,17 +737,12 @@ typename Vec<T>::const_iterator Vec<T>::end() const noexcept {
 
 template <typename T>
 typename Vec<T>::const_iterator Vec<T>::cbegin() const noexcept {
-  const_iterator it;
-  it.pos = const_cast<typename std::remove_const<T>::type *>(this->data());
-  it.stride = this->stride();
-  return it;
+  return Slice<const T>(this->data(), this->size()).begin();
 }
 
 template <typename T>
 typename Vec<T>::const_iterator Vec<T>::cend() const noexcept {
-  const_iterator it = this->cbegin();
-  it.pos = static_cast<char *>(it.pos) + it.stride * this->size();
-  return it;
+  return Slice<const T>(this->data(), this->size()).end();
 }
 
 template <typename T>
@@ -774,6 +758,74 @@ public:
   ~Opaque() = delete;
 };
 #endif // CXXBRIDGE1_RUST_OPAQUE
+
+#ifndef CXXBRIDGE1_IS_COMPLETE
+#define CXXBRIDGE1_IS_COMPLETE
+namespace detail {
+namespace {
+template <typename T, typename = std::size_t>
+struct is_complete : std::false_type {};
+template <typename T>
+struct is_complete<T, decltype(sizeof(T))> : std::true_type {};
+} // namespace
+} // namespace detail
+#endif // CXXBRIDGE1_IS_COMPLETE
+
+#ifndef CXXBRIDGE1_LAYOUT
+#define CXXBRIDGE1_LAYOUT
+class layout {
+  template <typename T>
+  friend std::size_t size_of();
+  template <typename T>
+  friend std::size_t align_of();
+  template <typename T>
+  static typename std::enable_if<std::is_base_of<Opaque, T>::value,
+                                 std::size_t>::type
+  do_size_of() {
+    return T::layout::size();
+  }
+  template <typename T>
+  static typename std::enable_if<!std::is_base_of<Opaque, T>::value,
+                                 std::size_t>::type
+  do_size_of() {
+    return sizeof(T);
+  }
+  template <typename T>
+  static
+      typename std::enable_if<detail::is_complete<T>::value, std::size_t>::type
+      size_of() {
+    return do_size_of<T>();
+  }
+  template <typename T>
+  static typename std::enable_if<std::is_base_of<Opaque, T>::value,
+                                 std::size_t>::type
+  do_align_of() {
+    return T::layout::align();
+  }
+  template <typename T>
+  static typename std::enable_if<!std::is_base_of<Opaque, T>::value,
+                                 std::size_t>::type
+  do_align_of() {
+    return alignof(T);
+  }
+  template <typename T>
+  static
+      typename std::enable_if<detail::is_complete<T>::value, std::size_t>::type
+      align_of() {
+    return do_align_of<T>();
+  }
+};
+
+template <typename T>
+std::size_t size_of() {
+  return layout::size_of<T>();
+}
+
+template <typename T>
+std::size_t align_of() {
+  return layout::align_of<T>();
+}
+#endif // CXXBRIDGE1_LAYOUT
 
 namespace detail {
 template <typename T, typename = void *>
@@ -824,12 +876,6 @@ public:
     return {static_cast<T *>(repr.ptr), repr.len};
   }
 };
-
-template <typename T, typename = ::std::size_t>
-struct is_complete : std::false_type {};
-
-template <typename T>
-struct is_complete<T, decltype(sizeof(T))> : std::true_type {};
 
 template <bool> struct deleter_if {
   template <typename T> void operator()(T *) {}
@@ -966,57 +1012,133 @@ enum class StreamDataState : ::std::uint8_t {
 #endif // CXXBRIDGE1_ENUM_open_comp_graph$StreamDataState
 
 namespace internal {
+#ifndef CXXBRIDGE1_STRUCT_open_comp_graph$internal$ThingR
+#define CXXBRIDGE1_STRUCT_open_comp_graph$internal$ThingR
+struct ThingR final : public ::rust::Opaque {
+private:
+  friend ::rust::layout;
+  struct layout {
+    static ::std::size_t size() noexcept;
+    static ::std::size_t align() noexcept;
+  };
+};
+#endif // CXXBRIDGE1_STRUCT_open_comp_graph$internal$ThingR
+
+#ifndef CXXBRIDGE1_STRUCT_open_comp_graph$internal$PixelBlock
+#define CXXBRIDGE1_STRUCT_open_comp_graph$internal$PixelBlock
+struct PixelBlock final : public ::rust::Opaque {
+private:
+  friend ::rust::layout;
+  struct layout {
+    static ::std::size_t size() noexcept;
+    static ::std::size_t align() noexcept;
+  };
+};
+#endif // CXXBRIDGE1_STRUCT_open_comp_graph$internal$PixelBlock
+
+#ifndef CXXBRIDGE1_STRUCT_open_comp_graph$internal$BoundingBox2D
+#define CXXBRIDGE1_STRUCT_open_comp_graph$internal$BoundingBox2D
+struct BoundingBox2D final : public ::rust::Opaque {
+private:
+  friend ::rust::layout;
+  struct layout {
+    static ::std::size_t size() noexcept;
+    static ::std::size_t align() noexcept;
+  };
+};
+#endif // CXXBRIDGE1_STRUCT_open_comp_graph$internal$BoundingBox2D
+
+#ifndef CXXBRIDGE1_STRUCT_open_comp_graph$internal$Matrix4
+#define CXXBRIDGE1_STRUCT_open_comp_graph$internal$Matrix4
+struct Matrix4 final : public ::rust::Opaque {
+private:
+  friend ::rust::layout;
+  struct layout {
+    static ::std::size_t size() noexcept;
+    static ::std::size_t align() noexcept;
+  };
+};
+#endif // CXXBRIDGE1_STRUCT_open_comp_graph$internal$Matrix4
+
 #ifndef CXXBRIDGE1_STRUCT_open_comp_graph$internal$StreamDataImpl
 #define CXXBRIDGE1_STRUCT_open_comp_graph$internal$StreamDataImpl
 struct StreamDataImpl final : public ::rust::Opaque {
-  ::open_comp_graph::StreamDataState get_state() const noexcept;
-  ::std::uint8_t get_state_id() const noexcept;
-  ::std::uint64_t get_hash() const noexcept;
-  const ::rust::Box<::open_comp_graph::internal::BoundingBox2D> &get_bounding_box() const noexcept;
-  const ::rust::Box<::open_comp_graph::internal::Matrix4> &get_color_matrix() const noexcept;
-  const ::rust::Box<::open_comp_graph::internal::Matrix4> &get_transform_matrix() const noexcept;
-  const ::open_comp_graph::internal::PixelBlock &get_pixel_block() const noexcept;
-  ::rust::Slice<const float> get_pixel_buffer() const noexcept;
-  ::std::uint32_t get_pixel_width() const noexcept;
-  ::std::uint32_t get_pixel_height() const noexcept;
+  __declspec(dllexport) ::open_comp_graph::StreamDataState get_state() const noexcept;
+  __declspec(dllexport) ::std::uint8_t get_state_id() const noexcept;
+  __declspec(dllexport) ::std::uint64_t get_hash() const noexcept;
+  __declspec(dllexport) const ::rust::Box<::open_comp_graph::internal::BoundingBox2D> &get_bounding_box() const noexcept;
+  __declspec(dllexport) const ::rust::Box<::open_comp_graph::internal::Matrix4> &get_color_matrix() const noexcept;
+  __declspec(dllexport) const ::rust::Box<::open_comp_graph::internal::Matrix4> &get_transform_matrix() const noexcept;
+  __declspec(dllexport) const ::open_comp_graph::internal::PixelBlock &get_pixel_block() const noexcept;
+  __declspec(dllexport) ::rust::Slice<const float> get_pixel_buffer() const noexcept;
+  __declspec(dllexport) ::std::uint32_t get_pixel_width() const noexcept;
+  __declspec(dllexport) ::std::uint32_t get_pixel_height() const noexcept;
+
+private:
+  friend ::rust::layout;
+  struct layout {
+    static ::std::size_t size() noexcept;
+    static ::std::size_t align() noexcept;
+  };
 };
 #endif // CXXBRIDGE1_STRUCT_open_comp_graph$internal$StreamDataImpl
 
 #ifndef CXXBRIDGE1_STRUCT_open_comp_graph$internal$NodeImpl
 #define CXXBRIDGE1_STRUCT_open_comp_graph$internal$NodeImpl
 struct NodeImpl final : public ::rust::Opaque {
-  ::std::uint64_t get_id() const noexcept;
-  ::open_comp_graph::NodeType get_node_type() const noexcept;
-  ::std::uint8_t get_node_type_id() const noexcept;
-  ::open_comp_graph::NodeStatus get_status() const noexcept;
-  ::std::uint8_t get_status_id() const noexcept;
-  ::std::uint64_t hash(const ::rust::Vec<::open_comp_graph::internal::StreamDataImplShared> &inputs) const noexcept;
-  ::open_comp_graph::NodeStatus compute(const ::rust::Vec<::open_comp_graph::internal::StreamDataImplShared> &inputs, ::open_comp_graph::internal::StreamDataImplShared &output) noexcept;
-  ::open_comp_graph::AttrState attr_exists(::rust::Str name) const noexcept;
-  float get_attr_f32(::rust::Str name) const noexcept;
-  ::std::int32_t get_attr_i32(::rust::Str name) const noexcept;
-  ::rust::Str get_attr_str(::rust::Str name) const noexcept;
-  void set_attr_f32(::rust::Str name, float value) noexcept;
-  void set_attr_i32(::rust::Str name, ::std::int32_t value) noexcept;
-  void set_attr_str(::rust::Str name, ::rust::Str value) noexcept;
+  __declspec(dllexport) ::std::uint64_t get_id() const noexcept;
+  __declspec(dllexport) ::open_comp_graph::NodeType get_node_type() const noexcept;
+  __declspec(dllexport) ::std::uint8_t get_node_type_id() const noexcept;
+  __declspec(dllexport) ::open_comp_graph::NodeStatus get_status() const noexcept;
+  __declspec(dllexport) ::std::uint8_t get_status_id() const noexcept;
+  __declspec(dllexport) ::std::uint64_t hash(const ::rust::Vec<::open_comp_graph::internal::StreamDataImplShared> &inputs) const noexcept;
+  __declspec(dllexport) ::open_comp_graph::NodeStatus compute(const ::rust::Vec<::open_comp_graph::internal::StreamDataImplShared> &inputs, ::open_comp_graph::internal::StreamDataImplShared &output) noexcept;
+  __declspec(dllexport) ::open_comp_graph::AttrState attr_exists(::rust::Str name) const noexcept;
+  __declspec(dllexport) float get_attr_f32(::rust::Str name) const noexcept;
+  __declspec(dllexport) ::std::int32_t get_attr_i32(::rust::Str name) const noexcept;
+  __declspec(dllexport) ::rust::Str get_attr_str(::rust::Str name) const noexcept;
+  __declspec(dllexport) void set_attr_f32(::rust::Str name, float value) noexcept;
+  __declspec(dllexport) void set_attr_i32(::rust::Str name, ::std::int32_t value) noexcept;
+  __declspec(dllexport) void set_attr_str(::rust::Str name, ::rust::Str value) noexcept;
+
+private:
+  friend ::rust::layout;
+  struct layout {
+    static ::std::size_t size() noexcept;
+    static ::std::size_t align() noexcept;
+  };
 };
 #endif // CXXBRIDGE1_STRUCT_open_comp_graph$internal$NodeImpl
 
 #ifndef CXXBRIDGE1_STRUCT_open_comp_graph$internal$CacheImpl
 #define CXXBRIDGE1_STRUCT_open_comp_graph$internal$CacheImpl
 struct CacheImpl final : public ::rust::Opaque {
-  ::std::uint64_t get_id() const noexcept;
-  ::std::size_t len() const noexcept;
+  __declspec(dllexport) ::std::uint64_t get_id() const noexcept;
+  __declspec(dllexport) ::std::size_t len() const noexcept;
+
+private:
+  friend ::rust::layout;
+  struct layout {
+    static ::std::size_t size() noexcept;
+    static ::std::size_t align() noexcept;
+  };
 };
 #endif // CXXBRIDGE1_STRUCT_open_comp_graph$internal$CacheImpl
 
 #ifndef CXXBRIDGE1_STRUCT_open_comp_graph$internal$GraphImpl
 #define CXXBRIDGE1_STRUCT_open_comp_graph$internal$GraphImpl
 struct GraphImpl final : public ::rust::Opaque {
-  ::std::size_t add_node(::rust::Box<::open_comp_graph::internal::NodeImpl> op_box) noexcept;
-  void connect(::std::size_t src_index, ::std::size_t dst_index, ::std::uint8_t input_num) noexcept;
-  ::open_comp_graph::ExecuteStatus execute(::std::size_t start_index, ::rust::Box<::open_comp_graph::internal::CacheImpl> &cache) noexcept;
-  ::open_comp_graph::internal::StreamDataImplShared output_stream() const noexcept;
+  __declspec(dllexport) ::std::size_t add_node(::rust::Box<::open_comp_graph::internal::NodeImpl> op_box) noexcept;
+  __declspec(dllexport) void connect(::std::size_t src_index, ::std::size_t dst_index, ::std::uint8_t input_num) noexcept;
+  __declspec(dllexport) ::open_comp_graph::ExecuteStatus execute(::std::size_t start_index, ::rust::Box<::open_comp_graph::internal::CacheImpl> &cache) noexcept;
+  __declspec(dllexport) ::open_comp_graph::internal::StreamDataImplShared output_stream() const noexcept;
+
+private:
+  friend ::rust::layout;
+  struct layout {
+    static ::std::size_t size() noexcept;
+    static ::std::size_t align() noexcept;
+  };
 };
 #endif // CXXBRIDGE1_STRUCT_open_comp_graph$internal$GraphImpl
 
@@ -1046,7 +1168,18 @@ __declspec(dllexport) void open_comp_graph$cpp$cxxbridge1$run_sharedthing(::open
 
 namespace internal {
 extern "C" {
+::std::size_t open_comp_graph$internal$cxxbridge1$ThingR$operator$sizeof() noexcept;
+::std::size_t open_comp_graph$internal$cxxbridge1$ThingR$operator$alignof() noexcept;
+
 void open_comp_graph$internal$cxxbridge1$print_r(const ::open_comp_graph::internal::ThingR &r) noexcept;
+::std::size_t open_comp_graph$internal$cxxbridge1$PixelBlock$operator$sizeof() noexcept;
+::std::size_t open_comp_graph$internal$cxxbridge1$PixelBlock$operator$alignof() noexcept;
+::std::size_t open_comp_graph$internal$cxxbridge1$BoundingBox2D$operator$sizeof() noexcept;
+::std::size_t open_comp_graph$internal$cxxbridge1$BoundingBox2D$operator$alignof() noexcept;
+::std::size_t open_comp_graph$internal$cxxbridge1$Matrix4$operator$sizeof() noexcept;
+::std::size_t open_comp_graph$internal$cxxbridge1$Matrix4$operator$alignof() noexcept;
+::std::size_t open_comp_graph$internal$cxxbridge1$StreamDataImpl$operator$sizeof() noexcept;
+::std::size_t open_comp_graph$internal$cxxbridge1$StreamDataImpl$operator$alignof() noexcept;
 
 ::open_comp_graph::StreamDataState open_comp_graph$internal$cxxbridge1$StreamDataImpl$get_state(const ::open_comp_graph::internal::StreamDataImpl &self) noexcept;
 
@@ -1067,6 +1200,8 @@ const ::open_comp_graph::internal::PixelBlock *open_comp_graph$internal$cxxbridg
 ::std::uint32_t open_comp_graph$internal$cxxbridge1$StreamDataImpl$get_pixel_width(const ::open_comp_graph::internal::StreamDataImpl &self) noexcept;
 
 ::std::uint32_t open_comp_graph$internal$cxxbridge1$StreamDataImpl$get_pixel_height(const ::open_comp_graph::internal::StreamDataImpl &self) noexcept;
+::std::size_t open_comp_graph$internal$cxxbridge1$NodeImpl$operator$sizeof() noexcept;
+::std::size_t open_comp_graph$internal$cxxbridge1$NodeImpl$operator$alignof() noexcept;
 
 ::std::uint64_t open_comp_graph$internal$cxxbridge1$NodeImpl$get_id(const ::open_comp_graph::internal::NodeImpl &self) noexcept;
 
@@ -1095,10 +1230,14 @@ void open_comp_graph$internal$cxxbridge1$NodeImpl$set_attr_f32(::open_comp_graph
 void open_comp_graph$internal$cxxbridge1$NodeImpl$set_attr_i32(::open_comp_graph::internal::NodeImpl &self, ::rust::repr::PtrLen name, ::std::int32_t value) noexcept;
 
 void open_comp_graph$internal$cxxbridge1$NodeImpl$set_attr_str(::open_comp_graph::internal::NodeImpl &self, ::rust::repr::PtrLen name, ::rust::repr::PtrLen value) noexcept;
+::std::size_t open_comp_graph$internal$cxxbridge1$CacheImpl$operator$sizeof() noexcept;
+::std::size_t open_comp_graph$internal$cxxbridge1$CacheImpl$operator$alignof() noexcept;
 
 ::std::uint64_t open_comp_graph$internal$cxxbridge1$CacheImpl$get_id(const ::open_comp_graph::internal::CacheImpl &self) noexcept;
 
 ::std::size_t open_comp_graph$internal$cxxbridge1$CacheImpl$len(const ::open_comp_graph::internal::CacheImpl &self) noexcept;
+::std::size_t open_comp_graph$internal$cxxbridge1$GraphImpl$operator$sizeof() noexcept;
+::std::size_t open_comp_graph$internal$cxxbridge1$GraphImpl$operator$alignof() noexcept;
 
 ::std::size_t open_comp_graph$internal$cxxbridge1$GraphImpl$add_node(::open_comp_graph::internal::GraphImpl &self, ::open_comp_graph::internal::NodeImpl *op_box) noexcept;
 
@@ -1149,199 +1288,263 @@ template <> struct hash<::open_comp_graph::internal::StreamDataImplShared> {
 
 namespace open_comp_graph {
 namespace internal {
-void print_r(const ::open_comp_graph::internal::ThingR &r) noexcept {
+::std::size_t ThingR::layout::size() noexcept {
+  return open_comp_graph$internal$cxxbridge1$ThingR$operator$sizeof();
+}
+
+::std::size_t ThingR::layout::align() noexcept {
+  return open_comp_graph$internal$cxxbridge1$ThingR$operator$alignof();
+}
+
+__declspec(dllexport) void print_r(const ::open_comp_graph::internal::ThingR &r) noexcept {
   open_comp_graph$internal$cxxbridge1$print_r(r);
 }
 
-::open_comp_graph::StreamDataState StreamDataImpl::get_state() const noexcept {
+::std::size_t PixelBlock::layout::size() noexcept {
+  return open_comp_graph$internal$cxxbridge1$PixelBlock$operator$sizeof();
+}
+
+::std::size_t PixelBlock::layout::align() noexcept {
+  return open_comp_graph$internal$cxxbridge1$PixelBlock$operator$alignof();
+}
+
+::std::size_t BoundingBox2D::layout::size() noexcept {
+  return open_comp_graph$internal$cxxbridge1$BoundingBox2D$operator$sizeof();
+}
+
+::std::size_t BoundingBox2D::layout::align() noexcept {
+  return open_comp_graph$internal$cxxbridge1$BoundingBox2D$operator$alignof();
+}
+
+::std::size_t Matrix4::layout::size() noexcept {
+  return open_comp_graph$internal$cxxbridge1$Matrix4$operator$sizeof();
+}
+
+::std::size_t Matrix4::layout::align() noexcept {
+  return open_comp_graph$internal$cxxbridge1$Matrix4$operator$alignof();
+}
+
+::std::size_t StreamDataImpl::layout::size() noexcept {
+  return open_comp_graph$internal$cxxbridge1$StreamDataImpl$operator$sizeof();
+}
+
+::std::size_t StreamDataImpl::layout::align() noexcept {
+  return open_comp_graph$internal$cxxbridge1$StreamDataImpl$operator$alignof();
+}
+
+__declspec(dllexport) ::open_comp_graph::StreamDataState StreamDataImpl::get_state() const noexcept {
   return open_comp_graph$internal$cxxbridge1$StreamDataImpl$get_state(*this);
 }
 
-::std::uint8_t StreamDataImpl::get_state_id() const noexcept {
+__declspec(dllexport) ::std::uint8_t StreamDataImpl::get_state_id() const noexcept {
   return open_comp_graph$internal$cxxbridge1$StreamDataImpl$get_state_id(*this);
 }
 
-::std::uint64_t StreamDataImpl::get_hash() const noexcept {
+__declspec(dllexport) ::std::uint64_t StreamDataImpl::get_hash() const noexcept {
   return open_comp_graph$internal$cxxbridge1$StreamDataImpl$get_hash(*this);
 }
 
-const ::rust::Box<::open_comp_graph::internal::BoundingBox2D> &StreamDataImpl::get_bounding_box() const noexcept {
+__declspec(dllexport) const ::rust::Box<::open_comp_graph::internal::BoundingBox2D> &StreamDataImpl::get_bounding_box() const noexcept {
   return *open_comp_graph$internal$cxxbridge1$StreamDataImpl$get_bounding_box(*this);
 }
 
-const ::rust::Box<::open_comp_graph::internal::Matrix4> &StreamDataImpl::get_color_matrix() const noexcept {
+__declspec(dllexport) const ::rust::Box<::open_comp_graph::internal::Matrix4> &StreamDataImpl::get_color_matrix() const noexcept {
   return *open_comp_graph$internal$cxxbridge1$StreamDataImpl$get_color_matrix(*this);
 }
 
-const ::rust::Box<::open_comp_graph::internal::Matrix4> &StreamDataImpl::get_transform_matrix() const noexcept {
+__declspec(dllexport) const ::rust::Box<::open_comp_graph::internal::Matrix4> &StreamDataImpl::get_transform_matrix() const noexcept {
   return *open_comp_graph$internal$cxxbridge1$StreamDataImpl$get_transform_matrix(*this);
 }
 
-const ::open_comp_graph::internal::PixelBlock &StreamDataImpl::get_pixel_block() const noexcept {
+__declspec(dllexport) const ::open_comp_graph::internal::PixelBlock &StreamDataImpl::get_pixel_block() const noexcept {
   return *open_comp_graph$internal$cxxbridge1$StreamDataImpl$get_pixel_block(*this);
 }
 
-::rust::Slice<const float> StreamDataImpl::get_pixel_buffer() const noexcept {
+__declspec(dllexport) ::rust::Slice<const float> StreamDataImpl::get_pixel_buffer() const noexcept {
   return ::rust::impl<::rust::Slice<const float>>::slice(open_comp_graph$internal$cxxbridge1$StreamDataImpl$get_pixel_buffer(*this));
 }
 
-::std::uint32_t StreamDataImpl::get_pixel_width() const noexcept {
+__declspec(dllexport) ::std::uint32_t StreamDataImpl::get_pixel_width() const noexcept {
   return open_comp_graph$internal$cxxbridge1$StreamDataImpl$get_pixel_width(*this);
 }
 
-::std::uint32_t StreamDataImpl::get_pixel_height() const noexcept {
+__declspec(dllexport) ::std::uint32_t StreamDataImpl::get_pixel_height() const noexcept {
   return open_comp_graph$internal$cxxbridge1$StreamDataImpl$get_pixel_height(*this);
 }
 
-::std::uint64_t NodeImpl::get_id() const noexcept {
+::std::size_t NodeImpl::layout::size() noexcept {
+  return open_comp_graph$internal$cxxbridge1$NodeImpl$operator$sizeof();
+}
+
+::std::size_t NodeImpl::layout::align() noexcept {
+  return open_comp_graph$internal$cxxbridge1$NodeImpl$operator$alignof();
+}
+
+__declspec(dllexport) ::std::uint64_t NodeImpl::get_id() const noexcept {
   return open_comp_graph$internal$cxxbridge1$NodeImpl$get_id(*this);
 }
 
-::open_comp_graph::NodeType NodeImpl::get_node_type() const noexcept {
+__declspec(dllexport) ::open_comp_graph::NodeType NodeImpl::get_node_type() const noexcept {
   return open_comp_graph$internal$cxxbridge1$NodeImpl$get_node_type(*this);
 }
 
-::std::uint8_t NodeImpl::get_node_type_id() const noexcept {
+__declspec(dllexport) ::std::uint8_t NodeImpl::get_node_type_id() const noexcept {
   return open_comp_graph$internal$cxxbridge1$NodeImpl$get_node_type_id(*this);
 }
 
-::open_comp_graph::NodeStatus NodeImpl::get_status() const noexcept {
+__declspec(dllexport) ::open_comp_graph::NodeStatus NodeImpl::get_status() const noexcept {
   return open_comp_graph$internal$cxxbridge1$NodeImpl$get_status(*this);
 }
 
-::std::uint8_t NodeImpl::get_status_id() const noexcept {
+__declspec(dllexport) ::std::uint8_t NodeImpl::get_status_id() const noexcept {
   return open_comp_graph$internal$cxxbridge1$NodeImpl$get_status_id(*this);
 }
 
-::std::uint64_t NodeImpl::hash(const ::rust::Vec<::open_comp_graph::internal::StreamDataImplShared> &inputs) const noexcept {
+__declspec(dllexport) ::std::uint64_t NodeImpl::hash(const ::rust::Vec<::open_comp_graph::internal::StreamDataImplShared> &inputs) const noexcept {
   return open_comp_graph$internal$cxxbridge1$NodeImpl$hash(*this, inputs);
 }
 
-::open_comp_graph::NodeStatus NodeImpl::compute(const ::rust::Vec<::open_comp_graph::internal::StreamDataImplShared> &inputs, ::open_comp_graph::internal::StreamDataImplShared &output) noexcept {
+__declspec(dllexport) ::open_comp_graph::NodeStatus NodeImpl::compute(const ::rust::Vec<::open_comp_graph::internal::StreamDataImplShared> &inputs, ::open_comp_graph::internal::StreamDataImplShared &output) noexcept {
   return open_comp_graph$internal$cxxbridge1$NodeImpl$compute(*this, inputs, output);
 }
 
-::open_comp_graph::AttrState NodeImpl::attr_exists(::rust::Str name) const noexcept {
+__declspec(dllexport) ::open_comp_graph::AttrState NodeImpl::attr_exists(::rust::Str name) const noexcept {
   return open_comp_graph$internal$cxxbridge1$NodeImpl$attr_exists(*this, ::rust::impl<::rust::Str>::repr(name));
 }
 
-float NodeImpl::get_attr_f32(::rust::Str name) const noexcept {
+__declspec(dllexport) float NodeImpl::get_attr_f32(::rust::Str name) const noexcept {
   return open_comp_graph$internal$cxxbridge1$NodeImpl$get_attr_f32(*this, ::rust::impl<::rust::Str>::repr(name));
 }
 
-::std::int32_t NodeImpl::get_attr_i32(::rust::Str name) const noexcept {
+__declspec(dllexport) ::std::int32_t NodeImpl::get_attr_i32(::rust::Str name) const noexcept {
   return open_comp_graph$internal$cxxbridge1$NodeImpl$get_attr_i32(*this, ::rust::impl<::rust::Str>::repr(name));
 }
 
-::rust::Str NodeImpl::get_attr_str(::rust::Str name) const noexcept {
+__declspec(dllexport) ::rust::Str NodeImpl::get_attr_str(::rust::Str name) const noexcept {
   return ::rust::impl<::rust::Str>::new_unchecked(open_comp_graph$internal$cxxbridge1$NodeImpl$get_attr_str(*this, ::rust::impl<::rust::Str>::repr(name)));
 }
 
-void NodeImpl::set_attr_f32(::rust::Str name, float value) noexcept {
+__declspec(dllexport) void NodeImpl::set_attr_f32(::rust::Str name, float value) noexcept {
   open_comp_graph$internal$cxxbridge1$NodeImpl$set_attr_f32(*this, ::rust::impl<::rust::Str>::repr(name), value);
 }
 
-void NodeImpl::set_attr_i32(::rust::Str name, ::std::int32_t value) noexcept {
+__declspec(dllexport) void NodeImpl::set_attr_i32(::rust::Str name, ::std::int32_t value) noexcept {
   open_comp_graph$internal$cxxbridge1$NodeImpl$set_attr_i32(*this, ::rust::impl<::rust::Str>::repr(name), value);
 }
 
-void NodeImpl::set_attr_str(::rust::Str name, ::rust::Str value) noexcept {
+__declspec(dllexport) void NodeImpl::set_attr_str(::rust::Str name, ::rust::Str value) noexcept {
   open_comp_graph$internal$cxxbridge1$NodeImpl$set_attr_str(*this, ::rust::impl<::rust::Str>::repr(name), ::rust::impl<::rust::Str>::repr(value));
 }
 
-::std::uint64_t CacheImpl::get_id() const noexcept {
+::std::size_t CacheImpl::layout::size() noexcept {
+  return open_comp_graph$internal$cxxbridge1$CacheImpl$operator$sizeof();
+}
+
+::std::size_t CacheImpl::layout::align() noexcept {
+  return open_comp_graph$internal$cxxbridge1$CacheImpl$operator$alignof();
+}
+
+__declspec(dllexport) ::std::uint64_t CacheImpl::get_id() const noexcept {
   return open_comp_graph$internal$cxxbridge1$CacheImpl$get_id(*this);
 }
 
-::std::size_t CacheImpl::len() const noexcept {
+__declspec(dllexport) ::std::size_t CacheImpl::len() const noexcept {
   return open_comp_graph$internal$cxxbridge1$CacheImpl$len(*this);
 }
 
-::std::size_t GraphImpl::add_node(::rust::Box<::open_comp_graph::internal::NodeImpl> op_box) noexcept {
+::std::size_t GraphImpl::layout::size() noexcept {
+  return open_comp_graph$internal$cxxbridge1$GraphImpl$operator$sizeof();
+}
+
+::std::size_t GraphImpl::layout::align() noexcept {
+  return open_comp_graph$internal$cxxbridge1$GraphImpl$operator$alignof();
+}
+
+__declspec(dllexport) ::std::size_t GraphImpl::add_node(::rust::Box<::open_comp_graph::internal::NodeImpl> op_box) noexcept {
   return open_comp_graph$internal$cxxbridge1$GraphImpl$add_node(*this, op_box.into_raw());
 }
 
-void GraphImpl::connect(::std::size_t src_index, ::std::size_t dst_index, ::std::uint8_t input_num) noexcept {
+__declspec(dllexport) void GraphImpl::connect(::std::size_t src_index, ::std::size_t dst_index, ::std::uint8_t input_num) noexcept {
   open_comp_graph$internal$cxxbridge1$GraphImpl$connect(*this, src_index, dst_index, input_num);
 }
 
-::open_comp_graph::ExecuteStatus GraphImpl::execute(::std::size_t start_index, ::rust::Box<::open_comp_graph::internal::CacheImpl> &cache) noexcept {
+__declspec(dllexport) ::open_comp_graph::ExecuteStatus GraphImpl::execute(::std::size_t start_index, ::rust::Box<::open_comp_graph::internal::CacheImpl> &cache) noexcept {
   return open_comp_graph$internal$cxxbridge1$GraphImpl$execute(*this, start_index, cache);
 }
 
-::open_comp_graph::internal::StreamDataImplShared GraphImpl::output_stream() const noexcept {
+__declspec(dllexport) ::open_comp_graph::internal::StreamDataImplShared GraphImpl::output_stream() const noexcept {
   ::rust::MaybeUninit<::open_comp_graph::internal::StreamDataImplShared> return$;
   open_comp_graph$internal$cxxbridge1$GraphImpl$output_stream(*this, &return$.value);
   return ::std::move(return$.value);
 }
 
-::rust::Box<::open_comp_graph::internal::NodeImpl> create_node_box(::open_comp_graph::NodeType node_type) noexcept {
+__declspec(dllexport) ::rust::Box<::open_comp_graph::internal::NodeImpl> create_node_box(::open_comp_graph::NodeType node_type) noexcept {
   return ::rust::Box<::open_comp_graph::internal::NodeImpl>::from_raw(open_comp_graph$internal$cxxbridge1$create_node_box(node_type));
 }
 
-::rust::Box<::open_comp_graph::internal::NodeImpl> create_node_box(::open_comp_graph::NodeType node_type, ::rust::Str name) noexcept {
+__declspec(dllexport) ::rust::Box<::open_comp_graph::internal::NodeImpl> create_node_box(::open_comp_graph::NodeType node_type, ::rust::Str name) noexcept {
   return ::rust::Box<::open_comp_graph::internal::NodeImpl>::from_raw(open_comp_graph$internal$cxxbridge1$create_node_box_with_name(node_type, ::rust::impl<::rust::Str>::repr(name)));
 }
 
-::rust::Box<::open_comp_graph::internal::NodeImpl> create_node_box(::open_comp_graph::NodeType node_type, ::std::uint64_t id) noexcept {
+__declspec(dllexport) ::rust::Box<::open_comp_graph::internal::NodeImpl> create_node_box(::open_comp_graph::NodeType node_type, ::std::uint64_t id) noexcept {
   return ::rust::Box<::open_comp_graph::internal::NodeImpl>::from_raw(open_comp_graph$internal$cxxbridge1$create_node_box_with_id(node_type, id));
 }
 
-::open_comp_graph::internal::NodeImplShared create_node_shared(::open_comp_graph::NodeType node_type) noexcept {
+__declspec(dllexport) ::open_comp_graph::internal::NodeImplShared create_node_shared(::open_comp_graph::NodeType node_type) noexcept {
   ::rust::MaybeUninit<::open_comp_graph::internal::NodeImplShared> return$;
   open_comp_graph$internal$cxxbridge1$create_node_shared(node_type, &return$.value);
   return ::std::move(return$.value);
 }
 
-::open_comp_graph::internal::NodeImplShared create_node_shared(::open_comp_graph::NodeType node_type, ::rust::Str name) noexcept {
+__declspec(dllexport) ::open_comp_graph::internal::NodeImplShared create_node_shared(::open_comp_graph::NodeType node_type, ::rust::Str name) noexcept {
   ::rust::MaybeUninit<::open_comp_graph::internal::NodeImplShared> return$;
   open_comp_graph$internal$cxxbridge1$create_node_shared_with_name(node_type, ::rust::impl<::rust::Str>::repr(name), &return$.value);
   return ::std::move(return$.value);
 }
 
-::open_comp_graph::internal::NodeImplShared create_node_shared(::open_comp_graph::NodeType node_type, ::std::uint64_t id) noexcept {
+__declspec(dllexport) ::open_comp_graph::internal::NodeImplShared create_node_shared(::open_comp_graph::NodeType node_type, ::std::uint64_t id) noexcept {
   ::rust::MaybeUninit<::open_comp_graph::internal::NodeImplShared> return$;
   open_comp_graph$internal$cxxbridge1$create_node_shared_with_id(node_type, id, &return$.value);
   return ::std::move(return$.value);
 }
 
-::rust::Box<::open_comp_graph::internal::CacheImpl> create_cache_box() noexcept {
+__declspec(dllexport) ::rust::Box<::open_comp_graph::internal::CacheImpl> create_cache_box() noexcept {
   return ::rust::Box<::open_comp_graph::internal::CacheImpl>::from_raw(open_comp_graph$internal$cxxbridge1$create_cache_box());
 }
 
-::open_comp_graph::internal::CacheImplShared create_cache_shared() noexcept {
+__declspec(dllexport) ::open_comp_graph::internal::CacheImplShared create_cache_shared() noexcept {
   ::rust::MaybeUninit<::open_comp_graph::internal::CacheImplShared> return$;
   open_comp_graph$internal$cxxbridge1$create_cache_shared(&return$.value);
   return ::std::move(return$.value);
 }
 
-::rust::Box<::open_comp_graph::internal::GraphImpl> create_graph_box() noexcept {
+__declspec(dllexport) ::rust::Box<::open_comp_graph::internal::GraphImpl> create_graph_box() noexcept {
   return ::rust::Box<::open_comp_graph::internal::GraphImpl>::from_raw(open_comp_graph$internal$cxxbridge1$create_graph_box());
 }
 
-::open_comp_graph::internal::GraphImplShared create_graph_shared() noexcept {
+__declspec(dllexport) ::open_comp_graph::internal::GraphImplShared create_graph_shared() noexcept {
   ::rust::MaybeUninit<::open_comp_graph::internal::GraphImplShared> return$;
   open_comp_graph$internal$cxxbridge1$create_graph_shared(&return$.value);
   return ::std::move(return$.value);
 }
 
-::rust::Box<::open_comp_graph::internal::StreamDataImpl> create_stream_data_box() noexcept {
+__declspec(dllexport) ::rust::Box<::open_comp_graph::internal::StreamDataImpl> create_stream_data_box() noexcept {
   return ::rust::Box<::open_comp_graph::internal::StreamDataImpl>::from_raw(open_comp_graph$internal$cxxbridge1$create_stream_data_box());
 }
 
-::open_comp_graph::internal::StreamDataImplShared create_stream_data_shared() noexcept {
+__declspec(dllexport) ::open_comp_graph::internal::StreamDataImplShared create_stream_data_shared() noexcept {
   ::rust::MaybeUninit<::open_comp_graph::internal::StreamDataImplShared> return$;
   open_comp_graph$internal$cxxbridge1$create_stream_data_shared(&return$.value);
   return ::std::move(return$.value);
 }
 
-::open_comp_graph::internal::StreamDataImplShared create_stream_data_shared_box(::rust::Box<::open_comp_graph::internal::StreamDataImpl> data) noexcept {
+__declspec(dllexport) ::open_comp_graph::internal::StreamDataImplShared create_stream_data_shared_box(::rust::Box<::open_comp_graph::internal::StreamDataImpl> data) noexcept {
   ::rust::MaybeUninit<::open_comp_graph::internal::StreamDataImplShared> return$;
   open_comp_graph$internal$cxxbridge1$create_stream_data_shared_box(data.into_raw(), &return$.value);
   return ::std::move(return$.value);
 }
 
-::rust::Vec<::open_comp_graph::internal::StreamDataImplShared> create_vec_stream_data_shared() noexcept {
+__declspec(dllexport) ::rust::Vec<::open_comp_graph::internal::StreamDataImplShared> create_vec_stream_data_shared() noexcept {
   ::rust::MaybeUninit<::rust::Vec<::open_comp_graph::internal::StreamDataImplShared>> return$;
   open_comp_graph$internal$cxxbridge1$create_vec_stream_data_shared(&return$.value);
   return ::std::move(return$.value);
@@ -1350,16 +1553,11 @@ void GraphImpl::connect(::std::size_t src_index, ::std::size_t dst_index, ::std:
 } // namespace open_comp_graph
 
 extern "C" {
-#ifndef CXXBRIDGE1_RUST_BOX_open_comp_graph$internal$ThingR
-#define CXXBRIDGE1_RUST_BOX_open_comp_graph$internal$ThingR
 ::open_comp_graph::internal::ThingR *cxxbridge1$box$open_comp_graph$internal$ThingR$alloc() noexcept;
 void cxxbridge1$box$open_comp_graph$internal$ThingR$dealloc(::open_comp_graph::internal::ThingR *) noexcept;
 void cxxbridge1$box$open_comp_graph$internal$ThingR$drop(::rust::Box<::open_comp_graph::internal::ThingR> *ptr) noexcept;
-#endif // CXXBRIDGE1_RUST_BOX_open_comp_graph$internal$ThingR
 
-#ifndef CXXBRIDGE1_UNIQUE_PTR_open_comp_graph$cpp$ThingC
-#define CXXBRIDGE1_UNIQUE_PTR_open_comp_graph$cpp$ThingC
-static_assert(::rust::is_complete<::open_comp_graph::cpp::ThingC>::value, "definition of ThingC is required");
+static_assert(::rust::detail::is_complete<::open_comp_graph::cpp::ThingC>::value, "definition of ThingC is required");
 static_assert(sizeof(::std::unique_ptr<::open_comp_graph::cpp::ThingC>) == sizeof(void *), "");
 static_assert(alignof(::std::unique_ptr<::open_comp_graph::cpp::ThingC>) == alignof(void *), "");
 void cxxbridge1$unique_ptr$open_comp_graph$cpp$ThingC$null(::std::unique_ptr<::open_comp_graph::cpp::ThingC> *ptr) noexcept {
@@ -1375,33 +1573,21 @@ const ::open_comp_graph::cpp::ThingC *cxxbridge1$unique_ptr$open_comp_graph$cpp$
   return ptr.release();
 }
 void cxxbridge1$unique_ptr$open_comp_graph$cpp$ThingC$drop(::std::unique_ptr<::open_comp_graph::cpp::ThingC> *ptr) noexcept {
-  ::rust::deleter_if<::rust::is_complete<::open_comp_graph::cpp::ThingC>::value>{}(ptr);
+  ::rust::deleter_if<::rust::detail::is_complete<::open_comp_graph::cpp::ThingC>::value>{}(ptr);
 }
-#endif // CXXBRIDGE1_UNIQUE_PTR_open_comp_graph$cpp$ThingC
 
-#ifndef CXXBRIDGE1_RUST_BOX_open_comp_graph$internal$GraphImpl
-#define CXXBRIDGE1_RUST_BOX_open_comp_graph$internal$GraphImpl
 ::open_comp_graph::internal::GraphImpl *cxxbridge1$box$open_comp_graph$internal$GraphImpl$alloc() noexcept;
 void cxxbridge1$box$open_comp_graph$internal$GraphImpl$dealloc(::open_comp_graph::internal::GraphImpl *) noexcept;
 void cxxbridge1$box$open_comp_graph$internal$GraphImpl$drop(::rust::Box<::open_comp_graph::internal::GraphImpl> *ptr) noexcept;
-#endif // CXXBRIDGE1_RUST_BOX_open_comp_graph$internal$GraphImpl
 
-#ifndef CXXBRIDGE1_RUST_BOX_open_comp_graph$internal$NodeImpl
-#define CXXBRIDGE1_RUST_BOX_open_comp_graph$internal$NodeImpl
 ::open_comp_graph::internal::NodeImpl *cxxbridge1$box$open_comp_graph$internal$NodeImpl$alloc() noexcept;
 void cxxbridge1$box$open_comp_graph$internal$NodeImpl$dealloc(::open_comp_graph::internal::NodeImpl *) noexcept;
 void cxxbridge1$box$open_comp_graph$internal$NodeImpl$drop(::rust::Box<::open_comp_graph::internal::NodeImpl> *ptr) noexcept;
-#endif // CXXBRIDGE1_RUST_BOX_open_comp_graph$internal$NodeImpl
 
-#ifndef CXXBRIDGE1_RUST_BOX_open_comp_graph$internal$StreamDataImpl
-#define CXXBRIDGE1_RUST_BOX_open_comp_graph$internal$StreamDataImpl
 ::open_comp_graph::internal::StreamDataImpl *cxxbridge1$box$open_comp_graph$internal$StreamDataImpl$alloc() noexcept;
 void cxxbridge1$box$open_comp_graph$internal$StreamDataImpl$dealloc(::open_comp_graph::internal::StreamDataImpl *) noexcept;
 void cxxbridge1$box$open_comp_graph$internal$StreamDataImpl$drop(::rust::Box<::open_comp_graph::internal::StreamDataImpl> *ptr) noexcept;
-#endif // CXXBRIDGE1_RUST_BOX_open_comp_graph$internal$StreamDataImpl
 
-#ifndef CXXBRIDGE1_RUST_VEC_open_comp_graph$internal$StreamDataImplShared
-#define CXXBRIDGE1_RUST_VEC_open_comp_graph$internal$StreamDataImplShared
 void cxxbridge1$rust_vec$open_comp_graph$internal$StreamDataImplShared$new(const ::rust::Vec<::open_comp_graph::internal::StreamDataImplShared> *ptr) noexcept;
 void cxxbridge1$rust_vec$open_comp_graph$internal$StreamDataImplShared$drop(::rust::Vec<::open_comp_graph::internal::StreamDataImplShared> *ptr) noexcept;
 ::std::size_t cxxbridge1$rust_vec$open_comp_graph$internal$StreamDataImplShared$len(const ::rust::Vec<::open_comp_graph::internal::StreamDataImplShared> *ptr) noexcept;
@@ -1409,147 +1595,132 @@ void cxxbridge1$rust_vec$open_comp_graph$internal$StreamDataImplShared$drop(::ru
 const ::open_comp_graph::internal::StreamDataImplShared *cxxbridge1$rust_vec$open_comp_graph$internal$StreamDataImplShared$data(const ::rust::Vec<::open_comp_graph::internal::StreamDataImplShared> *ptr) noexcept;
 void cxxbridge1$rust_vec$open_comp_graph$internal$StreamDataImplShared$reserve_total(::rust::Vec<::open_comp_graph::internal::StreamDataImplShared> *ptr, ::std::size_t cap) noexcept;
 void cxxbridge1$rust_vec$open_comp_graph$internal$StreamDataImplShared$set_len(::rust::Vec<::open_comp_graph::internal::StreamDataImplShared> *ptr, ::std::size_t len) noexcept;
-::std::size_t cxxbridge1$rust_vec$open_comp_graph$internal$StreamDataImplShared$stride() noexcept;
-#endif // CXXBRIDGE1_RUST_VEC_open_comp_graph$internal$StreamDataImplShared
 
-#ifndef CXXBRIDGE1_RUST_BOX_open_comp_graph$internal$CacheImpl
-#define CXXBRIDGE1_RUST_BOX_open_comp_graph$internal$CacheImpl
 ::open_comp_graph::internal::CacheImpl *cxxbridge1$box$open_comp_graph$internal$CacheImpl$alloc() noexcept;
 void cxxbridge1$box$open_comp_graph$internal$CacheImpl$dealloc(::open_comp_graph::internal::CacheImpl *) noexcept;
 void cxxbridge1$box$open_comp_graph$internal$CacheImpl$drop(::rust::Box<::open_comp_graph::internal::CacheImpl> *ptr) noexcept;
-#endif // CXXBRIDGE1_RUST_BOX_open_comp_graph$internal$CacheImpl
 
-#ifndef CXXBRIDGE1_RUST_BOX_open_comp_graph$internal$BoundingBox2D
-#define CXXBRIDGE1_RUST_BOX_open_comp_graph$internal$BoundingBox2D
 ::open_comp_graph::internal::BoundingBox2D *cxxbridge1$box$open_comp_graph$internal$BoundingBox2D$alloc() noexcept;
 void cxxbridge1$box$open_comp_graph$internal$BoundingBox2D$dealloc(::open_comp_graph::internal::BoundingBox2D *) noexcept;
 void cxxbridge1$box$open_comp_graph$internal$BoundingBox2D$drop(::rust::Box<::open_comp_graph::internal::BoundingBox2D> *ptr) noexcept;
-#endif // CXXBRIDGE1_RUST_BOX_open_comp_graph$internal$BoundingBox2D
 
-#ifndef CXXBRIDGE1_RUST_BOX_open_comp_graph$internal$Matrix4
-#define CXXBRIDGE1_RUST_BOX_open_comp_graph$internal$Matrix4
 ::open_comp_graph::internal::Matrix4 *cxxbridge1$box$open_comp_graph$internal$Matrix4$alloc() noexcept;
 void cxxbridge1$box$open_comp_graph$internal$Matrix4$dealloc(::open_comp_graph::internal::Matrix4 *) noexcept;
 void cxxbridge1$box$open_comp_graph$internal$Matrix4$drop(::rust::Box<::open_comp_graph::internal::Matrix4> *ptr) noexcept;
-#endif // CXXBRIDGE1_RUST_BOX_open_comp_graph$internal$Matrix4
 } // extern "C"
 
 namespace rust {
 inline namespace cxxbridge1 {
 template <>
-::open_comp_graph::internal::ThingR *Box<::open_comp_graph::internal::ThingR>::allocation::alloc() noexcept {
+__declspec(dllexport) ::open_comp_graph::internal::ThingR *Box<::open_comp_graph::internal::ThingR>::allocation::alloc() noexcept {
   return cxxbridge1$box$open_comp_graph$internal$ThingR$alloc();
 }
 template <>
-void Box<::open_comp_graph::internal::ThingR>::allocation::dealloc(::open_comp_graph::internal::ThingR *ptr) noexcept {
+__declspec(dllexport) void Box<::open_comp_graph::internal::ThingR>::allocation::dealloc(::open_comp_graph::internal::ThingR *ptr) noexcept {
   cxxbridge1$box$open_comp_graph$internal$ThingR$dealloc(ptr);
 }
 template <>
-void Box<::open_comp_graph::internal::ThingR>::drop() noexcept {
+__declspec(dllexport) void Box<::open_comp_graph::internal::ThingR>::drop() noexcept {
   cxxbridge1$box$open_comp_graph$internal$ThingR$drop(this);
 }
 template <>
-::open_comp_graph::internal::GraphImpl *Box<::open_comp_graph::internal::GraphImpl>::allocation::alloc() noexcept {
+__declspec(dllexport) ::open_comp_graph::internal::GraphImpl *Box<::open_comp_graph::internal::GraphImpl>::allocation::alloc() noexcept {
   return cxxbridge1$box$open_comp_graph$internal$GraphImpl$alloc();
 }
 template <>
-void Box<::open_comp_graph::internal::GraphImpl>::allocation::dealloc(::open_comp_graph::internal::GraphImpl *ptr) noexcept {
+__declspec(dllexport) void Box<::open_comp_graph::internal::GraphImpl>::allocation::dealloc(::open_comp_graph::internal::GraphImpl *ptr) noexcept {
   cxxbridge1$box$open_comp_graph$internal$GraphImpl$dealloc(ptr);
 }
 template <>
-void Box<::open_comp_graph::internal::GraphImpl>::drop() noexcept {
+__declspec(dllexport) void Box<::open_comp_graph::internal::GraphImpl>::drop() noexcept {
   cxxbridge1$box$open_comp_graph$internal$GraphImpl$drop(this);
 }
 template <>
-::open_comp_graph::internal::NodeImpl *Box<::open_comp_graph::internal::NodeImpl>::allocation::alloc() noexcept {
+__declspec(dllexport) ::open_comp_graph::internal::NodeImpl *Box<::open_comp_graph::internal::NodeImpl>::allocation::alloc() noexcept {
   return cxxbridge1$box$open_comp_graph$internal$NodeImpl$alloc();
 }
 template <>
-void Box<::open_comp_graph::internal::NodeImpl>::allocation::dealloc(::open_comp_graph::internal::NodeImpl *ptr) noexcept {
+__declspec(dllexport) void Box<::open_comp_graph::internal::NodeImpl>::allocation::dealloc(::open_comp_graph::internal::NodeImpl *ptr) noexcept {
   cxxbridge1$box$open_comp_graph$internal$NodeImpl$dealloc(ptr);
 }
 template <>
-void Box<::open_comp_graph::internal::NodeImpl>::drop() noexcept {
+__declspec(dllexport) void Box<::open_comp_graph::internal::NodeImpl>::drop() noexcept {
   cxxbridge1$box$open_comp_graph$internal$NodeImpl$drop(this);
 }
 template <>
-::open_comp_graph::internal::StreamDataImpl *Box<::open_comp_graph::internal::StreamDataImpl>::allocation::alloc() noexcept {
+__declspec(dllexport) ::open_comp_graph::internal::StreamDataImpl *Box<::open_comp_graph::internal::StreamDataImpl>::allocation::alloc() noexcept {
   return cxxbridge1$box$open_comp_graph$internal$StreamDataImpl$alloc();
 }
 template <>
-void Box<::open_comp_graph::internal::StreamDataImpl>::allocation::dealloc(::open_comp_graph::internal::StreamDataImpl *ptr) noexcept {
+__declspec(dllexport) void Box<::open_comp_graph::internal::StreamDataImpl>::allocation::dealloc(::open_comp_graph::internal::StreamDataImpl *ptr) noexcept {
   cxxbridge1$box$open_comp_graph$internal$StreamDataImpl$dealloc(ptr);
 }
 template <>
-void Box<::open_comp_graph::internal::StreamDataImpl>::drop() noexcept {
+__declspec(dllexport) void Box<::open_comp_graph::internal::StreamDataImpl>::drop() noexcept {
   cxxbridge1$box$open_comp_graph$internal$StreamDataImpl$drop(this);
 }
 template <>
-Vec<::open_comp_graph::internal::StreamDataImplShared>::Vec() noexcept {
+__declspec(dllexport) Vec<::open_comp_graph::internal::StreamDataImplShared>::Vec() noexcept {
   cxxbridge1$rust_vec$open_comp_graph$internal$StreamDataImplShared$new(this);
 }
 template <>
-void Vec<::open_comp_graph::internal::StreamDataImplShared>::drop() noexcept {
+__declspec(dllexport) void Vec<::open_comp_graph::internal::StreamDataImplShared>::drop() noexcept {
   return cxxbridge1$rust_vec$open_comp_graph$internal$StreamDataImplShared$drop(this);
 }
 template <>
-::std::size_t Vec<::open_comp_graph::internal::StreamDataImplShared>::size() const noexcept {
+__declspec(dllexport) ::std::size_t Vec<::open_comp_graph::internal::StreamDataImplShared>::size() const noexcept {
   return cxxbridge1$rust_vec$open_comp_graph$internal$StreamDataImplShared$len(this);
 }
 template <>
-::std::size_t Vec<::open_comp_graph::internal::StreamDataImplShared>::capacity() const noexcept {
+__declspec(dllexport) ::std::size_t Vec<::open_comp_graph::internal::StreamDataImplShared>::capacity() const noexcept {
   return cxxbridge1$rust_vec$open_comp_graph$internal$StreamDataImplShared$capacity(this);
 }
 template <>
-const ::open_comp_graph::internal::StreamDataImplShared *Vec<::open_comp_graph::internal::StreamDataImplShared>::data() const noexcept {
+__declspec(dllexport) const ::open_comp_graph::internal::StreamDataImplShared *Vec<::open_comp_graph::internal::StreamDataImplShared>::data() const noexcept {
   return cxxbridge1$rust_vec$open_comp_graph$internal$StreamDataImplShared$data(this);
 }
 template <>
-void Vec<::open_comp_graph::internal::StreamDataImplShared>::reserve_total(::std::size_t cap) noexcept {
+__declspec(dllexport) void Vec<::open_comp_graph::internal::StreamDataImplShared>::reserve_total(::std::size_t cap) noexcept {
   return cxxbridge1$rust_vec$open_comp_graph$internal$StreamDataImplShared$reserve_total(this, cap);
 }
 template <>
-void Vec<::open_comp_graph::internal::StreamDataImplShared>::set_len(::std::size_t len) noexcept {
+__declspec(dllexport) void Vec<::open_comp_graph::internal::StreamDataImplShared>::set_len(::std::size_t len) noexcept {
   return cxxbridge1$rust_vec$open_comp_graph$internal$StreamDataImplShared$set_len(this, len);
 }
 template <>
-::std::size_t Vec<::open_comp_graph::internal::StreamDataImplShared>::stride() noexcept {
-  return cxxbridge1$rust_vec$open_comp_graph$internal$StreamDataImplShared$stride();
-}
-template <>
-::open_comp_graph::internal::CacheImpl *Box<::open_comp_graph::internal::CacheImpl>::allocation::alloc() noexcept {
+__declspec(dllexport) ::open_comp_graph::internal::CacheImpl *Box<::open_comp_graph::internal::CacheImpl>::allocation::alloc() noexcept {
   return cxxbridge1$box$open_comp_graph$internal$CacheImpl$alloc();
 }
 template <>
-void Box<::open_comp_graph::internal::CacheImpl>::allocation::dealloc(::open_comp_graph::internal::CacheImpl *ptr) noexcept {
+__declspec(dllexport) void Box<::open_comp_graph::internal::CacheImpl>::allocation::dealloc(::open_comp_graph::internal::CacheImpl *ptr) noexcept {
   cxxbridge1$box$open_comp_graph$internal$CacheImpl$dealloc(ptr);
 }
 template <>
-void Box<::open_comp_graph::internal::CacheImpl>::drop() noexcept {
+__declspec(dllexport) void Box<::open_comp_graph::internal::CacheImpl>::drop() noexcept {
   cxxbridge1$box$open_comp_graph$internal$CacheImpl$drop(this);
 }
 template <>
-::open_comp_graph::internal::BoundingBox2D *Box<::open_comp_graph::internal::BoundingBox2D>::allocation::alloc() noexcept {
+__declspec(dllexport) ::open_comp_graph::internal::BoundingBox2D *Box<::open_comp_graph::internal::BoundingBox2D>::allocation::alloc() noexcept {
   return cxxbridge1$box$open_comp_graph$internal$BoundingBox2D$alloc();
 }
 template <>
-void Box<::open_comp_graph::internal::BoundingBox2D>::allocation::dealloc(::open_comp_graph::internal::BoundingBox2D *ptr) noexcept {
+__declspec(dllexport) void Box<::open_comp_graph::internal::BoundingBox2D>::allocation::dealloc(::open_comp_graph::internal::BoundingBox2D *ptr) noexcept {
   cxxbridge1$box$open_comp_graph$internal$BoundingBox2D$dealloc(ptr);
 }
 template <>
-void Box<::open_comp_graph::internal::BoundingBox2D>::drop() noexcept {
+__declspec(dllexport) void Box<::open_comp_graph::internal::BoundingBox2D>::drop() noexcept {
   cxxbridge1$box$open_comp_graph$internal$BoundingBox2D$drop(this);
 }
 template <>
-::open_comp_graph::internal::Matrix4 *Box<::open_comp_graph::internal::Matrix4>::allocation::alloc() noexcept {
+__declspec(dllexport) ::open_comp_graph::internal::Matrix4 *Box<::open_comp_graph::internal::Matrix4>::allocation::alloc() noexcept {
   return cxxbridge1$box$open_comp_graph$internal$Matrix4$alloc();
 }
 template <>
-void Box<::open_comp_graph::internal::Matrix4>::allocation::dealloc(::open_comp_graph::internal::Matrix4 *ptr) noexcept {
+__declspec(dllexport) void Box<::open_comp_graph::internal::Matrix4>::allocation::dealloc(::open_comp_graph::internal::Matrix4 *ptr) noexcept {
   cxxbridge1$box$open_comp_graph$internal$Matrix4$dealloc(ptr);
 }
 template <>
-void Box<::open_comp_graph::internal::Matrix4>::drop() noexcept {
+__declspec(dllexport) void Box<::open_comp_graph::internal::Matrix4>::drop() noexcept {
   cxxbridge1$box$open_comp_graph$internal$Matrix4$drop(this);
 }
 } // namespace cxxbridge1

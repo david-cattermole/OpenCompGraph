@@ -9,12 +9,12 @@ namespace open_comp_graph {
 
 class Cache {
 public:
-    Cache() noexcept;
-    ~Cache();
+    __declspec(dllexport) Cache() noexcept;
+    __declspec(dllexport) ~Cache();
 
-    rust::Box<internal::CacheImpl> get_box() noexcept;
-    void set_box(rust::Box<internal::CacheImpl> box) noexcept;
-    std::uint64_t count() noexcept;
+    __declspec(dllexport) rust::Box<internal::CacheImpl> get_box() noexcept;
+    __declspec(dllexport) void set_box(rust::Box<internal::CacheImpl> box) noexcept;
+    __declspec(dllexport) std::uint64_t count() noexcept;
 
 private:
     internal::CacheImplShared inner;

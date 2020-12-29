@@ -1,4 +1,3 @@
-
 # Expected inputs.
 set(RUST_BUILD_DIR "/path/to/rust/build/directory/" CACHE PATH
   "The path to the compiled rust directory.")
@@ -68,5 +67,3 @@ install(
   ARCHIVE DESTINATION "lib"
   LIBRARY DESTINATION "lib"
   RUNTIME DESTINATION "bin")
-
-set(opencompgraph_source_files ${opencompgraph_source_files} PARENT_SCOPE)
