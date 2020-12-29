@@ -34,8 +34,8 @@ ExecuteStatus Graph::execute(size_t start_node_index,
     return status;
 }
 
-internal::StreamDataImplShared Graph::query_stream_output() noexcept {
-    auto stream_data = this->inner.inner->query_stream_output();
+internal::StreamDataImplShared Graph::output_stream() noexcept {
+    auto stream_data = this->inner.inner->output_stream();
     return stream_data;
 }
 

@@ -160,7 +160,7 @@ impl GraphImpl {
         self.status
     }
 
-    pub fn query_stream_output(&self) -> StreamDataImplShared {
+    pub fn output_stream(&self) -> StreamDataImplShared {
         println!("Query Stream Output...");
         assert_eq!(self.status, ExecuteStatus::Success);
         self.output.clone()
