@@ -85,6 +85,10 @@ impl StreamDataImpl {
         self.pixel_block.height
     }
 
+    pub fn get_pixel_num_channels(&self) -> u8 {
+        self.pixel_block.num_channels
+    }
+
     pub fn get_color_matrix(&self) -> &Box<Matrix4> {
         &self.color_matrix
     }

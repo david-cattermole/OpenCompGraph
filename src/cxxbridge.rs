@@ -184,6 +184,7 @@ pub mod ffi {
         fn get_pixel_buffer(&self) -> &[f32];
         fn get_pixel_width(&self) -> u32;
         fn get_pixel_height(&self) -> u32;
+        fn get_pixel_num_channels(&self) -> u8;
     }
 
 

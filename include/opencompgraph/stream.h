@@ -23,6 +23,7 @@ public:
     __declspec(dllexport) rust::Slice<const float> pixel_buffer() noexcept;
     __declspec(dllexport) uint32_t pixel_width() noexcept;
     __declspec(dllexport) uint32_t pixel_height() noexcept;
+    uint8_t pixel_num_channels() noexcept;
 
 private:
     internal::StreamDataImplShared inner;

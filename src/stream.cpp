@@ -47,11 +47,17 @@ const internal::PixelBlock& StreamData::pixel_block() noexcept {
 rust::Slice<const float> StreamData::pixel_buffer() noexcept {
     return this->inner.inner->get_pixel_buffer();
 };
+
 uint32_t StreamData::pixel_width() noexcept {
     return this->inner.inner->get_pixel_width();
 };
+
 uint32_t StreamData::pixel_height() noexcept {
     return this->inner.inner->get_pixel_height();
+};
+
+uint8_t StreamData::pixel_num_channels() noexcept {
+    return this->inner.inner->get_pixel_num_channels();
 };
 
 } // namespace open_comp_graph

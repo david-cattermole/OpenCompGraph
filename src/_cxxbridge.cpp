@@ -1074,6 +1074,7 @@ struct StreamDataImpl final : public ::rust::Opaque {
   OPENCOMPGRAPH_SYMBOL_EXPORT ::rust::Slice<const float> get_pixel_buffer() const noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint32_t get_pixel_width() const noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint32_t get_pixel_height() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint8_t get_pixel_num_channels() const noexcept;
 
 private:
   friend ::rust::layout;
@@ -1201,6 +1202,8 @@ const ::open_comp_graph::internal::PixelBlock *open_comp_graph$internal$cxxbridg
 ::std::uint32_t open_comp_graph$internal$cxxbridge1$StreamDataImpl$get_pixel_width(const ::open_comp_graph::internal::StreamDataImpl &self) noexcept;
 
 ::std::uint32_t open_comp_graph$internal$cxxbridge1$StreamDataImpl$get_pixel_height(const ::open_comp_graph::internal::StreamDataImpl &self) noexcept;
+
+::std::uint8_t open_comp_graph$internal$cxxbridge1$StreamDataImpl$get_pixel_num_channels(const ::open_comp_graph::internal::StreamDataImpl &self) noexcept;
 ::std::size_t open_comp_graph$internal$cxxbridge1$NodeImpl$operator$sizeof() noexcept;
 ::std::size_t open_comp_graph$internal$cxxbridge1$NodeImpl$operator$alignof() noexcept;
 
@@ -1371,6 +1374,10 @@ OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint32_t StreamDataImpl::get_pixel_width() co
 
 OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint32_t StreamDataImpl::get_pixel_height() const noexcept {
   return open_comp_graph$internal$cxxbridge1$StreamDataImpl$get_pixel_height(*this);
+}
+
+OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint8_t StreamDataImpl::get_pixel_num_channels() const noexcept {
+  return open_comp_graph$internal$cxxbridge1$StreamDataImpl$get_pixel_num_channels(*this);
 }
 
 ::std::size_t NodeImpl::layout::size() noexcept {
