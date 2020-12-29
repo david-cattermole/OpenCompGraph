@@ -85,7 +85,7 @@ impl Compute for ReadImageCompute {
             // println!("Num Channels: {:?}", num_channels);
 
             // Convert the image to f32 values
-            let rgba_img = img.into_rgba8();
+            let rgba_img = img.into_rgb8();
             let flat_samples = rgba_img.into_flat_samples();
             let pixels: Vec<f32> = flat_samples
                 .as_slice()
