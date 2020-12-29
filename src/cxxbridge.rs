@@ -173,6 +173,8 @@ pub mod ffi {
     #[namespace = "open_comp_graph::internal"]
     extern "Rust" {
         type StreamDataImpl;
+        fn get_state(&self) -> StreamDataState;
+        fn get_state_id(&self) -> u8;
         fn get_hash(&self) -> u64;
         fn get_bounding_box(&self) -> &Box<BoundingBox2D>;
         fn get_color_matrix(&self) -> &Box<Matrix4>;

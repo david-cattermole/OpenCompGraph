@@ -16,6 +16,10 @@ public:
     rust::Box<internal::StreamDataImpl> get_box() noexcept;
     void set_box(rust::Box<internal::StreamDataImpl> box) noexcept;
 
+    StreamDataState state() noexcept;
+    uint8_t state_id() noexcept;
+    uint64_t hash() noexcept;
+
 private:
     internal::StreamDataImplShared inner;
 

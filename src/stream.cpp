@@ -27,4 +27,16 @@ void StreamData::set_box(rust::Box<internal::StreamDataImpl> box) noexcept {
     this->inner.inner = std::move(box);
 }
 
+StreamDataState StreamData::state() noexcept {
+    return this->inner.inner->get_state();
+}
+
+uint8_t StreamData::state_id() noexcept {
+    return this->inner.inner->get_state_id();
+}
+
+uint64_t StreamData::hash() noexcept {
+    return this->inner.inner->get_hash();
+}
+
 } // namespace open_comp_graph

@@ -72,6 +72,10 @@ int test_f(std::shared_ptr<ocg::Cache> cache) {
     auto status1 = g.execute(write1_id, cache);
     assert(status1 == ocg::ExecuteStatus::kSuccess);
     auto stream_data1 = g.output_stream();
+    auto state_id1 = stream_data1.state_id();
+    auto hash1 = stream_data1.hash();
+    std::cout << "state_id1=" << state_id1 << '\n';
+    std::cout << "hash1=" << hash1 << '\n';
 
     auto status2 = g.execute(write2_id, cache);
     assert(status2 == ocg::ExecuteStatus::kSuccess);
