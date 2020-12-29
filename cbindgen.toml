@@ -2,13 +2,17 @@
 language = "C++"
 
 # Options for wrapping the contents of the header:
+include_guard = "OPENCOMPGRAPH_CBINDGEN_H"
 
-# Whether to add a `#pragma once` guard 
-pragma_once = true
+# Whether to include a comment with the version of cbindgen used to
+# generate the file
+include_version = true
 
-# An optional namespace to output around the generated bindings
-# default: doesn't emit a namespace
-namespace = "open_comp_graph::cbindgen"
+# An optional list of namespaces to output around the generated bindings
+namespaces = ["open_comp_graph", "cbindgen"]
+
+# A list of headers to #include (with quotes)
+includes = ["symbol_export.h"]
 
 # Whether to make a C header C++ compatible.
 # These will wrap generated functions into a `extern "C"` block, e.g.
