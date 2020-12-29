@@ -1,6 +1,7 @@
 #include <iostream>
 #include <utility>
 #include <rust/cxx.h>
+#include <opencompgraph/_cxxbridge.h>
 #include <opencompgraph/stream.h>
 
 namespace open_comp_graph {
@@ -37,6 +38,10 @@ uint8_t StreamData::state_id() noexcept {
 
 uint64_t StreamData::hash() noexcept {
     return this->inner.inner->get_hash();
+}
+
+const internal::PixelBlock& StreamData::pixel_block() noexcept {
+    return this->inner.inner->get_pixel_block();
 }
 
 } // namespace open_comp_graph

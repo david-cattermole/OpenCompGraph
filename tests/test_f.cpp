@@ -76,14 +76,17 @@ int test_f(std::shared_ptr<ocg::Cache> cache) {
     auto hash1 = stream_data1.hash();
     std::cout << "state_id1=" << state_id1 << '\n';
     std::cout << "hash1=" << hash1 << '\n';
+    const ocg::internal::PixelBlock &pixel_block1 = stream_data1.pixel_block();
 
     auto status2 = g.execute(write2_id, cache);
     assert(status2 == ocg::ExecuteStatus::kSuccess);
     auto stream_data2 = g.output_stream();
+    const ocg::internal::PixelBlock &pixel_block2 = stream_data2.pixel_block();
 
     auto status3 = g.execute(write3_id, cache);
     assert(status3 == ocg::ExecuteStatus::kSuccess);
     auto stream_data3 = g.output_stream();
+    const ocg::internal::PixelBlock &pixel_block3 = stream_data3.pixel_block();
 
     bench.stop();
     bench.print("Test F:");

@@ -19,6 +19,7 @@ public:
     StreamDataState state() noexcept;
     uint8_t state_id() noexcept;
     uint64_t hash() noexcept;
+    const internal::PixelBlock& pixel_block() noexcept;
 
 private:
     internal::StreamDataImplShared inner;
