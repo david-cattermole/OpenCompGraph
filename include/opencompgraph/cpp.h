@@ -19,20 +19,25 @@ namespace shared {
 
 namespace cpp {
 
-    class ThingC {
-    public:
-        OPENCOMPGRAPH_SYMBOL_EXPORT ThingC(std::string appname);
+class ThingC {
+public:
+    OPENCOMPGRAPH_SYMBOL_EXPORT
+    ThingC(std::string appname);
 
-        OPENCOMPGRAPH_SYMBOL_EXPORT ~ThingC();
+    OPENCOMPGRAPH_SYMBOL_EXPORT
+    ~ThingC();
 
-        std::string appname;
-    };
+    std::string appname;
+};
 
-    OPENCOMPGRAPH_SYMBOL_EXPORT std::unique_ptr <ThingC> make_thingc(rust::Str appname);
+OPENCOMPGRAPH_SYMBOL_EXPORT
+std::unique_ptr <ThingC> make_thingc(rust::Str appname);
 
-    OPENCOMPGRAPH_SYMBOL_EXPORT const std::string &get_name(const ThingC &thing);
+OPENCOMPGRAPH_SYMBOL_EXPORT
+const std::string &get_name(const ThingC &thing);
 
-    OPENCOMPGRAPH_SYMBOL_EXPORT void run_sharedthing(shared::SharedThing state);
+OPENCOMPGRAPH_SYMBOL_EXPORT
+void run_sharedthing(shared::SharedThing state);
 
 } // namespace cpp
 } // namespace open_comp_graph

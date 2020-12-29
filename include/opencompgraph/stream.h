@@ -4,25 +4,49 @@
 #include <memory>
 #include <rust/cxx.h>
 #include <opencompgraph/_cxxbridge.h>
+#include "symbol_export.h"
 
 namespace open_comp_graph {
 
 class StreamData {
 public:
-    __declspec(dllexport) StreamData() noexcept;
-    __declspec(dllexport) StreamData(rust::Box<internal::StreamDataImpl> box) noexcept;
-    __declspec(dllexport) ~StreamData();
+    OPENCOMPGRAPH_SYMBOL_EXPORT
+    StreamData() noexcept;
 
-    __declspec(dllexport) rust::Box<internal::StreamDataImpl> get_box() noexcept;
-    __declspec(dllexport) void set_box(rust::Box<internal::StreamDataImpl> box) noexcept;
+    OPENCOMPGRAPH_SYMBOL_EXPORT
+    StreamData(rust::Box<internal::StreamDataImpl> box) noexcept;
 
-    __declspec(dllexport) StreamDataState state() noexcept;
-    __declspec(dllexport) uint8_t state_id() noexcept;
-    __declspec(dllexport) uint64_t hash() noexcept;
-    __declspec(dllexport) const internal::PixelBlock& pixel_block() noexcept;
-    __declspec(dllexport) rust::Slice<const float> pixel_buffer() noexcept;
-    __declspec(dllexport) uint32_t pixel_width() noexcept;
-    __declspec(dllexport) uint32_t pixel_height() noexcept;
+    OPENCOMPGRAPH_SYMBOL_EXPORT
+    ~StreamData();
+
+    OPENCOMPGRAPH_SYMBOL_EXPORT
+    rust::Box<internal::StreamDataImpl> get_box() noexcept;
+
+    OPENCOMPGRAPH_SYMBOL_EXPORT
+    void set_box(rust::Box<internal::StreamDataImpl> box) noexcept;
+
+    OPENCOMPGRAPH_SYMBOL_EXPORT
+    StreamDataState state() noexcept;
+
+    OPENCOMPGRAPH_SYMBOL_EXPORT
+    uint8_t state_id() noexcept;
+
+    OPENCOMPGRAPH_SYMBOL_EXPORT
+    uint64_t hash() noexcept;
+
+    OPENCOMPGRAPH_SYMBOL_EXPORT
+    const internal::PixelBlock& pixel_block() noexcept;
+
+    OPENCOMPGRAPH_SYMBOL_EXPORT
+    rust::Slice<const float> pixel_buffer() noexcept;
+
+    OPENCOMPGRAPH_SYMBOL_EXPORT
+    uint32_t pixel_width() noexcept;
+
+    OPENCOMPGRAPH_SYMBOL_EXPORT
+    uint32_t pixel_height() noexcept;
+
+    OPENCOMPGRAPH_SYMBOL_EXPORT
     uint8_t pixel_num_channels() noexcept;
 
 private:

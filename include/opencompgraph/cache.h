@@ -4,17 +4,26 @@
 #include <memory>
 #include <rust/cxx.h>
 #include <opencompgraph/_cxxbridge.h>
+#include "symbol_export.h"
 
 namespace open_comp_graph {
 
 class Cache {
 public:
-    __declspec(dllexport) Cache() noexcept;
-    __declspec(dllexport) ~Cache();
+    OPENCOMPGRAPH_SYMBOL_EXPORT
+    Cache() noexcept;
 
-    __declspec(dllexport) rust::Box<internal::CacheImpl> get_box() noexcept;
-    __declspec(dllexport) void set_box(rust::Box<internal::CacheImpl> box) noexcept;
-    __declspec(dllexport) std::uint64_t count() noexcept;
+    OPENCOMPGRAPH_SYMBOL_EXPORT
+    ~Cache();
+
+    OPENCOMPGRAPH_SYMBOL_EXPORT
+    rust::Box<internal::CacheImpl> get_box() noexcept;
+
+    OPENCOMPGRAPH_SYMBOL_EXPORT
+    void set_box(rust::Box<internal::CacheImpl> box) noexcept;
+
+    OPENCOMPGRAPH_SYMBOL_EXPORT
+    std::uint64_t count() noexcept;
 
 private:
     internal::CacheImplShared inner;

@@ -3,33 +3,54 @@
 
 #include <rust/cxx.h>
 #include <opencompgraph/_cxxbridge.h>
+#include "symbol_export.h"
 
 namespace open_comp_graph {
 
-    class Node {
-    public:
-        __declspec(dllexport) explicit Node(NodeType node_type) noexcept;
-        __declspec(dllexport) Node(NodeType node_type, const char *name) noexcept;
-        __declspec(dllexport) Node(NodeType node_type, size_t id) noexcept;
+class Node {
+public:
+    OPENCOMPGRAPH_SYMBOL_EXPORT
+    explicit Node(NodeType node_type) noexcept;
 
-        __declspec(dllexport) ~Node();
+    OPENCOMPGRAPH_SYMBOL_EXPORT
+    Node(NodeType node_type, const char *name) noexcept;
 
-        __declspec(dllexport) size_t get_id() noexcept;
-        __declspec(dllexport) rust::Box<open_comp_graph::internal::NodeImpl> get_box() noexcept;
+    OPENCOMPGRAPH_SYMBOL_EXPORT
+    Node(NodeType node_type, size_t id) noexcept;
 
-        __declspec(dllexport) AttrState attr_exists(rust::Str name) const noexcept;
+    OPENCOMPGRAPH_SYMBOL_EXPORT
+    ~Node();
 
-        __declspec(dllexport) float get_attr_f32(rust::Str name) const noexcept;
-        __declspec(dllexport) int32_t get_attr_i32(rust::Str name) const noexcept;
-        __declspec(dllexport) rust::Str get_attr_str(rust::Str name) const noexcept;
+    OPENCOMPGRAPH_SYMBOL_EXPORT
+    size_t get_id() noexcept;
 
-        __declspec(dllexport) void set_attr_f32(rust::Str name, float value) noexcept;
-        __declspec(dllexport) void set_attr_i32(rust::Str name, int32_t value) noexcept;
-        __declspec(dllexport) void set_attr_str(rust::Str name, rust::Str value) noexcept;
+    OPENCOMPGRAPH_SYMBOL_EXPORT
+    rust::Box<open_comp_graph::internal::NodeImpl> get_box() noexcept;
 
-    private:
-        internal::NodeImplShared inner;
-    };
+    OPENCOMPGRAPH_SYMBOL_EXPORT
+    AttrState attr_exists(rust::Str name) const noexcept;
+
+    OPENCOMPGRAPH_SYMBOL_EXPORT
+    float get_attr_f32(rust::Str name) const noexcept;
+
+    OPENCOMPGRAPH_SYMBOL_EXPORT
+    int32_t get_attr_i32(rust::Str name) const noexcept;
+
+    OPENCOMPGRAPH_SYMBOL_EXPORT
+    rust::Str get_attr_str(rust::Str name) const noexcept;
+
+    OPENCOMPGRAPH_SYMBOL_EXPORT
+    void set_attr_f32(rust::Str name, float value) noexcept;
+
+    OPENCOMPGRAPH_SYMBOL_EXPORT
+    void set_attr_i32(rust::Str name, int32_t value) noexcept;
+
+    OPENCOMPGRAPH_SYMBOL_EXPORT
+    void set_attr_str(rust::Str name, rust::Str value) noexcept;
+
+private:
+    internal::NodeImplShared inner;
+};
 
 } // namespace open_comp_graph
 
