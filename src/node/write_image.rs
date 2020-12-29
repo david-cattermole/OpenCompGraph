@@ -74,7 +74,7 @@ impl Compute for WriteImageCompute {
                 // Convert f32 pixel image to u8 ImageBuffer.
                 let pixels_u8: Vec<u8> = pixels
                     .iter()
-                    .map(|x| (*x as f32 / u8::max_value() as f32) as u8)
+                    .map(|x| ((*x as f32) * (u8::max_value() as f32)) as u8)
                     .collect();
                 let img: image::ImageBuffer<image::Rgb<u8>, Vec<u8>> =
                     match image::ImageBuffer::from_raw(width, height, pixels_u8) {

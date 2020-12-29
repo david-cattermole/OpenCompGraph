@@ -90,7 +90,7 @@ impl Compute for ReadImageCompute {
             let pixels: Vec<f32> = flat_samples
                 .as_slice()
                 .into_iter()
-                .map(|x| (*x as f32) * u8::max_value() as f32)
+                .map(|x| (*x as f32) / (u8::max_value() as f32))
                 .collect();
 
             let mut pixel_block = PixelBlock::new(width, height, num_channels);
