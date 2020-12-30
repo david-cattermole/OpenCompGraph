@@ -24,7 +24,7 @@ pub fn new(id: Identifier) -> NodeImpl {
     NodeImpl {
         node_type: NodeType::ReadImage,
         id,
-        op_status: NodeStatus::Uninitialized,
+        status: NodeStatus::Uninitialized,
         compute: Box::new(ReadImageCompute::new()),
         attr_block: Box::new(ReadImageAttrs::new()),
     }

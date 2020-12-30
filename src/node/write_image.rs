@@ -20,7 +20,7 @@ pub fn new(id: Identifier) -> NodeImpl {
     NodeImpl {
         node_type: NodeType::WriteImage,
         id,
-        op_status: NodeStatus::Uninitialized,
+        status: NodeStatus::Uninitialized,
         compute: Box::new(WriteImageCompute::new()),
         attr_block: Box::new(WriteImageAttrs::new()),
     }

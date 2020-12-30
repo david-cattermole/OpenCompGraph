@@ -23,7 +23,7 @@ pub mod write_image;
 pub struct NodeImpl {
     node_type: NodeType,
     id: Identifier,
-    op_status: NodeStatus,
+    status: NodeStatus,
     attr_block: Box<dyn traits::AttrBlock>,
     compute: Box<dyn traits::Compute>,
 }
@@ -44,13 +44,13 @@ impl NodeImpl {
     }
 
     pub fn get_status(&self) -> NodeStatus {
-        // println!("Node.get_status() -> {:?}", self.op_status);
-        self.op_status
+        // println!("Node.get_status() -> {:?}", self.status);
+        self.status
     }
 
     pub fn get_status_id(&self) -> u8 {
-        // println!("Node.get_status_id() -> {}", self.op_status.repr);
-        self.op_status.repr
+        // println!("Node.get_status_id() -> {}", self.status.repr);
+        self.status.repr
     }
 
     // This method is used to determine "has this node changed?

@@ -18,7 +18,7 @@ pub fn new(id: Identifier) -> NodeImpl {
     NodeImpl {
         node_type: NodeType::Grade,
         id,
-        op_status: NodeStatus::Uninitialized,
+        status: NodeStatus::Uninitialized,
         compute: Box::new(GradeCompute::new()),
         attr_block: Box::new(GradeAttrs::new()),
     }

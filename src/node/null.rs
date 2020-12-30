@@ -17,7 +17,7 @@ pub fn new(id: Identifier) -> NodeImpl {
     NodeImpl {
         node_type: NodeType::Null,
         id,
-        op_status: NodeStatus::Uninitialized,
+        status: NodeStatus::Uninitialized,
         compute: Box::new(NullCompute::new()),
         attr_block: Box::new(NullAttrs::new()),
     }
