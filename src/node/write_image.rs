@@ -1,3 +1,4 @@
+use fastapprox::faster;
 use std::path::Path;
 use std::string::String;
 
@@ -47,6 +48,16 @@ impl WriteImageAttrs {
     }
 }
 
+/// https://www.excamera.com/sphinx/article-srgb.html
+fn convert_linear_to_srgb(x: f32) -> f32 {
+    let a = 0.055;
+    if x <= 0.0031308 {
+        x * 12.92
+    } else {
+        (1.0 + a) * faster::pow(x, 1.0 / 2.4) - a
+    }
+}
+
 impl Compute for WriteImageCompute {
     fn compute(
         &mut self,
@@ -82,7 +93,7 @@ impl Compute for WriteImageCompute {
                 // Convert f32 pixel image to u8 ImageBuffer.
                 let pixels_u8: Vec<u8> = pixels
                     .iter()
-                    .map(|x| ((*x as f32) * (u8::max_value() as f32)) as u8)
+                    .map(|x| (convert_linear_to_srgb(*x as f32) * (u8::max_value() as f32)) as u8)
                     .collect();
                 let img: image::ImageBuffer<image::Rgb<u8>, Vec<u8>> =
                     match image::ImageBuffer::from_raw(width, height, pixels_u8) {

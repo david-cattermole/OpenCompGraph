@@ -1,3 +1,4 @@
+use fastapprox::faster;
 use image;
 use image::GenericImageView;
 use image::ImageBuffer;
@@ -51,6 +52,16 @@ impl ReadImageAttrs {
     }
 }
 
+/// https://www.excamera.com/sphinx/article-srgb.html
+fn convert_srgb_to_linear(x: f32) -> f32 {
+    let a: f32 = 0.055;
+    if x <= 0.04045 {
+        x * (1.0 / 12.92)
+    } else {
+        faster::pow((x + a) * (1.0 / (1.0 + a)), 2.4)
+    }
+}
+
 impl Compute for ReadImageCompute {
     fn compute(
         &mut self,
@@ -90,7 +101,7 @@ impl Compute for ReadImageCompute {
             let pixels: Vec<f32> = flat_samples
                 .as_slice()
                 .into_iter()
-                .map(|x| (*x as f32) / (u8::max_value() as f32))
+                .map(|x| convert_srgb_to_linear((*x as f32) / (u8::max_value() as f32)))
                 .collect();
 
             // Get pixel statistics
