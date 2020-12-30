@@ -1,7 +1,11 @@
-use fastapprox::faster;
+use image::RgbaImage;
+use std::collections::hash_map::DefaultHasher;
+use std::hash;
+use std::hash::Hash;
 use std::path::Path;
 use std::string::String;
 
+use crate::colorutils::convert_linear_to_srgb;
 use crate::cxxbridge::ffi::AttrState;
 use crate::cxxbridge::ffi::NodeStatus;
 use crate::cxxbridge::ffi::NodeType;
@@ -11,10 +15,6 @@ use crate::data::Identifier;
 use crate::node::traits::AttrBlock;
 use crate::node::traits::Compute;
 use crate::node::NodeImpl;
-use image::RgbaImage;
-use std::collections::hash_map::DefaultHasher;
-use std::hash;
-use std::hash::Hash;
 
 pub fn new(id: Identifier) -> NodeImpl {
     NodeImpl {
@@ -45,16 +45,6 @@ impl WriteImageAttrs {
         WriteImageAttrs {
             file_path: "".to_string(),
         }
-    }
-}
-
-/// https://www.excamera.com/sphinx/article-srgb.html
-fn convert_linear_to_srgb(x: f32) -> f32 {
-    let a = 0.055;
-    if x <= 0.0031308 {
-        x * 12.92
-    } else {
-        (1.0 + a) * faster::pow(x, 1.0 / 2.4) - a
     }
 }
 
