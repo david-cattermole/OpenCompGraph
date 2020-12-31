@@ -13,6 +13,7 @@ Graph::~Graph() {
     std::cout << "~Graph()" << '\n';
 }
 
+// TODO: Remove the Box-based node creation, users should not be doing this.
 size_t Graph::add_node(rust::Box<open_comp_graph::internal::NodeImpl> node_box) noexcept {
     auto index = this->inner.inner->add_node(std::move(node_box));
     return index;
@@ -21,6 +22,21 @@ size_t Graph::add_node(rust::Box<open_comp_graph::internal::NodeImpl> node_box) 
 size_t Graph::add_node(Node &node) noexcept {
     auto node_box = node.get_box();
     return this->inner.inner->add_node(std::move(node_box));
+}
+
+bool Graph::remove_node(Node &node) noexcept {
+    // TODO: Write this.
+    return true;
+}
+
+bool Graph::node_with_hash_exists(uint64_t hash) noexcept {
+    // TODO: Write this.
+    return false;
+}
+
+std::unique_ptr<Node> Graph::node_with_hash(uint64_t hash) noexcept {
+    // TODO: Write this.
+    return std::unique_ptr<Node>();
 }
 
 void Graph::connect(size_t src_index, size_t dst_index, uint8_t input_num) noexcept {

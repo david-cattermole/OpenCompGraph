@@ -23,6 +23,15 @@ public:
     size_t add_node(Node &node) noexcept;
 
     OPENCOMPGRAPH_SYMBOL_EXPORT
+    bool Graph::remove_node(Node &node) noexcept;
+
+    OPENCOMPGRAPH_SYMBOL_EXPORT
+    bool Graph::node_with_hash_exists(uint64_t hash) noexcept;
+
+    OPENCOMPGRAPH_SYMBOL_EXPORT
+    std::unique_ptr<Node> Graph::node_with_hash(uint64_t hash) noexcept;
+
+    OPENCOMPGRAPH_SYMBOL_EXPORT
     void connect(size_t src_index, size_t dst_index, uint8_t input_num) noexcept;
 
     OPENCOMPGRAPH_SYMBOL_EXPORT
