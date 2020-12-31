@@ -1278,6 +1278,8 @@ void open_comp_graph$internal$cxxbridge1$create_stream_data_shared(::open_comp_g
 void open_comp_graph$internal$cxxbridge1$create_stream_data_shared_box(::open_comp_graph::internal::StreamDataImpl *data, ::open_comp_graph::internal::StreamDataImplShared *return$) noexcept;
 
 void open_comp_graph$internal$cxxbridge1$create_vec_stream_data_shared(::rust::Vec<::open_comp_graph::internal::StreamDataImplShared> *return$) noexcept;
+
+::std::uint64_t open_comp_graph$internal$cxxbridge1$generate_id_from_name(::rust::repr::PtrLen name) noexcept;
 } // extern "C"
 } // namespace internal
 } // namespace open_comp_graph
@@ -1556,6 +1558,10 @@ OPENCOMPGRAPH_SYMBOL_EXPORT ::rust::Vec<::open_comp_graph::internal::StreamDataI
   ::rust::MaybeUninit<::rust::Vec<::open_comp_graph::internal::StreamDataImplShared>> return$;
   open_comp_graph$internal$cxxbridge1$create_vec_stream_data_shared(&return$.value);
   return ::std::move(return$.value);
+}
+
+OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint64_t generate_id_from_name(::rust::Str name) noexcept {
+  return open_comp_graph$internal$cxxbridge1$generate_id_from_name(::rust::impl<::rust::Str>::repr(name));
 }
 } // namespace internal
 } // namespace open_comp_graph

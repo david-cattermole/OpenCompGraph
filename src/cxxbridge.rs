@@ -187,7 +187,6 @@ pub mod ffi {
         fn get_pixel_num_channels(&self) -> u8;
     }
 
-
     // Node
     #[namespace = "open_comp_graph::internal"]
     extern "Rust" {
@@ -257,6 +256,8 @@ pub mod ffi {
         fn create_stream_data_shared() -> StreamDataImplShared;
         fn create_stream_data_shared_box(data: Box<StreamDataImpl>) -> StreamDataImplShared;
         fn create_vec_stream_data_shared() -> Vec<StreamDataImplShared>;
+
+        fn generate_id_from_name(name: &str) -> u64;
     }
 }
 
