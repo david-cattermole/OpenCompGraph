@@ -245,6 +245,7 @@ impl GraphImpl {
         for nx in sorted_node_indexes.iter().rev() {
             debug!("Compute Node Index: {:?}", nx);
 
+            // Get upstream parent inputs (so we can calculate the node hash)
             let mut inputs = Vec::<StreamDataImplShared>::new();
             let parents = self.graph.neighbors_directed(*nx, Direction::Incoming);
             for parent_node_index in parents {
@@ -264,10 +265,8 @@ impl GraphImpl {
                 }
             }
             parent_inputs = inputs.to_vec();
-
             let node_index = nx.index();
             let node = &mut self.nodes[node_index];
-            debug!("node: {:#?}", node);
             let node_hash = node.hash(&inputs);
 
             // Compute the node
