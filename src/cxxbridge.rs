@@ -32,12 +32,6 @@ pub mod ffi {
         inner: Box<GraphImpl>,
     }
 
-    #[derive(Debug)]
-    #[namespace = "open_comp_graph::internal"]
-    pub(crate) struct NodeImplShared {
-        inner: Box<NodeImpl>,
-    }
-
     #[derive(Debug, Hash, Clone)]
     #[namespace = "open_comp_graph::internal"]
     pub(crate) struct StreamDataImplShared {
@@ -224,8 +218,20 @@ pub mod ffi {
     extern "Rust" {
         type GraphImpl;
         fn add_node(&mut self, op_box: Box<NodeImpl>) -> usize;
-        fn connect(&mut self, src_index: usize, dst_index: usize, input_num: u8);
-        fn execute(&mut self, start_index: usize, cache: &mut Box<CacheImpl>) -> ExecuteStatus;
+        fn remove_node(&mut self, node_id: u64) -> bool;
+
+        fn node_attr_exists(&self, node_id: u64, name: &str) -> AttrState;
+        fn get_node_attr_f32(&self, node_id: u64, name: &str) -> f32;
+        fn get_node_attr_i32(&self, node_id: u64, name: &str) -> i32;
+        unsafe fn get_node_attr_str<'a, 'b>(&'b self, node_id: u64, name: &'a str) -> &'b str;
+        fn set_node_attr_f32(&mut self, node_id: u64, name: &str, value: f32);
+        fn set_node_attr_i32(&mut self, node_id: u64, name: &str, value: i32);
+        fn set_node_attr_str(&mut self, node_id: u64, name: &str, value: &str);
+
+        fn node_exists(&mut self, node_id: u64) -> bool;
+        // fn find_node(&mut self, node_id: u64) -> &Box<NodeImpl>;
+        fn connect(&mut self, src_node_id: u64, dst_node_id: u64, input_num: u8);
+        fn execute(&mut self, node_id: u64, cache: &mut Box<CacheImpl>) -> ExecuteStatus;
         fn output_stream(&self) -> StreamDataImplShared;
     }
 
@@ -233,18 +239,7 @@ pub mod ffi {
     #[namespace = "open_comp_graph::internal"]
     extern "Rust" {
         #[cxx_name = "create_node_box"]
-        fn create_node_box(node_type: NodeType) -> Box<NodeImpl>;
-        #[cxx_name = "create_node_box"]
-        fn create_node_box_with_name(node_type: NodeType, name: &str) -> Box<NodeImpl>;
-        #[cxx_name = "create_node_box"]
         fn create_node_box_with_id(node_type: NodeType, id: u64) -> Box<NodeImpl>;
-
-        #[cxx_name = "create_node_shared"]
-        fn create_node_shared(node_type: NodeType) -> NodeImplShared;
-        #[cxx_name = "create_node_shared"]
-        fn create_node_shared_with_name(node_type: NodeType, name: &str) -> NodeImplShared;
-        #[cxx_name = "create_node_shared"]
-        fn create_node_shared_with_id(node_type: NodeType, id: u64) -> NodeImplShared;
 
         fn create_cache_box() -> Box<CacheImpl>;
         fn create_cache_shared() -> CacheImplShared;
@@ -257,6 +252,7 @@ pub mod ffi {
         fn create_stream_data_shared_box(data: Box<StreamDataImpl>) -> StreamDataImplShared;
         fn create_vec_stream_data_shared() -> Vec<StreamDataImplShared>;
 
+        fn generate_random_id() -> u64;
         fn generate_id_from_name(name: &str) -> u64;
     }
 }
@@ -278,36 +274,9 @@ fn my_test() {
     });
 }
 
-pub fn create_node_box(node_type: ffi::NodeType) -> Box<NodeImpl> {
-    let id = generate_random_id();
-    create_node_box_with_id(node_type, id)
-}
-
-pub fn create_node_box_with_name(node_type: ffi::NodeType, name: &str) -> Box<NodeImpl> {
-    let id = generate_id_from_name(name);
-    create_node_box_with_id(node_type, id)
-}
-
 pub fn create_node_box_with_id(node_type: ffi::NodeType, id: Identifier) -> Box<NodeImpl> {
     // println!("create_node_box(node_type={:?}, id={:?})", node_type, id);
     Box::new(create_node(node_type, id))
-}
-
-fn create_node_shared(node_type: ffi::NodeType) -> ffi::NodeImplShared {
-    let id = generate_random_id();
-    create_node_shared_with_id(node_type, id)
-}
-
-fn create_node_shared_with_name(node_type: ffi::NodeType, name: &str) -> ffi::NodeImplShared {
-    let id = generate_id_from_name(name);
-    create_node_shared_with_id(node_type, id)
-}
-
-fn create_node_shared_with_id(node_type: ffi::NodeType, id: Identifier) -> ffi::NodeImplShared {
-    // println!("create_node_shared(node_type={:?}, id={:?})", node_type, id,);
-    ffi::NodeImplShared {
-        inner: create_node_box_with_id(node_type, id),
-    }
 }
 
 fn create_cache_shared() -> ffi::CacheImplShared {

@@ -6,6 +6,7 @@
 #include "test_d.h"
 #include "test_e.h"
 #include "test_f.h"
+#include "test_g.h"
 
 namespace ocg = open_comp_graph;
 
@@ -14,10 +15,11 @@ int main() {
     auto bench = ocg::internal::BenchmarkTime();
     bench.start();
 
-    // Create a cache.
+    // Create a cache for each test.
     auto cache_d = std::make_shared<ocg::Cache>();
     auto cache_e = std::make_shared<ocg::Cache>();
     auto cache_f = std::make_shared<ocg::Cache>();
+    auto cache_g = std::make_shared<ocg::Cache>();
 
     // Run tests.
     auto count = 20;
@@ -28,6 +30,7 @@ int main() {
         test_d(cache_d);
         test_e(cache_e);
         test_f(cache_f);
+        test_g(cache_g);
     }
 
     bench.stop();
@@ -36,6 +39,7 @@ int main() {
     std::cout << "CacheD Count: " << cache_d->count() << '\n';
     std::cout << "CacheE Count: " << cache_e->count() << '\n';
     std::cout << "CacheF Count: " << cache_f->count() << '\n';
+    std::cout << "CacheG Count: " << cache_g->count() << '\n';
     std::cout << "Completed Tests!" << std::endl;
 
     return 0;

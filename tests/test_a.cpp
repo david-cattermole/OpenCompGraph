@@ -4,7 +4,7 @@
 namespace ocg = open_comp_graph;
 
 int test_a() {
-    std::cout << "====================================== test_a()" << '\n';
+    std::cout << "=========================================== test_a()" << '\n';
     auto bench = ocg::internal::BenchmarkTime();
 
     int scene_id = 42;

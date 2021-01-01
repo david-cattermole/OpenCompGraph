@@ -9,7 +9,9 @@ add_executable(${target_test_exe}
   ${CMAKE_CURRENT_SOURCE_DIR}/test_c.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/test_d.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/test_e.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/test_f.cpp)
+  ${CMAKE_CURRENT_SOURCE_DIR}/test_f.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/test_g.cpp
+  )
 target_link_libraries(${target_test_exe} ${target_lib})
 target_include_directories(${target_test_exe}
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../include/

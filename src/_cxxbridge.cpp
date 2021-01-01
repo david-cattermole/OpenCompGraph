@@ -900,7 +900,6 @@ namespace open_comp_graph {
   }
   namespace internal {
     struct GraphImplShared;
-    struct NodeImplShared;
     struct StreamDataImplShared;
     struct CacheImplShared;
     struct ThingR;
@@ -940,15 +939,6 @@ struct GraphImplShared final {
   using IsRelocatable = ::std::true_type;
 };
 #endif // CXXBRIDGE1_STRUCT_open_comp_graph$internal$GraphImplShared
-
-#ifndef CXXBRIDGE1_STRUCT_open_comp_graph$internal$NodeImplShared
-#define CXXBRIDGE1_STRUCT_open_comp_graph$internal$NodeImplShared
-struct NodeImplShared final {
-  ::rust::Box<::open_comp_graph::internal::NodeImpl> inner;
-
-  using IsRelocatable = ::std::true_type;
-};
-#endif // CXXBRIDGE1_STRUCT_open_comp_graph$internal$NodeImplShared
 
 #ifndef CXXBRIDGE1_STRUCT_open_comp_graph$internal$StreamDataImplShared
 #define CXXBRIDGE1_STRUCT_open_comp_graph$internal$StreamDataImplShared
@@ -1131,8 +1121,17 @@ private:
 #define CXXBRIDGE1_STRUCT_open_comp_graph$internal$GraphImpl
 struct GraphImpl final : public ::rust::Opaque {
   OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t add_node(::rust::Box<::open_comp_graph::internal::NodeImpl> op_box) noexcept;
-  OPENCOMPGRAPH_SYMBOL_EXPORT void connect(::std::size_t src_index, ::std::size_t dst_index, ::std::uint8_t input_num) noexcept;
-  OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::ExecuteStatus execute(::std::size_t start_index, ::rust::Box<::open_comp_graph::internal::CacheImpl> &cache) noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT bool remove_node(::std::uint64_t node_id) noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::AttrState node_attr_exists(::std::uint64_t node_id, ::rust::Str name) const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT float get_node_attr_f32(::std::uint64_t node_id, ::rust::Str name) const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::std::int32_t get_node_attr_i32(::std::uint64_t node_id, ::rust::Str name) const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::rust::Str get_node_attr_str(::std::uint64_t node_id, ::rust::Str name) const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT void set_node_attr_f32(::std::uint64_t node_id, ::rust::Str name, float value) noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT void set_node_attr_i32(::std::uint64_t node_id, ::rust::Str name, ::std::int32_t value) noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT void set_node_attr_str(::std::uint64_t node_id, ::rust::Str name, ::rust::Str value) noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT bool node_exists(::std::uint64_t node_id) noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT void connect(::std::uint64_t src_node_id, ::std::uint64_t dst_node_id, ::std::uint8_t input_num) noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::ExecuteStatus execute(::std::uint64_t node_id, ::rust::Box<::open_comp_graph::internal::CacheImpl> &cache) noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::internal::StreamDataImplShared output_stream() const noexcept;
 
 private:
@@ -1245,23 +1244,31 @@ void open_comp_graph$internal$cxxbridge1$NodeImpl$set_attr_str(::open_comp_graph
 
 ::std::size_t open_comp_graph$internal$cxxbridge1$GraphImpl$add_node(::open_comp_graph::internal::GraphImpl &self, ::open_comp_graph::internal::NodeImpl *op_box) noexcept;
 
-void open_comp_graph$internal$cxxbridge1$GraphImpl$connect(::open_comp_graph::internal::GraphImpl &self, ::std::size_t src_index, ::std::size_t dst_index, ::std::uint8_t input_num) noexcept;
+bool open_comp_graph$internal$cxxbridge1$GraphImpl$remove_node(::open_comp_graph::internal::GraphImpl &self, ::std::uint64_t node_id) noexcept;
 
-::open_comp_graph::ExecuteStatus open_comp_graph$internal$cxxbridge1$GraphImpl$execute(::open_comp_graph::internal::GraphImpl &self, ::std::size_t start_index, ::rust::Box<::open_comp_graph::internal::CacheImpl> &cache) noexcept;
+::open_comp_graph::AttrState open_comp_graph$internal$cxxbridge1$GraphImpl$node_attr_exists(const ::open_comp_graph::internal::GraphImpl &self, ::std::uint64_t node_id, ::rust::repr::PtrLen name) noexcept;
+
+float open_comp_graph$internal$cxxbridge1$GraphImpl$get_node_attr_f32(const ::open_comp_graph::internal::GraphImpl &self, ::std::uint64_t node_id, ::rust::repr::PtrLen name) noexcept;
+
+::std::int32_t open_comp_graph$internal$cxxbridge1$GraphImpl$get_node_attr_i32(const ::open_comp_graph::internal::GraphImpl &self, ::std::uint64_t node_id, ::rust::repr::PtrLen name) noexcept;
+
+::rust::repr::PtrLen open_comp_graph$internal$cxxbridge1$GraphImpl$get_node_attr_str(const ::open_comp_graph::internal::GraphImpl &self, ::std::uint64_t node_id, ::rust::repr::PtrLen name) noexcept;
+
+void open_comp_graph$internal$cxxbridge1$GraphImpl$set_node_attr_f32(::open_comp_graph::internal::GraphImpl &self, ::std::uint64_t node_id, ::rust::repr::PtrLen name, float value) noexcept;
+
+void open_comp_graph$internal$cxxbridge1$GraphImpl$set_node_attr_i32(::open_comp_graph::internal::GraphImpl &self, ::std::uint64_t node_id, ::rust::repr::PtrLen name, ::std::int32_t value) noexcept;
+
+void open_comp_graph$internal$cxxbridge1$GraphImpl$set_node_attr_str(::open_comp_graph::internal::GraphImpl &self, ::std::uint64_t node_id, ::rust::repr::PtrLen name, ::rust::repr::PtrLen value) noexcept;
+
+bool open_comp_graph$internal$cxxbridge1$GraphImpl$node_exists(::open_comp_graph::internal::GraphImpl &self, ::std::uint64_t node_id) noexcept;
+
+void open_comp_graph$internal$cxxbridge1$GraphImpl$connect(::open_comp_graph::internal::GraphImpl &self, ::std::uint64_t src_node_id, ::std::uint64_t dst_node_id, ::std::uint8_t input_num) noexcept;
+
+::open_comp_graph::ExecuteStatus open_comp_graph$internal$cxxbridge1$GraphImpl$execute(::open_comp_graph::internal::GraphImpl &self, ::std::uint64_t node_id, ::rust::Box<::open_comp_graph::internal::CacheImpl> &cache) noexcept;
 
 void open_comp_graph$internal$cxxbridge1$GraphImpl$output_stream(const ::open_comp_graph::internal::GraphImpl &self, ::open_comp_graph::internal::StreamDataImplShared *return$) noexcept;
 
-::open_comp_graph::internal::NodeImpl *open_comp_graph$internal$cxxbridge1$create_node_box(::open_comp_graph::NodeType node_type) noexcept;
-
-::open_comp_graph::internal::NodeImpl *open_comp_graph$internal$cxxbridge1$create_node_box_with_name(::open_comp_graph::NodeType node_type, ::rust::repr::PtrLen name) noexcept;
-
 ::open_comp_graph::internal::NodeImpl *open_comp_graph$internal$cxxbridge1$create_node_box_with_id(::open_comp_graph::NodeType node_type, ::std::uint64_t id) noexcept;
-
-void open_comp_graph$internal$cxxbridge1$create_node_shared(::open_comp_graph::NodeType node_type, ::open_comp_graph::internal::NodeImplShared *return$) noexcept;
-
-void open_comp_graph$internal$cxxbridge1$create_node_shared_with_name(::open_comp_graph::NodeType node_type, ::rust::repr::PtrLen name, ::open_comp_graph::internal::NodeImplShared *return$) noexcept;
-
-void open_comp_graph$internal$cxxbridge1$create_node_shared_with_id(::open_comp_graph::NodeType node_type, ::std::uint64_t id, ::open_comp_graph::internal::NodeImplShared *return$) noexcept;
 
 ::open_comp_graph::internal::CacheImpl *open_comp_graph$internal$cxxbridge1$create_cache_box() noexcept;
 
@@ -1278,6 +1285,8 @@ void open_comp_graph$internal$cxxbridge1$create_stream_data_shared(::open_comp_g
 void open_comp_graph$internal$cxxbridge1$create_stream_data_shared_box(::open_comp_graph::internal::StreamDataImpl *data, ::open_comp_graph::internal::StreamDataImplShared *return$) noexcept;
 
 void open_comp_graph$internal$cxxbridge1$create_vec_stream_data_shared(::rust::Vec<::open_comp_graph::internal::StreamDataImplShared> *return$) noexcept;
+
+::std::uint64_t open_comp_graph$internal$cxxbridge1$generate_random_id() noexcept;
 
 ::std::uint64_t open_comp_graph$internal$cxxbridge1$generate_id_from_name(::rust::repr::PtrLen name) noexcept;
 } // extern "C"
@@ -1474,12 +1483,48 @@ OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t GraphImpl::add_node(::rust::Box<::open
   return open_comp_graph$internal$cxxbridge1$GraphImpl$add_node(*this, op_box.into_raw());
 }
 
-OPENCOMPGRAPH_SYMBOL_EXPORT void GraphImpl::connect(::std::size_t src_index, ::std::size_t dst_index, ::std::uint8_t input_num) noexcept {
-  open_comp_graph$internal$cxxbridge1$GraphImpl$connect(*this, src_index, dst_index, input_num);
+OPENCOMPGRAPH_SYMBOL_EXPORT bool GraphImpl::remove_node(::std::uint64_t node_id) noexcept {
+  return open_comp_graph$internal$cxxbridge1$GraphImpl$remove_node(*this, node_id);
 }
 
-OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::ExecuteStatus GraphImpl::execute(::std::size_t start_index, ::rust::Box<::open_comp_graph::internal::CacheImpl> &cache) noexcept {
-  return open_comp_graph$internal$cxxbridge1$GraphImpl$execute(*this, start_index, cache);
+OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::AttrState GraphImpl::node_attr_exists(::std::uint64_t node_id, ::rust::Str name) const noexcept {
+  return open_comp_graph$internal$cxxbridge1$GraphImpl$node_attr_exists(*this, node_id, ::rust::impl<::rust::Str>::repr(name));
+}
+
+OPENCOMPGRAPH_SYMBOL_EXPORT float GraphImpl::get_node_attr_f32(::std::uint64_t node_id, ::rust::Str name) const noexcept {
+  return open_comp_graph$internal$cxxbridge1$GraphImpl$get_node_attr_f32(*this, node_id, ::rust::impl<::rust::Str>::repr(name));
+}
+
+OPENCOMPGRAPH_SYMBOL_EXPORT ::std::int32_t GraphImpl::get_node_attr_i32(::std::uint64_t node_id, ::rust::Str name) const noexcept {
+  return open_comp_graph$internal$cxxbridge1$GraphImpl$get_node_attr_i32(*this, node_id, ::rust::impl<::rust::Str>::repr(name));
+}
+
+OPENCOMPGRAPH_SYMBOL_EXPORT ::rust::Str GraphImpl::get_node_attr_str(::std::uint64_t node_id, ::rust::Str name) const noexcept {
+  return ::rust::impl<::rust::Str>::new_unchecked(open_comp_graph$internal$cxxbridge1$GraphImpl$get_node_attr_str(*this, node_id, ::rust::impl<::rust::Str>::repr(name)));
+}
+
+OPENCOMPGRAPH_SYMBOL_EXPORT void GraphImpl::set_node_attr_f32(::std::uint64_t node_id, ::rust::Str name, float value) noexcept {
+  open_comp_graph$internal$cxxbridge1$GraphImpl$set_node_attr_f32(*this, node_id, ::rust::impl<::rust::Str>::repr(name), value);
+}
+
+OPENCOMPGRAPH_SYMBOL_EXPORT void GraphImpl::set_node_attr_i32(::std::uint64_t node_id, ::rust::Str name, ::std::int32_t value) noexcept {
+  open_comp_graph$internal$cxxbridge1$GraphImpl$set_node_attr_i32(*this, node_id, ::rust::impl<::rust::Str>::repr(name), value);
+}
+
+OPENCOMPGRAPH_SYMBOL_EXPORT void GraphImpl::set_node_attr_str(::std::uint64_t node_id, ::rust::Str name, ::rust::Str value) noexcept {
+  open_comp_graph$internal$cxxbridge1$GraphImpl$set_node_attr_str(*this, node_id, ::rust::impl<::rust::Str>::repr(name), ::rust::impl<::rust::Str>::repr(value));
+}
+
+OPENCOMPGRAPH_SYMBOL_EXPORT bool GraphImpl::node_exists(::std::uint64_t node_id) noexcept {
+  return open_comp_graph$internal$cxxbridge1$GraphImpl$node_exists(*this, node_id);
+}
+
+OPENCOMPGRAPH_SYMBOL_EXPORT void GraphImpl::connect(::std::uint64_t src_node_id, ::std::uint64_t dst_node_id, ::std::uint8_t input_num) noexcept {
+  open_comp_graph$internal$cxxbridge1$GraphImpl$connect(*this, src_node_id, dst_node_id, input_num);
+}
+
+OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::ExecuteStatus GraphImpl::execute(::std::uint64_t node_id, ::rust::Box<::open_comp_graph::internal::CacheImpl> &cache) noexcept {
+  return open_comp_graph$internal$cxxbridge1$GraphImpl$execute(*this, node_id, cache);
 }
 
 OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::internal::StreamDataImplShared GraphImpl::output_stream() const noexcept {
@@ -1488,34 +1533,8 @@ OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::internal::StreamDataImplShared Gr
   return ::std::move(return$.value);
 }
 
-OPENCOMPGRAPH_SYMBOL_EXPORT ::rust::Box<::open_comp_graph::internal::NodeImpl> create_node_box(::open_comp_graph::NodeType node_type) noexcept {
-  return ::rust::Box<::open_comp_graph::internal::NodeImpl>::from_raw(open_comp_graph$internal$cxxbridge1$create_node_box(node_type));
-}
-
-OPENCOMPGRAPH_SYMBOL_EXPORT ::rust::Box<::open_comp_graph::internal::NodeImpl> create_node_box(::open_comp_graph::NodeType node_type, ::rust::Str name) noexcept {
-  return ::rust::Box<::open_comp_graph::internal::NodeImpl>::from_raw(open_comp_graph$internal$cxxbridge1$create_node_box_with_name(node_type, ::rust::impl<::rust::Str>::repr(name)));
-}
-
 OPENCOMPGRAPH_SYMBOL_EXPORT ::rust::Box<::open_comp_graph::internal::NodeImpl> create_node_box(::open_comp_graph::NodeType node_type, ::std::uint64_t id) noexcept {
   return ::rust::Box<::open_comp_graph::internal::NodeImpl>::from_raw(open_comp_graph$internal$cxxbridge1$create_node_box_with_id(node_type, id));
-}
-
-OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::internal::NodeImplShared create_node_shared(::open_comp_graph::NodeType node_type) noexcept {
-  ::rust::MaybeUninit<::open_comp_graph::internal::NodeImplShared> return$;
-  open_comp_graph$internal$cxxbridge1$create_node_shared(node_type, &return$.value);
-  return ::std::move(return$.value);
-}
-
-OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::internal::NodeImplShared create_node_shared(::open_comp_graph::NodeType node_type, ::rust::Str name) noexcept {
-  ::rust::MaybeUninit<::open_comp_graph::internal::NodeImplShared> return$;
-  open_comp_graph$internal$cxxbridge1$create_node_shared_with_name(node_type, ::rust::impl<::rust::Str>::repr(name), &return$.value);
-  return ::std::move(return$.value);
-}
-
-OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::internal::NodeImplShared create_node_shared(::open_comp_graph::NodeType node_type, ::std::uint64_t id) noexcept {
-  ::rust::MaybeUninit<::open_comp_graph::internal::NodeImplShared> return$;
-  open_comp_graph$internal$cxxbridge1$create_node_shared_with_id(node_type, id, &return$.value);
-  return ::std::move(return$.value);
 }
 
 OPENCOMPGRAPH_SYMBOL_EXPORT ::rust::Box<::open_comp_graph::internal::CacheImpl> create_cache_box() noexcept {
@@ -1560,6 +1579,10 @@ OPENCOMPGRAPH_SYMBOL_EXPORT ::rust::Vec<::open_comp_graph::internal::StreamDataI
   return ::std::move(return$.value);
 }
 
+OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint64_t generate_random_id() noexcept {
+  return open_comp_graph$internal$cxxbridge1$generate_random_id();
+}
+
 OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint64_t generate_id_from_name(::rust::Str name) noexcept {
   return open_comp_graph$internal$cxxbridge1$generate_id_from_name(::rust::impl<::rust::Str>::repr(name));
 }
@@ -1594,10 +1617,6 @@ void cxxbridge1$unique_ptr$open_comp_graph$cpp$ThingC$drop(::std::unique_ptr<::o
 void cxxbridge1$box$open_comp_graph$internal$GraphImpl$dealloc(::open_comp_graph::internal::GraphImpl *) noexcept;
 void cxxbridge1$box$open_comp_graph$internal$GraphImpl$drop(::rust::Box<::open_comp_graph::internal::GraphImpl> *ptr) noexcept;
 
-::open_comp_graph::internal::NodeImpl *cxxbridge1$box$open_comp_graph$internal$NodeImpl$alloc() noexcept;
-void cxxbridge1$box$open_comp_graph$internal$NodeImpl$dealloc(::open_comp_graph::internal::NodeImpl *) noexcept;
-void cxxbridge1$box$open_comp_graph$internal$NodeImpl$drop(::rust::Box<::open_comp_graph::internal::NodeImpl> *ptr) noexcept;
-
 ::open_comp_graph::internal::StreamDataImpl *cxxbridge1$box$open_comp_graph$internal$StreamDataImpl$alloc() noexcept;
 void cxxbridge1$box$open_comp_graph$internal$StreamDataImpl$dealloc(::open_comp_graph::internal::StreamDataImpl *) noexcept;
 void cxxbridge1$box$open_comp_graph$internal$StreamDataImpl$drop(::rust::Box<::open_comp_graph::internal::StreamDataImpl> *ptr) noexcept;
@@ -1621,6 +1640,10 @@ void cxxbridge1$box$open_comp_graph$internal$BoundingBox2D$drop(::rust::Box<::op
 ::open_comp_graph::internal::Matrix4 *cxxbridge1$box$open_comp_graph$internal$Matrix4$alloc() noexcept;
 void cxxbridge1$box$open_comp_graph$internal$Matrix4$dealloc(::open_comp_graph::internal::Matrix4 *) noexcept;
 void cxxbridge1$box$open_comp_graph$internal$Matrix4$drop(::rust::Box<::open_comp_graph::internal::Matrix4> *ptr) noexcept;
+
+::open_comp_graph::internal::NodeImpl *cxxbridge1$box$open_comp_graph$internal$NodeImpl$alloc() noexcept;
+void cxxbridge1$box$open_comp_graph$internal$NodeImpl$dealloc(::open_comp_graph::internal::NodeImpl *) noexcept;
+void cxxbridge1$box$open_comp_graph$internal$NodeImpl$drop(::rust::Box<::open_comp_graph::internal::NodeImpl> *ptr) noexcept;
 } // extern "C"
 
 namespace rust {
@@ -1648,18 +1671,6 @@ OPENCOMPGRAPH_SYMBOL_EXPORT void Box<::open_comp_graph::internal::GraphImpl>::al
 template <>
 OPENCOMPGRAPH_SYMBOL_EXPORT void Box<::open_comp_graph::internal::GraphImpl>::drop() noexcept {
   cxxbridge1$box$open_comp_graph$internal$GraphImpl$drop(this);
-}
-template <>
-OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::internal::NodeImpl *Box<::open_comp_graph::internal::NodeImpl>::allocation::alloc() noexcept {
-  return cxxbridge1$box$open_comp_graph$internal$NodeImpl$alloc();
-}
-template <>
-OPENCOMPGRAPH_SYMBOL_EXPORT void Box<::open_comp_graph::internal::NodeImpl>::allocation::dealloc(::open_comp_graph::internal::NodeImpl *ptr) noexcept {
-  cxxbridge1$box$open_comp_graph$internal$NodeImpl$dealloc(ptr);
-}
-template <>
-OPENCOMPGRAPH_SYMBOL_EXPORT void Box<::open_comp_graph::internal::NodeImpl>::drop() noexcept {
-  cxxbridge1$box$open_comp_graph$internal$NodeImpl$drop(this);
 }
 template <>
 OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::internal::StreamDataImpl *Box<::open_comp_graph::internal::StreamDataImpl>::allocation::alloc() noexcept {
@@ -1736,6 +1747,18 @@ OPENCOMPGRAPH_SYMBOL_EXPORT void Box<::open_comp_graph::internal::Matrix4>::allo
 template <>
 OPENCOMPGRAPH_SYMBOL_EXPORT void Box<::open_comp_graph::internal::Matrix4>::drop() noexcept {
   cxxbridge1$box$open_comp_graph$internal$Matrix4$drop(this);
+}
+template <>
+OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::internal::NodeImpl *Box<::open_comp_graph::internal::NodeImpl>::allocation::alloc() noexcept {
+  return cxxbridge1$box$open_comp_graph$internal$NodeImpl$alloc();
+}
+template <>
+OPENCOMPGRAPH_SYMBOL_EXPORT void Box<::open_comp_graph::internal::NodeImpl>::allocation::dealloc(::open_comp_graph::internal::NodeImpl *ptr) noexcept {
+  cxxbridge1$box$open_comp_graph$internal$NodeImpl$dealloc(ptr);
+}
+template <>
+OPENCOMPGRAPH_SYMBOL_EXPORT void Box<::open_comp_graph::internal::NodeImpl>::drop() noexcept {
+  cxxbridge1$box$open_comp_graph$internal$NodeImpl$drop(this);
 }
 } // namespace cxxbridge1
 } // namespace rust

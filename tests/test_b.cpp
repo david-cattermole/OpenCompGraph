@@ -5,7 +5,7 @@
 namespace ocg = open_comp_graph;
 
 int test_b() {
-    std::cout << "====================================== test_b()" << '\n';
+    std::cout << "=========================================== test_b()" << '\n';
     auto bench = ocg::internal::BenchmarkTime();
 
     auto app_name = std::string("my awesome demo");
