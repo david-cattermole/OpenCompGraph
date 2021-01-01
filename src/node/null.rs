@@ -1,3 +1,7 @@
+use log::{debug, error, info, warn};
+use std::collections::hash_map::DefaultHasher;
+use std::hash;
+use std::hash::Hash;
 use std::string::String;
 
 use crate::cxxbridge::ffi::AttrState;
@@ -9,9 +13,6 @@ use crate::data::Identifier;
 use crate::node::traits::AttrBlock;
 use crate::node::traits::Compute;
 use crate::node::NodeImpl;
-use std::collections::hash_map::DefaultHasher;
-use std::hash;
-use std::hash::Hash;
 
 pub fn new(id: Identifier) -> NodeImpl {
     NodeImpl {
@@ -48,10 +49,10 @@ impl Compute for NullCompute {
         inputs: &Vec<StreamDataImplShared>,
         output: &mut StreamDataImplShared,
     ) -> NodeStatus {
-        println!("NullCompute.compute()");
-        // println!("AttrBlock: {:?}", attr_block);
-        // println!("Inputs: {:?}", inputs);
-        // println!("Output: {:?}", output);
+        debug!("NullCompute.compute()");
+        // debug!("AttrBlock: {:?}", attr_block);
+        // debug!("Inputs: {:?}", inputs);
+        // debug!("Output: {:?}", output);
         match inputs.len() {
             0 => NodeStatus::Error,
             _ => {

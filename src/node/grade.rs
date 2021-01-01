@@ -1,3 +1,7 @@
+use log::{debug, error, info, warn};
+use std::collections::hash_map::DefaultHasher;
+use std::hash;
+use std::hash::Hash;
 use std::string::String;
 
 use crate::cxxbridge::ffi::AttrState;
@@ -10,9 +14,6 @@ use crate::data::Identifier;
 use crate::node::traits::AttrBlock;
 use crate::node::traits::Compute;
 use crate::node::NodeImpl;
-use std::collections::hash_map::DefaultHasher;
-use std::hash;
-use std::hash::Hash;
 
 pub fn new(id: Identifier) -> NodeImpl {
     NodeImpl {
@@ -57,10 +58,10 @@ impl Compute for GradeCompute {
         inputs: &Vec<StreamDataImplShared>,
         output: &mut StreamDataImplShared,
     ) -> NodeStatus {
-        println!("GradeCompute.compute()");
-        // println!("AttrBlock: {:?}", attr_block);
-        // println!("Inputs: {:?}", inputs);
-        // println!("Output: {:?}", output);
+        debug!("GradeCompute.compute()");
+        // debug!("AttrBlock: {:?}", attr_block);
+        // debug!("Inputs: {:?}", inputs);
+        // debug!("Output: {:?}", output);
         let mut copy = inputs[0].inner.clone();
 
         let multiply = attr_block.get_attr_f32("multiply");
@@ -68,11 +69,11 @@ impl Compute for GradeCompute {
         // let mut i = 0;
         for v in &mut pixel_block.pixels {
             // if i < 5 {
-            //     println!("a={}", *v);
+            //     debug!("a={}", *v);
             // }
             *v *= multiply;
             // if i < 5 {
-            //     println!("b={}", *v);
+            //     debug!("b={}", *v);
             // }
             // i += 1;
         }

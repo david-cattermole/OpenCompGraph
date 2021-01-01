@@ -1,6 +1,7 @@
 use image;
 use image::GenericImageView;
 use image::ImageBuffer;
+use log::{debug, error, info, log_enabled, warn, Level};
 use rustc_hash::FxHasher;
 use std::collections::hash_map::DefaultHasher;
 use std::hash;
@@ -59,31 +60,31 @@ impl Compute for ReadImageCompute {
         inputs: &Vec<StreamDataImplShared>,
         output: &mut StreamDataImplShared,
     ) -> NodeStatus {
-        println!("ReadImageCompute.compute()");
-        // println!("AttrBlock: {:?}", attr_block);
-        // println!("Inputs: {:?}", inputs);
-        // println!("Output: {:?}", output);
+        debug!("ReadImageCompute.compute()");
+        // debug!("AttrBlock: {:?}", attr_block);
+        // debug!("Inputs: {:?}", inputs);
+        // debug!("Output: {:?}", output);
 
         let file_path = attr_block.get_attr_str("file_path");
-        // println!("file_path {:?}", file_path);
+        // debug!("file_path {:?}", file_path);
 
         let path = match Path::new(&file_path).canonicalize() {
             Ok(full_path) => full_path,
             Err(_) => return NodeStatus::Error,
         };
-        println!("Opening... {:?}", path);
+        debug!("Opening... {:?}", path);
         if path.is_file() == true {
             let img = image::open(path).unwrap();
             let (width, height) = img.dimensions();
             let color_type = img.color();
-            println!("Resolution: {:?}x{:?}", width, height);
-            println!("Color Type: {:?}", color_type);
+            debug!("Resolution: {:?}x{:?}", width, height);
+            debug!("Color Type: {:?}", color_type);
             let num_channels = match color_type {
                 image::ColorType::Rgb8 => 3,
                 image::ColorType::Rgba8 => 3,
                 _ => 0,
             };
-            println!("Num Channels: {:?}", num_channels);
+            debug!("Num Channels: {:?}", num_channels);
 
             // Convert the image to f32 values
             let rgba_img = img.into_rgb8();
@@ -95,12 +96,14 @@ impl Compute for ReadImageCompute {
                 .collect();
 
             // Get pixel statistics
-            let min = pixels.iter().fold(f32::INFINITY, |a, &b| a.min(b));
-            let max = pixels.iter().fold(f32::NEG_INFINITY, |a, &b| a.max(b));
-            let avg = pixels.iter().sum::<f32>() / (pixels.len() as f32);
-            println!("Min value: {}", min);
-            println!("Max value: {}", max);
-            println!("Avg value: {}", avg);
+            if log_enabled!(Level::Debug) {
+                let min = pixels.iter().fold(f32::INFINITY, |a, &b| a.min(b));
+                let max = pixels.iter().fold(f32::NEG_INFINITY, |a, &b| a.max(b));
+                let avg = pixels.iter().sum::<f32>() / (pixels.len() as f32);
+                debug!("Min value: {}", min);
+                debug!("Max value: {}", max);
+                debug!("Avg value: {}", avg);
+            }
 
             let mut pixel_block = PixelBlock::new(width, height, num_channels);
             let pixels = pixel_block.set_pixels(pixels);

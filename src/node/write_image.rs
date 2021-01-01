@@ -1,4 +1,5 @@
 use image::RgbaImage;
+use log::{debug, error, info, log_enabled, warn, Level};
 use std::collections::hash_map::DefaultHasher;
 use std::hash;
 use std::hash::Hash;
@@ -55,17 +56,17 @@ impl Compute for WriteImageCompute {
         inputs: &Vec<StreamDataImplShared>,
         output: &mut StreamDataImplShared,
     ) -> NodeStatus {
-        println!("WriteImageCompute.compute()");
-        // println!("AttrBlock: {:?}", attr_block);
-        // println!("Inputs: {:?}", inputs);
-        // println!("Output: {:?}", output);
+        debug!("WriteImageCompute.compute()");
+        // debug!("AttrBlock: {:?}", attr_block);
+        // debug!("Inputs: {:?}", inputs);
+        // debug!("Output: {:?}", output);
         match inputs.len() {
             0 => NodeStatus::Error,
             _ => {
                 let input = &inputs[0].inner;
 
                 let file_path = attr_block.get_attr_str("file_path");
-                // println!("file_path {:?}", file_path);
+                // debug!("file_path {:?}", file_path);
 
                 let pixel_block = input.get_pixel_block();
                 let width = pixel_block.width;
@@ -73,12 +74,14 @@ impl Compute for WriteImageCompute {
                 let pixels = &pixel_block.pixels;
 
                 // Get pixel statistics
-                let min = pixels.iter().fold(f32::INFINITY, |a, &b| a.min(b));
-                let max = pixels.iter().fold(f32::NEG_INFINITY, |a, &b| a.max(b));
-                let avg = pixels.iter().sum::<f32>() / (pixels.len() as f32);
-                println!("Min value: {}", min);
-                println!("Max value: {}", max);
-                println!("Avg value: {}", avg);
+                if log_enabled!(Level::Debug) {
+                    let min = pixels.iter().fold(f32::INFINITY, |a, &b| a.min(b));
+                    let max = pixels.iter().fold(f32::NEG_INFINITY, |a, &b| a.max(b));
+                    let avg = pixels.iter().sum::<f32>() / (pixels.len() as f32);
+                    debug!("Min value: {}", min);
+                    debug!("Max value: {}", max);
+                    debug!("Avg value: {}", avg);
+                }
 
                 // Convert f32 pixel image to u8 ImageBuffer.
                 let pixels_u8: Vec<u8> = pixels
@@ -91,12 +94,12 @@ impl Compute for WriteImageCompute {
                         _ => panic!("invalid image."),
                     };
 
-                println!("Writing... {:?}", file_path);
+                debug!("Writing... {:?}", file_path);
                 let ok = match img.save(file_path) {
                     Ok(value) => true,
                     Err(_) => false,
                 };
-                println!("Succcess: {}", ok);
+                debug!("Succcess: {}", ok);
                 NodeStatus::Valid
             }
         }
