@@ -109,7 +109,7 @@ impl GraphImpl {
             Some(value) => &mut self.nodes[value],
             None => {
                 warn!("Node id not found: id={}", node_id);
-                return; // Add error code?
+                return; // TODO: Add error code?
             }
         };
         node_box.set_attr_str(name, value);
@@ -131,7 +131,7 @@ impl GraphImpl {
             Some(value) => &mut self.nodes[value],
             None => {
                 warn!("Node id not found: id={}", node_id);
-                return; // Add error code?
+                return; // TODO: Add error code?
             }
         };
         node_box.set_attr_i32(name, value);
@@ -153,7 +153,7 @@ impl GraphImpl {
             Some(value) => &mut self.nodes[value],
             None => {
                 warn!("Node id not found: id={}", node_id);
-                return; // Add error code?
+                return; // TODO: Add error code?
             }
         };
         node_box.set_attr_f32(name, value);
@@ -175,9 +175,9 @@ impl GraphImpl {
         debug!("find_node_index_from_id {:?}.", node_id);
         let maybe_node_idx = self.ids.iter().position(|&v| v == node_id);
         match maybe_node_idx {
-            // Some(value) => debug!("Node found: id={} index={}", node_id, value),
+            Some(value) => debug!("Node found: id={} index={}", node_id, value),
             None => warn!("Node NOT found: id={}", node_id),
-            _ => (),
+            // _ => (),
         }
         maybe_node_idx
     }
