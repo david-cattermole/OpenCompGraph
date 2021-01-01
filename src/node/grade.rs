@@ -54,6 +54,7 @@ impl GradeAttrs {
 impl Compute for GradeCompute {
     fn compute(
         &mut self,
+        node_type_id: u8,
         attr_block: &Box<dyn AttrBlock>,
         inputs: &Vec<StreamDataImplShared>,
         output: &mut StreamDataImplShared,
@@ -78,7 +79,9 @@ impl Compute for GradeCompute {
             // i += 1;
         }
 
+        let hash_value = self.cache_hash(node_type_id, &attr_block, inputs);
         output.inner = copy;
+        output.inner.set_hash(hash_value);
         NodeStatus::Valid
     }
 }

@@ -58,10 +58,12 @@ impl NodeImpl {
     // This method is used to determine "has this node changed?
     // If I re-compute this Node, do I expect a different value?"
     pub fn hash(&self, inputs: &Vec<StreamDataImplShared>) -> HashValue {
-        debug!("Node.hash() -> {}", self.id);
         let node_type_id = self.get_node_type_id();
-        self.compute
-            .cache_hash(node_type_id, &self.attr_block, inputs)
+        let value = self
+            .compute
+            .cache_hash(node_type_id, &self.attr_block, inputs);
+        warn!("Node.hash(): id={} hash={}", self.id, value);
+        value
     }
 
     pub fn compute(
@@ -69,7 +71,9 @@ impl NodeImpl {
         inputs: &Vec<StreamDataImplShared>,
         output: &mut StreamDataImplShared,
     ) -> NodeStatus {
-        self.compute.compute(&self.attr_block, inputs, output)
+        let node_type_id = self.get_node_type_id();
+        self.compute
+            .compute(node_type_id, &self.attr_block, inputs, output)
     }
 
     pub fn attr_exists(&self, name: &str) -> AttrState {

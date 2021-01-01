@@ -1,4 +1,5 @@
 use image;
+use log::{debug, error, info, warn};
 use std::rc::Rc;
 
 use crate::cxxbridge::ffi::StreamDataState;
@@ -49,8 +50,16 @@ impl StreamDataImpl {
         self.state.repr
     }
 
+    pub fn set_state(&mut self, value: StreamDataState) {
+        self.state = value;
+    }
+
     pub fn get_hash(&self) -> HashValue {
         self.hash
+    }
+
+    pub fn set_hash(&mut self, value: HashValue) {
+        self.hash = value;
     }
 
     pub fn get_bounding_box(&self) -> &Box<BoundingBox2D> {

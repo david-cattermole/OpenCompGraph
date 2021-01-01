@@ -52,6 +52,7 @@ impl WriteImageAttrs {
 impl Compute for WriteImageCompute {
     fn compute(
         &mut self,
+        node_type_id: u8,
         attr_block: &Box<dyn AttrBlock>,
         inputs: &Vec<StreamDataImplShared>,
         output: &mut StreamDataImplShared,

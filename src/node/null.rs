@@ -45,6 +45,7 @@ impl NullAttrs {
 impl Compute for NullCompute {
     fn compute(
         &mut self,
+        node_type_id: u8,
         attr_block: &Box<dyn AttrBlock>,
         inputs: &Vec<StreamDataImplShared>,
         output: &mut StreamDataImplShared,
@@ -56,7 +57,9 @@ impl Compute for NullCompute {
         match inputs.len() {
             0 => NodeStatus::Error,
             _ => {
+                let hash_value = self.cache_hash(node_type_id, &attr_block, inputs);
                 output.inner = inputs[0].inner.clone();
+                output.inner.set_hash(hash_value);
                 NodeStatus::Valid
             }
         }

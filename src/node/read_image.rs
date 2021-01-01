@@ -56,6 +56,7 @@ impl ReadImageAttrs {
 impl Compute for ReadImageCompute {
     fn compute(
         &mut self,
+        node_type_id: u8,
         attr_block: &Box<dyn AttrBlock>,
         inputs: &Vec<StreamDataImplShared>,
         output: &mut StreamDataImplShared,
@@ -107,6 +108,8 @@ impl Compute for ReadImageCompute {
 
             let mut pixel_block = PixelBlock::new(width, height, num_channels);
             let pixels = pixel_block.set_pixels(pixels);
+            let hash_value = self.cache_hash(node_type_id, &attr_block, inputs);
+            output.inner.set_hash(hash_value);
             output.inner.set_pixel_block(pixel_block);
         }
 
