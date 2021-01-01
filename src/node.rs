@@ -1,3 +1,5 @@
+use log::{debug, error, info, warn};
+
 use crate::cxxbridge::ffi::AttrState;
 use crate::cxxbridge::ffi::NodeStatus;
 use crate::cxxbridge::ffi::NodeType;
@@ -34,29 +36,29 @@ impl NodeImpl {
     }
 
     pub fn get_node_type(&self) -> NodeType {
-        // println!("Node.get_node_type() -> {:?}", self.node_type);
+        debug!("Node.get_node_type() -> {:?}", self.node_type);
         self.node_type
     }
 
     pub fn get_node_type_id(&self) -> u8 {
-        // println!("Node.get_node_type_id() -> {}", self.node_type.repr);
+        debug!("Node.get_node_type_id() -> {}", self.node_type.repr);
         self.node_type.repr
     }
 
     pub fn get_status(&self) -> NodeStatus {
-        // println!("Node.get_status() -> {:?}", self.status);
+        debug!("Node.get_status() -> {:?}", self.status);
         self.status
     }
 
     pub fn get_status_id(&self) -> u8 {
-        // println!("Node.get_status_id() -> {}", self.status.repr);
+        debug!("Node.get_status_id() -> {}", self.status.repr);
         self.status.repr
     }
 
     // This method is used to determine "has this node changed?
     // If I re-compute this Node, do I expect a different value?"
     pub fn hash(&self, inputs: &Vec<StreamDataImplShared>) -> HashValue {
-        // println!("Node.hash() -> {}", self.id);
+        debug!("Node.hash() -> {}", self.id);
         let node_type_id = self.get_node_type_id();
         self.compute
             .cache_hash(node_type_id, &self.attr_block, inputs)
@@ -78,7 +80,7 @@ impl NodeImpl {
         match self.attr_block.attr_exists(name) {
             AttrState::Exists => self.attr_block.get_attr_str(name),
             AttrState::Missing => {
-                println!("Missing attribute: {}", name);
+                warn!("Missing attribute: {}", name);
                 ""
             }
             _ => panic!("Incorrect AttrState"),
@@ -88,7 +90,7 @@ impl NodeImpl {
     pub fn set_attr_str(&mut self, name: &str, value: &str) {
         match self.attr_block.attr_exists(name) {
             AttrState::Exists => self.attr_block.set_attr_str(name, value),
-            AttrState::Missing => println!("Missing attribute: {}", name),
+            AttrState::Missing => warn!("Missing attribute: {}", name),
             _ => panic!("Incorrect AttrState"),
         }
     }
@@ -97,7 +99,7 @@ impl NodeImpl {
         match self.attr_block.attr_exists(name) {
             AttrState::Exists => self.attr_block.get_attr_i32(name),
             AttrState::Missing => {
-                println!("Missing attribute: {}", name);
+                warn!("Missing attribute: {}", name);
                 0
             }
             _ => panic!("Incorrect AttrState"),
@@ -107,7 +109,7 @@ impl NodeImpl {
     pub fn set_attr_i32(&mut self, name: &str, value: i32) {
         match self.attr_block.attr_exists(name) {
             AttrState::Exists => self.attr_block.set_attr_i32(name, value),
-            AttrState::Missing => println!("Missing attribute: {}", name),
+            AttrState::Missing => warn!("Missing attribute: {}", name),
             _ => panic!("Incorrect AttrState"),
         }
     }
@@ -116,7 +118,7 @@ impl NodeImpl {
         match self.attr_block.attr_exists(name) {
             AttrState::Exists => self.attr_block.get_attr_f32(name),
             AttrState::Missing => {
-                println!("Missing attribute: {}", name);
+                warn!("Missing attribute: {}", name);
                 0.0
             }
             _ => panic!("Incorrect AttrState"),
@@ -126,14 +128,14 @@ impl NodeImpl {
     pub fn set_attr_f32(&mut self, name: &str, value: f32) {
         match self.attr_block.attr_exists(name) {
             AttrState::Exists => self.attr_block.set_attr_f32(name, value),
-            AttrState::Missing => println!("Missing attribute: {}", name),
+            AttrState::Missing => warn!("Missing attribute: {}", name),
             _ => panic!("Incorrect AttrState"),
         }
     }
 }
 
 pub fn create_node(node_type: NodeType, id: Identifier) -> NodeImpl {
-    // println!("create_node(id={:?}, node_type={:?})", id, node_type);
+    debug!("create_node(id={:?}, node_type={:?})", id, node_type);
     match node_type {
         NodeType::ReadImage => read_image::new(id),
         NodeType::WriteImage => write_image::new(id),

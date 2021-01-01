@@ -1,4 +1,5 @@
 use cxx::{CxxString, UniquePtr};
+use log::{debug, error, info, warn};
 use rand::rngs::SmallRng;
 use rand::{Rng, SeedableRng};
 use rustc_hash::FxHasher;
@@ -12,6 +13,7 @@ use crate::data::Identifier;
 use crate::data::Matrix4;
 use crate::data::PixelBlock;
 use crate::graph::GraphImpl;
+use crate::logger::initialize;
 use crate::node::create_node;
 use crate::node::NodeImpl;
 use crate::stream::StreamDataImpl;
@@ -255,6 +257,12 @@ pub mod ffi {
         fn generate_random_id() -> u64;
         fn generate_id_from_name(name: &str) -> u64;
     }
+
+    // Logging
+    #[namespace = "open_comp_graph::log"]
+    extern "Rust" {
+        fn initialize() -> bool;
+    }
 }
 
 pub struct ThingR(usize);
@@ -275,53 +283,53 @@ fn my_test() {
 }
 
 pub fn create_node_box_with_id(node_type: ffi::NodeType, id: Identifier) -> Box<NodeImpl> {
-    // println!("create_node_box(node_type={:?}, id={:?})", node_type, id);
+    debug!("create_node_box(node_type={:?}, id={:?})", node_type, id);
     Box::new(create_node(node_type, id))
 }
 
 fn create_cache_shared() -> ffi::CacheImplShared {
-    // println!("create_cache_shared()");
+    debug!("create_cache_shared()");
     ffi::CacheImplShared {
         inner: create_cache_box(),
     }
 }
 
 pub fn create_cache_box() -> Box<CacheImpl> {
-    // println!("create_cache_box()");
+    debug!("create_cache_box()");
     Box::new(CacheImpl::new())
 }
 
 fn create_graph_shared() -> ffi::GraphImplShared {
-    // println!("create_graph_shared()");
+    debug!("create_graph_shared()");
     ffi::GraphImplShared {
         inner: create_graph_box(),
     }
 }
 
 fn create_graph_box() -> Box<GraphImpl> {
-    // println!("create_graph_box()");
+    debug!("create_graph_box()");
     Box::new(GraphImpl::new())
 }
 
 pub fn create_vec_stream_data_shared() -> Vec<ffi::StreamDataImplShared> {
-    // println!("create_stream_data_shared()");
+    debug!("create_stream_data_shared()");
     Vec::<ffi::StreamDataImplShared>::new()
 }
 
 pub fn create_stream_data_shared() -> ffi::StreamDataImplShared {
-    // println!("create_stream_data_shared()");
+    debug!("create_stream_data_shared()");
     ffi::StreamDataImplShared {
         inner: create_stream_data_box(),
     }
 }
 
 pub fn create_stream_data_shared_box(data: Box<StreamDataImpl>) -> ffi::StreamDataImplShared {
-    // println!("create_stream_data_shared_box()");
+    debug!("create_stream_data_shared_box()");
     ffi::StreamDataImplShared { inner: data }
 }
 
 pub fn create_stream_data_box() -> Box<StreamDataImpl> {
-    // println!("create_stream_data_box()");
+    debug!("create_stream_data_box()");
     Box::new(StreamDataImpl::new())
 }
 

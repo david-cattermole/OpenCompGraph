@@ -9,5 +9,6 @@ pub mod cxxbridge;
 pub mod data;
 pub mod graph;
 pub mod graphiter;
+pub mod logger;
 pub mod node;
 pub mod stream;

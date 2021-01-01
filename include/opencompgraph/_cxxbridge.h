@@ -1108,4 +1108,8 @@ OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint64_t generate_random_id() noexcept;
 
 OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint64_t generate_id_from_name(::rust::Str name) noexcept;
 } // namespace internal
+
+namespace log {
+OPENCOMPGRAPH_SYMBOL_EXPORT bool initialize() noexcept;
+} // namespace log
 } // namespace open_comp_graph

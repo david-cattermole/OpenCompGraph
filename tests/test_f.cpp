@@ -58,6 +58,7 @@ int test_f(std::shared_ptr<ocg::Cache> cache) {
     graph.connect(grade_light_node, write3_node, 0);
 
     // Execute 1. The image should appear unchanged.
+    std::cout << "Execute #1 =========================================" << '\n';
     auto status1 = graph.execute(write1_node, cache);
     assert(status1 == ocg::ExecuteStatus::kSuccess);
     auto stream_data1 = graph.output_stream();
@@ -78,6 +79,7 @@ int test_f(std::shared_ptr<ocg::Cache> cache) {
     std::cout << "num_channels1=" << static_cast<uint32_t>(num_channels1) << '\n';
 
     // Execute 2. The image should appear darker.
+    std::cout << "Execute #2 =========================================" << '\n';
     auto status2 = graph.execute(write2_node, cache);
     assert(status2 == ocg::ExecuteStatus::kSuccess);
     auto stream_data2 = graph.output_stream();
@@ -94,6 +96,7 @@ int test_f(std::shared_ptr<ocg::Cache> cache) {
     std::cout << "num_channels2=" << static_cast<uint32_t>(num_channels2) << '\n';
 
     // Execute 3. The image should appear lighter.
+    std::cout << "Execute #3 =========================================" << '\n';
     auto status3 = graph.execute(write3_node, cache);
     assert(status3 == ocg::ExecuteStatus::kSuccess);
     auto stream_data3 = graph.output_stream();

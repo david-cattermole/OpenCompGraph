@@ -12,6 +12,7 @@ namespace ocg = open_comp_graph;
 
 int main() {
     std::cout << "Starting Tests..." << '\n';
+    ocg::log::initialize();
     auto bench = ocg::internal::BenchmarkTime();
     bench.start();
 

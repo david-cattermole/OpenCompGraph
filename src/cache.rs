@@ -1,3 +1,4 @@
+use log::{debug, error, info, warn};
 use rustc_hash::FxHashMap;
 
 use crate::cxxbridge::ffi::StreamDataImplShared;
@@ -22,12 +23,12 @@ impl CacheImpl {
 
     pub fn len(&self) -> usize {
         let value = self.map.len();
-        // println!("count value: {}", value);
+        debug!("count value: {}", value);
         value
     }
 
     pub fn insert(&mut self, key: CacheKey, value: CacheValue) {
-        // println!("Insert into Cache: key={}", key);
+        debug!("Insert into Cache: key={}", key);
         self.map.insert(key, value);
     }
 
