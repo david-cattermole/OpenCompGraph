@@ -88,6 +88,9 @@ impl Compute for ReadImageCompute {
             debug!("Num Channels: {:?}", num_channels);
 
             // Convert the image to f32 values
+            //
+            // NOTE: We strip off the alpha channel here, this
+            // functionality will be implemented later.
             let rgba_img = img.into_rgb8();
             let flat_samples = rgba_img.into_flat_samples();
             let pixels: Vec<f32> = flat_samples
