@@ -21,17 +21,6 @@ int test_f(std::shared_ptr<ocg::Cache> cache) {
     auto write2_node = graph.create_node(ocg::NodeType::kWriteImage, "writeimage2");
     auto write3_node = graph.create_node(ocg::NodeType::kWriteImage, "writeimage3");
 
-    std::cout << "read_node=" << &read_node << '\n';
-    std::cout << "grade_overexpose_node=" << &grade_overexpose_node << '\n';
-    std::cout << "grade_underexpose_node=" << &grade_underexpose_node << '\n';
-    std::cout << "grade_dark_node=" << &grade_dark_node << '\n';
-    std::cout << "grade_light_node=" << &grade_light_node << '\n';
-    std::cout << "null1_node=" << &null1_node << '\n';
-    std::cout << "null2_node=" << &null2_node << '\n';
-    std::cout << "write1_node=" << &write1_node << '\n';
-    std::cout << "write2_node=" << &write2_node << '\n';
-    std::cout << "write3_node=" << &write3_node << '\n';
-
     graph.set_node_attr_str(read_node, "file_path", "tests/data/oiio-images/tahoe-gps.jpg");
     graph.set_node_attr_f32(grade_overexpose_node, "multiply", 2.0f);
     graph.set_node_attr_f32(grade_underexpose_node, "multiply", 0.5f);
