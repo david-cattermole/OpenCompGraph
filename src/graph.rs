@@ -58,8 +58,7 @@ impl GraphImpl {
         self.nodes.push(node_box);
         self.ids.push(id);
 
-        // TODO: Remove the "id" from the graph (node weight).
-        let index = self.graph.add_node(id).index();
+        let index = self.graph.add_node(()).index();
         debug!("Add Node index={} id={}", index, id);
         assert_eq!(index, nodes_index);
         index
@@ -237,14 +236,9 @@ impl GraphImpl {
         let mut walker = UpstreamEvalSearch::new(&self.graph, start_index);
         while let Some(nx) = walker.next(&self.graph) {
             let index = nx.index();
-            let node_weight = self.graph[nx];
             let node = &self.nodes[index];
             sorted_node_indexes.push(nx);
-            assert_eq!(node_weight, node.get_id());
             debug!("walk index: {}", index);
-
-            // // We can access `graph` mutably here still
-            // self.graph[nx] += 1;  // Modify the node weight.
         }
 
         let mut parent_inputs = Vec::<StreamDataImplShared>::new();
