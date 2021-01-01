@@ -16,10 +16,10 @@ public:
     ~Node();
 
     OPENCOMPGRAPH_SYMBOL_EXPORT
-    uint64_t get_id() noexcept;
+    uint64_t get_id() const noexcept;
 
     OPENCOMPGRAPH_SYMBOL_EXPORT
-    NodeType get_node_type() noexcept;
+    NodeType get_node_type() const noexcept;
 
 private:
     uint64_t m_id;

@@ -22,7 +22,7 @@ void Cache::set_box(rust::Box<internal::CacheImpl> box) noexcept {
     this->inner.inner = std::move(box);
 }
 
-std::size_t Cache::count() noexcept {
+std::size_t Cache::count() const noexcept {
     return this->inner.inner->len();
 }
 

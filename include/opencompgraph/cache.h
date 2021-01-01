@@ -23,7 +23,7 @@ public:
     void set_box(rust::Box<internal::CacheImpl> box) noexcept;
 
     OPENCOMPGRAPH_SYMBOL_EXPORT
-    std::uint64_t count() noexcept;
+    std::uint64_t count() const noexcept;
 
 private:
     internal::CacheImplShared inner;
