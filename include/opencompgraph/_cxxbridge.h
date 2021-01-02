@@ -953,6 +953,7 @@ struct CacheImplShared final {
 enum class ExecuteStatus : ::std::uint8_t {
   kError = 0,
   kSuccess = 1,
+  kUninitialized = 2,
 };
 #endif // CXXBRIDGE1_ENUM_open_comp_graph$ExecuteStatus
 

@@ -55,6 +55,8 @@ pub mod ffi {
         Error = 0,
         #[cxx_name = "kSuccess"]
         Success = 1,
+        #[cxx_name = "kUninitialized"]
+        Uninitialized = 2,
     }
 
     #[repr(u8)]

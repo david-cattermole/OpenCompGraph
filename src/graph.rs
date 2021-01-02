@@ -41,7 +41,7 @@ impl GraphImpl {
         let ids = Vec::new();
         let graph = NodeGraph::with_capacity(0, 0);
         let output = create_stream_data_shared();
-        let status = ExecuteStatus::Error;
+        let status = ExecuteStatus::Uninitialized;
         GraphImpl {
             nodes,
             ids,
