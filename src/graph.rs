@@ -314,23 +314,26 @@ impl GraphImpl {
                     self.output = value.clone();
                 }
                 None => {
-                    let mut output = create_stream_data_shared();
-                    match node.compute(&inputs, &mut output) {
-                        NodeStatus::Valid => cache.insert(node_hash, output.clone()),
+                    debug!("Cache Miss: {}", node_hash);
+                    self.output = create_stream_data_shared();
+                    match node.compute(&inputs, &mut self.output) {
+                        NodeStatus::Valid => cache.insert(node_hash, self.output.clone()),
                         NodeStatus::Uninitialized => {
+                            self.status = ExecuteStatus::Uninitialized;
                             error!("Node is uninitialized: node_index={}", node_index);
-                            break;
+                            return self.status;
                         }
                         NodeStatus::Error => {
+                            self.status = ExecuteStatus::Error;
                             error!("Failed to compute node: node_index={}", node_index);
-                            break;
+                            return self.status;
                         }
                         _ => {
+                            self.status = ExecuteStatus::Error;
                             error!("Unknown error: node_index={}", node_index);
-                            break;
+                            return self.status;
                         }
                     }
-                    self.output = output;
                 }
             }
         }
