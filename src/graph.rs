@@ -205,7 +205,14 @@ impl GraphImpl {
     }
 
     /// Connect the source node (src_node_id) to destination node
-    /// (dst_node_id).
+    /// (dst_node_id), with the input number (input_num).
+    ///
+    /// Each node may have multiple input nodes. For example a node
+    /// combining two images will have two inputs.
+    ///
+    /// If the edge between the source and destination nodes already
+    /// exist and the same input number is used, no new connection is
+    /// made.
     pub fn connect(&mut self, src_node_id: Identifier, dst_node_id: Identifier, input_num: u8) {
         debug!("Connect {} to {}:{}", src_node_id, dst_node_id, input_num);
         let src_node_idx = match self.find_node_index_from_id(src_node_id) {
@@ -225,9 +232,17 @@ impl GraphImpl {
 
         let src_index = petgraph::graph::NodeIndex::new(src_node_idx);
         let dst_index = petgraph::graph::NodeIndex::new(dst_node_idx);
-        // TODO: Check there is no other edge from src to dst, with
+
+        // Check there is no other edge from src to dst, with
         // the same input_num value.
-        let index = self.graph.add_edge(src_index, dst_index, input_num).index();
+        let incoming_edges = self.graph.edges_directed(dst_index, Direction::Incoming);
+        let edges_existing = incoming_edges
+            .into_iter()
+            .fold(0, |acc, x| acc + (*x.weight() == input_num) as usize);
+
+        if edges_existing == 0 {
+            self.graph.add_edge(src_index, dst_index, input_num);
+        }
     }
 
     /// Compute the graph!
