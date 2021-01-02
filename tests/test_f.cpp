@@ -49,6 +49,8 @@ int test_f(std::shared_ptr<ocg::Cache> cache) {
     // Execute 1. The image should appear unchanged.
     std::cout << "Execute #1 =========================================" << '\n';
     auto status1 = graph.execute(write1_node, cache);
+    std::cout << "Graph as string:\n"
+              << graph.data_debug_string();
     assert(status1 == ocg::ExecuteStatus::kSuccess);
     auto stream_data1 = graph.output_stream();
     auto state_id1 = stream_data1.state_id();
@@ -70,6 +72,8 @@ int test_f(std::shared_ptr<ocg::Cache> cache) {
     // Execute 2. The image should appear darker.
     std::cout << "Execute #2 =========================================" << '\n';
     auto status2 = graph.execute(write2_node, cache);
+    std::cout << "Graph as string:\n"
+              << graph.data_debug_string();
     assert(status2 == ocg::ExecuteStatus::kSuccess);
     auto stream_data2 = graph.output_stream();
     const ocg::internal::PixelBlock &pixel_block2 = stream_data2.pixel_block();
@@ -87,6 +91,8 @@ int test_f(std::shared_ptr<ocg::Cache> cache) {
     // Execute 3. The image should appear lighter.
     std::cout << "Execute #3 =========================================" << '\n';
     auto status3 = graph.execute(write3_node, cache);
+    std::cout << "Graph as string:\n"
+              << graph.data_debug_string();
     assert(status3 == ocg::ExecuteStatus::kSuccess);
     auto stream_data3 = graph.output_stream();
     const ocg::internal::PixelBlock &pixel_block3 = stream_data3.pixel_block();

@@ -91,6 +91,9 @@ int test_c() {
         std::cout << "write_path2=" << write_path2 << '\n';
     }
 
+    std::cout << "Graph as string:\n"
+              << graph.data_debug_string();
+
     bench.stop();
     bench.print("Test C:");
 

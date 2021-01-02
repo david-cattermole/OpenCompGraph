@@ -234,6 +234,7 @@ pub mod ffi {
         // fn find_node(&mut self, node_id: u64) -> &Box<NodeImpl>;
         fn connect(&mut self, src_node_id: u64, dst_node_id: u64, input_num: u8);
         fn execute(&mut self, node_id: u64, cache: &mut Box<CacheImpl>) -> ExecuteStatus;
+        fn data_debug_string(&self) -> String;
         fn output_stream(&self) -> StreamDataImplShared;
     }
 

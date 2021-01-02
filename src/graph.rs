@@ -159,6 +159,17 @@ impl GraphImpl {
         node_box.set_attr_f32(name, value);
     }
 
+    fn node_attrs_data_debug_string(&self, node_id: Identifier) -> String {
+        let node_box = match self.find_node_index_from_id(node_id) {
+            Some(value) => &self.nodes[value],
+            None => {
+                warn!("Node id not found: id={}", node_id);
+                return "could not find node attrs".to_string();
+            }
+        };
+        node_box.data_debug_string()
+    }
+
     /// Check if a node with the given hash exists in the graph.
     pub fn node_exists(&mut self, node_id: u64) -> bool {
         let node_idx = self.find_node_index_from_id(node_id);
@@ -300,6 +311,26 @@ impl GraphImpl {
 
         self.status = ExecuteStatus::Success;
         self.status
+    }
+
+    /// Convert the graph into a human-readable string, for debug
+    /// printing.
+    pub fn data_debug_string(&self) -> String {
+        debug!("Graph Debug");
+        let mut string = format!(
+            "{:#?}",
+            Dot::with_config(&self.graph, &[Config::GraphContentOnly])
+        );
+        for (i, id) in self.ids.iter().enumerate() {
+            let node_status = self.node_status(*id);
+            let attrs = self.node_attrs_data_debug_string(*id);
+            let line = format!(
+                "index={} id={} status={:?} attrs={}\n",
+                i, *id, node_status, attrs
+            );
+            string.push_str(line.as_str());
+        }
+        string
     }
 
     /// Get the output stream from the last executed graph node.

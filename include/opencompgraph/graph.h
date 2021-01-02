@@ -62,6 +62,9 @@ public:
     ExecuteStatus execute(Node node, std::shared_ptr<Cache> &cache) noexcept;
 
     OPENCOMPGRAPH_SYMBOL_EXPORT
+    std::string data_debug_string() const noexcept;
+
+    OPENCOMPGRAPH_SYMBOL_EXPORT
     StreamData output_stream() noexcept;
 
 private:

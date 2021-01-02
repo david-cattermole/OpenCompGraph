@@ -100,6 +100,11 @@ ExecuteStatus Graph::execute(Node node, std::shared_ptr<Cache> &cache) noexcept 
     return status;
 }
 
+std::string Graph::data_debug_string() const noexcept {
+    auto rust_string = this->inner.inner->data_debug_string();
+    return std::string(rust_string);
+}
+
 StreamData Graph::output_stream() noexcept {
     auto data = this->inner.inner->output_stream();
     return StreamData(std::move(data.inner));

@@ -28,6 +28,8 @@ int test_e(std::shared_ptr<ocg::Cache> cache) {
     graph.connect(null_node4, write_node, 0);
 
     graph.execute(write_node, cache);
+    std::cout << "Graph as string:\n"
+              << graph.data_debug_string();
 
     bench.stop();
     bench.print("Test E:");

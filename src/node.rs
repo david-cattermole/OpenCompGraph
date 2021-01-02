@@ -80,6 +80,10 @@ impl NodeImpl {
         self.attr_block.attr_exists(name)
     }
 
+    pub fn data_debug_string(&self) -> String {
+        format!("{:?}", self.attr_block)
+    }
+
     pub fn get_attr_str(&self, name: &str) -> &str {
         match self.attr_block.attr_exists(name) {
             AttrState::Exists => self.attr_block.get_attr_str(name),
