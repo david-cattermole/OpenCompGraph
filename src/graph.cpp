@@ -81,6 +81,11 @@ void Graph::set_node_attr_str(Node node, rust::Str name, rust::Str value) noexce
     return this->inner.inner->set_node_attr_str(node_id, name, value);
 }
 
+NodeStatus Graph::node_status(const Node &node) const noexcept {
+    auto node_id = node.get_id();
+    return this->inner.inner->node_status(node_id);
+}
+
 bool Graph::node_exists(Node node) noexcept {
     auto node_id = node.get_id();
     return this->inner.inner->node_exists(node_id);

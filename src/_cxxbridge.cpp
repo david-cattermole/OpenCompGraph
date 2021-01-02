@@ -1031,6 +1031,7 @@ enum class NodeStatus : ::std::uint8_t {
   kError = 0,
   kValid = 1,
   kUninitialized = 2,
+  kNonExistent = 3,
 };
 #endif // CXXBRIDGE1_ENUM_open_comp_graph$NodeStatus
 
@@ -1171,6 +1172,7 @@ struct GraphImpl final : public ::rust::Opaque {
   OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t add_node(::rust::Box<::open_comp_graph::internal::NodeImpl> op_box) noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT bool remove_node(::std::uint64_t node_id) noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::AttrState node_attr_exists(::std::uint64_t node_id, ::rust::Str name) const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::NodeStatus node_status(::std::uint64_t node_id) const noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT float get_node_attr_f32(::std::uint64_t node_id, ::rust::Str name) const noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT ::std::int32_t get_node_attr_i32(::std::uint64_t node_id, ::rust::Str name) const noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT ::rust::Str get_node_attr_str(::std::uint64_t node_id, ::rust::Str name) const noexcept;
@@ -1296,6 +1298,8 @@ void open_comp_graph$internal$cxxbridge1$NodeImpl$set_attr_str(::open_comp_graph
 bool open_comp_graph$internal$cxxbridge1$GraphImpl$remove_node(::open_comp_graph::internal::GraphImpl &self, ::std::uint64_t node_id) noexcept;
 
 ::open_comp_graph::AttrState open_comp_graph$internal$cxxbridge1$GraphImpl$node_attr_exists(const ::open_comp_graph::internal::GraphImpl &self, ::std::uint64_t node_id, ::rust::repr::PtrLen name) noexcept;
+
+::open_comp_graph::NodeStatus open_comp_graph$internal$cxxbridge1$GraphImpl$node_status(const ::open_comp_graph::internal::GraphImpl &self, ::std::uint64_t node_id) noexcept;
 
 float open_comp_graph$internal$cxxbridge1$GraphImpl$get_node_attr_f32(const ::open_comp_graph::internal::GraphImpl &self, ::std::uint64_t node_id, ::rust::repr::PtrLen name) noexcept;
 
@@ -1546,6 +1550,10 @@ OPENCOMPGRAPH_SYMBOL_EXPORT bool GraphImpl::remove_node(::std::uint64_t node_id)
 
 OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::AttrState GraphImpl::node_attr_exists(::std::uint64_t node_id, ::rust::Str name) const noexcept {
   return open_comp_graph$internal$cxxbridge1$GraphImpl$node_attr_exists(*this, node_id, ::rust::impl<::rust::Str>::repr(name));
+}
+
+OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::NodeStatus GraphImpl::node_status(::std::uint64_t node_id) const noexcept {
+  return open_comp_graph$internal$cxxbridge1$GraphImpl$node_status(*this, node_id);
 }
 
 OPENCOMPGRAPH_SYMBOL_EXPORT float GraphImpl::get_node_attr_f32(::std::uint64_t node_id, ::rust::Str name) const noexcept {

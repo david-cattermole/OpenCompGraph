@@ -105,7 +105,8 @@ pub mod ffi {
         Valid = 1,
         #[cxx_name = "kUninitialized"]
         Uninitialized = 2,
-        // Warning = 2,
+        #[cxx_name = "kNonExistent"]
+        NonExistent = 3,
     }
 
     #[repr(u8)]
@@ -223,6 +224,7 @@ pub mod ffi {
         fn remove_node(&mut self, node_id: u64) -> bool;
 
         fn node_attr_exists(&self, node_id: u64, name: &str) -> AttrState;
+        fn node_status(&self, node_id: u64) -> NodeStatus;
         fn get_node_attr_f32(&self, node_id: u64, name: &str) -> f32;
         fn get_node_attr_i32(&self, node_id: u64, name: &str) -> i32;
         unsafe fn get_node_attr_str<'a, 'b>(&'b self, node_id: u64, name: &'a str) -> &'b str;
@@ -231,7 +233,6 @@ pub mod ffi {
         fn set_node_attr_str(&mut self, node_id: u64, name: &str, value: &str);
 
         fn node_exists(&mut self, node_id: u64) -> bool;
-        // fn find_node(&mut self, node_id: u64) -> &Box<NodeImpl>;
         fn connect(&mut self, src_node_id: u64, dst_node_id: u64, input_num: u8);
         fn execute(&mut self, node_id: u64, cache: &mut Box<CacheImpl>) -> ExecuteStatus;
         fn data_debug_string(&self) -> String;

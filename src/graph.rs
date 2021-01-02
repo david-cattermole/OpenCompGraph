@@ -159,6 +159,17 @@ impl GraphImpl {
         node_box.set_attr_f32(name, value);
     }
 
+    pub fn node_status(&self, node_id: Identifier) -> NodeStatus {
+        let node_box = match self.find_node_index_from_id(node_id) {
+            Some(value) => &self.nodes[value],
+            None => {
+                warn!("Node id not found: id={}", node_id);
+                return NodeStatus::NonExistent;
+            }
+        };
+        node_box.get_status()
+    }
+
     fn node_attrs_data_debug_string(&self, node_id: Identifier) -> String {
         let node_box = match self.find_node_index_from_id(node_id) {
             Some(value) => &self.nodes[value],
