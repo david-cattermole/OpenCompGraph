@@ -36,6 +36,7 @@ pub struct ReadImageCompute {}
 
 #[derive(Debug, Clone, Default, hash::Hash)]
 pub struct ReadImageAttrs {
+    pub enable: i32,
     pub file_path: String,
 }
 
@@ -48,6 +49,7 @@ impl ReadImageCompute {
 impl ReadImageAttrs {
     pub fn new() -> ReadImageAttrs {
         ReadImageAttrs {
+            enable: 1,
             file_path: "".to_string(),
         }
     }
@@ -65,6 +67,10 @@ impl Compute for ReadImageCompute {
         // debug!("AttrBlock: {:?}", attr_block);
         // debug!("Inputs: {:?}", inputs);
         // debug!("Output: {:?}", output);
+        let enable = attr_block.get_attr_i32("enable");
+        if enable != 1 {
+            return NodeStatus::Error;
+        }
 
         let file_path = attr_block.get_attr_str("file_path");
         // debug!("file_path {:?}", file_path);
@@ -137,6 +143,7 @@ impl AttrBlock for ReadImageAttrs {
 
     fn attr_exists(&self, name: &str) -> AttrState {
         match name {
+            "enable" => AttrState::Exists,
             "file_path" => AttrState::Exists,
             _ => AttrState::Missing,
         }
@@ -157,11 +164,17 @@ impl AttrBlock for ReadImageAttrs {
     }
 
     fn get_attr_i32(&self, name: &str) -> i32 {
-        0
+        match name {
+            "enable" => self.enable,
+            _ => 0,
+        }
     }
 
     fn set_attr_i32(&mut self, name: &str, value: i32) {
-        ()
+        match name {
+            "enable" => self.enable = value,
+            _ => (),
+        };
     }
 
     fn get_attr_f32(&self, name: &str) -> f32 {

@@ -32,6 +32,7 @@ pub struct WriteImageCompute {}
 
 #[derive(Debug, Clone, Default, Hash)]
 pub struct WriteImageAttrs {
+    pub enable: i32,
     pub file_path: String,
 }
 
@@ -44,6 +45,7 @@ impl WriteImageCompute {
 impl WriteImageAttrs {
     pub fn new() -> WriteImageAttrs {
         WriteImageAttrs {
+            enable: 1,
             file_path: "".to_string(),
         }
     }
@@ -61,6 +63,11 @@ impl Compute for WriteImageCompute {
         // debug!("AttrBlock: {:?}", attr_block);
         // debug!("Inputs: {:?}", inputs);
         // debug!("Output: {:?}", output);
+        let enable = attr_block.get_attr_i32("enable");
+        if enable != 1 {
+            return NodeStatus::Error;
+        }
+
         match inputs.len() {
             0 => NodeStatus::Error,
             _ => {
@@ -114,6 +121,7 @@ impl AttrBlock for WriteImageAttrs {
 
     fn attr_exists(&self, name: &str) -> AttrState {
         match name {
+            "enable" => AttrState::Exists,
             "file_path" => AttrState::Exists,
             _ => AttrState::Missing,
         }
@@ -134,11 +142,17 @@ impl AttrBlock for WriteImageAttrs {
     }
 
     fn get_attr_i32(&self, name: &str) -> i32 {
-        0
+        match name {
+            "enable" => self.enable,
+            _ => 0,
+        }
     }
 
     fn set_attr_i32(&mut self, name: &str, value: i32) {
-        ()
+        match name {
+            "enable" => self.enable = value,
+            _ => (),
+        };
     }
 
     fn get_attr_f32(&self, name: &str) -> f32 {

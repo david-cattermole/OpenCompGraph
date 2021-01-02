@@ -30,6 +30,7 @@ pub struct GradeCompute {}
 
 #[derive(Debug, Clone, Default)]
 pub struct GradeAttrs {
+    pub enable: i32,
     pub multiply: f32,
 }
 
@@ -47,7 +48,10 @@ impl GradeCompute {
 
 impl GradeAttrs {
     pub fn new() -> GradeAttrs {
-        GradeAttrs { multiply: 1.0 }
+        GradeAttrs {
+            enable: 1,
+            multiply: 1.0,
+        }
     }
 }
 
@@ -63,6 +67,11 @@ impl Compute for GradeCompute {
         // debug!("AttrBlock: {:?}", attr_block);
         // debug!("Inputs: {:?}", inputs);
         // debug!("Output: {:?}", output);
+        let enable = attr_block.get_attr_i32("enable");
+        if enable != 1 {
+            return NodeStatus::Error;
+        }
+
         let mut copy = inputs[0].inner.clone();
 
         let multiply = attr_block.get_attr_f32("multiply");
@@ -93,6 +102,7 @@ impl AttrBlock for GradeAttrs {
 
     fn attr_exists(&self, name: &str) -> AttrState {
         match name {
+            "enable" => AttrState::Exists,
             "multiply" => AttrState::Exists,
             _ => AttrState::Missing,
         }
@@ -107,11 +117,17 @@ impl AttrBlock for GradeAttrs {
     }
 
     fn get_attr_i32(&self, name: &str) -> i32 {
-        0
+        match name {
+            "enable" => self.enable,
+            _ => 0,
+        }
     }
 
     fn set_attr_i32(&mut self, name: &str, value: i32) {
-        ()
+        match name {
+            "enable" => self.enable = value,
+            _ => (),
+        };
     }
 
     fn get_attr_f32(&self, name: &str) -> f32 {
