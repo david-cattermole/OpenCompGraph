@@ -25,6 +25,8 @@ The build environment assumes to be running on Linux with GCC 6.3.1.
 ``` shell
 $ cd /path/to/project/root/
 
+$ cargo install cxxbridge-cmd --git "https://github.com/david-cattermole/cxx.git" --rev "363c18b2982329d6e4fbc2a6e5f324f4fef03661" --force
+
 $ bash build_linux.bash
 
 # Run tests

@@ -91,9 +91,8 @@ dependencies = [
 
 [[package]]
 name = "cxx"
-version = "1.0.25"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c65e9df8d5ac95ac0a838dfc6e793c0a90a84e8e89338d1fdcbb39fa76c5af28"
+version = "1.0.23"
+source = "git+https://github.com/david-cattermole/cxx.git?rev=363c18b2982329d6e4fbc2a6e5f324f4fef03661#363c18b2982329d6e4fbc2a6e5f324f4fef03661"
 dependencies = [
  "cc",
  "cxxbridge-flags",
@@ -103,15 +102,13 @@ dependencies = [
 
 [[package]]
 name = "cxxbridge-flags"
-version = "1.0.25"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4f45d94c8a06e5a72cffa97c659e4d0e678419e4dd9849895a97d3d74b2aa0ed"
+version = "1.0.23"
+source = "git+https://github.com/david-cattermole/cxx.git?rev=363c18b2982329d6e4fbc2a6e5f324f4fef03661#363c18b2982329d6e4fbc2a6e5f324f4fef03661"
 
 [[package]]
 name = "cxxbridge-macro"
-version = "1.0.25"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fab771f612674321f5b2f083a060d688d9bc75589969357764314942b9c6dfee"
+version = "1.0.23"
+source = "git+https://github.com/david-cattermole/cxx.git?rev=363c18b2982329d6e4fbc2a6e5f324f4fef03661#363c18b2982329d6e4fbc2a6e5f324f4fef03661"
 dependencies = [
  "proc-macro2",
  "quote",
