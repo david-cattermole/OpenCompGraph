@@ -72,8 +72,11 @@ impl NodeImpl {
         output: &mut StreamDataImplShared,
     ) -> NodeStatus {
         let node_type_id = self.get_node_type_id();
-        self.compute
-            .compute(node_type_id, &self.attr_block, inputs, output)
+        let status = self
+            .compute
+            .compute(node_type_id, &self.attr_block, inputs, output);
+        self.status = status;
+        status
     }
 
     pub fn attr_exists(&self, name: &str) -> AttrState {
