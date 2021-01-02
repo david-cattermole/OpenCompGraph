@@ -2,6 +2,7 @@
 #define OPENCOMPGRAPH_GRAPH_H
 
 #include <memory>
+#include <string>
 #include <rust/cxx.h>
 #include <opencompgraph/_cxxbridge.h>
 #include <opencompgraph/cache.h>

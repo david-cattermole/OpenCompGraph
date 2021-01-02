@@ -1,4 +1,5 @@
 #include <iostream>
+#include <string>
 #include <opencompgraph/graph.h>
 #include <opencompgraph/node.h>
 #include <opencompgraph/stream.h>
