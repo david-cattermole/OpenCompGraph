@@ -10,11 +10,11 @@ Node::Node(NodeType node_type, uint64_t id) noexcept
     std::cout << "Node() with id"
               << " node_type=" << static_cast<uint32_t>(node_type)
               << " id=" << id
-              << std::endl;
+              << '\n';
 }
 
 Node::~Node() {
-    // std::cout << "~Node()" << std::endl;
+    // std::cout << "~Node()" << '\n';
 }
 
 uint64_t Node::get_id() const noexcept {
