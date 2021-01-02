@@ -5,7 +5,7 @@ use std::hash::{Hash, Hasher};
 use std::mem;
 
 pub type GraphIdx = usize;
-pub type NodeWeight = ();
+pub type NodeWeight = u64;
 pub type EdgeWeight = u8;
 pub type NodeIdx = petgraph::graph::NodeIndex<GraphIdx>;
 pub type EdgeIdx = petgraph::graph::EdgeIndex<GraphIdx>;

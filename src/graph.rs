@@ -58,7 +58,7 @@ impl GraphImpl {
         self.nodes.push(node_box);
         self.ids.push(id);
 
-        let index = self.graph.add_node(()).index();
+        let index = self.graph.add_node(id).index();
         debug!("Add Node index={} id={}", index, id);
         assert_eq!(index, nodes_index);
         index
