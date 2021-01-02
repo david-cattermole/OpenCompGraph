@@ -1,18 +1,25 @@
 use env_logger::{Builder, Env};
-use log::{error, info, warn, Level, LevelFilter, Metadata, Record, SetLoggerError};
+use log::info;
 
 /// Start the logger for OpenCompGraph.
 ///
 /// Use the environment variables "OCG_LOG" and "OCG_LOG_STYLE" to
 /// control the logging.
 ///
-/// OCG_LOG: the level filter
-/// OCG_LOG_STYLE: whether or not to print styles with records.
+/// OCG_LOG: The level filter
+/// OCG_LOG_STYLE: Whether or not to print styles with records.
 ///
 /// Set OCG_LOG to "info", "debug", "error", "warn" or "main". "main"
 /// will enable all logging, the other names are used to specifiy a
-/// specific logging level to be displayed (printed). By default only
-/// "errors" are displayed.
+/// specific logging level to be displayed (printed). By default ub
+/// OCG only warnings and errors are displayed.
+///
+/// Set OCG_LOG_STYLE to "auto", "always" or "never". The default in
+/// OCG is "never".
+///
+/// - "auto" - Try to print styles, but don't force the issue.
+/// - "always" - Try very hard to print styles.
+/// - "never" - Never print styles.
 ///
 /// See the links below for details of the environment variable
 /// configuration.
@@ -22,8 +29,10 @@ use log::{error, info, warn, Level, LevelFilter, Metadata, Record, SetLoggerErro
 /// https://docs.rs/env_logger/0.8.2/env_logger/index.html#disabling-colors
 ///
 pub fn initialize() -> bool {
-    let env = Env::new().filter("OCG_LOG").write_style("OCG_LOG_STYLE");
-    let res = env_logger::try_init_from_env(env);
+    let env = Env::new()
+        .filter_or("OCG_LOG", "warn")
+        .write_style_or("OCG_LOG_STYLE", "never");
+    let res = Builder::from_env(env).try_init();
     info!("Log initialized!");
     match res {
         Ok(_) => true,
