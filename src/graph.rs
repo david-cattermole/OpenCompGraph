@@ -260,11 +260,6 @@ impl GraphImpl {
             }
         };
 
-        // debug!(
-        //     "{:?}",
-        //     Dot::with_config(&self.graph, &[Config::EdgeNoLabel])
-        // );
-
         let mut sorted_node_indexes = Vec::<NodeIdx>::new();
 
         // Get the stack of indices to be computed, going upstream
