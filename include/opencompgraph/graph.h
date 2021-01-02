@@ -26,40 +26,40 @@ public:
     Node create_node(NodeType node_type, uint64_t id) noexcept;
 
     OPENCOMPGRAPH_SYMBOL_EXPORT
-    bool Graph::delete_node(Node node) noexcept;
+    bool delete_node(const Node &node) noexcept;
 
     OPENCOMPGRAPH_SYMBOL_EXPORT
-    bool Graph::delete_node(uint64_t node_id) noexcept;
+    bool delete_node(uint64_t node_id) noexcept;
 
     OPENCOMPGRAPH_SYMBOL_EXPORT
-    AttrState node_attr_exists(Node node, rust::Str name) const noexcept;
+    AttrState node_attr_exists(const Node &node, rust::Str name) const noexcept;
 
     OPENCOMPGRAPH_SYMBOL_EXPORT
-    float get_node_attr_f32(Node node, rust::Str name) const noexcept;
+    float get_node_attr_f32(const Node &node, rust::Str name) const noexcept;
 
     OPENCOMPGRAPH_SYMBOL_EXPORT
-    int32_t get_node_attr_i32(Node node, rust::Str name) const noexcept;
+    int32_t get_node_attr_i32(const Node &node, rust::Str name) const noexcept;
 
     OPENCOMPGRAPH_SYMBOL_EXPORT
-    rust::Str get_node_attr_str(Node node, rust::Str name) const noexcept;
+    rust::Str get_node_attr_str(const Node &node, rust::Str name) const noexcept;
 
     OPENCOMPGRAPH_SYMBOL_EXPORT
-    void set_node_attr_f32(Node node, rust::Str name, float value) noexcept;
+    void set_node_attr_f32(const Node &node, rust::Str name, float value) noexcept;
 
     OPENCOMPGRAPH_SYMBOL_EXPORT
-    void set_node_attr_i32(Node node, rust::Str name, int32_t value) noexcept;
+    void set_node_attr_i32(const Node &node, rust::Str name, int32_t value) noexcept;
 
     OPENCOMPGRAPH_SYMBOL_EXPORT
-    void set_node_attr_str(Node node, rust::Str name, rust::Str value) noexcept;
+    void set_node_attr_str(const Node &node, rust::Str name, rust::Str value) noexcept;
 
     OPENCOMPGRAPH_SYMBOL_EXPORT
-    bool Graph::node_exists(Node node) noexcept;
+    bool node_exists(const Node& node) noexcept;
 
     OPENCOMPGRAPH_SYMBOL_EXPORT
-    void connect(Node src_node, Node dst_node, uint8_t input_num) noexcept;
+    void connect(const Node& src_node, const Node& dst_node, uint8_t input_num) noexcept;
 
     OPENCOMPGRAPH_SYMBOL_EXPORT
-    ExecuteStatus execute(Node node, std::shared_ptr<Cache> &cache) noexcept;
+    ExecuteStatus execute(const Node& node, std::shared_ptr<Cache> &cache) noexcept;
 
     OPENCOMPGRAPH_SYMBOL_EXPORT
     NodeStatus node_status(const Node &node) const noexcept;

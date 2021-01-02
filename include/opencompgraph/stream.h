@@ -14,7 +14,7 @@ public:
     StreamData() noexcept;
 
     OPENCOMPGRAPH_SYMBOL_EXPORT
-    StreamData(rust::Box<internal::StreamDataImpl> box) noexcept;
+    explicit StreamData(rust::Box<internal::StreamDataImpl> box) noexcept;
 
     OPENCOMPGRAPH_SYMBOL_EXPORT
     ~StreamData();
@@ -26,32 +26,31 @@ public:
     void set_box(rust::Box<internal::StreamDataImpl> box) noexcept;
 
     OPENCOMPGRAPH_SYMBOL_EXPORT
-    StreamDataState state() noexcept;
+    StreamDataState state() const noexcept;
 
     OPENCOMPGRAPH_SYMBOL_EXPORT
-    uint8_t state_id() noexcept;
+    uint8_t state_id() const noexcept;
 
     OPENCOMPGRAPH_SYMBOL_EXPORT
-    uint64_t hash() noexcept;
+    uint64_t hash() const noexcept;
 
     OPENCOMPGRAPH_SYMBOL_EXPORT
-    const internal::PixelBlock& pixel_block() noexcept;
+    const internal::PixelBlock& pixel_block() const noexcept;
 
     OPENCOMPGRAPH_SYMBOL_EXPORT
-    rust::Slice<const float> pixel_buffer() noexcept;
+    rust::Slice<const float> pixel_buffer() const noexcept;
 
     OPENCOMPGRAPH_SYMBOL_EXPORT
-    uint32_t pixel_width() noexcept;
+    uint32_t pixel_width() const noexcept;
 
     OPENCOMPGRAPH_SYMBOL_EXPORT
-    uint32_t pixel_height() noexcept;
+    uint32_t pixel_height() const noexcept;
 
     OPENCOMPGRAPH_SYMBOL_EXPORT
-    uint8_t pixel_num_channels() noexcept;
+    uint8_t pixel_num_channels() const noexcept;
 
 private:
     internal::StreamDataImplShared inner;
-
 };
 
 }  // namespace open_comp_graph

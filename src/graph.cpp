@@ -37,7 +37,7 @@ Node Graph::create_node(NodeType node_type, uint64_t id) noexcept {
     return node;
 }
 
-bool Graph::delete_node(Node node) noexcept {
+bool Graph::delete_node(const Node &node) noexcept {
     auto node_id = node.get_id();
     return Graph::delete_node(node_id);
 }
@@ -46,37 +46,38 @@ bool Graph::delete_node(uint64_t node_id) noexcept {
     return this->inner.inner->remove_node(node_id);
 }
 
-AttrState Graph::node_attr_exists(Node node, rust::Str name) const noexcept {
+AttrState Graph::node_attr_exists(const Node &node, rust::Str name) const noexcept {
     auto node_id = node.get_id();
     return this->inner.inner->node_attr_exists(node_id, name);
 }
 
-float Graph::get_node_attr_f32(Node node, rust::Str name) const noexcept {
+float Graph::get_node_attr_f32(const Node &node, rust::Str name) const noexcept {
     auto node_id = node.get_id();
     return this->inner.inner->get_node_attr_f32(node_id, name);
 }
 
-int32_t Graph::get_node_attr_i32(Node node, rust::Str name) const noexcept {
+int32_t Graph::get_node_attr_i32(const Node &node, rust::Str name) const noexcept {
     auto node_id = node.get_id();
     return this->inner.inner->get_node_attr_i32(node_id, name);
 }
 
-rust::Str Graph::get_node_attr_str(Node node, rust::Str name) const noexcept {
+rust::Str Graph::get_node_attr_str(const Node &node, rust::Str name) const noexcept {
     auto node_id = node.get_id();
     return this->inner.inner->get_node_attr_str(node_id, name);
 }
 
-void Graph::set_node_attr_f32(Node node, rust::Str name, float value) noexcept {
+void Graph::set_node_attr_f32(const Node &node, rust::Str name, float value) noexcept {
     auto node_id = node.get_id();
+    std::cout << "Graph::set_node_attr_f32: name=" << name << " value="  << value << '\n';
     return this->inner.inner->set_node_attr_f32(node_id, name, value);
 }
 
-void Graph::set_node_attr_i32(Node node, rust::Str name, int32_t value) noexcept {
+void Graph::set_node_attr_i32(const Node &node, rust::Str name, int32_t value) noexcept {
     auto node_id = node.get_id();
     return this->inner.inner->set_node_attr_i32(node_id, name, value);
 }
 
-void Graph::set_node_attr_str(Node node, rust::Str name, rust::Str value) noexcept {
+void Graph::set_node_attr_str(const Node& node, rust::Str name, rust::Str value) noexcept {
     auto node_id = node.get_id();
     return this->inner.inner->set_node_attr_str(node_id, name, value);
 }
@@ -86,18 +87,18 @@ NodeStatus Graph::node_status(const Node &node) const noexcept {
     return this->inner.inner->node_status(node_id);
 }
 
-bool Graph::node_exists(Node node) noexcept {
+bool Graph::node_exists(const Node& node) noexcept {
     auto node_id = node.get_id();
     return this->inner.inner->node_exists(node_id);
 }
 
-void Graph::connect(Node src_node, Node dst_node, uint8_t input_num) noexcept {
+void Graph::connect(const Node& src_node, const Node& dst_node, uint8_t input_num) noexcept {
     auto src_node_id = src_node.get_id();
     auto dst_node_id = dst_node.get_id();
     this->inner.inner->connect(src_node_id, dst_node_id, input_num);
 }
 
-ExecuteStatus Graph::execute(Node node, std::shared_ptr<Cache> &cache) noexcept {
+ExecuteStatus Graph::execute(const Node& node, std::shared_ptr<Cache> &cache) noexcept {
     auto node_id = node.get_id();
     auto cache_box = cache->get_box();  // Borrow the underlying cache object.
     auto status = this->inner.inner->execute(node_id, cache_box);
