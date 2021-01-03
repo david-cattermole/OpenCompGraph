@@ -3,19 +3,19 @@ use log::info;
 
 /// Start the logger for OpenCompGraph.
 ///
-/// Use the environment variables "OCG_LOG" and "OCG_LOG_STYLE" to
-/// control the logging.
+/// Use the environment variables "OPENCOMPGRAPH_LOG" and
+/// "OPENCOMPGRAPH_LOG_STYLE" to control the logging.
 ///
-/// OCG_LOG: The level filter
-/// OCG_LOG_STYLE: Whether or not to print styles with records.
+/// OPENCOMPGRAPH_LOG: The level filter
+/// OPENCOMPGRAPH_LOG_STYLE: Whether or not to print styles with records.
 ///
-/// Set OCG_LOG to "info", "debug", "error", "warn" or "main". "main"
-/// will enable all logging, the other names are used to specifiy a
-/// specific logging level to be displayed (printed). By default ub
-/// OCG only warnings and errors are displayed.
+/// Set OPENCOMPGRAPH_LOG to "info", "debug", "error", "warn" or
+/// "main". "main" will enable all logging, the other names are used
+/// to specifiy a specific logging level to be displayed (printed). By
+/// default ub OCG only warnings and errors are displayed.
 ///
-/// Set OCG_LOG_STYLE to "auto", "always" or "never". The default in
-/// OCG is "never".
+/// Set OPENCOMPGRAPH_LOG_STYLE to "auto", "always" or "never". The
+/// default in OCG is "never".
 ///
 /// - "auto" - Try to print styles, but don't force the issue.
 /// - "always" - Try very hard to print styles.
@@ -30,8 +30,8 @@ use log::info;
 ///
 pub fn initialize() -> bool {
     let env = Env::new()
-        .filter_or("OCG_LOG", "warn")
-        .write_style_or("OCG_LOG_STYLE", "never");
+        .filter_or("OPENCOMPGRAPH_LOG", "warn")
+        .write_style_or("OPENCOMPGRAPH_LOG_STYLE", "never");
     let res = Builder::from_env(env).try_init();
     info!("Log initialized!");
     match res {
