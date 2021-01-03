@@ -12,6 +12,16 @@ use crate::data::HashValue;
 use crate::data::Identifier;
 use crate::data::Matrix4;
 use crate::data::PixelBlock;
+// use crate::geom::plane::calc_buffer_size_index_lines;
+use crate::geom::plane::calc_buffer_size_index_tris;
+use crate::geom::plane::calc_buffer_size_vertex_positions;
+use crate::geom::plane::calc_buffer_size_vertex_uvs;
+use crate::geom::plane::export_mesh;
+use crate::geom::plane::fill_all_buffers;
+// use crate::geom::plane::fill_buffer_index_lines;
+use crate::geom::plane::fill_buffer_index_tris;
+use crate::geom::plane::fill_buffer_vertex_positions;
+use crate::geom::plane::fill_buffer_vertex_uvs;
 use crate::graph::GraphImpl;
 use crate::logger::initialize;
 use crate::node::create_node;
@@ -260,6 +270,62 @@ pub mod ffi {
 
         fn generate_random_id() -> u64;
         fn generate_id_from_name(name: &str) -> u64;
+    }
+
+    // Geometry
+    #[namespace = "open_comp_graph::internal"]
+    extern "Rust" {
+        fn calc_buffer_size_vertex_positions(
+            divisions_x: u32,
+            divisions_y: u32,
+        ) -> usize;
+        fn calc_buffer_size_vertex_uvs(
+            divisions_x: u32,
+            divisions_y: u32,
+        ) -> usize;
+        // fn calc_buffer_size_index_lines(
+        //     divisions_x: u32,
+        //     divisions_y: u32,
+        // ) -> usize;
+        fn calc_buffer_size_index_tris(
+            divisions_x: u32,
+            divisions_y: u32,
+        ) -> usize;
+
+        fn fill_buffer_vertex_positions(
+            divisions_x: u32,
+            divisions_y: u32,
+            buffer_vertex_positions: &mut [f32],
+        ) -> bool;
+        fn fill_buffer_vertex_uvs(
+            divisions_x: u32,
+            divisions_y: u32,
+            buffer_vertex_uvs: &mut [f32],
+        ) -> bool;
+        fn fill_buffer_index_tris(
+            divisions_x: u32,
+            divisions_y: u32,
+            buffer_index_tris: &mut [u32],
+        ) -> bool;
+        // fn fill_buffer_index_lines(
+        //     divisions_x: u32,
+        //     divisions_y: u32,
+        //     buffer_index_lines: &mut [u32],
+        // ) -> bool;
+        fn fill_all_buffers(
+            divisions_x: u32,
+            divisions_y: u32,
+            buffer_vertex_positions: &mut [f32],
+            buffer_vertex_uvs: &mut [f32],
+            buffer_index_tris: &mut [u32],
+            // buffer_index_lines: &mut [u32],
+        ) -> bool;
+
+        fn export_mesh(
+            buffer_vertex_positions: &mut [f32],
+            buffer_index_tris: &mut [u32],
+            file_path: &str,
+        );
     }
 
     // Logging

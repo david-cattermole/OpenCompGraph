@@ -1159,6 +1159,22 @@ OPENCOMPGRAPH_SYMBOL_EXPORT ::rust::Vec<::open_comp_graph::internal::StreamDataI
 OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint64_t generate_random_id() noexcept;
 
 OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint64_t generate_id_from_name(::rust::Str name) noexcept;
+
+OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t calc_buffer_size_vertex_positions(::std::uint32_t divisions_x, ::std::uint32_t divisions_y) noexcept;
+
+OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t calc_buffer_size_vertex_uvs(::std::uint32_t divisions_x, ::std::uint32_t divisions_y) noexcept;
+
+OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t calc_buffer_size_index_tris(::std::uint32_t divisions_x, ::std::uint32_t divisions_y) noexcept;
+
+OPENCOMPGRAPH_SYMBOL_EXPORT bool fill_buffer_vertex_positions(::std::uint32_t divisions_x, ::std::uint32_t divisions_y, ::rust::Slice<float> buffer_vertex_positions) noexcept;
+
+OPENCOMPGRAPH_SYMBOL_EXPORT bool fill_buffer_vertex_uvs(::std::uint32_t divisions_x, ::std::uint32_t divisions_y, ::rust::Slice<float> buffer_vertex_uvs) noexcept;
+
+OPENCOMPGRAPH_SYMBOL_EXPORT bool fill_buffer_index_tris(::std::uint32_t divisions_x, ::std::uint32_t divisions_y, ::rust::Slice<::std::uint32_t> buffer_index_tris) noexcept;
+
+OPENCOMPGRAPH_SYMBOL_EXPORT bool fill_all_buffers(::std::uint32_t divisions_x, ::std::uint32_t divisions_y, ::rust::Slice<float> buffer_vertex_positions, ::rust::Slice<float> buffer_vertex_uvs, ::rust::Slice<::std::uint32_t> buffer_index_tris) noexcept;
+
+OPENCOMPGRAPH_SYMBOL_EXPORT void export_mesh(::rust::Slice<float> buffer_vertex_positions, ::rust::Slice<::std::uint32_t> buffer_index_tris, ::rust::Str file_path) noexcept;
 } // namespace internal
 
 namespace log {

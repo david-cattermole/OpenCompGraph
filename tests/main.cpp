@@ -8,6 +8,7 @@
 #include "test_f.h"
 #include "test_g.h"
 #include "test_h.h"
+#include "test_i.h"
 
 namespace ocg = open_comp_graph;
 
@@ -35,6 +36,7 @@ int main() {
         test_f(cache_f);
         test_g(cache_g);
         test_h(cache_h);
+        test_i();
     }
 
     bench.stop();

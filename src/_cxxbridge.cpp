@@ -924,6 +924,9 @@ public:
   static Slice<T> slice(repr::PtrLen repr) noexcept {
     return {static_cast<T *>(repr.ptr), repr.len};
   }
+  static repr::PtrLen repr(Slice<T> slice) noexcept {
+    return repr::PtrLen{slice.ptr, slice.len};
+  }
 };
 
 template <bool> struct deleter_if {
@@ -1345,6 +1348,22 @@ void open_comp_graph$internal$cxxbridge1$create_vec_stream_data_shared(::rust::V
 ::std::uint64_t open_comp_graph$internal$cxxbridge1$generate_random_id() noexcept;
 
 ::std::uint64_t open_comp_graph$internal$cxxbridge1$generate_id_from_name(::rust::repr::PtrLen name) noexcept;
+
+::std::size_t open_comp_graph$internal$cxxbridge1$calc_buffer_size_vertex_positions(::std::uint32_t divisions_x, ::std::uint32_t divisions_y) noexcept;
+
+::std::size_t open_comp_graph$internal$cxxbridge1$calc_buffer_size_vertex_uvs(::std::uint32_t divisions_x, ::std::uint32_t divisions_y) noexcept;
+
+::std::size_t open_comp_graph$internal$cxxbridge1$calc_buffer_size_index_tris(::std::uint32_t divisions_x, ::std::uint32_t divisions_y) noexcept;
+
+bool open_comp_graph$internal$cxxbridge1$fill_buffer_vertex_positions(::std::uint32_t divisions_x, ::std::uint32_t divisions_y, ::rust::repr::PtrLen buffer_vertex_positions) noexcept;
+
+bool open_comp_graph$internal$cxxbridge1$fill_buffer_vertex_uvs(::std::uint32_t divisions_x, ::std::uint32_t divisions_y, ::rust::repr::PtrLen buffer_vertex_uvs) noexcept;
+
+bool open_comp_graph$internal$cxxbridge1$fill_buffer_index_tris(::std::uint32_t divisions_x, ::std::uint32_t divisions_y, ::rust::repr::PtrLen buffer_index_tris) noexcept;
+
+bool open_comp_graph$internal$cxxbridge1$fill_all_buffers(::std::uint32_t divisions_x, ::std::uint32_t divisions_y, ::rust::repr::PtrLen buffer_vertex_positions, ::rust::repr::PtrLen buffer_vertex_uvs, ::rust::repr::PtrLen buffer_index_tris) noexcept;
+
+void open_comp_graph$internal$cxxbridge1$export_mesh(::rust::repr::PtrLen buffer_vertex_positions, ::rust::repr::PtrLen buffer_index_tris, ::rust::repr::PtrLen file_path) noexcept;
 } // extern "C"
 } // namespace internal
 
@@ -1657,6 +1676,38 @@ OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint64_t generate_random_id() noexcept {
 
 OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint64_t generate_id_from_name(::rust::Str name) noexcept {
   return open_comp_graph$internal$cxxbridge1$generate_id_from_name(::rust::impl<::rust::Str>::repr(name));
+}
+
+OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t calc_buffer_size_vertex_positions(::std::uint32_t divisions_x, ::std::uint32_t divisions_y) noexcept {
+  return open_comp_graph$internal$cxxbridge1$calc_buffer_size_vertex_positions(divisions_x, divisions_y);
+}
+
+OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t calc_buffer_size_vertex_uvs(::std::uint32_t divisions_x, ::std::uint32_t divisions_y) noexcept {
+  return open_comp_graph$internal$cxxbridge1$calc_buffer_size_vertex_uvs(divisions_x, divisions_y);
+}
+
+OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t calc_buffer_size_index_tris(::std::uint32_t divisions_x, ::std::uint32_t divisions_y) noexcept {
+  return open_comp_graph$internal$cxxbridge1$calc_buffer_size_index_tris(divisions_x, divisions_y);
+}
+
+OPENCOMPGRAPH_SYMBOL_EXPORT bool fill_buffer_vertex_positions(::std::uint32_t divisions_x, ::std::uint32_t divisions_y, ::rust::Slice<float> buffer_vertex_positions) noexcept {
+  return open_comp_graph$internal$cxxbridge1$fill_buffer_vertex_positions(divisions_x, divisions_y, ::rust::impl<::rust::Slice<float>>::repr(buffer_vertex_positions));
+}
+
+OPENCOMPGRAPH_SYMBOL_EXPORT bool fill_buffer_vertex_uvs(::std::uint32_t divisions_x, ::std::uint32_t divisions_y, ::rust::Slice<float> buffer_vertex_uvs) noexcept {
+  return open_comp_graph$internal$cxxbridge1$fill_buffer_vertex_uvs(divisions_x, divisions_y, ::rust::impl<::rust::Slice<float>>::repr(buffer_vertex_uvs));
+}
+
+OPENCOMPGRAPH_SYMBOL_EXPORT bool fill_buffer_index_tris(::std::uint32_t divisions_x, ::std::uint32_t divisions_y, ::rust::Slice<::std::uint32_t> buffer_index_tris) noexcept {
+  return open_comp_graph$internal$cxxbridge1$fill_buffer_index_tris(divisions_x, divisions_y, ::rust::impl<::rust::Slice<::std::uint32_t>>::repr(buffer_index_tris));
+}
+
+OPENCOMPGRAPH_SYMBOL_EXPORT bool fill_all_buffers(::std::uint32_t divisions_x, ::std::uint32_t divisions_y, ::rust::Slice<float> buffer_vertex_positions, ::rust::Slice<float> buffer_vertex_uvs, ::rust::Slice<::std::uint32_t> buffer_index_tris) noexcept {
+  return open_comp_graph$internal$cxxbridge1$fill_all_buffers(divisions_x, divisions_y, ::rust::impl<::rust::Slice<float>>::repr(buffer_vertex_positions), ::rust::impl<::rust::Slice<float>>::repr(buffer_vertex_uvs), ::rust::impl<::rust::Slice<::std::uint32_t>>::repr(buffer_index_tris));
+}
+
+OPENCOMPGRAPH_SYMBOL_EXPORT void export_mesh(::rust::Slice<float> buffer_vertex_positions, ::rust::Slice<::std::uint32_t> buffer_index_tris, ::rust::Str file_path) noexcept {
+  open_comp_graph$internal$cxxbridge1$export_mesh(::rust::impl<::rust::Slice<float>>::repr(buffer_vertex_positions), ::rust::impl<::rust::Slice<::std::uint32_t>>::repr(buffer_index_tris), ::rust::impl<::rust::Str>::repr(file_path));
 }
 } // namespace internal
 
