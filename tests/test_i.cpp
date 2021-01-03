@@ -49,6 +49,7 @@ void generate_mesh(const uint32_t divisions_x,
     // Export
     ocg::internal::export_mesh(
         slice_vertex_pos,
+        slice_vertex_uvs,
         slice_index_tris,
         file_path);
 }

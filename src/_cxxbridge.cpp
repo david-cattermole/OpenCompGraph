@@ -1363,7 +1363,7 @@ bool open_comp_graph$internal$cxxbridge1$fill_buffer_index_tris(::std::uint32_t 
 
 bool open_comp_graph$internal$cxxbridge1$fill_all_buffers(::std::uint32_t divisions_x, ::std::uint32_t divisions_y, ::rust::repr::PtrLen buffer_vertex_positions, ::rust::repr::PtrLen buffer_vertex_uvs, ::rust::repr::PtrLen buffer_index_tris) noexcept;
 
-void open_comp_graph$internal$cxxbridge1$export_mesh(::rust::repr::PtrLen buffer_vertex_positions, ::rust::repr::PtrLen buffer_index_tris, ::rust::repr::PtrLen file_path) noexcept;
+void open_comp_graph$internal$cxxbridge1$export_mesh(::rust::repr::PtrLen buffer_vertex_positions, ::rust::repr::PtrLen buffer_vertex_uvs, ::rust::repr::PtrLen buffer_index_tris, ::rust::repr::PtrLen file_path) noexcept;
 } // extern "C"
 } // namespace internal
 
@@ -1706,8 +1706,8 @@ OPENCOMPGRAPH_SYMBOL_EXPORT bool fill_all_buffers(::std::uint32_t divisions_x, :
   return open_comp_graph$internal$cxxbridge1$fill_all_buffers(divisions_x, divisions_y, ::rust::impl<::rust::Slice<float>>::repr(buffer_vertex_positions), ::rust::impl<::rust::Slice<float>>::repr(buffer_vertex_uvs), ::rust::impl<::rust::Slice<::std::uint32_t>>::repr(buffer_index_tris));
 }
 
-OPENCOMPGRAPH_SYMBOL_EXPORT void export_mesh(::rust::Slice<float> buffer_vertex_positions, ::rust::Slice<::std::uint32_t> buffer_index_tris, ::rust::Str file_path) noexcept {
-  open_comp_graph$internal$cxxbridge1$export_mesh(::rust::impl<::rust::Slice<float>>::repr(buffer_vertex_positions), ::rust::impl<::rust::Slice<::std::uint32_t>>::repr(buffer_index_tris), ::rust::impl<::rust::Str>::repr(file_path));
+OPENCOMPGRAPH_SYMBOL_EXPORT void export_mesh(::rust::Slice<float> buffer_vertex_positions, ::rust::Slice<float> buffer_vertex_uvs, ::rust::Slice<::std::uint32_t> buffer_index_tris, ::rust::Str file_path) noexcept {
+  open_comp_graph$internal$cxxbridge1$export_mesh(::rust::impl<::rust::Slice<float>>::repr(buffer_vertex_positions), ::rust::impl<::rust::Slice<float>>::repr(buffer_vertex_uvs), ::rust::impl<::rust::Slice<::std::uint32_t>>::repr(buffer_index_tris), ::rust::impl<::rust::Str>::repr(file_path));
 }
 } // namespace internal
 

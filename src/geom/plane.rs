@@ -16,7 +16,7 @@ pub fn calc_buffer_size_vertex_positions(divisions_x: u32, divisions_y: u32) -> 
 
 pub fn calc_buffer_size_vertex_uvs(divisions_x: u32, divisions_y: u32) -> usize {
     let number_of_elements = 2;
-    let length = calc_buffer_size_vertex_positions(divisions_x, divisions_y);
+    let length = calc_buffer_length_vertex_positions(divisions_x, divisions_y);
     (length * number_of_elements) as usize
 }
 
@@ -40,8 +40,8 @@ pub fn fill_buffer_vertex_positions(
 ) -> bool {
     let mut index = 0;
     let per_vertex_num = 3;
-    let square_size_x: f32 = 1.0 / (divisions_x as f32);
-    let square_size_y: f32 = 1.0 / (divisions_y as f32);
+    let square_size_x: f32 = 1.0 / ((divisions_x - 1) as f32);
+    let square_size_y: f32 = 1.0 / ((divisions_y - 1) as f32);
     for row in 0..divisions_y {
         for col in 0..divisions_x {
             buffer[index + 0] = col as f32;
@@ -57,8 +57,8 @@ pub fn fill_buffer_vertex_positions(
 pub fn fill_buffer_vertex_uvs(divisions_x: u32, divisions_y: u32, buffer: &mut [f32]) -> bool {
     let mut index = 0;
     let per_vertex_num = 2;
-    let square_size_x: f32 = 1.0 / (divisions_x as f32);
-    let square_size_y: f32 = 1.0 / (divisions_y as f32);
+    let square_size_x: f32 = 1.0 / ((divisions_x - 1) as f32);
+    let square_size_y: f32 = 1.0 / ((divisions_y - 1) as f32);
     for row in 0..divisions_y {
         for col in 0..divisions_x {
             buffer[index + 0] = (col as f32) * square_size_x;
@@ -131,7 +131,7 @@ pub fn fill_all_buffers(
     true
 }
 
-pub fn export_mesh(positions: &[f32], indices: &[u32], file_path: &str) {
+pub fn export_mesh(positions: &[f32], uvs: &[f32], indices: &[u32], file_path: &str) {
     debug!("Exporting Mesh: {}", file_path);
     // debug!("positions: size={} {:#?}", positions.len(), positions);
     // debug!("indices: size={} {:#?}", indices.len(), indices);
@@ -148,6 +148,15 @@ pub fn export_mesh(positions: &[f32], indices: &[u32], file_path: &str) {
         data.push_str(&format!("v {} {} {}\n", x, y, z));
     }
 
+    let uv_count = uvs.len() / 2;
+    debug!("uv_count: {}", uv_count);
+    for i in 0..uv_count {
+        let index = i * 2;
+        let x = uvs[index + 0];
+        let y = uvs[index + 1];
+        data.push_str(&format!("vt {} {}\n", x, y));
+    }
+
     let tri_count = indices.len() / 3;
     debug!("tri_count: {}", tri_count);
     let mut tri_index = 0;
@@ -157,7 +166,7 @@ pub fn export_mesh(positions: &[f32], indices: &[u32], file_path: &str) {
         let x = 1 + indices[tri_index + 0];
         let y = 1 + indices[tri_index + 1];
         let z = 1 + indices[tri_index + 2];
-        data.push_str(&format!("f {} {} {}\n", x, y, z));
+        data.push_str(&format!("f {0}/{0} {1}/{1} {2}/{2}\n", x, y, z));
         tri_index += 3;
     }
 

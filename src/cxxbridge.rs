@@ -323,6 +323,7 @@ pub mod ffi {
 
         fn export_mesh(
             buffer_vertex_positions: &mut [f32],
+            buffer_vertex_uvs: &mut [f32],
             buffer_index_tris: &mut [u32],
             file_path: &str,
         );
