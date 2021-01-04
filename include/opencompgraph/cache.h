@@ -14,9 +14,6 @@ public:
     Cache() noexcept;
 
     OPENCOMPGRAPH_SYMBOL_EXPORT
-    ~Cache();
-
-    OPENCOMPGRAPH_SYMBOL_EXPORT
     rust::Box<internal::CacheImpl> get_box() noexcept;
 
     OPENCOMPGRAPH_SYMBOL_EXPORT

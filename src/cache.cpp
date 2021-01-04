@@ -10,10 +10,6 @@ Cache::Cache() noexcept
     std::cout << "Cache()" << '\n';
 }
 
-Cache::~Cache() {
-    std::cout << "~Cache()" << '\n';
-}
-
 rust::Box<internal::CacheImpl> Cache::get_box() noexcept {
     return std::move(this->inner.inner);
 }

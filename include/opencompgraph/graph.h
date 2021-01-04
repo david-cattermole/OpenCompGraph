@@ -15,7 +15,6 @@ namespace open_comp_graph {
 class Graph {
 public:
     OPENCOMPGRAPH_SYMBOL_EXPORT Graph() noexcept;
-    OPENCOMPGRAPH_SYMBOL_EXPORT ~Graph();
 
     OPENCOMPGRAPH_SYMBOL_EXPORT
     Node create_node(NodeType node_type) noexcept;

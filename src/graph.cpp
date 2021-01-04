@@ -11,10 +11,6 @@ Graph::Graph() noexcept : inner{internal::create_graph_shared()} {
     std::cout << "Graph()" << '\n';
 }
 
-Graph::~Graph() {
-    std::cout << "~Graph()" << '\n';
-}
-
 Node Graph::create_node(NodeType node_type) noexcept {
     auto id = internal::generate_random_id();
     auto node = Node(node_type, id);
