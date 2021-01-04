@@ -12,12 +12,10 @@ use crate::data::HashValue;
 use crate::data::Identifier;
 use crate::data::Matrix4;
 use crate::data::PixelBlock;
-// use crate::geom::plane::calc_buffer_size_index_lines;
 use crate::geom::plane::calc_buffer_size_index_tris;
 use crate::geom::plane::calc_buffer_size_vertex_positions;
 use crate::geom::plane::calc_buffer_size_vertex_uvs;
 use crate::geom::plane::export_mesh;
-// use crate::geom::plane::fill_buffer_index_lines;
 use crate::geom::plane::fill_buffer_index_tris;
 use crate::geom::plane::fill_buffer_vertex_positions;
 use crate::geom::plane::fill_buffer_vertex_uvs;
@@ -308,7 +306,6 @@ pub mod ffi {
         //     buffer_vertex_positions: &mut [f32],
         //     buffer_vertex_uvs: &mut [f32],
         //     buffer_index_tris: &mut [u32],
-        //     // buffer_index_lines: &mut [u32],
         // ) -> bool;
 
         fn export_mesh(

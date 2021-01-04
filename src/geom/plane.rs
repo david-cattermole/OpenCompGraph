@@ -20,11 +20,6 @@ pub fn calc_buffer_size_vertex_uvs(divisions_x: u32, divisions_y: u32) -> usize 
     (length * number_of_elements) as usize
 }
 
-// pub fn calc_buffer_size_index_lines(divisions_x: u32, divisions_y: u32) -> usize {
-//     // TODO: Support Line buffers.
-//     0
-// }
-
 pub fn calc_buffer_size_index_tris(divisions_x: u32, divisions_y: u32) -> usize {
     let number_of_faces = ((divisions_x - 1) * (divisions_y - 1)) as usize;
     let tris_per_face = 2;
@@ -96,15 +91,6 @@ pub fn fill_buffer_index_tris(divisions_x: u32, divisions_y: u32, buffer: &mut [
     true
 }
 
-// /// Index Buffer Lines
-// pub fn fill_buffer_index_lines(
-//     divisions_x: u32,
-//     divisions_y: u32,
-//     buffer_index_lines: &mut [u32],
-// ) -> bool {
-//     true
-// }
-
 // /// Fill the values of all buffers at once.
 // pub fn fill_all_buffers(
 //     divisions_x: u32,
@@ -112,21 +98,17 @@ pub fn fill_buffer_index_tris(divisions_x: u32, divisions_y: u32, buffer: &mut [
 //     buffer_vertex_positions: &mut [f32],
 //     buffer_vertex_uvs: &mut [f32],
 //     buffer_index_tris: &mut [u32],
-//     // buffer_index_lines: &mut [u32],
 // ) -> bool {
 //     let vertex_pos_num = calc_buffer_size_vertex_positions(divisions_x, divisions_y);
 //     let vertex_uv_num = calc_buffer_size_vertex_uvs(divisions_x, divisions_y);
 //     let index_tri_num = calc_buffer_size_index_tris(divisions_x, divisions_y);
-//     // let index_line_num = calc_buffer_size_index_lines(divisions_x, divisions_y);
 //     assert_eq!(buffer_vertex_positions.len(), vertex_pos_num);
 //     assert_eq!(buffer_vertex_uvs.len(), vertex_uv_num);
 //     assert_eq!(buffer_index_tris.len(), index_tri_num);
-//     // assert_eq!(buffer_index_lines.len(), index_line_num);
 
 //     fill_buffer_vertex_positions(divisions_x, divisions_y, buffer_vertex_positions);
 //     fill_buffer_vertex_uvs(divisions_x, divisions_y, buffer_vertex_uvs);
 //     fill_buffer_index_tris(divisions_x, divisions_y, buffer_index_tris);
-//     // fill_buffer_index_lines(divisions_x, divisions_y, buffer_index_lines);
 //     true
 // }
 
