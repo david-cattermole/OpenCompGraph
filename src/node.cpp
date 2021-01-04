@@ -7,10 +7,10 @@ namespace open_comp_graph {
 
 Node::Node(NodeType node_type, uint64_t id) noexcept
         : m_id(id), m_node_type(node_type) {
-    std::cout << "Node() with id"
-              << " node_type=" << static_cast<uint32_t>(node_type)
-              << " id=" << id
-              << '\n';
+    // std::cout << "Node() with id"
+    //           << " node_type=" << static_cast<uint32_t>(node_type)
+    //           << " id=" << id
+    //           << '\n';
 }
 
 Node::~Node() {

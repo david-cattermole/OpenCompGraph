@@ -7,7 +7,7 @@ namespace open_comp_graph {
 
 Cache::Cache() noexcept
         : inner{internal::create_cache_shared()} {
-    std::cout << "Cache()" << '\n';
+    // std::cout << "Cache()" << '\n';
 }
 
 rust::Box<internal::CacheImpl> Cache::get_box() noexcept {

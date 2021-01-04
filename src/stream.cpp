@@ -8,12 +8,12 @@ namespace open_comp_graph {
 
 StreamData::StreamData() noexcept
         : inner{internal::create_stream_data_shared()} {
-    std::cout << "StreamData()" << '\n';
+    // std::cout << "StreamData()" << '\n';
 }
 
 StreamData::StreamData(rust::Box<internal::StreamDataImpl> box) noexcept
         : inner{internal::create_stream_data_shared_box(std::move(box))} {
-    std::cout << "StreamData(box)" << '\n';
+    // std::cout << "StreamData(box)" << '\n';
 }
 
 rust::Box<internal::StreamDataImpl> StreamData::get_box() noexcept {

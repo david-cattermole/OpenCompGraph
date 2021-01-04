@@ -8,7 +8,7 @@
 namespace open_comp_graph {
 
 Graph::Graph() noexcept : inner{internal::create_graph_shared()} {
-    std::cout << "Graph()" << '\n';
+    // std::cout << "Graph()" << '\n';
 }
 
 Node Graph::create_node(NodeType node_type) noexcept {
@@ -65,7 +65,7 @@ rust::Str Graph::get_node_attr_str(const Node &node, rust::Str name) const noexc
 
 void Graph::set_node_attr_f32(const Node &node, rust::Str name, float value) noexcept {
     auto node_id = node.get_id();
-    std::cout << "Graph::set_node_attr_f32: name=" << name << " value="  << value << '\n';
+    // std::cout << "Graph::set_node_attr_f32: name=" << name << " value="  << value << '\n';
     return this->inner.inner->set_node_attr_f32(node_id, name, value);
 }
 
