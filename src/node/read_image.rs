@@ -9,8 +9,8 @@ use std::hash::Hash;
 use std::path::Path;
 use std::string::String;
 
-use crate::bbox::BBox2D;
 use crate::cxxbridge::ffi::AttrState;
+use crate::cxxbridge::ffi::BBox2D;
 use crate::cxxbridge::ffi::NodeStatus;
 use crate::cxxbridge::ffi::NodeType;
 use crate::cxxbridge::ffi::StreamDataImplShared;
@@ -85,12 +85,12 @@ impl Compute for ReadImageCompute {
             let img = image::open(path).unwrap();
             let pixel_block = PixelBlock::from_image(img);
 
-            let display_window = Box::new(BBox2D::new(
+            let display_window = BBox2D::new(
                 0.0,
                 0.0,
                 pixel_block.width as f32,
                 pixel_block.height as f32,
-            ));
+            );
             let data_window = display_window.clone();
 
             let hash_value = self.cache_hash(node_type_id, &attr_block, inputs);

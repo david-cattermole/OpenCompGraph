@@ -2,20 +2,20 @@ use image;
 use log::{debug, error, info, warn};
 use std::rc::Rc;
 
-use crate::bbox::BBox2D;
+use crate::cxxbridge::ffi::BBox2D;
+use crate::cxxbridge::ffi::Matrix4;
 use crate::cxxbridge::ffi::StreamDataState;
 use crate::data::HashValue;
-use crate::matrix::Matrix4;
 use crate::pixelblock::PixelBlock;
 
 #[derive(Debug, Clone, Hash)]
 pub struct StreamDataImpl {
     state: StreamDataState,
     hash: HashValue,
-    display_window: Box<BBox2D>,
-    data_window: Box<BBox2D>,
-    color_matrix: Box<Matrix4>,
-    transform_matrix: Box<Matrix4>,
+    display_window: BBox2D,
+    data_window: BBox2D,
+    color_matrix: Matrix4,
+    transform_matrix: Matrix4,
     pixel_block: Rc<PixelBlock>,
 }
 
@@ -29,10 +29,10 @@ impl StreamDataImpl {
         let num_channels = 3;
         let pixel_block = Rc::new(PixelBlock::new(width, height, num_channels));
 
-        let display_window = Box::new(BBox2D::new(0.0, 0.0, 1.0, 1.0));
-        let data_window = Box::new(BBox2D::new(0.0, 0.0, 1.0, 1.0));
-        let color_matrix = Box::new(Matrix4::new());
-        let transform_matrix = Box::new(Matrix4::new());
+        let display_window = BBox2D::new(0.0, 0.0, 1.0, 1.0);
+        let data_window = BBox2D::new(0.0, 0.0, 1.0, 1.0);
+        let color_matrix = Matrix4::identity();
+        let transform_matrix = Matrix4::identity();
 
         StreamDataImpl {
             state,
@@ -65,19 +65,19 @@ impl StreamDataImpl {
         self.hash = value;
     }
 
-    pub fn display_window(&self) -> &Box<BBox2D> {
-        &self.display_window
+    pub fn display_window(&self) -> BBox2D {
+        self.display_window
     }
 
-    pub fn set_display_window(&mut self, value: Box<BBox2D>) {
+    pub fn set_display_window(&mut self, value: BBox2D) {
         self.display_window = value;
     }
 
-    pub fn data_window(&self) -> &Box<BBox2D> {
-        &self.data_window
+    pub fn data_window(&self) -> BBox2D {
+        self.data_window
     }
 
-    pub fn set_data_window(&mut self, value: Box<BBox2D>) {
+    pub fn set_data_window(&mut self, value: BBox2D) {
         self.data_window = value;
     }
 
@@ -113,11 +113,11 @@ impl StreamDataImpl {
         self.pixel_block.num_channels
     }
 
-    pub fn color_matrix(&self) -> &Box<Matrix4> {
-        &self.color_matrix
+    pub fn color_matrix(&self) -> Matrix4 {
+        self.color_matrix
     }
 
-    pub fn transform_matrix(&self) -> &Box<Matrix4> {
-        &self.transform_matrix
+    pub fn transform_matrix(&self) -> Matrix4 {
+        self.transform_matrix
     }
 }

@@ -36,6 +36,22 @@ uint64_t StreamData::hash() const noexcept {
     return this->inner.inner->hash();
 }
 
+BBox2D StreamData::display_window() const noexcept {
+    return this->inner.inner->display_window();
+};
+
+void StreamData::set_display_window(BBox2D value) noexcept {
+    this->inner.inner->set_display_window(value);
+};
+
+BBox2D StreamData::data_window() const noexcept {
+    return this->inner.inner->data_window();
+};
+
+void StreamData::set_data_window(BBox2D value) noexcept {
+    this->inner.inner->set_data_window(value);
+};
+
 const internal::PixelBlock& StreamData::pixel_block() const noexcept {
     return this->inner.inner->pixel_block();
 }

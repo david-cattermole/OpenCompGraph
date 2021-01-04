@@ -32,6 +32,18 @@ public:
     uint64_t hash() const noexcept;
 
     OPENCOMPGRAPH_SYMBOL_EXPORT
+    BBox2D display_window() const noexcept;
+
+    OPENCOMPGRAPH_SYMBOL_EXPORT
+    void set_display_window(BBox2D value) noexcept;
+
+    OPENCOMPGRAPH_SYMBOL_EXPORT
+    BBox2D data_window() const noexcept;
+
+    OPENCOMPGRAPH_SYMBOL_EXPORT
+    void set_data_window(BBox2D value) noexcept;
+
+    OPENCOMPGRAPH_SYMBOL_EXPORT
     const internal::PixelBlock& pixel_block() const noexcept;
 
     OPENCOMPGRAPH_SYMBOL_EXPORT

@@ -898,6 +898,8 @@ std::size_t align_of() {
 } // namespace rust
 
 namespace open_comp_graph {
+  struct BBox2D;
+  struct Matrix4;
   enum class ExecuteStatus : ::std::uint8_t;
   enum class NodeType : ::std::uint8_t;
   enum class NodeStatus : ::std::uint8_t;
@@ -912,8 +914,6 @@ namespace open_comp_graph {
     struct CacheImplShared;
     struct ThingR;
     struct PixelBlock;
-    struct BBox2D;
-    struct Matrix4;
     struct StreamDataImpl;
     struct NodeImpl;
     struct CacheImpl;
@@ -937,6 +937,54 @@ struct SharedThing final {
 };
 #endif // CXXBRIDGE1_STRUCT_open_comp_graph$shared$SharedThing
 } // namespace shared
+
+#ifndef CXXBRIDGE1_STRUCT_open_comp_graph$BBox2D
+#define CXXBRIDGE1_STRUCT_open_comp_graph$BBox2D
+struct BBox2D final {
+  float min_x;
+  float min_y;
+  float max_x;
+  float max_y;
+
+  bool operator==(const BBox2D &) const noexcept;
+  bool operator!=(const BBox2D &) const noexcept;
+  bool operator<(const BBox2D &) const noexcept;
+  bool operator<=(const BBox2D &) const noexcept;
+  bool operator>(const BBox2D &) const noexcept;
+  bool operator>=(const BBox2D &) const noexcept;
+  using IsRelocatable = ::std::true_type;
+};
+#endif // CXXBRIDGE1_STRUCT_open_comp_graph$BBox2D
+
+#ifndef CXXBRIDGE1_STRUCT_open_comp_graph$Matrix4
+#define CXXBRIDGE1_STRUCT_open_comp_graph$Matrix4
+struct Matrix4 final {
+  float m00;
+  float m01;
+  float m02;
+  float m03;
+  float m10;
+  float m11;
+  float m12;
+  float m13;
+  float m20;
+  float m21;
+  float m22;
+  float m23;
+  float m30;
+  float m31;
+  float m32;
+  float m33;
+
+  bool operator==(const Matrix4 &) const noexcept;
+  bool operator!=(const Matrix4 &) const noexcept;
+  bool operator<(const Matrix4 &) const noexcept;
+  bool operator<=(const Matrix4 &) const noexcept;
+  bool operator>(const Matrix4 &) const noexcept;
+  bool operator>=(const Matrix4 &) const noexcept;
+  using IsRelocatable = ::std::true_type;
+};
+#endif // CXXBRIDGE1_STRUCT_open_comp_graph$Matrix4
 
 namespace internal {
 #ifndef CXXBRIDGE1_STRUCT_open_comp_graph$internal$GraphImplShared
@@ -1041,44 +1089,18 @@ private:
 };
 #endif // CXXBRIDGE1_STRUCT_open_comp_graph$internal$PixelBlock
 
-#ifndef CXXBRIDGE1_STRUCT_open_comp_graph$internal$BBox2D
-#define CXXBRIDGE1_STRUCT_open_comp_graph$internal$BBox2D
-struct BBox2D final : public ::rust::Opaque {
-  ~BBox2D() = delete;
-
-private:
-  friend ::rust::layout;
-  struct layout {
-    static ::std::size_t size() noexcept;
-    static ::std::size_t align() noexcept;
-  };
-};
-#endif // CXXBRIDGE1_STRUCT_open_comp_graph$internal$BBox2D
-
-#ifndef CXXBRIDGE1_STRUCT_open_comp_graph$internal$Matrix4
-#define CXXBRIDGE1_STRUCT_open_comp_graph$internal$Matrix4
-struct Matrix4 final : public ::rust::Opaque {
-  ~Matrix4() = delete;
-
-private:
-  friend ::rust::layout;
-  struct layout {
-    static ::std::size_t size() noexcept;
-    static ::std::size_t align() noexcept;
-  };
-};
-#endif // CXXBRIDGE1_STRUCT_open_comp_graph$internal$Matrix4
-
 #ifndef CXXBRIDGE1_STRUCT_open_comp_graph$internal$StreamDataImpl
 #define CXXBRIDGE1_STRUCT_open_comp_graph$internal$StreamDataImpl
 struct StreamDataImpl final : public ::rust::Opaque {
   OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::StreamDataState state() const noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint8_t state_id() const noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint64_t hash() const noexcept;
-  OPENCOMPGRAPH_SYMBOL_EXPORT const ::rust::Box<::open_comp_graph::internal::BBox2D> &display_window() const noexcept;
-  OPENCOMPGRAPH_SYMBOL_EXPORT const ::rust::Box<::open_comp_graph::internal::BBox2D> &data_window() const noexcept;
-  OPENCOMPGRAPH_SYMBOL_EXPORT const ::rust::Box<::open_comp_graph::internal::Matrix4> &color_matrix() const noexcept;
-  OPENCOMPGRAPH_SYMBOL_EXPORT const ::rust::Box<::open_comp_graph::internal::Matrix4> &transform_matrix() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::BBox2D display_window() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT void set_display_window(::open_comp_graph::BBox2D value) noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::BBox2D data_window() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT void set_data_window(::open_comp_graph::BBox2D value) noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::Matrix4 color_matrix() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::Matrix4 transform_matrix() const noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT const ::open_comp_graph::internal::PixelBlock &pixel_block() const noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT ::rust::Slice<const float> pixel_buffer() const noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint32_t pixel_width() const noexcept;

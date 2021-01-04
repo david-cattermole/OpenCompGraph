@@ -25,6 +25,20 @@ int test_h(std::shared_ptr<ocg::Cache> cache) {
               << graph.data_debug_string();
 
     auto stream_data = graph.output_stream();
+    auto display_window = stream_data.display_window();
+    std::cerr << "display_window:"
+              << " min_x=" << display_window.min_x
+              << " min_y=" << display_window.min_y
+              << " max_x=" << display_window.max_x
+              << " max_y=" << display_window.max_y
+              << '\n';
+    auto data_window = stream_data.data_window();
+    std::cerr << "data_window:"
+              << " min_x=" << data_window.min_x
+              << " min_y=" << data_window.min_y
+              << " max_x=" << data_window.max_x
+              << " max_y=" << data_window.max_y
+              << '\n';
     auto pixel_buffer = stream_data.pixel_buffer();
     auto pixel_width = stream_data.pixel_width();
     auto pixel_height = stream_data.pixel_height();

@@ -1,7 +1,6 @@
 use cxx::{CxxString, UniquePtr};
 use log::{debug, error, info, warn};
 
-use crate::bbox::BBox2D;
 use crate::cache::CacheImpl;
 use crate::data::HashValue;
 use crate::data::Identifier;
@@ -19,7 +18,6 @@ use crate::hashutils::calculate_hash;
 use crate::hashutils::generate_id_from_name;
 use crate::hashutils::generate_random_id;
 use crate::logger::initialize;
-use crate::matrix::Matrix4;
 use crate::node::create_node;
 use crate::node::NodeImpl;
 use crate::pixelblock::PixelBlock;
@@ -35,11 +33,45 @@ pub mod ffi {
         x: UniquePtr<ThingC>,
     }
 
+    #[derive(Debug, Copy, Clone, Default, PartialEq, PartialOrd)]
+    #[namespace = "open_comp_graph"]
+    struct BBox2D {
+        min_x: f32,
+        min_y: f32,
+        max_x: f32,
+        max_y: f32,
+    }
+
+    #[derive(Debug, Copy, Clone, Default, PartialEq, PartialOrd)]
+    #[namespace = "open_comp_graph"]
+    struct Matrix4 {
+        m00: f32,
+        m01: f32,
+        m02: f32,
+        m03: f32,
+        //
+        m10: f32,
+        m11: f32,
+        m12: f32,
+        m13: f32,
+        //
+        m20: f32,
+        m21: f32,
+        m22: f32,
+        m23: f32,
+        //
+        m30: f32,
+        m31: f32,
+        m32: f32,
+        m33: f32,
+    }
+
     #[derive(Debug)]
     #[namespace = "open_comp_graph::internal"]
     pub(crate) struct GraphImplShared {
         inner: Box<GraphImpl>,
     }
+
 
     #[derive(Debug, Hash, Clone)]
     #[namespace = "open_comp_graph::internal"]
@@ -164,18 +196,6 @@ pub mod ffi {
         type PixelBlock;
     }
 
-    // BBox2D
-    #[namespace = "open_comp_graph::internal"]
-    extern "Rust" {
-        type BBox2D;
-    }
-
-    // Matrix4
-    #[namespace = "open_comp_graph::internal"]
-    extern "Rust" {
-        type Matrix4;
-    }
-
     // StreamData
     #[namespace = "open_comp_graph::internal"]
     extern "Rust" {
@@ -183,10 +203,12 @@ pub mod ffi {
         fn state(&self) -> StreamDataState;
         fn state_id(&self) -> u8;
         fn hash(&self) -> u64;
-        fn display_window(&self) -> &Box<BBox2D>;
-        fn data_window(&self) -> &Box<BBox2D>;
-        fn color_matrix(&self) -> &Box<Matrix4>;
-        fn transform_matrix(&self) -> &Box<Matrix4>;
+        fn display_window(&self) -> BBox2D;
+        fn set_display_window(&mut self, value: BBox2D);
+        fn data_window(&self) -> BBox2D;
+        fn set_data_window(&mut self, value: BBox2D);
+        fn color_matrix(&self) -> Matrix4;
+        fn transform_matrix(&self) -> Matrix4;
         fn pixel_block(&self) -> &PixelBlock;
         fn pixel_buffer(&self) -> &[f32];
         fn pixel_width(&self) -> u32;
