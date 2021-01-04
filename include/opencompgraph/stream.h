@@ -17,9 +17,6 @@ public:
     explicit StreamData(rust::Box<internal::StreamDataImpl> box) noexcept;
 
     OPENCOMPGRAPH_SYMBOL_EXPORT
-    ~StreamData();
-
-    OPENCOMPGRAPH_SYMBOL_EXPORT
     rust::Box<internal::StreamDataImpl> get_box() noexcept;
 
     OPENCOMPGRAPH_SYMBOL_EXPORT

@@ -77,9 +77,13 @@ public:
   bool operator>(const String &) const noexcept;
   bool operator>=(const String &) const noexcept;
 
+  void swap(String &) noexcept;
+
   String(unsafe_bitcopy_t, const String &) noexcept;
 
 private:
+  friend void swap(String &lhs, String &rhs) noexcept { lhs.swap(rhs); }
+
   std::array<std::uintptr_t, 3> repr;
 };
 #endif // CXXBRIDGE1_RUST_STRING
@@ -119,17 +123,15 @@ public:
   bool operator>(const Str &) const noexcept;
   bool operator>=(const Str &) const noexcept;
 
+  void swap(Str &) noexcept;
+
 private:
+  class uninit;
+  Str(uninit) noexcept;
   friend impl<Str>;
-  const char *ptr;
-  std::size_t len;
+
+  std::array<std::uintptr_t, 2> repr;
 };
-
-inline const char *Str::data() const noexcept { return this->ptr; }
-
-inline std::size_t Str::size() const noexcept { return this->len; }
-
-inline std::size_t Str::length() const noexcept { return this->len; }
 #endif // CXXBRIDGE1_RUST_STR
 
 #ifndef CXXBRIDGE1_RUST_SLICE
@@ -176,10 +178,17 @@ public:
   iterator begin() const noexcept;
   iterator end() const noexcept;
 
+  void swap(Slice &) noexcept;
+
 private:
+  class uninit;
+  Slice(uninit) noexcept;
   friend impl<Slice>;
-  void *ptr;
-  std::size_t len;
+  friend void sliceInit(void *, const void *, std::size_t) noexcept;
+  friend void *slicePtr(const void *) noexcept;
+  friend std::size_t sliceLen(const void *) noexcept;
+
+  std::array<std::uintptr_t, 2> repr;
 };
 
 template <typename T>
@@ -220,37 +229,39 @@ private:
 };
 
 template <typename T>
-Slice<T>::Slice() noexcept
-    : ptr(reinterpret_cast<void *>(align_of<T>())), len(0) {}
+Slice<T>::Slice() noexcept {
+  sliceInit(this, reinterpret_cast<void *>(align_of<T>()), 0);
+}
 
 template <typename T>
-Slice<T>::Slice(T *s, std::size_t count) noexcept
-    : ptr(const_cast<typename std::remove_const<T>::type *>(s)), len(count) {}
+Slice<T>::Slice(T *s, std::size_t count) noexcept {
+  sliceInit(this, const_cast<typename std::remove_const<T>::type *>(s), count);
+}
 
 template <typename T>
 T *Slice<T>::data() const noexcept {
-  return reinterpret_cast<T *>(this->ptr);
+  return reinterpret_cast<T *>(slicePtr(this));
 }
 
 template <typename T>
 std::size_t Slice<T>::size() const noexcept {
-  return this->len;
+  return sliceLen(this);
 }
 
 template <typename T>
 std::size_t Slice<T>::length() const noexcept {
-  return this->len;
+  return this->size();
 }
 
 template <typename T>
 bool Slice<T>::empty() const noexcept {
-  return this->len == 0;
+  return this->size() == 0;
 }
 
 template <typename T>
 T &Slice<T>::operator[](std::size_t n) const noexcept {
   assert(n < this->size());
-  auto pos = static_cast<char *>(this->ptr) + size_of<T>() * n;
+  auto pos = static_cast<char *>(slicePtr(this)) + size_of<T>() * n;
   return *reinterpret_cast<T *>(pos);
 }
 
@@ -271,7 +282,7 @@ T &Slice<T>::front() const noexcept {
 template <typename T>
 T &Slice<T>::back() const noexcept {
   assert(!this->empty());
-  return (*this)[this->len - 1];
+  return (*this)[this->size() - 1];
 }
 
 template <typename T>
@@ -290,7 +301,7 @@ template <typename T>
 typename Slice<T>::iterator::reference Slice<T>::iterator::operator[](
     typename Slice<T>::iterator::difference_type n) const noexcept {
   auto pos = static_cast<char *>(this->pos) + this->stride * n;
-  return *static_cast<T *>(pos);
+  return *reinterpret_cast<T *>(pos);
 }
 
 template <typename T>
@@ -390,7 +401,7 @@ bool Slice<T>::iterator::operator>=(const iterator &other) const noexcept {
 template <typename T>
 typename Slice<T>::iterator Slice<T>::begin() const noexcept {
   iterator it;
-  it.pos = this->ptr;
+  it.pos = slicePtr(this);
   it.stride = size_of<T>();
   return it;
 }
@@ -398,8 +409,13 @@ typename Slice<T>::iterator Slice<T>::begin() const noexcept {
 template <typename T>
 typename Slice<T>::iterator Slice<T>::end() const noexcept {
   iterator it = this->begin();
-  it.pos = static_cast<char *>(it.pos) + it.stride * this->len;
+  it.pos = static_cast<char *>(it.pos) + it.stride * this->size();
   return it;
+}
+
+template <typename T>
+void Slice<T>::swap(Slice &rhs) noexcept {
+  std::swap(*this, rhs);
 }
 #endif // CXXBRIDGE1_RUST_SLICE
 
@@ -414,14 +430,12 @@ public:
   using pointer = typename std::add_pointer<T>::type;
 
   Box() = delete;
-  Box(const Box &);
   Box(Box &&) noexcept;
   ~Box() noexcept;
 
   explicit Box(const T &);
   explicit Box(T &&);
 
-  Box &operator=(const Box &);
   Box &operator=(Box &&) noexcept;
 
   const T *operator->() const noexcept;
@@ -431,6 +445,8 @@ public:
 
   template <typename... Fields>
   static Box in_place(Fields &&...);
+
+  void swap(Box &) noexcept;
 
   static Box from_raw(T *) noexcept;
 
@@ -443,6 +459,9 @@ private:
   class allocation;
   Box(uninit) noexcept;
   void drop() noexcept;
+
+  friend void swap(Box &lhs, Box &rhs) noexcept { lhs.swap(rhs); }
+
   T *ptr;
 };
 
@@ -463,9 +482,6 @@ public:
   }
   T *ptr;
 };
-
-template <typename T>
-Box<T>::Box(const Box &other) : Box(*other) {}
 
 template <typename T>
 Box<T>::Box(Box &&other) noexcept : ptr(other.ptr) {
@@ -493,19 +509,6 @@ Box<T>::~Box() noexcept {
   if (this->ptr) {
     this->drop();
   }
-}
-
-template <typename T>
-Box<T> &Box<T>::operator=(const Box &other) {
-  if (this->ptr) {
-    **this = *other;
-  } else {
-    allocation alloc;
-    ::new (alloc.ptr) T(*other);
-    this->ptr = alloc.ptr;
-    alloc.ptr = nullptr;
-  }
-  return *this;
 }
 
 template <typename T>
@@ -546,6 +549,12 @@ Box<T> Box<T>::in_place(Fields &&... fields) {
   ::new (ptr) T{std::forward<Fields>(fields)...};
   alloc.ptr = nullptr;
   return from_raw(ptr);
+}
+
+template <typename T>
+void Box<T>::swap(Box &rhs) noexcept {
+  using std::swap;
+  swap(this->ptr, rhs.ptr);
 }
 
 template <typename T>
@@ -623,12 +632,16 @@ public:
   const_iterator cbegin() const noexcept;
   const_iterator cend() const noexcept;
 
+  void swap(Vec &) noexcept;
+
   Vec(unsafe_bitcopy_t, const Vec &) noexcept;
 
 private:
   void reserve_total(std::size_t cap) noexcept;
   void set_len(std::size_t len) noexcept;
   void drop() noexcept;
+
+  friend void swap(Vec &lhs, Vec &rhs) noexcept { lhs.swap(rhs); }
 
   std::array<std::uintptr_t, 3> repr;
 };
@@ -792,6 +805,12 @@ typename Vec<T>::const_iterator Vec<T>::cbegin() const noexcept {
 template <typename T>
 typename Vec<T>::const_iterator Vec<T>::cend() const noexcept {
   return Slice<const T>(this->data(), this->size()).end();
+}
+
+template <typename T>
+void Vec<T>::swap(Vec &rhs) noexcept {
+  using std::swap;
+  swap(this->repr, rhs.repr);
 }
 
 template <typename T>
@@ -997,6 +1016,8 @@ namespace internal {
 #ifndef CXXBRIDGE1_STRUCT_open_comp_graph$internal$ThingR
 #define CXXBRIDGE1_STRUCT_open_comp_graph$internal$ThingR
 struct ThingR final : public ::rust::Opaque {
+  ~ThingR() = delete;
+
 private:
   friend ::rust::layout;
   struct layout {
@@ -1009,6 +1030,8 @@ private:
 #ifndef CXXBRIDGE1_STRUCT_open_comp_graph$internal$PixelBlock
 #define CXXBRIDGE1_STRUCT_open_comp_graph$internal$PixelBlock
 struct PixelBlock final : public ::rust::Opaque {
+  ~PixelBlock() = delete;
+
 private:
   friend ::rust::layout;
   struct layout {
@@ -1021,6 +1044,8 @@ private:
 #ifndef CXXBRIDGE1_STRUCT_open_comp_graph$internal$BoundingBox2D
 #define CXXBRIDGE1_STRUCT_open_comp_graph$internal$BoundingBox2D
 struct BoundingBox2D final : public ::rust::Opaque {
+  ~BoundingBox2D() = delete;
+
 private:
   friend ::rust::layout;
   struct layout {
@@ -1033,6 +1058,8 @@ private:
 #ifndef CXXBRIDGE1_STRUCT_open_comp_graph$internal$Matrix4
 #define CXXBRIDGE1_STRUCT_open_comp_graph$internal$Matrix4
 struct Matrix4 final : public ::rust::Opaque {
+  ~Matrix4() = delete;
+
 private:
   friend ::rust::layout;
   struct layout {
@@ -1056,6 +1083,7 @@ struct StreamDataImpl final : public ::rust::Opaque {
   OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint32_t get_pixel_width() const noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint32_t get_pixel_height() const noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint8_t get_pixel_num_channels() const noexcept;
+  ~StreamDataImpl() = delete;
 
 private:
   friend ::rust::layout;
@@ -1083,6 +1111,7 @@ struct NodeImpl final : public ::rust::Opaque {
   OPENCOMPGRAPH_SYMBOL_EXPORT void set_attr_f32(::rust::Str name, float value) noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT void set_attr_i32(::rust::Str name, ::std::int32_t value) noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT void set_attr_str(::rust::Str name, ::rust::Str value) noexcept;
+  ~NodeImpl() = delete;
 
 private:
   friend ::rust::layout;
@@ -1098,6 +1127,7 @@ private:
 struct CacheImpl final : public ::rust::Opaque {
   OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint64_t get_id() const noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t len() const noexcept;
+  ~CacheImpl() = delete;
 
 private:
   friend ::rust::layout;
@@ -1126,6 +1156,7 @@ struct GraphImpl final : public ::rust::Opaque {
   OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::ExecuteStatus execute(::std::uint64_t node_id, ::rust::Box<::open_comp_graph::internal::CacheImpl> &cache) noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT ::rust::String data_debug_string() const noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::internal::StreamDataImplShared output_stream() const noexcept;
+  ~GraphImpl() = delete;
 
 private:
   friend ::rust::layout;

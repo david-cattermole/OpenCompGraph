@@ -16,10 +16,6 @@ StreamData::StreamData(rust::Box<internal::StreamDataImpl> box) noexcept
     std::cout << "StreamData(box)" << '\n';
 }
 
-StreamData::~StreamData() {
-    std::cout << "~StreamData()" << '\n';
-}
-
 rust::Box<internal::StreamDataImpl> StreamData::get_box() noexcept {
     return std::move(this->inner.inner);
 }

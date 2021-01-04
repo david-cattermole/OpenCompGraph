@@ -73,16 +73,21 @@ public:
   bool operator>(const String &) const noexcept;
   bool operator>=(const String &) const noexcept;
 
+  void swap(String &) noexcept;
+
   // Internal API only intended for the cxxbridge code generator.
   String(unsafe_bitcopy_t, const String &) noexcept;
 
 private:
+  friend void swap(String &lhs, String &rhs) noexcept { lhs.swap(rhs); }
+
   // Size and alignment statically verified by rust_string.rs.
   std::array<std::uintptr_t, 3> repr;
 };
 #endif // CXXBRIDGE1_RUST_STRING
 
 #ifndef CXXBRIDGE1_RUST_STR
+#define CXXBRIDGE1_RUST_STR
 // https://cxx.rs/binding/str.html
 class Str final {
 public:
@@ -119,12 +124,14 @@ public:
   bool operator>(const Str &) const noexcept;
   bool operator>=(const Str &) const noexcept;
 
+  void swap(Str &) noexcept;
+
 private:
+  class uninit;
+  Str(uninit) noexcept;
   friend impl<Str>;
-  // Not necessarily ABI compatible with &str. Codegen will translate to
-  // cxx::rust_str::RustStr which matches this layout.
-  const char *ptr;
-  std::size_t len;
+
+  std::array<std::uintptr_t, 2> repr;
 };
 #endif // CXXBRIDGE1_RUST_STR
 
@@ -173,12 +180,17 @@ public:
   iterator begin() const noexcept;
   iterator end() const noexcept;
 
+  void swap(Slice &) noexcept;
+
 private:
+  class uninit;
+  Slice(uninit) noexcept;
   friend impl<Slice>;
-  // Not necessarily ABI compatible with &[T]. Codegen will translate to
-  // cxx::rust_slice::RustSlice which matches this layout.
-  void *ptr;
-  std::size_t len;
+  friend void sliceInit(void *, const void *, std::size_t) noexcept;
+  friend void *slicePtr(const void *) noexcept;
+  friend std::size_t sliceLen(const void *) noexcept;
+
+  std::array<std::uintptr_t, 2> repr;
 };
 
 template <typename T>
@@ -230,14 +242,12 @@ public:
   using pointer = typename std::add_pointer<T>::type;
 
   Box() = delete;
-  Box(const Box &);
   Box(Box &&) noexcept;
   ~Box() noexcept;
 
   explicit Box(const T &);
   explicit Box(T &&);
 
-  Box &operator=(const Box &);
   Box &operator=(Box &&) noexcept;
 
   const T *operator->() const noexcept;
@@ -247,6 +257,8 @@ public:
 
   template <typename... Fields>
   static Box in_place(Fields &&...);
+
+  void swap(Box &) noexcept;
 
   // Important: requires that `raw` came from an into_raw call. Do not pass a
   // pointer from `new` or any other source.
@@ -261,6 +273,9 @@ private:
   class allocation;
   Box(uninit) noexcept;
   void drop() noexcept;
+
+  friend void swap(Box &lhs, Box &rhs) noexcept { lhs.swap(rhs); }
+
   T *ptr;
 };
 #endif // CXXBRIDGE1_RUST_BOX
@@ -313,6 +328,8 @@ public:
   const_iterator cbegin() const noexcept;
   const_iterator cend() const noexcept;
 
+  void swap(Vec &) noexcept;
+
   // Internal API only intended for the cxxbridge code generator.
   Vec(unsafe_bitcopy_t, const Vec &) noexcept;
 
@@ -320,6 +337,8 @@ private:
   void reserve_total(std::size_t cap) noexcept;
   void set_len(std::size_t len) noexcept;
   void drop() noexcept;
+
+  friend void swap(Vec &lhs, Vec &rhs) noexcept { lhs.swap(rhs); }
 
   // Size and alignment statically verified by rust_vec.rs.
   std::array<std::uintptr_t, 3> repr;
@@ -474,49 +493,42 @@ struct unsafe_bitcopy_t final {
 constexpr unsafe_bitcopy_t unsafe_bitcopy{};
 #endif // CXXBRIDGE1_RUST_BITCOPY
 
-#ifndef CXXBRIDGE1_RUST_STR
-#define CXXBRIDGE1_RUST_STR
-inline const char *Str::data() const noexcept { return this->ptr; }
-
-inline std::size_t Str::size() const noexcept { return this->len; }
-
-inline std::size_t Str::length() const noexcept { return this->len; }
-#endif // CXXBRIDGE1_RUST_STR
-
 #ifndef CXXBRIDGE1_RUST_SLICE
 #define CXXBRIDGE1_RUST_SLICE
 template <typename T>
-Slice<T>::Slice() noexcept
-    : ptr(reinterpret_cast<void *>(align_of<T>())), len(0) {}
+Slice<T>::Slice() noexcept {
+  sliceInit(this, reinterpret_cast<void *>(align_of<T>()), 0);
+}
 
 template <typename T>
-Slice<T>::Slice(T *s, std::size_t count) noexcept
-    : ptr(const_cast<typename std::remove_const<T>::type *>(s)), len(count) {}
+Slice<T>::Slice(T *s, std::size_t count) noexcept {
+  sliceInit(this, const_cast<typename std::remove_const<T>::type *>(s), count);
+}
 
 template <typename T>
 T *Slice<T>::data() const noexcept {
-  return reinterpret_cast<T *>(this->ptr);
+  return reinterpret_cast<T *>(slicePtr(this));
 }
 
 template <typename T>
 std::size_t Slice<T>::size() const noexcept {
-  return this->len;
+  return sliceLen(this);
 }
 
 template <typename T>
 std::size_t Slice<T>::length() const noexcept {
-  return this->len;
+  return this->size();
 }
 
 template <typename T>
 bool Slice<T>::empty() const noexcept {
-  return this->len == 0;
+  return this->size() == 0;
 }
 
 template <typename T>
 T &Slice<T>::operator[](std::size_t n) const noexcept {
   assert(n < this->size());
-  auto pos = static_cast<char *>(this->ptr) + size_of<T>() * n;
+  auto pos = static_cast<char *>(slicePtr(this)) + size_of<T>() * n;
   return *reinterpret_cast<T *>(pos);
 }
 
@@ -537,7 +549,7 @@ T &Slice<T>::front() const noexcept {
 template <typename T>
 T &Slice<T>::back() const noexcept {
   assert(!this->empty());
-  return (*this)[this->len - 1];
+  return (*this)[this->size() - 1];
 }
 
 template <typename T>
@@ -556,7 +568,7 @@ template <typename T>
 typename Slice<T>::iterator::reference Slice<T>::iterator::operator[](
     typename Slice<T>::iterator::difference_type n) const noexcept {
   auto pos = static_cast<char *>(this->pos) + this->stride * n;
-  return *static_cast<T *>(pos);
+  return *reinterpret_cast<T *>(pos);
 }
 
 template <typename T>
@@ -656,7 +668,7 @@ bool Slice<T>::iterator::operator>=(const iterator &other) const noexcept {
 template <typename T>
 typename Slice<T>::iterator Slice<T>::begin() const noexcept {
   iterator it;
-  it.pos = this->ptr;
+  it.pos = slicePtr(this);
   it.stride = size_of<T>();
   return it;
 }
@@ -664,8 +676,13 @@ typename Slice<T>::iterator Slice<T>::begin() const noexcept {
 template <typename T>
 typename Slice<T>::iterator Slice<T>::end() const noexcept {
   iterator it = this->begin();
-  it.pos = static_cast<char *>(it.pos) + it.stride * this->len;
+  it.pos = static_cast<char *>(it.pos) + it.stride * this->size();
   return it;
+}
+
+template <typename T>
+void Slice<T>::swap(Slice &rhs) noexcept {
+  std::swap(*this, rhs);
 }
 #endif // CXXBRIDGE1_RUST_SLICE
 
@@ -688,9 +705,6 @@ public:
   }
   T *ptr;
 };
-
-template <typename T>
-Box<T>::Box(const Box &other) : Box(*other) {}
 
 template <typename T>
 Box<T>::Box(Box &&other) noexcept : ptr(other.ptr) {
@@ -718,19 +732,6 @@ Box<T>::~Box() noexcept {
   if (this->ptr) {
     this->drop();
   }
-}
-
-template <typename T>
-Box<T> &Box<T>::operator=(const Box &other) {
-  if (this->ptr) {
-    **this = *other;
-  } else {
-    allocation alloc;
-    ::new (alloc.ptr) T(*other);
-    this->ptr = alloc.ptr;
-    alloc.ptr = nullptr;
-  }
-  return *this;
 }
 
 template <typename T>
@@ -771,6 +772,12 @@ Box<T> Box<T>::in_place(Fields &&... fields) {
   ::new (ptr) T{std::forward<Fields>(fields)...};
   alloc.ptr = nullptr;
   return from_raw(ptr);
+}
+
+template <typename T>
+void Box<T>::swap(Box &rhs) noexcept {
+  using std::swap;
+  swap(this->ptr, rhs.ptr);
 }
 
 template <typename T>
@@ -952,6 +959,12 @@ typename Vec<T>::const_iterator Vec<T>::cbegin() const noexcept {
 template <typename T>
 typename Vec<T>::const_iterator Vec<T>::cend() const noexcept {
   return Slice<const T>(this->data(), this->size()).end();
+}
+
+template <typename T>
+void Vec<T>::swap(Vec &rhs) noexcept {
+  using std::swap;
+  swap(this->repr, rhs.repr);
 }
 
 // Internal API only intended for the cxxbridge code generator.

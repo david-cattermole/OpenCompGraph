@@ -8,6 +8,10 @@ SET ROOT=%THIS_DIR%..\
 ECHO OpenCompGroup Root: %ROOT%
 CHDIR %ROOT%
 
+:: Install the needed cxxbridge.exe command to be installed with the
+:: exact version we need.
+cargo install cxxbridge-cmd --version 1.0.26
+
 :: Build Rust
 ::
 :: Assumes 'cxxbridge-cmd' and 'cbindgen' is installed.

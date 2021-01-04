@@ -13,7 +13,7 @@ path = "./src/lib.rs"
 crate_type = ["staticlib"]
 
 [dependencies]
-cxx = { git = "https://github.com/david-cattermole/cxx.git", rev = "363c18b2982329d6e4fbc2a6e5f324f4fef03661" }
+cxx = "=1.0.26"
 libc = "0.2.0"
 rustc-hash = "1.1.0"
 fastapprox = "0.3.0"
