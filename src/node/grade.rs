@@ -72,26 +72,31 @@ impl Compute for GradeCompute {
             return NodeStatus::Error;
         }
 
-        let mut copy = inputs[0].inner.clone();
+        match inputs.len() {
+            0 => NodeStatus::Error,
+            _ => {
+                let mut copy = inputs[0].inner.clone();
 
-        let multiply = attr_block.get_attr_f32("multiply");
-        let pixel_block = copy.pixel_block_as_mut();
-        // let mut i = 0;
-        for v in &mut pixel_block.pixels {
-            // if i < 5 {
-            //     debug!("a={}", *v);
-            // }
-            *v *= multiply;
-            // if i < 5 {
-            //     debug!("b={}", *v);
-            // }
-            // i += 1;
+                let multiply = attr_block.get_attr_f32("multiply");
+                let pixel_block = copy.pixel_block_as_mut();
+                // let mut i = 0;
+                for v in &mut pixel_block.pixels {
+                    // if i < 5 {
+                    //     debug!("a={}", *v);
+                    // }
+                    *v *= multiply;
+                    // if i < 5 {
+                    //     debug!("b={}", *v);
+                    // }
+                    // i += 1;
+                }
+
+                let hash_value = self.cache_hash(node_type_id, &attr_block, inputs);
+                output.inner = copy;
+                output.inner.set_hash(hash_value);
+                NodeStatus::Valid
+            }
         }
-
-        let hash_value = self.cache_hash(node_type_id, &attr_block, inputs);
-        output.inner = copy;
-        output.inner.set_hash(hash_value);
-        NodeStatus::Valid
     }
 }
 
