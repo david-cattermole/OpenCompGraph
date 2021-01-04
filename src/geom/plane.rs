@@ -93,7 +93,6 @@ pub fn fill_buffer_index_tris(divisions_x: u32, divisions_y: u32, buffer: &mut [
             index += 6;
         }
     }
-
     true
 }
 
@@ -106,30 +105,30 @@ pub fn fill_buffer_index_tris(divisions_x: u32, divisions_y: u32, buffer: &mut [
 //     true
 // }
 
-/// Fill the values of all buffers at once.
-pub fn fill_all_buffers(
-    divisions_x: u32,
-    divisions_y: u32,
-    buffer_vertex_positions: &mut [f32],
-    buffer_vertex_uvs: &mut [f32],
-    buffer_index_tris: &mut [u32],
-    // buffer_index_lines: &mut [u32],
-) -> bool {
-    let vertex_pos_num = calc_buffer_size_vertex_positions(divisions_x, divisions_y);
-    let vertex_uv_num = calc_buffer_size_vertex_uvs(divisions_x, divisions_y);
-    let index_tri_num = calc_buffer_size_index_tris(divisions_x, divisions_y);
-    // let index_line_num = calc_buffer_size_index_lines(divisions_x, divisions_y);
-    assert_eq!(buffer_vertex_positions.len(), vertex_pos_num);
-    assert_eq!(buffer_vertex_uvs.len(), vertex_uv_num);
-    assert_eq!(buffer_index_tris.len(), index_tri_num);
-    // assert_eq!(buffer_index_lines.len(), index_line_num);
+// /// Fill the values of all buffers at once.
+// pub fn fill_all_buffers(
+//     divisions_x: u32,
+//     divisions_y: u32,
+//     buffer_vertex_positions: &mut [f32],
+//     buffer_vertex_uvs: &mut [f32],
+//     buffer_index_tris: &mut [u32],
+//     // buffer_index_lines: &mut [u32],
+// ) -> bool {
+//     let vertex_pos_num = calc_buffer_size_vertex_positions(divisions_x, divisions_y);
+//     let vertex_uv_num = calc_buffer_size_vertex_uvs(divisions_x, divisions_y);
+//     let index_tri_num = calc_buffer_size_index_tris(divisions_x, divisions_y);
+//     // let index_line_num = calc_buffer_size_index_lines(divisions_x, divisions_y);
+//     assert_eq!(buffer_vertex_positions.len(), vertex_pos_num);
+//     assert_eq!(buffer_vertex_uvs.len(), vertex_uv_num);
+//     assert_eq!(buffer_index_tris.len(), index_tri_num);
+//     // assert_eq!(buffer_index_lines.len(), index_line_num);
 
-    fill_buffer_vertex_positions(divisions_x, divisions_y, buffer_vertex_positions);
-    fill_buffer_vertex_uvs(divisions_x, divisions_y, buffer_vertex_uvs);
-    fill_buffer_index_tris(divisions_x, divisions_y, buffer_index_tris);
-    // fill_buffer_index_lines(divisions_x, divisions_y, buffer_index_lines);
-    true
-}
+//     fill_buffer_vertex_positions(divisions_x, divisions_y, buffer_vertex_positions);
+//     fill_buffer_vertex_uvs(divisions_x, divisions_y, buffer_vertex_uvs);
+//     fill_buffer_index_tris(divisions_x, divisions_y, buffer_index_tris);
+//     // fill_buffer_index_lines(divisions_x, divisions_y, buffer_index_lines);
+//     true
+// }
 
 pub fn export_mesh(positions: &[f32], uvs: &[f32], indices: &[u32], file_path: &str) {
     debug!("Exporting Mesh: {}", file_path);

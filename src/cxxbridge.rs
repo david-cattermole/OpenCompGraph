@@ -17,7 +17,6 @@ use crate::geom::plane::calc_buffer_size_index_tris;
 use crate::geom::plane::calc_buffer_size_vertex_positions;
 use crate::geom::plane::calc_buffer_size_vertex_uvs;
 use crate::geom::plane::export_mesh;
-use crate::geom::plane::fill_all_buffers;
 // use crate::geom::plane::fill_buffer_index_lines;
 use crate::geom::plane::fill_buffer_index_tris;
 use crate::geom::plane::fill_buffer_vertex_positions;
@@ -283,10 +282,6 @@ pub mod ffi {
             divisions_x: u32,
             divisions_y: u32,
         ) -> usize;
-        // fn calc_buffer_size_index_lines(
-        //     divisions_x: u32,
-        //     divisions_y: u32,
-        // ) -> usize;
         fn calc_buffer_size_index_tris(
             divisions_x: u32,
             divisions_y: u32,
@@ -307,19 +302,14 @@ pub mod ffi {
             divisions_y: u32,
             buffer_index_tris: &mut [u32],
         ) -> bool;
-        // fn fill_buffer_index_lines(
+        // fn fill_all_buffers(
         //     divisions_x: u32,
         //     divisions_y: u32,
-        //     buffer_index_lines: &mut [u32],
+        //     buffer_vertex_positions: &mut [f32],
+        //     buffer_vertex_uvs: &mut [f32],
+        //     buffer_index_tris: &mut [u32],
+        //     // buffer_index_lines: &mut [u32],
         // ) -> bool;
-        fn fill_all_buffers(
-            divisions_x: u32,
-            divisions_y: u32,
-            buffer_vertex_positions: &mut [f32],
-            buffer_vertex_uvs: &mut [f32],
-            buffer_index_tris: &mut [u32],
-            // buffer_index_lines: &mut [u32],
-        ) -> bool;
 
         fn export_mesh(
             buffer_vertex_positions: &[f32],
@@ -330,6 +320,8 @@ pub mod ffi {
     }
 
     // Logging
+    //
+    // TODO: Add more logging functions for C++ to use.
     #[namespace = "open_comp_graph::log"]
     extern "Rust" {
         fn initialize() -> bool;
