@@ -12,6 +12,8 @@ use crate::data::HashValue;
 use crate::data::Identifier;
 use crate::data::Matrix4;
 use crate::data::PixelBlock;
+use crate::geom::plane::calc_count_vertex_positions;
+use crate::geom::plane::calc_count_vertex_uvs;
 use crate::geom::plane::calc_buffer_size_index_tris;
 use crate::geom::plane::calc_buffer_size_vertex_positions;
 use crate::geom::plane::calc_buffer_size_vertex_uvs;
@@ -272,6 +274,15 @@ pub mod ffi {
     // Geometry
     #[namespace = "open_comp_graph::internal"]
     extern "Rust" {
+        fn calc_count_vertex_positions(
+            divisions_x: u32,
+            divisions_y: u32,
+        ) -> usize;
+        fn calc_count_vertex_uvs(
+            divisions_x: u32,
+            divisions_y: u32,
+        ) -> usize;
+
         fn calc_buffer_size_vertex_positions(
             divisions_x: u32,
             divisions_y: u32,
@@ -300,13 +311,6 @@ pub mod ffi {
             divisions_y: u32,
             buffer_index_tris: &mut [u32],
         ) -> bool;
-        // fn fill_all_buffers(
-        //     divisions_x: u32,
-        //     divisions_y: u32,
-        //     buffer_vertex_positions: &mut [f32],
-        //     buffer_vertex_uvs: &mut [f32],
-        //     buffer_index_tris: &mut [u32],
-        // ) -> bool;
 
         fn export_mesh(
             buffer_vertex_positions: &[f32],

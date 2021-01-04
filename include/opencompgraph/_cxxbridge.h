@@ -1191,6 +1191,10 @@ OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint64_t generate_random_id() noexcept;
 
 OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint64_t generate_id_from_name(::rust::Str name) noexcept;
 
+OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t calc_count_vertex_positions(::std::uint32_t divisions_x, ::std::uint32_t divisions_y) noexcept;
+
+OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t calc_count_vertex_uvs(::std::uint32_t divisions_x, ::std::uint32_t divisions_y) noexcept;
+
 OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t calc_buffer_size_vertex_positions(::std::uint32_t divisions_x, ::std::uint32_t divisions_y) noexcept;
 
 OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t calc_buffer_size_vertex_uvs(::std::uint32_t divisions_x, ::std::uint32_t divisions_y) noexcept;

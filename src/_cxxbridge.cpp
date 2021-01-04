@@ -1380,6 +1380,10 @@ void open_comp_graph$internal$cxxbridge1$create_vec_stream_data_shared(::rust::V
 
 ::std::uint64_t open_comp_graph$internal$cxxbridge1$generate_id_from_name(::rust::Str name) noexcept;
 
+::std::size_t open_comp_graph$internal$cxxbridge1$calc_count_vertex_positions(::std::uint32_t divisions_x, ::std::uint32_t divisions_y) noexcept;
+
+::std::size_t open_comp_graph$internal$cxxbridge1$calc_count_vertex_uvs(::std::uint32_t divisions_x, ::std::uint32_t divisions_y) noexcept;
+
 ::std::size_t open_comp_graph$internal$cxxbridge1$calc_buffer_size_vertex_positions(::std::uint32_t divisions_x, ::std::uint32_t divisions_y) noexcept;
 
 ::std::size_t open_comp_graph$internal$cxxbridge1$calc_buffer_size_vertex_uvs(::std::uint32_t divisions_x, ::std::uint32_t divisions_y) noexcept;
@@ -1705,6 +1709,14 @@ OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint64_t generate_random_id() noexcept {
 
 OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint64_t generate_id_from_name(::rust::Str name) noexcept {
   return open_comp_graph$internal$cxxbridge1$generate_id_from_name(name);
+}
+
+OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t calc_count_vertex_positions(::std::uint32_t divisions_x, ::std::uint32_t divisions_y) noexcept {
+  return open_comp_graph$internal$cxxbridge1$calc_count_vertex_positions(divisions_x, divisions_y);
+}
+
+OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t calc_count_vertex_uvs(::std::uint32_t divisions_x, ::std::uint32_t divisions_y) noexcept {
+  return open_comp_graph$internal$cxxbridge1$calc_count_vertex_uvs(divisions_x, divisions_y);
 }
 
 OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t calc_buffer_size_vertex_positions(::std::uint32_t divisions_x, ::std::uint32_t divisions_y) noexcept {

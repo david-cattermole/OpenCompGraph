@@ -1,22 +1,22 @@
 use log::{debug, error, info, warn};
 
-pub fn calc_buffer_length_vertex_positions(divisions_x: u32, divisions_y: u32) -> usize {
+pub fn calc_count_vertex_positions(divisions_x: u32, divisions_y: u32) -> usize {
     (divisions_x * divisions_y) as usize
 }
 
-pub fn calc_buffer_length_uv_positions(divisions_x: u32, divisions_y: u32) -> usize {
-    calc_buffer_length_vertex_positions(divisions_x, divisions_y)
+pub fn calc_count_vertex_uvs(divisions_x: u32, divisions_y: u32) -> usize {
+    calc_count_vertex_positions(divisions_x, divisions_y)
 }
 
 pub fn calc_buffer_size_vertex_positions(divisions_x: u32, divisions_y: u32) -> usize {
     let number_of_elements = 3;
-    let length = calc_buffer_length_vertex_positions(divisions_x, divisions_y);
+    let length = calc_count_vertex_positions(divisions_x, divisions_y);
     (length * number_of_elements) as usize
 }
 
 pub fn calc_buffer_size_vertex_uvs(divisions_x: u32, divisions_y: u32) -> usize {
     let number_of_elements = 2;
-    let length = calc_buffer_length_vertex_positions(divisions_x, divisions_y);
+    let length = calc_count_vertex_uvs(divisions_x, divisions_y);
     (length * number_of_elements) as usize
 }
 
@@ -91,27 +91,7 @@ pub fn fill_buffer_index_tris(divisions_x: u32, divisions_y: u32, buffer: &mut [
     true
 }
 
-// /// Fill the values of all buffers at once.
-// pub fn fill_all_buffers(
-//     divisions_x: u32,
-//     divisions_y: u32,
-//     buffer_vertex_positions: &mut [f32],
-//     buffer_vertex_uvs: &mut [f32],
-//     buffer_index_tris: &mut [u32],
-// ) -> bool {
-//     let vertex_pos_num = calc_buffer_size_vertex_positions(divisions_x, divisions_y);
-//     let vertex_uv_num = calc_buffer_size_vertex_uvs(divisions_x, divisions_y);
-//     let index_tri_num = calc_buffer_size_index_tris(divisions_x, divisions_y);
-//     assert_eq!(buffer_vertex_positions.len(), vertex_pos_num);
-//     assert_eq!(buffer_vertex_uvs.len(), vertex_uv_num);
-//     assert_eq!(buffer_index_tris.len(), index_tri_num);
-
-//     fill_buffer_vertex_positions(divisions_x, divisions_y, buffer_vertex_positions);
-//     fill_buffer_vertex_uvs(divisions_x, divisions_y, buffer_vertex_uvs);
-//     fill_buffer_index_tris(divisions_x, divisions_y, buffer_index_tris);
-//     true
-// }
-
+/// Export arrays of data as an .obj file - for debug.
 pub fn export_mesh(positions: &[f32], uvs: &[f32], indices: &[u32], file_path: &str) {
     debug!("Exporting Mesh: {}", file_path);
     // debug!("positions: size={} {:#?}", positions.len(), positions);
