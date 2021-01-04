@@ -88,8 +88,8 @@ impl Compute for ReadImageCompute {
             let display_window = BBox2D::new(
                 0.0,
                 0.0,
-                pixel_block.width as f32,
-                pixel_block.height as f32,
+                (pixel_block.width - 1) as f32,
+                (pixel_block.height - 1) as f32,
             );
             let data_window = display_window.clone();
 
