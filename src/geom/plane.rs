@@ -39,8 +39,8 @@ pub fn fill_buffer_vertex_positions(
     let square_size_y: f32 = 1.0 / ((divisions_y - 1) as f32);
     for row in 0..divisions_y {
         for col in 0..divisions_x {
-            buffer[index + 0] = col as f32;
-            buffer[index + 1] = row as f32;
+            buffer[index + 0] = -0.5 + ((col as f32) * square_size_x);
+            buffer[index + 1] = -0.5 + ((row as f32) * square_size_x);
             buffer[index + 2] = 0.0;
             index += per_vertex_num;
         }
