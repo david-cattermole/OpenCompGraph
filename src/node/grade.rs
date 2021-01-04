@@ -8,9 +8,9 @@ use crate::cxxbridge::ffi::AttrState;
 use crate::cxxbridge::ffi::NodeStatus;
 use crate::cxxbridge::ffi::NodeType;
 use crate::cxxbridge::ffi::StreamDataImplShared;
-use crate::data::Distance32;
 use crate::data::HashValue;
 use crate::data::Identifier;
+use crate::hashutils::HashableF32;
 use crate::node::traits::AttrBlock;
 use crate::node::traits::Compute;
 use crate::node::NodeImpl;
@@ -36,7 +36,7 @@ pub struct GradeAttrs {
 
 impl hash::Hash for GradeAttrs {
     fn hash<H: hash::Hasher>(&self, state: &mut H) {
-        Distance32::new(self.multiply).hash(state);
+        HashableF32::new(self.multiply).hash(state);
     }
 }
 
@@ -75,7 +75,7 @@ impl Compute for GradeCompute {
         let mut copy = inputs[0].inner.clone();
 
         let multiply = attr_block.get_attr_f32("multiply");
-        let pixel_block = copy.get_pixel_block_as_mut();
+        let pixel_block = copy.pixel_block_as_mut();
         // let mut i = 0;
         for v in &mut pixel_block.pixels {
             // if i < 5 {

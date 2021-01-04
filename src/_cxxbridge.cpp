@@ -974,7 +974,7 @@ namespace open_comp_graph {
     struct CacheImplShared;
     struct ThingR;
     struct PixelBlock;
-    struct BoundingBox2D;
+    struct BBox2D;
     struct Matrix4;
     struct StreamDataImpl;
     struct NodeImpl;
@@ -1103,10 +1103,10 @@ private:
 };
 #endif // CXXBRIDGE1_STRUCT_open_comp_graph$internal$PixelBlock
 
-#ifndef CXXBRIDGE1_STRUCT_open_comp_graph$internal$BoundingBox2D
-#define CXXBRIDGE1_STRUCT_open_comp_graph$internal$BoundingBox2D
-struct BoundingBox2D final : public ::rust::Opaque {
-  ~BoundingBox2D() = delete;
+#ifndef CXXBRIDGE1_STRUCT_open_comp_graph$internal$BBox2D
+#define CXXBRIDGE1_STRUCT_open_comp_graph$internal$BBox2D
+struct BBox2D final : public ::rust::Opaque {
+  ~BBox2D() = delete;
 
 private:
   friend ::rust::layout;
@@ -1115,7 +1115,7 @@ private:
     static ::std::size_t align() noexcept;
   };
 };
-#endif // CXXBRIDGE1_STRUCT_open_comp_graph$internal$BoundingBox2D
+#endif // CXXBRIDGE1_STRUCT_open_comp_graph$internal$BBox2D
 
 #ifndef CXXBRIDGE1_STRUCT_open_comp_graph$internal$Matrix4
 #define CXXBRIDGE1_STRUCT_open_comp_graph$internal$Matrix4
@@ -1134,17 +1134,18 @@ private:
 #ifndef CXXBRIDGE1_STRUCT_open_comp_graph$internal$StreamDataImpl
 #define CXXBRIDGE1_STRUCT_open_comp_graph$internal$StreamDataImpl
 struct StreamDataImpl final : public ::rust::Opaque {
-  OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::StreamDataState get_state() const noexcept;
-  OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint8_t get_state_id() const noexcept;
-  OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint64_t get_hash() const noexcept;
-  OPENCOMPGRAPH_SYMBOL_EXPORT const ::rust::Box<::open_comp_graph::internal::BoundingBox2D> &get_bounding_box() const noexcept;
-  OPENCOMPGRAPH_SYMBOL_EXPORT const ::rust::Box<::open_comp_graph::internal::Matrix4> &get_color_matrix() const noexcept;
-  OPENCOMPGRAPH_SYMBOL_EXPORT const ::rust::Box<::open_comp_graph::internal::Matrix4> &get_transform_matrix() const noexcept;
-  OPENCOMPGRAPH_SYMBOL_EXPORT const ::open_comp_graph::internal::PixelBlock &get_pixel_block() const noexcept;
-  OPENCOMPGRAPH_SYMBOL_EXPORT ::rust::Slice<const float> get_pixel_buffer() const noexcept;
-  OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint32_t get_pixel_width() const noexcept;
-  OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint32_t get_pixel_height() const noexcept;
-  OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint8_t get_pixel_num_channels() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::StreamDataState state() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint8_t state_id() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint64_t hash() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT const ::rust::Box<::open_comp_graph::internal::BBox2D> &display_window() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT const ::rust::Box<::open_comp_graph::internal::BBox2D> &data_window() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT const ::rust::Box<::open_comp_graph::internal::Matrix4> &color_matrix() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT const ::rust::Box<::open_comp_graph::internal::Matrix4> &transform_matrix() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT const ::open_comp_graph::internal::PixelBlock &pixel_block() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::rust::Slice<const float> pixel_buffer() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint32_t pixel_width() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint32_t pixel_height() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint8_t pixel_num_channels() const noexcept;
   ~StreamDataImpl() = delete;
 
 private:
@@ -1187,7 +1188,6 @@ private:
 #ifndef CXXBRIDGE1_STRUCT_open_comp_graph$internal$CacheImpl
 #define CXXBRIDGE1_STRUCT_open_comp_graph$internal$CacheImpl
 struct CacheImpl final : public ::rust::Opaque {
-  OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint64_t get_id() const noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t len() const noexcept;
   ~CacheImpl() = delete;
 
@@ -1261,34 +1261,36 @@ extern "C" {
 void open_comp_graph$internal$cxxbridge1$print_r(const ::open_comp_graph::internal::ThingR &r) noexcept;
 ::std::size_t open_comp_graph$internal$cxxbridge1$PixelBlock$operator$sizeof() noexcept;
 ::std::size_t open_comp_graph$internal$cxxbridge1$PixelBlock$operator$alignof() noexcept;
-::std::size_t open_comp_graph$internal$cxxbridge1$BoundingBox2D$operator$sizeof() noexcept;
-::std::size_t open_comp_graph$internal$cxxbridge1$BoundingBox2D$operator$alignof() noexcept;
+::std::size_t open_comp_graph$internal$cxxbridge1$BBox2D$operator$sizeof() noexcept;
+::std::size_t open_comp_graph$internal$cxxbridge1$BBox2D$operator$alignof() noexcept;
 ::std::size_t open_comp_graph$internal$cxxbridge1$Matrix4$operator$sizeof() noexcept;
 ::std::size_t open_comp_graph$internal$cxxbridge1$Matrix4$operator$alignof() noexcept;
 ::std::size_t open_comp_graph$internal$cxxbridge1$StreamDataImpl$operator$sizeof() noexcept;
 ::std::size_t open_comp_graph$internal$cxxbridge1$StreamDataImpl$operator$alignof() noexcept;
 
-::open_comp_graph::StreamDataState open_comp_graph$internal$cxxbridge1$StreamDataImpl$get_state(const ::open_comp_graph::internal::StreamDataImpl &self) noexcept;
+::open_comp_graph::StreamDataState open_comp_graph$internal$cxxbridge1$StreamDataImpl$state(const ::open_comp_graph::internal::StreamDataImpl &self) noexcept;
 
-::std::uint8_t open_comp_graph$internal$cxxbridge1$StreamDataImpl$get_state_id(const ::open_comp_graph::internal::StreamDataImpl &self) noexcept;
+::std::uint8_t open_comp_graph$internal$cxxbridge1$StreamDataImpl$state_id(const ::open_comp_graph::internal::StreamDataImpl &self) noexcept;
 
-::std::uint64_t open_comp_graph$internal$cxxbridge1$StreamDataImpl$get_hash(const ::open_comp_graph::internal::StreamDataImpl &self) noexcept;
+::std::uint64_t open_comp_graph$internal$cxxbridge1$StreamDataImpl$hash(const ::open_comp_graph::internal::StreamDataImpl &self) noexcept;
 
-const ::rust::Box<::open_comp_graph::internal::BoundingBox2D> *open_comp_graph$internal$cxxbridge1$StreamDataImpl$get_bounding_box(const ::open_comp_graph::internal::StreamDataImpl &self) noexcept;
+const ::rust::Box<::open_comp_graph::internal::BBox2D> *open_comp_graph$internal$cxxbridge1$StreamDataImpl$display_window(const ::open_comp_graph::internal::StreamDataImpl &self) noexcept;
 
-const ::rust::Box<::open_comp_graph::internal::Matrix4> *open_comp_graph$internal$cxxbridge1$StreamDataImpl$get_color_matrix(const ::open_comp_graph::internal::StreamDataImpl &self) noexcept;
+const ::rust::Box<::open_comp_graph::internal::BBox2D> *open_comp_graph$internal$cxxbridge1$StreamDataImpl$data_window(const ::open_comp_graph::internal::StreamDataImpl &self) noexcept;
 
-const ::rust::Box<::open_comp_graph::internal::Matrix4> *open_comp_graph$internal$cxxbridge1$StreamDataImpl$get_transform_matrix(const ::open_comp_graph::internal::StreamDataImpl &self) noexcept;
+const ::rust::Box<::open_comp_graph::internal::Matrix4> *open_comp_graph$internal$cxxbridge1$StreamDataImpl$color_matrix(const ::open_comp_graph::internal::StreamDataImpl &self) noexcept;
 
-const ::open_comp_graph::internal::PixelBlock *open_comp_graph$internal$cxxbridge1$StreamDataImpl$get_pixel_block(const ::open_comp_graph::internal::StreamDataImpl &self) noexcept;
+const ::rust::Box<::open_comp_graph::internal::Matrix4> *open_comp_graph$internal$cxxbridge1$StreamDataImpl$transform_matrix(const ::open_comp_graph::internal::StreamDataImpl &self) noexcept;
 
-::rust::repr::Fat open_comp_graph$internal$cxxbridge1$StreamDataImpl$get_pixel_buffer(const ::open_comp_graph::internal::StreamDataImpl &self) noexcept;
+const ::open_comp_graph::internal::PixelBlock *open_comp_graph$internal$cxxbridge1$StreamDataImpl$pixel_block(const ::open_comp_graph::internal::StreamDataImpl &self) noexcept;
 
-::std::uint32_t open_comp_graph$internal$cxxbridge1$StreamDataImpl$get_pixel_width(const ::open_comp_graph::internal::StreamDataImpl &self) noexcept;
+::rust::repr::Fat open_comp_graph$internal$cxxbridge1$StreamDataImpl$pixel_buffer(const ::open_comp_graph::internal::StreamDataImpl &self) noexcept;
 
-::std::uint32_t open_comp_graph$internal$cxxbridge1$StreamDataImpl$get_pixel_height(const ::open_comp_graph::internal::StreamDataImpl &self) noexcept;
+::std::uint32_t open_comp_graph$internal$cxxbridge1$StreamDataImpl$pixel_width(const ::open_comp_graph::internal::StreamDataImpl &self) noexcept;
 
-::std::uint8_t open_comp_graph$internal$cxxbridge1$StreamDataImpl$get_pixel_num_channels(const ::open_comp_graph::internal::StreamDataImpl &self) noexcept;
+::std::uint32_t open_comp_graph$internal$cxxbridge1$StreamDataImpl$pixel_height(const ::open_comp_graph::internal::StreamDataImpl &self) noexcept;
+
+::std::uint8_t open_comp_graph$internal$cxxbridge1$StreamDataImpl$pixel_num_channels(const ::open_comp_graph::internal::StreamDataImpl &self) noexcept;
 ::std::size_t open_comp_graph$internal$cxxbridge1$NodeImpl$operator$sizeof() noexcept;
 ::std::size_t open_comp_graph$internal$cxxbridge1$NodeImpl$operator$alignof() noexcept;
 
@@ -1321,8 +1323,6 @@ void open_comp_graph$internal$cxxbridge1$NodeImpl$set_attr_i32(::open_comp_graph
 void open_comp_graph$internal$cxxbridge1$NodeImpl$set_attr_str(::open_comp_graph::internal::NodeImpl &self, ::rust::Str name, ::rust::Str value) noexcept;
 ::std::size_t open_comp_graph$internal$cxxbridge1$CacheImpl$operator$sizeof() noexcept;
 ::std::size_t open_comp_graph$internal$cxxbridge1$CacheImpl$operator$alignof() noexcept;
-
-::std::uint64_t open_comp_graph$internal$cxxbridge1$CacheImpl$get_id(const ::open_comp_graph::internal::CacheImpl &self) noexcept;
 
 ::std::size_t open_comp_graph$internal$cxxbridge1$CacheImpl$len(const ::open_comp_graph::internal::CacheImpl &self) noexcept;
 ::std::size_t open_comp_graph$internal$cxxbridge1$GraphImpl$operator$sizeof() noexcept;
@@ -1437,12 +1437,12 @@ OPENCOMPGRAPH_SYMBOL_EXPORT void print_r(const ::open_comp_graph::internal::Thin
   return open_comp_graph$internal$cxxbridge1$PixelBlock$operator$alignof();
 }
 
-::std::size_t BoundingBox2D::layout::size() noexcept {
-  return open_comp_graph$internal$cxxbridge1$BoundingBox2D$operator$sizeof();
+::std::size_t BBox2D::layout::size() noexcept {
+  return open_comp_graph$internal$cxxbridge1$BBox2D$operator$sizeof();
 }
 
-::std::size_t BoundingBox2D::layout::align() noexcept {
-  return open_comp_graph$internal$cxxbridge1$BoundingBox2D$operator$alignof();
+::std::size_t BBox2D::layout::align() noexcept {
+  return open_comp_graph$internal$cxxbridge1$BBox2D$operator$alignof();
 }
 
 ::std::size_t Matrix4::layout::size() noexcept {
@@ -1461,48 +1461,52 @@ OPENCOMPGRAPH_SYMBOL_EXPORT void print_r(const ::open_comp_graph::internal::Thin
   return open_comp_graph$internal$cxxbridge1$StreamDataImpl$operator$alignof();
 }
 
-OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::StreamDataState StreamDataImpl::get_state() const noexcept {
-  return open_comp_graph$internal$cxxbridge1$StreamDataImpl$get_state(*this);
+OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::StreamDataState StreamDataImpl::state() const noexcept {
+  return open_comp_graph$internal$cxxbridge1$StreamDataImpl$state(*this);
 }
 
-OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint8_t StreamDataImpl::get_state_id() const noexcept {
-  return open_comp_graph$internal$cxxbridge1$StreamDataImpl$get_state_id(*this);
+OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint8_t StreamDataImpl::state_id() const noexcept {
+  return open_comp_graph$internal$cxxbridge1$StreamDataImpl$state_id(*this);
 }
 
-OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint64_t StreamDataImpl::get_hash() const noexcept {
-  return open_comp_graph$internal$cxxbridge1$StreamDataImpl$get_hash(*this);
+OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint64_t StreamDataImpl::hash() const noexcept {
+  return open_comp_graph$internal$cxxbridge1$StreamDataImpl$hash(*this);
 }
 
-OPENCOMPGRAPH_SYMBOL_EXPORT const ::rust::Box<::open_comp_graph::internal::BoundingBox2D> &StreamDataImpl::get_bounding_box() const noexcept {
-  return *open_comp_graph$internal$cxxbridge1$StreamDataImpl$get_bounding_box(*this);
+OPENCOMPGRAPH_SYMBOL_EXPORT const ::rust::Box<::open_comp_graph::internal::BBox2D> &StreamDataImpl::display_window() const noexcept {
+  return *open_comp_graph$internal$cxxbridge1$StreamDataImpl$display_window(*this);
 }
 
-OPENCOMPGRAPH_SYMBOL_EXPORT const ::rust::Box<::open_comp_graph::internal::Matrix4> &StreamDataImpl::get_color_matrix() const noexcept {
-  return *open_comp_graph$internal$cxxbridge1$StreamDataImpl$get_color_matrix(*this);
+OPENCOMPGRAPH_SYMBOL_EXPORT const ::rust::Box<::open_comp_graph::internal::BBox2D> &StreamDataImpl::data_window() const noexcept {
+  return *open_comp_graph$internal$cxxbridge1$StreamDataImpl$data_window(*this);
 }
 
-OPENCOMPGRAPH_SYMBOL_EXPORT const ::rust::Box<::open_comp_graph::internal::Matrix4> &StreamDataImpl::get_transform_matrix() const noexcept {
-  return *open_comp_graph$internal$cxxbridge1$StreamDataImpl$get_transform_matrix(*this);
+OPENCOMPGRAPH_SYMBOL_EXPORT const ::rust::Box<::open_comp_graph::internal::Matrix4> &StreamDataImpl::color_matrix() const noexcept {
+  return *open_comp_graph$internal$cxxbridge1$StreamDataImpl$color_matrix(*this);
 }
 
-OPENCOMPGRAPH_SYMBOL_EXPORT const ::open_comp_graph::internal::PixelBlock &StreamDataImpl::get_pixel_block() const noexcept {
-  return *open_comp_graph$internal$cxxbridge1$StreamDataImpl$get_pixel_block(*this);
+OPENCOMPGRAPH_SYMBOL_EXPORT const ::rust::Box<::open_comp_graph::internal::Matrix4> &StreamDataImpl::transform_matrix() const noexcept {
+  return *open_comp_graph$internal$cxxbridge1$StreamDataImpl$transform_matrix(*this);
 }
 
-OPENCOMPGRAPH_SYMBOL_EXPORT ::rust::Slice<const float> StreamDataImpl::get_pixel_buffer() const noexcept {
-  return ::rust::impl<::rust::Slice<const float>>::slice(open_comp_graph$internal$cxxbridge1$StreamDataImpl$get_pixel_buffer(*this));
+OPENCOMPGRAPH_SYMBOL_EXPORT const ::open_comp_graph::internal::PixelBlock &StreamDataImpl::pixel_block() const noexcept {
+  return *open_comp_graph$internal$cxxbridge1$StreamDataImpl$pixel_block(*this);
 }
 
-OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint32_t StreamDataImpl::get_pixel_width() const noexcept {
-  return open_comp_graph$internal$cxxbridge1$StreamDataImpl$get_pixel_width(*this);
+OPENCOMPGRAPH_SYMBOL_EXPORT ::rust::Slice<const float> StreamDataImpl::pixel_buffer() const noexcept {
+  return ::rust::impl<::rust::Slice<const float>>::slice(open_comp_graph$internal$cxxbridge1$StreamDataImpl$pixel_buffer(*this));
 }
 
-OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint32_t StreamDataImpl::get_pixel_height() const noexcept {
-  return open_comp_graph$internal$cxxbridge1$StreamDataImpl$get_pixel_height(*this);
+OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint32_t StreamDataImpl::pixel_width() const noexcept {
+  return open_comp_graph$internal$cxxbridge1$StreamDataImpl$pixel_width(*this);
 }
 
-OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint8_t StreamDataImpl::get_pixel_num_channels() const noexcept {
-  return open_comp_graph$internal$cxxbridge1$StreamDataImpl$get_pixel_num_channels(*this);
+OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint32_t StreamDataImpl::pixel_height() const noexcept {
+  return open_comp_graph$internal$cxxbridge1$StreamDataImpl$pixel_height(*this);
+}
+
+OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint8_t StreamDataImpl::pixel_num_channels() const noexcept {
+  return open_comp_graph$internal$cxxbridge1$StreamDataImpl$pixel_num_channels(*this);
 }
 
 ::std::size_t NodeImpl::layout::size() noexcept {
@@ -1575,10 +1579,6 @@ OPENCOMPGRAPH_SYMBOL_EXPORT void NodeImpl::set_attr_str(::rust::Str name, ::rust
 
 ::std::size_t CacheImpl::layout::align() noexcept {
   return open_comp_graph$internal$cxxbridge1$CacheImpl$operator$alignof();
-}
-
-OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint64_t CacheImpl::get_id() const noexcept {
-  return open_comp_graph$internal$cxxbridge1$CacheImpl$get_id(*this);
 }
 
 OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t CacheImpl::len() const noexcept {
@@ -1799,9 +1799,9 @@ void cxxbridge1$box$open_comp_graph$internal$StreamDataImpl$drop(::rust::Box<::o
 void cxxbridge1$box$open_comp_graph$internal$CacheImpl$dealloc(::open_comp_graph::internal::CacheImpl *) noexcept;
 void cxxbridge1$box$open_comp_graph$internal$CacheImpl$drop(::rust::Box<::open_comp_graph::internal::CacheImpl> *ptr) noexcept;
 
-::open_comp_graph::internal::BoundingBox2D *cxxbridge1$box$open_comp_graph$internal$BoundingBox2D$alloc() noexcept;
-void cxxbridge1$box$open_comp_graph$internal$BoundingBox2D$dealloc(::open_comp_graph::internal::BoundingBox2D *) noexcept;
-void cxxbridge1$box$open_comp_graph$internal$BoundingBox2D$drop(::rust::Box<::open_comp_graph::internal::BoundingBox2D> *ptr) noexcept;
+::open_comp_graph::internal::BBox2D *cxxbridge1$box$open_comp_graph$internal$BBox2D$alloc() noexcept;
+void cxxbridge1$box$open_comp_graph$internal$BBox2D$dealloc(::open_comp_graph::internal::BBox2D *) noexcept;
+void cxxbridge1$box$open_comp_graph$internal$BBox2D$drop(::rust::Box<::open_comp_graph::internal::BBox2D> *ptr) noexcept;
 
 ::open_comp_graph::internal::Matrix4 *cxxbridge1$box$open_comp_graph$internal$Matrix4$alloc() noexcept;
 void cxxbridge1$box$open_comp_graph$internal$Matrix4$dealloc(::open_comp_graph::internal::Matrix4 *) noexcept;
@@ -1891,16 +1891,16 @@ OPENCOMPGRAPH_SYMBOL_EXPORT void Box<::open_comp_graph::internal::CacheImpl>::dr
   cxxbridge1$box$open_comp_graph$internal$CacheImpl$drop(this);
 }
 template <>
-OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::internal::BoundingBox2D *Box<::open_comp_graph::internal::BoundingBox2D>::allocation::alloc() noexcept {
-  return cxxbridge1$box$open_comp_graph$internal$BoundingBox2D$alloc();
+OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::internal::BBox2D *Box<::open_comp_graph::internal::BBox2D>::allocation::alloc() noexcept {
+  return cxxbridge1$box$open_comp_graph$internal$BBox2D$alloc();
 }
 template <>
-OPENCOMPGRAPH_SYMBOL_EXPORT void Box<::open_comp_graph::internal::BoundingBox2D>::allocation::dealloc(::open_comp_graph::internal::BoundingBox2D *ptr) noexcept {
-  cxxbridge1$box$open_comp_graph$internal$BoundingBox2D$dealloc(ptr);
+OPENCOMPGRAPH_SYMBOL_EXPORT void Box<::open_comp_graph::internal::BBox2D>::allocation::dealloc(::open_comp_graph::internal::BBox2D *ptr) noexcept {
+  cxxbridge1$box$open_comp_graph$internal$BBox2D$dealloc(ptr);
 }
 template <>
-OPENCOMPGRAPH_SYMBOL_EXPORT void Box<::open_comp_graph::internal::BoundingBox2D>::drop() noexcept {
-  cxxbridge1$box$open_comp_graph$internal$BoundingBox2D$drop(this);
+OPENCOMPGRAPH_SYMBOL_EXPORT void Box<::open_comp_graph::internal::BBox2D>::drop() noexcept {
+  cxxbridge1$box$open_comp_graph$internal$BBox2D$drop(this);
 }
 template <>
 OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::internal::Matrix4 *Box<::open_comp_graph::internal::Matrix4>::allocation::alloc() noexcept {

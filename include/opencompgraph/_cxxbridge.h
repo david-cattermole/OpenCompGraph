@@ -912,7 +912,7 @@ namespace open_comp_graph {
     struct CacheImplShared;
     struct ThingR;
     struct PixelBlock;
-    struct BoundingBox2D;
+    struct BBox2D;
     struct Matrix4;
     struct StreamDataImpl;
     struct NodeImpl;
@@ -1041,10 +1041,10 @@ private:
 };
 #endif // CXXBRIDGE1_STRUCT_open_comp_graph$internal$PixelBlock
 
-#ifndef CXXBRIDGE1_STRUCT_open_comp_graph$internal$BoundingBox2D
-#define CXXBRIDGE1_STRUCT_open_comp_graph$internal$BoundingBox2D
-struct BoundingBox2D final : public ::rust::Opaque {
-  ~BoundingBox2D() = delete;
+#ifndef CXXBRIDGE1_STRUCT_open_comp_graph$internal$BBox2D
+#define CXXBRIDGE1_STRUCT_open_comp_graph$internal$BBox2D
+struct BBox2D final : public ::rust::Opaque {
+  ~BBox2D() = delete;
 
 private:
   friend ::rust::layout;
@@ -1053,7 +1053,7 @@ private:
     static ::std::size_t align() noexcept;
   };
 };
-#endif // CXXBRIDGE1_STRUCT_open_comp_graph$internal$BoundingBox2D
+#endif // CXXBRIDGE1_STRUCT_open_comp_graph$internal$BBox2D
 
 #ifndef CXXBRIDGE1_STRUCT_open_comp_graph$internal$Matrix4
 #define CXXBRIDGE1_STRUCT_open_comp_graph$internal$Matrix4
@@ -1072,17 +1072,18 @@ private:
 #ifndef CXXBRIDGE1_STRUCT_open_comp_graph$internal$StreamDataImpl
 #define CXXBRIDGE1_STRUCT_open_comp_graph$internal$StreamDataImpl
 struct StreamDataImpl final : public ::rust::Opaque {
-  OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::StreamDataState get_state() const noexcept;
-  OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint8_t get_state_id() const noexcept;
-  OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint64_t get_hash() const noexcept;
-  OPENCOMPGRAPH_SYMBOL_EXPORT const ::rust::Box<::open_comp_graph::internal::BoundingBox2D> &get_bounding_box() const noexcept;
-  OPENCOMPGRAPH_SYMBOL_EXPORT const ::rust::Box<::open_comp_graph::internal::Matrix4> &get_color_matrix() const noexcept;
-  OPENCOMPGRAPH_SYMBOL_EXPORT const ::rust::Box<::open_comp_graph::internal::Matrix4> &get_transform_matrix() const noexcept;
-  OPENCOMPGRAPH_SYMBOL_EXPORT const ::open_comp_graph::internal::PixelBlock &get_pixel_block() const noexcept;
-  OPENCOMPGRAPH_SYMBOL_EXPORT ::rust::Slice<const float> get_pixel_buffer() const noexcept;
-  OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint32_t get_pixel_width() const noexcept;
-  OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint32_t get_pixel_height() const noexcept;
-  OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint8_t get_pixel_num_channels() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::StreamDataState state() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint8_t state_id() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint64_t hash() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT const ::rust::Box<::open_comp_graph::internal::BBox2D> &display_window() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT const ::rust::Box<::open_comp_graph::internal::BBox2D> &data_window() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT const ::rust::Box<::open_comp_graph::internal::Matrix4> &color_matrix() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT const ::rust::Box<::open_comp_graph::internal::Matrix4> &transform_matrix() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT const ::open_comp_graph::internal::PixelBlock &pixel_block() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::rust::Slice<const float> pixel_buffer() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint32_t pixel_width() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint32_t pixel_height() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint8_t pixel_num_channels() const noexcept;
   ~StreamDataImpl() = delete;
 
 private:
@@ -1125,7 +1126,6 @@ private:
 #ifndef CXXBRIDGE1_STRUCT_open_comp_graph$internal$CacheImpl
 #define CXXBRIDGE1_STRUCT_open_comp_graph$internal$CacheImpl
 struct CacheImpl final : public ::rust::Opaque {
-  OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint64_t get_id() const noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t len() const noexcept;
   ~CacheImpl() = delete;
 

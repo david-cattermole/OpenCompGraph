@@ -1,30 +1,28 @@
 use cxx::{CxxString, UniquePtr};
 use log::{debug, error, info, warn};
-use rand::rngs::SmallRng;
-use rand::{Rng, SeedableRng};
-use rustc_hash::FxHasher;
-use std::collections::hash_map::DefaultHasher;
-use std::hash::{Hash, Hasher};
 
+use crate::bbox::BBox2D;
 use crate::cache::CacheImpl;
-use crate::data::BoundingBox2D;
 use crate::data::HashValue;
 use crate::data::Identifier;
-use crate::data::Matrix4;
-use crate::data::PixelBlock;
-use crate::geom::plane::calc_count_vertex_positions;
-use crate::geom::plane::calc_count_vertex_uvs;
 use crate::geom::plane::calc_buffer_size_index_tris;
 use crate::geom::plane::calc_buffer_size_vertex_positions;
 use crate::geom::plane::calc_buffer_size_vertex_uvs;
+use crate::geom::plane::calc_count_vertex_positions;
+use crate::geom::plane::calc_count_vertex_uvs;
 use crate::geom::plane::export_mesh;
 use crate::geom::plane::fill_buffer_index_tris;
 use crate::geom::plane::fill_buffer_vertex_positions;
 use crate::geom::plane::fill_buffer_vertex_uvs;
 use crate::graph::GraphImpl;
+use crate::hashutils::calculate_hash;
+use crate::hashutils::generate_id_from_name;
+use crate::hashutils::generate_random_id;
 use crate::logger::initialize;
+use crate::matrix::Matrix4;
 use crate::node::create_node;
 use crate::node::NodeImpl;
+use crate::pixelblock::PixelBlock;
 use crate::stream::StreamDataImpl;
 
 #[rustfmt::skip]
@@ -166,10 +164,10 @@ pub mod ffi {
         type PixelBlock;
     }
 
-    // BoundingBox2D
+    // BBox2D
     #[namespace = "open_comp_graph::internal"]
     extern "Rust" {
-        type BoundingBox2D;
+        type BBox2D;
     }
 
     // Matrix4
@@ -182,17 +180,18 @@ pub mod ffi {
     #[namespace = "open_comp_graph::internal"]
     extern "Rust" {
         type StreamDataImpl;
-        fn get_state(&self) -> StreamDataState;
-        fn get_state_id(&self) -> u8;
-        fn get_hash(&self) -> u64;
-        fn get_bounding_box(&self) -> &Box<BoundingBox2D>;
-        fn get_color_matrix(&self) -> &Box<Matrix4>;
-        fn get_transform_matrix(&self) -> &Box<Matrix4>;
-        fn get_pixel_block(&self) -> &PixelBlock;
-        fn get_pixel_buffer(&self) -> &[f32];
-        fn get_pixel_width(&self) -> u32;
-        fn get_pixel_height(&self) -> u32;
-        fn get_pixel_num_channels(&self) -> u8;
+        fn state(&self) -> StreamDataState;
+        fn state_id(&self) -> u8;
+        fn hash(&self) -> u64;
+        fn display_window(&self) -> &Box<BBox2D>;
+        fn data_window(&self) -> &Box<BBox2D>;
+        fn color_matrix(&self) -> &Box<Matrix4>;
+        fn transform_matrix(&self) -> &Box<Matrix4>;
+        fn pixel_block(&self) -> &PixelBlock;
+        fn pixel_buffer(&self) -> &[f32];
+        fn pixel_width(&self) -> u32;
+        fn pixel_height(&self) -> u32;
+        fn pixel_num_channels(&self) -> u8;
     }
 
     // Node
@@ -223,7 +222,6 @@ pub mod ffi {
     #[namespace = "open_comp_graph::internal"]
     extern "Rust" {
         type CacheImpl;
-        fn get_id(&self) -> u64;
         fn len(&self) -> usize;
     }
 
@@ -395,21 +393,4 @@ pub fn create_stream_data_shared_box(data: Box<StreamDataImpl>) -> ffi::StreamDa
 pub fn create_stream_data_box() -> Box<StreamDataImpl> {
     debug!("create_stream_data_box()");
     Box::new(StreamDataImpl::new())
-}
-
-fn calculate_hash<T: Hash>(t: &T) -> HashValue {
-    let mut s = FxHasher::default();
-    t.hash(&mut s);
-    s.finish()
-}
-
-fn generate_id_from_name(name: &str) -> HashValue {
-    calculate_hash::<&str>(&name)
-}
-
-fn generate_random_id() -> HashValue {
-    // Create small, cheap to initialize and fast RNG with a random seed.
-    // The randomness is supplied by the operating system.
-    let mut rng = SmallRng::from_entropy();
-    rng.gen()
 }

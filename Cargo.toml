@@ -35,6 +35,11 @@ version = "0.23.12"
 default-features = false
 features = ["jpeg", "png", "tga", "tiff"]
 
+[dependencies.nalgebra]
+version = "0.23.2"
+default-features = false
+features = ["std", "matrixmultiply"]  # "serde"
+
 [profile.release]
 opt-level = 2
 debug = false

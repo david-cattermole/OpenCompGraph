@@ -9,16 +9,13 @@ type CacheValue = StreamDataImplShared;
 #[derive(Debug)]
 pub struct CacheImpl {
     map: FxHashMap<CacheKey, CacheValue>,
+    capacity: usize,
 }
 
 impl CacheImpl {
     pub fn new() -> CacheImpl {
         let map = FxHashMap::default();
-        CacheImpl { map }
-    }
-
-    pub fn get_id(&self) -> u64 {
-        42
+        CacheImpl { map, capacity: 0 }
     }
 
     pub fn len(&self) -> usize {
@@ -35,6 +32,16 @@ impl CacheImpl {
     pub fn get(&mut self, key: &CacheKey) -> Option<&CacheValue> {
         self.map.get(key)
     }
+
+    pub fn capacity(&self) -> usize {
+        self.capacity
+    }
+
+    pub fn set_capacity(&mut self, value: usize) {
+        self.capacity = value;
+    }
+
+    pub fn evict(&mut self) {}
 }
 
 /*

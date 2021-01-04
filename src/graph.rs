@@ -11,7 +11,6 @@ use crate::cxxbridge::ffi::CacheImplShared;
 use crate::cxxbridge::ffi::ExecuteStatus;
 use crate::cxxbridge::ffi::NodeStatus;
 use crate::cxxbridge::ffi::StreamDataImplShared;
-use crate::data::BoundingBox2D;
 use crate::data::EdgeIdx;
 use crate::data::EdgeWeight;
 use crate::data::GraphIdx;

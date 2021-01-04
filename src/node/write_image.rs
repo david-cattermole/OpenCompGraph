@@ -76,7 +76,7 @@ impl Compute for WriteImageCompute {
                 let file_path = attr_block.get_attr_str("file_path");
                 // debug!("file_path {:?}", file_path);
 
-                let pixel_block = input.get_pixel_block();
+                let pixel_block = input.pixel_block();
                 let width = pixel_block.width;
                 let height = pixel_block.height;
                 let pixels = &pixel_block.pixels;

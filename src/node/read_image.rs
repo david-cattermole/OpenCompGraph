@@ -1,7 +1,7 @@
 use image;
 use image::GenericImageView;
 use image::ImageBuffer;
-use log::{debug, error, info, log_enabled, warn, Level};
+use log::{debug, error, info, warn};
 use rustc_hash::FxHasher;
 use std::collections::hash_map::DefaultHasher;
 use std::hash;
@@ -9,17 +9,17 @@ use std::hash::Hash;
 use std::path::Path;
 use std::string::String;
 
-use crate::colorutils;
+use crate::bbox::BBox2D;
 use crate::cxxbridge::ffi::AttrState;
 use crate::cxxbridge::ffi::NodeStatus;
 use crate::cxxbridge::ffi::NodeType;
 use crate::cxxbridge::ffi::StreamDataImplShared;
 use crate::data::HashValue;
 use crate::data::Identifier;
-use crate::data::PixelBlock;
 use crate::node::traits::AttrBlock;
 use crate::node::traits::Compute;
 use crate::node::NodeImpl;
+use crate::pixelblock::PixelBlock;
 
 pub fn new(id: Identifier) -> NodeImpl {
     NodeImpl {
@@ -81,56 +81,24 @@ impl Compute for ReadImageCompute {
         };
         debug!("Opening... {:?}", path);
         if path.is_file() == true {
+            // Read image
             let img = image::open(path).unwrap();
-            let (width, height) = img.dimensions();
-            let color_type = img.color();
-            debug!("Resolution: {:?}x{:?}", width, height);
-            debug!("Color Type: {:?}", color_type);
-            let num_channels = match color_type {
-                image::ColorType::Rgb8 => 3,
-                image::ColorType::Rgba8 => 3,
-                _ => 0,
-            };
-            debug!("Num Channels: {:?}", num_channels);
+            let pixel_block = PixelBlock::from_image(img);
 
-            // Convert the image to f32 values
-            //
-            // NOTE: We strip off the alpha channel here, this
-            // functionality will be implemented later.
-            let rgba_img = img.into_rgb8();
-            let flat_samples = rgba_img.into_flat_samples();
-            let pixels: Vec<f32> = flat_samples
-                .as_slice()
-                .into_iter()
-                .map(|x| colorutils::convert_srgb_to_linear((*x as f32) / (u8::max_value() as f32)))
-                .collect();
+            let display_window = Box::new(BBox2D::new(
+                0.0,
+                0.0,
+                pixel_block.width as f32,
+                pixel_block.height as f32,
+            ));
+            let data_window = display_window.clone();
 
-            // Get pixel statistics
-            if log_enabled!(Level::Debug) {
-                let min = pixels.iter().fold(f32::INFINITY, |a, &b| a.min(b));
-                let max = pixels.iter().fold(f32::NEG_INFINITY, |a, &b| a.max(b));
-                let avg = pixels.iter().sum::<f32>() / (pixels.len() as f32);
-                debug!("Min value: {}", min);
-                debug!("Max value: {}", max);
-                debug!("Avg value: {}", avg);
-            }
-
-            let mut pixel_block = PixelBlock::new(width, height, num_channels);
-            let pixels = pixel_block.set_pixels(pixels);
             let hash_value = self.cache_hash(node_type_id, &attr_block, inputs);
+            output.inner.set_display_window(display_window);
+            output.inner.set_data_window(data_window);
             output.inner.set_hash(hash_value);
             output.inner.set_pixel_block(pixel_block);
         }
-
-        // BoundingBox displayBox;
-        // displayBox.min.x = 0;
-        // displayBox.min.y = 0;
-        // displayBox.max.x = image_width;
-        // displayBox.max.y = image_height;
-
-        // Image img;
-        // img.pixelBlock = pixels;
-        // img.displayWindow = displayBox;
 
         NodeStatus::Valid
     }
