@@ -56,8 +56,10 @@ pub fn fill_buffer_vertex_uvs(divisions_x: u32, divisions_y: u32, buffer: &mut [
     let square_size_y: f32 = 1.0 / ((divisions_y - 1) as f32);
     for row in 0..divisions_y {
         for col in 0..divisions_x {
+            // Flip Y coordinates because the texture data starts at the
+            // top-left, but our UVs start at bottom-left.
             buffer[index + 0] = (col as f32) * square_size_x;
-            buffer[index + 1] = (row as f32) * square_size_y;
+            buffer[index + 1] = 1.0 + ((row as f32) * square_size_y * -1.0);
             index += per_vertex_num;
         }
     }
