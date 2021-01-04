@@ -322,9 +322,9 @@ pub mod ffi {
         ) -> bool;
 
         fn export_mesh(
-            buffer_vertex_positions: &mut [f32],
-            buffer_vertex_uvs: &mut [f32],
-            buffer_index_tris: &mut [u32],
+            buffer_vertex_positions: &[f32],
+            buffer_vertex_uvs: &[f32],
+            buffer_index_tris: &[u32],
             file_path: &str,
         );
     }

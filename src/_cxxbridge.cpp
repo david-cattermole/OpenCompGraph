@@ -1394,7 +1394,7 @@ bool open_comp_graph$internal$cxxbridge1$fill_buffer_index_tris(::std::uint32_t 
 
 bool open_comp_graph$internal$cxxbridge1$fill_all_buffers(::std::uint32_t divisions_x, ::std::uint32_t divisions_y, ::rust::Slice<float> buffer_vertex_positions, ::rust::Slice<float> buffer_vertex_uvs, ::rust::Slice<::std::uint32_t> buffer_index_tris) noexcept;
 
-void open_comp_graph$internal$cxxbridge1$export_mesh(::rust::Slice<float> buffer_vertex_positions, ::rust::Slice<float> buffer_vertex_uvs, ::rust::Slice<::std::uint32_t> buffer_index_tris, ::rust::Str file_path) noexcept;
+void open_comp_graph$internal$cxxbridge1$export_mesh(::rust::Slice<const float> buffer_vertex_positions, ::rust::Slice<const float> buffer_vertex_uvs, ::rust::Slice<const ::std::uint32_t> buffer_index_tris, ::rust::Str file_path) noexcept;
 } // extern "C"
 } // namespace internal
 
@@ -1737,7 +1737,7 @@ OPENCOMPGRAPH_SYMBOL_EXPORT bool fill_all_buffers(::std::uint32_t divisions_x, :
   return open_comp_graph$internal$cxxbridge1$fill_all_buffers(divisions_x, divisions_y, buffer_vertex_positions, buffer_vertex_uvs, buffer_index_tris);
 }
 
-OPENCOMPGRAPH_SYMBOL_EXPORT void export_mesh(::rust::Slice<float> buffer_vertex_positions, ::rust::Slice<float> buffer_vertex_uvs, ::rust::Slice<::std::uint32_t> buffer_index_tris, ::rust::Str file_path) noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT void export_mesh(::rust::Slice<const float> buffer_vertex_positions, ::rust::Slice<const float> buffer_vertex_uvs, ::rust::Slice<const ::std::uint32_t> buffer_index_tris, ::rust::Str file_path) noexcept {
   open_comp_graph$internal$cxxbridge1$export_mesh(buffer_vertex_positions, buffer_vertex_uvs, buffer_index_tris, file_path);
 }
 } // namespace internal

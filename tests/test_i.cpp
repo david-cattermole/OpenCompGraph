@@ -1,6 +1,7 @@
 #include <iostream>
 #include <opencompgraph.h>
 
+
 namespace ocg = open_comp_graph;
 
 void generate_mesh(const uint32_t divisions_x,
@@ -10,8 +11,8 @@ void generate_mesh(const uint32_t divisions_x,
                    size_t &uv_count,
                    // size_t &line_count,
                    size_t &tri_count) {
-    assert(divisions_x > 0);
-    assert(divisions_y > 0);
+    assert(divisions_x > 1);
+    assert(divisions_y > 1);
     std::cout << "divisions: " << divisions_x << "x" << divisions_y << '\n';
     pos_count = ocg::internal::calc_buffer_size_vertex_positions(divisions_x, divisions_y);
     uv_count = ocg::internal::calc_buffer_size_vertex_uvs(divisions_x, divisions_y);
@@ -47,10 +48,13 @@ void generate_mesh(const uint32_t divisions_x,
         );
 
     // Export
+    rust::Slice<const float> const_slice_vertex_pos(vertex_pos.data(), vertex_pos.capacity());
+    rust::Slice<const float> const_slice_vertex_uvs(vertex_uvs.data(), vertex_uvs.capacity());
+    rust::Slice<const uint32_t> const_slice_index_tris(index_tris.data(), index_tris.capacity());
     ocg::internal::export_mesh(
-        slice_vertex_pos,
-        slice_vertex_uvs,
-        slice_index_tris,
+        const_slice_vertex_pos,
+        const_slice_vertex_uvs,
+        const_slice_index_tris,
         file_path);
 }
 

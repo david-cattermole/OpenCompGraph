@@ -1205,7 +1205,7 @@ OPENCOMPGRAPH_SYMBOL_EXPORT bool fill_buffer_index_tris(::std::uint32_t division
 
 OPENCOMPGRAPH_SYMBOL_EXPORT bool fill_all_buffers(::std::uint32_t divisions_x, ::std::uint32_t divisions_y, ::rust::Slice<float> buffer_vertex_positions, ::rust::Slice<float> buffer_vertex_uvs, ::rust::Slice<::std::uint32_t> buffer_index_tris) noexcept;
 
-OPENCOMPGRAPH_SYMBOL_EXPORT void export_mesh(::rust::Slice<float> buffer_vertex_positions, ::rust::Slice<float> buffer_vertex_uvs, ::rust::Slice<::std::uint32_t> buffer_index_tris, ::rust::Str file_path) noexcept;
+OPENCOMPGRAPH_SYMBOL_EXPORT void export_mesh(::rust::Slice<const float> buffer_vertex_positions, ::rust::Slice<const float> buffer_vertex_uvs, ::rust::Slice<const ::std::uint32_t> buffer_index_tris, ::rust::Str file_path) noexcept;
 } // namespace internal
 
 namespace log {

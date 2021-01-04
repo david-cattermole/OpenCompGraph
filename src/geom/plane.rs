@@ -131,7 +131,7 @@ pub fn fill_all_buffers(
     true
 }
 
-pub fn export_mesh(positions: &mut [f32], uvs: &mut [f32], indices: &mut [u32], file_path: &str) {
+pub fn export_mesh(positions: &[f32], uvs: &[f32], indices: &[u32], file_path: &str) {
     debug!("Exporting Mesh: {}", file_path);
     // debug!("positions: size={} {:#?}", positions.len(), positions);
     // debug!("indices: size={} {:#?}", indices.len(), indices);
