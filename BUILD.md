@@ -27,7 +27,7 @@ $ cd /path/to/project/root/
 
 $ cargo install cxxbridge-cmd --git "https://github.com/david-cattermole/cxx.git" --rev "363c18b2982329d6e4fbc2a6e5f324f4fef03661" --force
 
-$ bash build_linux.bash
+$ bash build_OpenCompGraph_linux.bash
 
 # Run tests
 $ ./install/bin/opencompgraph_tests
@@ -40,7 +40,7 @@ done with ThingC
 
 Note: If you are using CentOS 7.8 and require the Red Hat Developer
 Toolset 6 (GCC 6.3.1) for compatiblity with the VFX Reference Platform CY2018,
-then you can use the following commands prior to running `build_linux.bash`:
+then you can use the following commands prior to running `build_OpenCompGraph_linux.bash`:
 ```
 $ export CC=/opt/rh/devtoolset-6/root/usr/bin/gcc
 $ export CXX=/opt/rh/devtoolset-6/root/usr/bin/g++
@@ -58,7 +58,7 @@ Make sure the following commands are run in the Visual Studio 2015 enabled Comma
 ``` shell
 > cd C:\path\to\project\root\
 
-> build_windows64.bat
+> build_OpenCompGraph_windows64.bat
 
 > install\bin\opencompgraph_tests.exe
 2 + 2 = 4
