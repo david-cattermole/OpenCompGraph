@@ -65,9 +65,32 @@ int test_f(std::shared_ptr<ocg::Cache> cache) {
     auto width1 = stream_data1.pixel_width();
     auto height1 = stream_data1.pixel_height();
     auto num_channels1 = stream_data1.pixel_num_channels();
+    auto color_matrix1 = stream_data1.color_matrix();
     std::cout << "width1=" << width1 << '\n';
     std::cout << "height1=" << height1 << '\n';
     std::cout << "num_channels1=" << static_cast<uint32_t>(num_channels1) << '\n';
+        std::cout << "color_matrix1:\n"
+                  << " row0="
+                  << color_matrix1.m00 << ","
+                  << color_matrix1.m01 << ","
+                  << color_matrix1.m02 << ","
+                  << color_matrix1.m03 << '\n'
+                  << " row1="
+                  << color_matrix1.m10 << ","
+                  << color_matrix1.m11 << ","
+                  << color_matrix1.m12 << ","
+                  << color_matrix1.m13 << '\n'
+                  << " row2="
+                  << color_matrix1.m20 << ","
+                  << color_matrix1.m21 << ","
+                  << color_matrix1.m22 << ","
+                  << color_matrix1.m23 << '\n'
+                  << " row3="
+                  << color_matrix1.m30 << ","
+                  << color_matrix1.m31 << ","
+                  << color_matrix1.m32 << ","
+                  << color_matrix1.m33 << '\n'
+                  << '\n';
 
     // Execute 2. The image should appear darker.
     std::cout << "Execute #2 =========================================" << '\n';
@@ -84,9 +107,32 @@ int test_f(std::shared_ptr<ocg::Cache> cache) {
     auto width2 = stream_data2.pixel_width();
     auto height2 = stream_data2.pixel_height();
     auto num_channels2 = stream_data2.pixel_num_channels();
+    auto color_matrix2 = stream_data2.color_matrix();
     std::cout << "width2=" << width2 << '\n';
     std::cout << "height2=" << height2 << '\n';
     std::cout << "num_channels2=" << static_cast<uint32_t>(num_channels2) << '\n';
+        std::cout << "color_matrix2:\n"
+                  << " row0="
+                  << color_matrix2.m00 << ","
+                  << color_matrix2.m01 << ","
+                  << color_matrix2.m02 << ","
+                  << color_matrix2.m03 << '\n'
+                  << " row1="
+                  << color_matrix2.m10 << ","
+                  << color_matrix2.m11 << ","
+                  << color_matrix2.m12 << ","
+                  << color_matrix2.m13 << '\n'
+                  << " row2="
+                  << color_matrix2.m20 << ","
+                  << color_matrix2.m21 << ","
+                  << color_matrix2.m22 << ","
+                  << color_matrix2.m23 << '\n'
+                  << " row3="
+                  << color_matrix2.m30 << ","
+                  << color_matrix2.m31 << ","
+                  << color_matrix2.m32 << ","
+                  << color_matrix2.m33 << '\n'
+                  << '\n';
 
     // Execute 3. The image should appear lighter.
     std::cout << "Execute #3 =========================================" << '\n';
@@ -103,9 +149,32 @@ int test_f(std::shared_ptr<ocg::Cache> cache) {
     auto width3 = stream_data3.pixel_width();
     auto height3 = stream_data3.pixel_height();
     auto num_channels3 = stream_data3.pixel_num_channels();
+    auto color_matrix3 = stream_data3.color_matrix();
     std::cout << "width3=" << width3 << '\n';
     std::cout << "height3=" << height3 << '\n';
     std::cout << "num_channels3=" << static_cast<uint32_t>(num_channels3) << '\n';
+        std::cout << "color_matrix3:\n"
+                  << " row0="
+                  << color_matrix3.m00 << ","
+                  << color_matrix3.m01 << ","
+                  << color_matrix3.m02 << ","
+                  << color_matrix3.m03 << '\n'
+                  << " row1="
+                  << color_matrix3.m10 << ","
+                  << color_matrix3.m11 << ","
+                  << color_matrix3.m12 << ","
+                  << color_matrix3.m13 << '\n'
+                  << " row2="
+                  << color_matrix3.m20 << ","
+                  << color_matrix3.m21 << ","
+                  << color_matrix3.m22 << ","
+                  << color_matrix3.m23 << '\n'
+                  << " row3="
+                  << color_matrix3.m30 << ","
+                  << color_matrix3.m31 << ","
+                  << color_matrix3.m32 << ","
+                  << color_matrix3.m33 << '\n'
+                  << '\n';
 
     bench.stop();
     bench.print("Test F:");

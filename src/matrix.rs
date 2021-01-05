@@ -1,10 +1,34 @@
-use nalgebra;
+use nalgebra as na;
 use std::hash::{Hash, Hasher};
 
 use crate::cxxbridge::ffi::Matrix4;
 use crate::hashutils;
 
 impl Matrix4 {
+    pub fn from_diagonal(x: f32, y: f32, z: f32, w: f32) -> Matrix4 {
+        Matrix4 {
+            m00: x,
+            m01: 0.0,
+            m02: 0.0,
+            m03: 0.0,
+            //
+            m10: 0.0,
+            m11: y,
+            m12: 0.0,
+            m13: 0.0,
+            //
+            m20: 0.0,
+            m21: 0.0,
+            m22: z,
+            m23: 0.0,
+            //
+            m30: 0.0,
+            m31: 0.0,
+            m32: 0.0,
+            m33: w,
+        }
+    }
+
     pub fn identity() -> Matrix4 {
         Matrix4 {
             m00: 1.0,
@@ -29,8 +53,8 @@ impl Matrix4 {
         }
     }
 
-    pub fn to_nalgebra_matrix(&self) -> nalgebra::Matrix4<f32> {
-        nalgebra::Matrix4::<f32>::new(
+    pub fn to_na_matrix(&self) -> na::Matrix4<f32> {
+        na::Matrix4::<f32>::new(
             self.m00, self.m01, self.m02, self.m03, //
             self.m10, self.m11, self.m12, self.m13, //
             self.m20, self.m21, self.m22, self.m23, //
@@ -38,7 +62,7 @@ impl Matrix4 {
         )
     }
 
-    pub fn from_nalgebra_matrix(value: nalgebra::Matrix4<f32>) -> Matrix4 {
+    pub fn from_na_matrix(value: na::Matrix4<f32>) -> Matrix4 {
         Matrix4 {
             m00: value[(0, 0)],
             m01: value[(0, 1)],

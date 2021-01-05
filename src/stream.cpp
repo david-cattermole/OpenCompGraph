@@ -52,6 +52,10 @@ void StreamData::set_data_window(BBox2Df value) noexcept {
     this->inner.inner->set_data_window(value);
 };
 
+Matrix4 StreamData::color_matrix() const noexcept {
+    return this->inner.inner->color_matrix();
+};
+
 const internal::PixelBlock& StreamData::pixel_block() const noexcept {
     return this->inner.inner->pixel_block();
 }

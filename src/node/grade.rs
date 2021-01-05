@@ -2,9 +2,11 @@ use log::{debug, error, info, warn};
 use std::collections::hash_map::DefaultHasher;
 use std::hash;
 use std::hash::Hash;
-use std::string::String;
 
+use crate::colorutils;
+use crate::colorxform;
 use crate::cxxbridge::ffi::AttrState;
+use crate::cxxbridge::ffi::Matrix4;
 use crate::cxxbridge::ffi::NodeStatus;
 use crate::cxxbridge::ffi::NodeType;
 use crate::cxxbridge::ffi::StreamDataImplShared;
@@ -75,25 +77,24 @@ impl Compute for GradeCompute {
         match inputs.len() {
             0 => NodeStatus::Error,
             _ => {
-                let mut copy = inputs[0].inner.clone();
+                let input = &inputs[0].inner;
 
-                let multiply = attr_block.get_attr_f32("multiply");
-                let pixel_block = copy.pixel_block_as_mut();
-                // let mut i = 0;
-                for v in &mut pixel_block.pixels {
-                    // if i < 5 {
-                    //     debug!("a={}", *v);
-                    // }
-                    *v *= multiply;
-                    // if i < 5 {
-                    //     debug!("b={}", *v);
-                    // }
-                    // i += 1;
-                }
+                // Calculate Color Matrix
+                let in_matrix = input.color_matrix().to_na_matrix();
+                let r_multiply = attr_block.get_attr_f32("multiply");
+                let g_multiply = attr_block.get_attr_f32("multiply");
+                let b_multiply = attr_block.get_attr_f32("multiply");
+                let a_multiply = 1.0;
+                let out_matrix = colorxform::apply_scale_rgba(
+                    in_matrix, r_multiply, g_multiply, b_multiply, a_multiply,
+                );
 
+                // Set Output data
+                let mut copy = input.clone();
+                copy.set_color_matrix(Matrix4::from_na_matrix(out_matrix));
                 let hash_value = self.cache_hash(node_type_id, &attr_block, inputs);
+                copy.set_hash(hash_value);
                 output.inner = copy;
-                output.inner.set_hash(hash_value);
                 NodeStatus::Valid
             }
         }

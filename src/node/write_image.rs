@@ -6,7 +6,9 @@ use std::hash::Hash;
 use std::path::Path;
 use std::string::String;
 
+use crate::colorutils;
 use crate::colorutils::convert_linear_to_srgb;
+use crate::colorxform;
 use crate::cxxbridge::ffi::AttrState;
 use crate::cxxbridge::ffi::NodeStatus;
 use crate::cxxbridge::ffi::NodeType;
@@ -73,12 +75,19 @@ impl Compute for WriteImageCompute {
             _ => {
                 let input = &inputs[0].inner;
 
-                let file_path = attr_block.get_attr_str("file_path");
-                // debug!("file_path {:?}", file_path);
+                // Copy input data
+                let mut copy = &mut input.clone();
+                let num_channels = copy.pixel_num_channels();
 
-                let pixel_block = input.pixel_block();
+                // Apply Color Matrix
+                let color_matrix = copy.color_matrix().to_na_matrix();
+                let pixel_block = copy.pixel_block_as_mut();
+                let mut pixels = &mut pixel_block.pixels;
+                colorutils::apply_color_matrix_inplace(pixels, num_channels, color_matrix);
+
                 let img = pixel_block.to_image_buffer_rgb_u8();
 
+                let file_path = attr_block.get_attr_str("file_path");
                 debug!("Writing... {:?}", file_path);
                 let ok = match img.save(file_path) {
                     Ok(value) => true,

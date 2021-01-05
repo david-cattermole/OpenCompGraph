@@ -81,6 +81,24 @@ impl StreamDataImpl {
         self.data_window = value;
     }
 
+    pub fn color_matrix(&self) -> Matrix4 {
+        debug!("StreamDataImpl.color_matrix: {:#?}", self.color_matrix);
+        self.color_matrix
+    }
+
+    pub fn set_color_matrix(&mut self, value: Matrix4) {
+        debug!("StreamDataImpl.set_color_matrix: {:#?}", value);
+        self.color_matrix = value;
+    }
+
+    pub fn transform_matrix(&self) -> Matrix4 {
+        self.transform_matrix
+    }
+
+    pub fn set_transform_matrix(&mut self, value: Matrix4) {
+        self.transform_matrix = value;
+    }
+
     pub fn pixel_block(&self) -> &PixelBlock {
         &self.pixel_block
     }
@@ -111,13 +129,5 @@ impl StreamDataImpl {
 
     pub fn pixel_num_channels(&self) -> u8 {
         self.pixel_block.num_channels
-    }
-
-    pub fn color_matrix(&self) -> Matrix4 {
-        self.color_matrix
-    }
-
-    pub fn transform_matrix(&self) -> Matrix4 {
-        self.transform_matrix
     }
 }

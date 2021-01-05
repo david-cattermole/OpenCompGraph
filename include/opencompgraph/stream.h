@@ -44,6 +44,9 @@ public:
     void set_data_window(BBox2Df value) noexcept;
 
     OPENCOMPGRAPH_SYMBOL_EXPORT
+    Matrix4 color_matrix() const noexcept;
+
+    OPENCOMPGRAPH_SYMBOL_EXPORT
     const internal::PixelBlock& pixel_block() const noexcept;
 
     OPENCOMPGRAPH_SYMBOL_EXPORT
