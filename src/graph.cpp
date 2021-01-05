@@ -11,6 +11,14 @@ Graph::Graph() noexcept : inner{internal::create_graph_shared()} {
     // std::cout << "Graph()" << '\n';
 }
 
+GraphState Graph::state() const noexcept {
+    return this->inner.inner->state();
+}
+
+ExecuteStatus Graph::execute_status() const noexcept {
+    return this->inner.inner->execute_status();
+}
+
 Node Graph::create_node(NodeType node_type) noexcept {
     auto id = internal::generate_random_id();
     auto node = Node(node_type, id);

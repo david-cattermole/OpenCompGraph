@@ -9,6 +9,7 @@ use crate::cxxbridge::create_stream_data_shared;
 use crate::cxxbridge::ffi::AttrState;
 use crate::cxxbridge::ffi::CacheImplShared;
 use crate::cxxbridge::ffi::ExecuteStatus;
+use crate::cxxbridge::ffi::GraphState;
 use crate::cxxbridge::ffi::NodeStatus;
 use crate::cxxbridge::ffi::StreamDataImplShared;
 use crate::data::EdgeIdx;
@@ -30,6 +31,7 @@ pub struct GraphImpl {
     ids: Vec<Identifier>,
     graph: NodeGraph,
     output: StreamDataImplShared,
+    state: GraphState,
     status: ExecuteStatus,
 }
 
@@ -40,14 +42,26 @@ impl GraphImpl {
         let ids = Vec::new();
         let graph = NodeGraph::with_capacity(0, 0);
         let output = create_stream_data_shared();
+        let state = GraphState::Uninitialized;
         let status = ExecuteStatus::Uninitialized;
         GraphImpl {
             nodes,
             ids,
             graph,
             output,
+            state,
             status,
         }
+    }
+
+    /// What state is the graph in?
+    pub fn state(&self) -> GraphState {
+        self.state
+    }
+
+    /// Return the last execution status.
+    pub fn execute_status(&self) -> ExecuteStatus {
+        self.status
     }
 
     /// Add a new node to the graph.
@@ -57,6 +71,7 @@ impl GraphImpl {
         self.nodes.push(node_box);
         self.ids.push(id);
 
+        self.state = GraphState::Dirty;
         let index = self.graph.add_node(id).index();
         debug!("Add Node index={} id={}", index, id);
         assert_eq!(index, nodes_index);
@@ -76,7 +91,10 @@ impl GraphImpl {
         // TODO: Zero out the now empty fields.
         let node_index = petgraph::graph::NodeIndex::new(node_idx);
         match self.graph.remove_node(node_index) {
-            Some(value) => true,
+            Some(value) => {
+                self.state = GraphState::Dirty;
+                true
+            }
             None => false,
         }
     }
@@ -111,6 +129,9 @@ impl GraphImpl {
                 return; // TODO: Add error code?
             }
         };
+        // TODO: Only set dirty state if setting the value was
+        // successful (there is no way to confirm this currently.)
+        self.state = GraphState::Dirty;
         node_box.set_attr_str(name, value);
     }
 
@@ -133,6 +154,9 @@ impl GraphImpl {
                 return; // TODO: Add error code?
             }
         };
+        // TODO: Only set dirty state if setting the value was
+        // successful (there is no way to confirm this currently.)
+        self.state = GraphState::Dirty;
         node_box.set_attr_i32(name, value);
     }
 
@@ -155,6 +179,9 @@ impl GraphImpl {
                 return; // TODO: Add error code?
             }
         };
+        // TODO: Only set dirty state if setting the value was
+        // successful (there is no way to confirm this currently.)
+        self.state = GraphState::Dirty;
         node_box.set_attr_f32(name, value);
     }
 
@@ -240,14 +267,15 @@ impl GraphImpl {
             .fold(0, |acc, x| acc + (*x.weight() == input_num) as usize);
 
         if edges_existing == 0 {
+            self.state = GraphState::Dirty;
             self.graph.add_edge(src_index, dst_index, input_num);
         }
     }
 
     /// Compute the graph!
+    // TODO: Add an "executor" or "evaluation context" variable to
+    // this method to explain how we wish to execute the graph.
     //
-    // TODO: Add an "executor" variable to this method to explain how
-    // we wish to execute the graph.
     pub fn execute(&mut self, start_node_id: u64, cache: &mut Box<CacheImpl>) -> ExecuteStatus {
         debug!("Execute: {}", start_node_id);
         let start_node_idx = match self.find_node_index_from_id(start_node_id) {
@@ -332,6 +360,7 @@ impl GraphImpl {
             }
         }
 
+        self.state = GraphState::Clean;
         self.status = ExecuteStatus::Success;
         self.status
     }

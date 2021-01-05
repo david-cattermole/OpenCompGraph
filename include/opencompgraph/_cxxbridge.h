@@ -901,6 +901,7 @@ namespace open_comp_graph {
   struct BBox2Df;
   struct BBox2Di;
   struct Matrix4;
+  enum class GraphState : ::std::uint8_t;
   enum class ExecuteStatus : ::std::uint8_t;
   enum class NodeType : ::std::uint8_t;
   enum class PixelDataType : ::std::uint8_t;
@@ -1035,12 +1036,21 @@ struct CacheImplShared final {
 #endif // CXXBRIDGE1_STRUCT_open_comp_graph$internal$CacheImplShared
 } // namespace internal
 
+#ifndef CXXBRIDGE1_ENUM_open_comp_graph$GraphState
+#define CXXBRIDGE1_ENUM_open_comp_graph$GraphState
+enum class GraphState : ::std::uint8_t {
+  kDirty = 0,
+  kClean = 1,
+  kUninitialized = 255,
+};
+#endif // CXXBRIDGE1_ENUM_open_comp_graph$GraphState
+
 #ifndef CXXBRIDGE1_ENUM_open_comp_graph$ExecuteStatus
 #define CXXBRIDGE1_ENUM_open_comp_graph$ExecuteStatus
 enum class ExecuteStatus : ::std::uint8_t {
   kError = 0,
   kSuccess = 1,
-  kUninitialized = 2,
+  kUninitialized = 255,
 };
 #endif // CXXBRIDGE1_ENUM_open_comp_graph$ExecuteStatus
 
@@ -1194,6 +1204,8 @@ private:
 #ifndef CXXBRIDGE1_STRUCT_open_comp_graph$internal$GraphImpl
 #define CXXBRIDGE1_STRUCT_open_comp_graph$internal$GraphImpl
 struct GraphImpl final : public ::rust::Opaque {
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::GraphState state() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::ExecuteStatus execute_status() const noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t add_node(::rust::Box<::open_comp_graph::internal::NodeImpl> op_box) noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT bool remove_node(::std::uint64_t node_id) noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::AttrState node_attr_exists(::std::uint64_t node_id, ::rust::Str name) const noexcept;

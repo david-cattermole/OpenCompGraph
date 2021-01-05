@@ -98,13 +98,25 @@ pub mod ffi {
     #[repr(u8)]
     #[derive(Debug, Copy, Clone, Hash)]
     #[namespace = "open_comp_graph"]
+    pub(crate) enum GraphState {
+        #[cxx_name = "kDirty"]
+        Dirty = 0,
+        #[cxx_name = "kClean"]
+        Clean = 1,
+        #[cxx_name = "kUninitialized"]
+        Uninitialized = 255,
+    }
+
+    #[repr(u8)]
+    #[derive(Debug, Copy, Clone, Hash)]
+    #[namespace = "open_comp_graph"]
     pub(crate) enum ExecuteStatus {
         #[cxx_name = "kError"]
         Error = 0,
         #[cxx_name = "kSuccess"]
         Success = 1,
         #[cxx_name = "kUninitialized"]
-        Uninitialized = 2,
+        Uninitialized = 255,
     }
 
     #[repr(u8)]
@@ -277,6 +289,8 @@ pub mod ffi {
     #[namespace = "open_comp_graph::internal"]
     extern "Rust" {
         type GraphImpl;
+        fn state(&self) -> GraphState;
+        fn execute_status(&self) -> ExecuteStatus;
         fn add_node(&mut self, op_box: Box<NodeImpl>) -> usize;
         fn remove_node(&mut self, node_id: u64) -> bool;
 

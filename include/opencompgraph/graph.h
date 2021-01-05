@@ -17,6 +17,12 @@ public:
     OPENCOMPGRAPH_SYMBOL_EXPORT Graph() noexcept;
 
     OPENCOMPGRAPH_SYMBOL_EXPORT
+    GraphState state() const noexcept;
+
+    OPENCOMPGRAPH_SYMBOL_EXPORT
+    ExecuteStatus execute_status() const noexcept;
+
+    OPENCOMPGRAPH_SYMBOL_EXPORT
     Node create_node(NodeType node_type) noexcept;
 
     OPENCOMPGRAPH_SYMBOL_EXPORT

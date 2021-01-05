@@ -963,6 +963,7 @@ namespace open_comp_graph {
   struct BBox2Df;
   struct BBox2Di;
   struct Matrix4;
+  enum class GraphState : ::std::uint8_t;
   enum class ExecuteStatus : ::std::uint8_t;
   enum class NodeType : ::std::uint8_t;
   enum class PixelDataType : ::std::uint8_t;
@@ -1097,12 +1098,21 @@ struct CacheImplShared final {
 #endif // CXXBRIDGE1_STRUCT_open_comp_graph$internal$CacheImplShared
 } // namespace internal
 
+#ifndef CXXBRIDGE1_ENUM_open_comp_graph$GraphState
+#define CXXBRIDGE1_ENUM_open_comp_graph$GraphState
+enum class GraphState : ::std::uint8_t {
+  kDirty = 0,
+  kClean = 1,
+  kUninitialized = 255,
+};
+#endif // CXXBRIDGE1_ENUM_open_comp_graph$GraphState
+
 #ifndef CXXBRIDGE1_ENUM_open_comp_graph$ExecuteStatus
 #define CXXBRIDGE1_ENUM_open_comp_graph$ExecuteStatus
 enum class ExecuteStatus : ::std::uint8_t {
   kError = 0,
   kSuccess = 1,
-  kUninitialized = 2,
+  kUninitialized = 255,
 };
 #endif // CXXBRIDGE1_ENUM_open_comp_graph$ExecuteStatus
 
@@ -1256,6 +1266,8 @@ private:
 #ifndef CXXBRIDGE1_STRUCT_open_comp_graph$internal$GraphImpl
 #define CXXBRIDGE1_STRUCT_open_comp_graph$internal$GraphImpl
 struct GraphImpl final : public ::rust::Opaque {
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::GraphState state() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::ExecuteStatus execute_status() const noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t add_node(::rust::Box<::open_comp_graph::internal::NodeImpl> op_box) noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT bool remove_node(::std::uint64_t node_id) noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::AttrState node_attr_exists(::std::uint64_t node_id, ::rust::Str name) const noexcept;
@@ -1404,6 +1416,10 @@ void open_comp_graph$internal$cxxbridge1$NodeImpl$set_attr_str(::open_comp_graph
 ::std::size_t open_comp_graph$internal$cxxbridge1$CacheImpl$len(const ::open_comp_graph::internal::CacheImpl &self) noexcept;
 ::std::size_t open_comp_graph$internal$cxxbridge1$GraphImpl$operator$sizeof() noexcept;
 ::std::size_t open_comp_graph$internal$cxxbridge1$GraphImpl$operator$alignof() noexcept;
+
+::open_comp_graph::GraphState open_comp_graph$internal$cxxbridge1$GraphImpl$state(const ::open_comp_graph::internal::GraphImpl &self) noexcept;
+
+::open_comp_graph::ExecuteStatus open_comp_graph$internal$cxxbridge1$GraphImpl$execute_status(const ::open_comp_graph::internal::GraphImpl &self) noexcept;
 
 ::std::size_t open_comp_graph$internal$cxxbridge1$GraphImpl$add_node(::open_comp_graph::internal::GraphImpl &self, ::open_comp_graph::internal::NodeImpl *op_box) noexcept;
 
@@ -1738,6 +1754,14 @@ OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t CacheImpl::len() const noexcept {
 
 ::std::size_t GraphImpl::layout::align() noexcept {
   return open_comp_graph$internal$cxxbridge1$GraphImpl$operator$alignof();
+}
+
+OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::GraphState GraphImpl::state() const noexcept {
+  return open_comp_graph$internal$cxxbridge1$GraphImpl$state(*this);
+}
+
+OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::ExecuteStatus GraphImpl::execute_status() const noexcept {
+  return open_comp_graph$internal$cxxbridge1$GraphImpl$execute_status(*this);
 }
 
 OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t GraphImpl::add_node(::rust::Box<::open_comp_graph::internal::NodeImpl> op_box) noexcept {
