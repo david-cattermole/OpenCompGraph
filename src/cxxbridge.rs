@@ -35,11 +35,20 @@ pub mod ffi {
 
     #[derive(Debug, Copy, Clone, Default, PartialEq, PartialOrd)]
     #[namespace = "open_comp_graph"]
-    struct BBox2D {
+    struct BBox2Df {
         min_x: f32,
         min_y: f32,
         max_x: f32,
         max_y: f32,
+    }
+
+    #[derive(Debug, Copy, Clone, Default, Hash, PartialEq, PartialOrd)]
+    #[namespace = "open_comp_graph"]
+    struct BBox2Di {
+        min_x: i32,
+        min_y: i32,
+        max_x: i32,
+        max_y: i32,
     }
 
     #[derive(Debug, Copy, Clone, Default, PartialEq, PartialOrd)]
@@ -220,10 +229,10 @@ pub mod ffi {
         fn state(&self) -> StreamDataState;
         fn state_id(&self) -> u8;
         fn hash(&self) -> u64;
-        fn display_window(&self) -> BBox2D;
-        fn set_display_window(&mut self, value: BBox2D);
-        fn data_window(&self) -> BBox2D;
-        fn set_data_window(&mut self, value: BBox2D);
+        fn display_window(&self) -> BBox2Df;
+        fn set_display_window(&mut self, value: BBox2Df);
+        fn data_window(&self) -> BBox2Df;
+        fn set_data_window(&mut self, value: BBox2Df);
         fn color_matrix(&self) -> Matrix4;
         fn transform_matrix(&self) -> Matrix4;
         fn pixel_block(&self) -> &PixelBlock;

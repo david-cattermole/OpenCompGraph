@@ -10,7 +10,7 @@ use std::path::Path;
 use std::string::String;
 
 use crate::cxxbridge::ffi::AttrState;
-use crate::cxxbridge::ffi::BBox2D;
+use crate::cxxbridge::ffi::BBox2Df;
 use crate::cxxbridge::ffi::NodeStatus;
 use crate::cxxbridge::ffi::NodeType;
 use crate::cxxbridge::ffi::StreamDataImplShared;
@@ -85,7 +85,7 @@ impl Compute for ReadImageCompute {
             let img = image::open(path).unwrap();
             let pixel_block = PixelBlock::from_dynamic_image(img);
 
-            let display_window = BBox2D::new(
+            let display_window = BBox2Df::new(
                 0.0,
                 0.0,
                 (pixel_block.width - 1) as f32,

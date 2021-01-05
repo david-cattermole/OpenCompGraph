@@ -960,7 +960,8 @@ template <> struct deleter_if<true> {
 } // namespace rust
 
 namespace open_comp_graph {
-  struct BBox2D;
+  struct BBox2Df;
+  struct BBox2Di;
   struct Matrix4;
   enum class ExecuteStatus : ::std::uint8_t;
   enum class NodeType : ::std::uint8_t;
@@ -1001,23 +1002,41 @@ struct SharedThing final {
 #endif // CXXBRIDGE1_STRUCT_open_comp_graph$shared$SharedThing
 } // namespace shared
 
-#ifndef CXXBRIDGE1_STRUCT_open_comp_graph$BBox2D
-#define CXXBRIDGE1_STRUCT_open_comp_graph$BBox2D
-struct BBox2D final {
+#ifndef CXXBRIDGE1_STRUCT_open_comp_graph$BBox2Df
+#define CXXBRIDGE1_STRUCT_open_comp_graph$BBox2Df
+struct BBox2Df final {
   float min_x;
   float min_y;
   float max_x;
   float max_y;
 
-  bool operator==(const BBox2D &) const noexcept;
-  bool operator!=(const BBox2D &) const noexcept;
-  bool operator<(const BBox2D &) const noexcept;
-  bool operator<=(const BBox2D &) const noexcept;
-  bool operator>(const BBox2D &) const noexcept;
-  bool operator>=(const BBox2D &) const noexcept;
+  bool operator==(const BBox2Df &) const noexcept;
+  bool operator!=(const BBox2Df &) const noexcept;
+  bool operator<(const BBox2Df &) const noexcept;
+  bool operator<=(const BBox2Df &) const noexcept;
+  bool operator>(const BBox2Df &) const noexcept;
+  bool operator>=(const BBox2Df &) const noexcept;
   using IsRelocatable = ::std::true_type;
 };
-#endif // CXXBRIDGE1_STRUCT_open_comp_graph$BBox2D
+#endif // CXXBRIDGE1_STRUCT_open_comp_graph$BBox2Df
+
+#ifndef CXXBRIDGE1_STRUCT_open_comp_graph$BBox2Di
+#define CXXBRIDGE1_STRUCT_open_comp_graph$BBox2Di
+struct BBox2Di final {
+  ::std::int32_t min_x;
+  ::std::int32_t min_y;
+  ::std::int32_t max_x;
+  ::std::int32_t max_y;
+
+  bool operator==(const BBox2Di &) const noexcept;
+  bool operator!=(const BBox2Di &) const noexcept;
+  bool operator<(const BBox2Di &) const noexcept;
+  bool operator<=(const BBox2Di &) const noexcept;
+  bool operator>(const BBox2Di &) const noexcept;
+  bool operator>=(const BBox2Di &) const noexcept;
+  using IsRelocatable = ::std::true_type;
+};
+#endif // CXXBRIDGE1_STRUCT_open_comp_graph$BBox2Di
 
 #ifndef CXXBRIDGE1_STRUCT_open_comp_graph$Matrix4
 #define CXXBRIDGE1_STRUCT_open_comp_graph$Matrix4
@@ -1169,10 +1188,10 @@ struct StreamDataImpl final : public ::rust::Opaque {
   OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::StreamDataState state() const noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint8_t state_id() const noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint64_t hash() const noexcept;
-  OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::BBox2D display_window() const noexcept;
-  OPENCOMPGRAPH_SYMBOL_EXPORT void set_display_window(::open_comp_graph::BBox2D value) noexcept;
-  OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::BBox2D data_window() const noexcept;
-  OPENCOMPGRAPH_SYMBOL_EXPORT void set_data_window(::open_comp_graph::BBox2D value) noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::BBox2Df display_window() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT void set_display_window(::open_comp_graph::BBox2Df value) noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::BBox2Df data_window() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT void set_data_window(::open_comp_graph::BBox2Df value) noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::Matrix4 color_matrix() const noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::Matrix4 transform_matrix() const noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT const ::open_comp_graph::internal::PixelBlock &pixel_block() const noexcept;
@@ -1265,12 +1284,19 @@ private:
 } // namespace internal
 
 extern "C" {
-bool open_comp_graph$cxxbridge1$BBox2D$operator$eq(const BBox2D &, const BBox2D &) noexcept;
-bool open_comp_graph$cxxbridge1$BBox2D$operator$ne(const BBox2D &, const BBox2D &) noexcept;
-bool open_comp_graph$cxxbridge1$BBox2D$operator$lt(const BBox2D &, const BBox2D &) noexcept;
-bool open_comp_graph$cxxbridge1$BBox2D$operator$le(const BBox2D &, const BBox2D &) noexcept;
-bool open_comp_graph$cxxbridge1$BBox2D$operator$gt(const BBox2D &, const BBox2D &) noexcept;
-bool open_comp_graph$cxxbridge1$BBox2D$operator$ge(const BBox2D &, const BBox2D &) noexcept;
+bool open_comp_graph$cxxbridge1$BBox2Df$operator$eq(const BBox2Df &, const BBox2Df &) noexcept;
+bool open_comp_graph$cxxbridge1$BBox2Df$operator$ne(const BBox2Df &, const BBox2Df &) noexcept;
+bool open_comp_graph$cxxbridge1$BBox2Df$operator$lt(const BBox2Df &, const BBox2Df &) noexcept;
+bool open_comp_graph$cxxbridge1$BBox2Df$operator$le(const BBox2Df &, const BBox2Df &) noexcept;
+bool open_comp_graph$cxxbridge1$BBox2Df$operator$gt(const BBox2Df &, const BBox2Df &) noexcept;
+bool open_comp_graph$cxxbridge1$BBox2Df$operator$ge(const BBox2Df &, const BBox2Df &) noexcept;
+bool open_comp_graph$cxxbridge1$BBox2Di$operator$eq(const BBox2Di &, const BBox2Di &) noexcept;
+bool open_comp_graph$cxxbridge1$BBox2Di$operator$ne(const BBox2Di &, const BBox2Di &) noexcept;
+bool open_comp_graph$cxxbridge1$BBox2Di$operator$lt(const BBox2Di &, const BBox2Di &) noexcept;
+bool open_comp_graph$cxxbridge1$BBox2Di$operator$le(const BBox2Di &, const BBox2Di &) noexcept;
+bool open_comp_graph$cxxbridge1$BBox2Di$operator$gt(const BBox2Di &, const BBox2Di &) noexcept;
+bool open_comp_graph$cxxbridge1$BBox2Di$operator$ge(const BBox2Di &, const BBox2Di &) noexcept;
+::std::size_t open_comp_graph$cxxbridge1$BBox2Di$operator$hash(const BBox2Di &) noexcept;
 bool open_comp_graph$cxxbridge1$Matrix4$operator$eq(const Matrix4 &, const Matrix4 &) noexcept;
 bool open_comp_graph$cxxbridge1$Matrix4$operator$ne(const Matrix4 &, const Matrix4 &) noexcept;
 bool open_comp_graph$cxxbridge1$Matrix4$operator$lt(const Matrix4 &, const Matrix4 &) noexcept;
@@ -1321,13 +1347,13 @@ void open_comp_graph$internal$cxxbridge1$print_r(const ::open_comp_graph::intern
 
 ::std::uint64_t open_comp_graph$internal$cxxbridge1$StreamDataImpl$hash(const ::open_comp_graph::internal::StreamDataImpl &self) noexcept;
 
-::open_comp_graph::BBox2D open_comp_graph$internal$cxxbridge1$StreamDataImpl$display_window(const ::open_comp_graph::internal::StreamDataImpl &self) noexcept;
+::open_comp_graph::BBox2Df open_comp_graph$internal$cxxbridge1$StreamDataImpl$display_window(const ::open_comp_graph::internal::StreamDataImpl &self) noexcept;
 
-void open_comp_graph$internal$cxxbridge1$StreamDataImpl$set_display_window(::open_comp_graph::internal::StreamDataImpl &self, ::open_comp_graph::BBox2D value) noexcept;
+void open_comp_graph$internal$cxxbridge1$StreamDataImpl$set_display_window(::open_comp_graph::internal::StreamDataImpl &self, ::open_comp_graph::BBox2Df value) noexcept;
 
-::open_comp_graph::BBox2D open_comp_graph$internal$cxxbridge1$StreamDataImpl$data_window(const ::open_comp_graph::internal::StreamDataImpl &self) noexcept;
+::open_comp_graph::BBox2Df open_comp_graph$internal$cxxbridge1$StreamDataImpl$data_window(const ::open_comp_graph::internal::StreamDataImpl &self) noexcept;
 
-void open_comp_graph$internal$cxxbridge1$StreamDataImpl$set_data_window(::open_comp_graph::internal::StreamDataImpl &self, ::open_comp_graph::BBox2D value) noexcept;
+void open_comp_graph$internal$cxxbridge1$StreamDataImpl$set_data_window(::open_comp_graph::internal::StreamDataImpl &self, ::open_comp_graph::BBox2Df value) noexcept;
 
 ::open_comp_graph::Matrix4 open_comp_graph$internal$cxxbridge1$StreamDataImpl$color_matrix(const ::open_comp_graph::internal::StreamDataImpl &self) noexcept;
 
@@ -1459,6 +1485,12 @@ bool open_comp_graph$log$cxxbridge1$initialize() noexcept;
 } // namespace open_comp_graph
 
 namespace std {
+template <> struct hash<::open_comp_graph::BBox2Di> {
+  ::std::size_t operator()(const ::open_comp_graph::BBox2Di &self) const noexcept {
+    return ::open_comp_graph::open_comp_graph$cxxbridge1$BBox2Di$operator$hash(self);
+  }
+};
+
 template <> struct hash<::open_comp_graph::internal::StreamDataImplShared> {
   ::std::size_t operator()(const ::open_comp_graph::internal::StreamDataImplShared &self) const noexcept {
     return ::open_comp_graph::internal::open_comp_graph$internal$cxxbridge1$StreamDataImplShared$operator$hash(self);
@@ -1467,28 +1499,52 @@ template <> struct hash<::open_comp_graph::internal::StreamDataImplShared> {
 } // namespace std
 
 namespace open_comp_graph {
-bool BBox2D::operator==(const BBox2D &rhs) const noexcept {
-  return open_comp_graph$cxxbridge1$BBox2D$operator$eq(*this, rhs);
+bool BBox2Df::operator==(const BBox2Df &rhs) const noexcept {
+  return open_comp_graph$cxxbridge1$BBox2Df$operator$eq(*this, rhs);
 }
 
-bool BBox2D::operator!=(const BBox2D &rhs) const noexcept {
-  return open_comp_graph$cxxbridge1$BBox2D$operator$ne(*this, rhs);
+bool BBox2Df::operator!=(const BBox2Df &rhs) const noexcept {
+  return open_comp_graph$cxxbridge1$BBox2Df$operator$ne(*this, rhs);
 }
 
-bool BBox2D::operator<(const BBox2D &rhs) const noexcept {
-  return open_comp_graph$cxxbridge1$BBox2D$operator$lt(*this, rhs);
+bool BBox2Df::operator<(const BBox2Df &rhs) const noexcept {
+  return open_comp_graph$cxxbridge1$BBox2Df$operator$lt(*this, rhs);
 }
 
-bool BBox2D::operator<=(const BBox2D &rhs) const noexcept {
-  return open_comp_graph$cxxbridge1$BBox2D$operator$le(*this, rhs);
+bool BBox2Df::operator<=(const BBox2Df &rhs) const noexcept {
+  return open_comp_graph$cxxbridge1$BBox2Df$operator$le(*this, rhs);
 }
 
-bool BBox2D::operator>(const BBox2D &rhs) const noexcept {
-  return open_comp_graph$cxxbridge1$BBox2D$operator$gt(*this, rhs);
+bool BBox2Df::operator>(const BBox2Df &rhs) const noexcept {
+  return open_comp_graph$cxxbridge1$BBox2Df$operator$gt(*this, rhs);
 }
 
-bool BBox2D::operator>=(const BBox2D &rhs) const noexcept {
-  return open_comp_graph$cxxbridge1$BBox2D$operator$ge(*this, rhs);
+bool BBox2Df::operator>=(const BBox2Df &rhs) const noexcept {
+  return open_comp_graph$cxxbridge1$BBox2Df$operator$ge(*this, rhs);
+}
+
+bool BBox2Di::operator==(const BBox2Di &rhs) const noexcept {
+  return open_comp_graph$cxxbridge1$BBox2Di$operator$eq(*this, rhs);
+}
+
+bool BBox2Di::operator!=(const BBox2Di &rhs) const noexcept {
+  return open_comp_graph$cxxbridge1$BBox2Di$operator$ne(*this, rhs);
+}
+
+bool BBox2Di::operator<(const BBox2Di &rhs) const noexcept {
+  return open_comp_graph$cxxbridge1$BBox2Di$operator$lt(*this, rhs);
+}
+
+bool BBox2Di::operator<=(const BBox2Di &rhs) const noexcept {
+  return open_comp_graph$cxxbridge1$BBox2Di$operator$le(*this, rhs);
+}
+
+bool BBox2Di::operator>(const BBox2Di &rhs) const noexcept {
+  return open_comp_graph$cxxbridge1$BBox2Di$operator$gt(*this, rhs);
+}
+
+bool BBox2Di::operator>=(const BBox2Di &rhs) const noexcept {
+  return open_comp_graph$cxxbridge1$BBox2Di$operator$ge(*this, rhs);
 }
 
 bool Matrix4::operator==(const Matrix4 &rhs) const noexcept {
@@ -1556,19 +1612,19 @@ OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint64_t StreamDataImpl::hash() const noexcep
   return open_comp_graph$internal$cxxbridge1$StreamDataImpl$hash(*this);
 }
 
-OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::BBox2D StreamDataImpl::display_window() const noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::BBox2Df StreamDataImpl::display_window() const noexcept {
   return open_comp_graph$internal$cxxbridge1$StreamDataImpl$display_window(*this);
 }
 
-OPENCOMPGRAPH_SYMBOL_EXPORT void StreamDataImpl::set_display_window(::open_comp_graph::BBox2D value) noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT void StreamDataImpl::set_display_window(::open_comp_graph::BBox2Df value) noexcept {
   open_comp_graph$internal$cxxbridge1$StreamDataImpl$set_display_window(*this, value);
 }
 
-OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::BBox2D StreamDataImpl::data_window() const noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::BBox2Df StreamDataImpl::data_window() const noexcept {
   return open_comp_graph$internal$cxxbridge1$StreamDataImpl$data_window(*this);
 }
 
-OPENCOMPGRAPH_SYMBOL_EXPORT void StreamDataImpl::set_data_window(::open_comp_graph::BBox2D value) noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT void StreamDataImpl::set_data_window(::open_comp_graph::BBox2Df value) noexcept {
   open_comp_graph$internal$cxxbridge1$StreamDataImpl$set_data_window(*this, value);
 }
 

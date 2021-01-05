@@ -898,7 +898,8 @@ std::size_t align_of() {
 } // namespace rust
 
 namespace open_comp_graph {
-  struct BBox2D;
+  struct BBox2Df;
+  struct BBox2Di;
   struct Matrix4;
   enum class ExecuteStatus : ::std::uint8_t;
   enum class NodeType : ::std::uint8_t;
@@ -939,23 +940,41 @@ struct SharedThing final {
 #endif // CXXBRIDGE1_STRUCT_open_comp_graph$shared$SharedThing
 } // namespace shared
 
-#ifndef CXXBRIDGE1_STRUCT_open_comp_graph$BBox2D
-#define CXXBRIDGE1_STRUCT_open_comp_graph$BBox2D
-struct BBox2D final {
+#ifndef CXXBRIDGE1_STRUCT_open_comp_graph$BBox2Df
+#define CXXBRIDGE1_STRUCT_open_comp_graph$BBox2Df
+struct BBox2Df final {
   float min_x;
   float min_y;
   float max_x;
   float max_y;
 
-  bool operator==(const BBox2D &) const noexcept;
-  bool operator!=(const BBox2D &) const noexcept;
-  bool operator<(const BBox2D &) const noexcept;
-  bool operator<=(const BBox2D &) const noexcept;
-  bool operator>(const BBox2D &) const noexcept;
-  bool operator>=(const BBox2D &) const noexcept;
+  bool operator==(const BBox2Df &) const noexcept;
+  bool operator!=(const BBox2Df &) const noexcept;
+  bool operator<(const BBox2Df &) const noexcept;
+  bool operator<=(const BBox2Df &) const noexcept;
+  bool operator>(const BBox2Df &) const noexcept;
+  bool operator>=(const BBox2Df &) const noexcept;
   using IsRelocatable = ::std::true_type;
 };
-#endif // CXXBRIDGE1_STRUCT_open_comp_graph$BBox2D
+#endif // CXXBRIDGE1_STRUCT_open_comp_graph$BBox2Df
+
+#ifndef CXXBRIDGE1_STRUCT_open_comp_graph$BBox2Di
+#define CXXBRIDGE1_STRUCT_open_comp_graph$BBox2Di
+struct BBox2Di final {
+  ::std::int32_t min_x;
+  ::std::int32_t min_y;
+  ::std::int32_t max_x;
+  ::std::int32_t max_y;
+
+  bool operator==(const BBox2Di &) const noexcept;
+  bool operator!=(const BBox2Di &) const noexcept;
+  bool operator<(const BBox2Di &) const noexcept;
+  bool operator<=(const BBox2Di &) const noexcept;
+  bool operator>(const BBox2Di &) const noexcept;
+  bool operator>=(const BBox2Di &) const noexcept;
+  using IsRelocatable = ::std::true_type;
+};
+#endif // CXXBRIDGE1_STRUCT_open_comp_graph$BBox2Di
 
 #ifndef CXXBRIDGE1_STRUCT_open_comp_graph$Matrix4
 #define CXXBRIDGE1_STRUCT_open_comp_graph$Matrix4
@@ -1107,10 +1126,10 @@ struct StreamDataImpl final : public ::rust::Opaque {
   OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::StreamDataState state() const noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint8_t state_id() const noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint64_t hash() const noexcept;
-  OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::BBox2D display_window() const noexcept;
-  OPENCOMPGRAPH_SYMBOL_EXPORT void set_display_window(::open_comp_graph::BBox2D value) noexcept;
-  OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::BBox2D data_window() const noexcept;
-  OPENCOMPGRAPH_SYMBOL_EXPORT void set_data_window(::open_comp_graph::BBox2D value) noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::BBox2Df display_window() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT void set_display_window(::open_comp_graph::BBox2Df value) noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::BBox2Df data_window() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT void set_data_window(::open_comp_graph::BBox2Df value) noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::Matrix4 color_matrix() const noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::Matrix4 transform_matrix() const noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT const ::open_comp_graph::internal::PixelBlock &pixel_block() const noexcept;
