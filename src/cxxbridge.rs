@@ -136,6 +136,23 @@ pub mod ffi {
         // LensDistort,
     }
 
+    // Each pixel has this type of data.
+    #[repr(u8)]
+    #[derive(Debug, Copy, Clone, Hash)]
+    #[namespace = "open_comp_graph"]
+    pub(crate) enum PixelDataType {
+        #[cxx_name = "kFloat32"]
+        Float32 = 0,
+        #[cxx_name = "kHalf16"]
+        Half16 = 1,
+        #[cxx_name = "kUInt8"]
+        UInt8 = 2,
+        #[cxx_name = "kUInt16"]
+        UInt16 = 3,
+        #[cxx_name = "kUnknown"]
+        Unknown = 255,
+    }
+
     #[repr(u8)]
     #[derive(Debug, Copy, Clone, Hash)]
     #[namespace = "open_comp_graph"]

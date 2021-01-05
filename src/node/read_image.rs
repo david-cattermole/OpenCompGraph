@@ -83,7 +83,7 @@ impl Compute for ReadImageCompute {
         if path.is_file() == true {
             // Read image
             let img = image::open(path).unwrap();
-            let pixel_block = PixelBlock::from_image(img);
+            let pixel_block = PixelBlock::from_dynamic_image(img);
 
             let display_window = BBox2D::new(
                 0.0,

@@ -77,30 +77,7 @@ impl Compute for WriteImageCompute {
                 // debug!("file_path {:?}", file_path);
 
                 let pixel_block = input.pixel_block();
-                let width = pixel_block.width;
-                let height = pixel_block.height;
-                let pixels = &pixel_block.pixels;
-
-                // Get pixel statistics
-                if log_enabled!(Level::Debug) {
-                    let min = pixels.iter().fold(f32::INFINITY, |a, &b| a.min(b));
-                    let max = pixels.iter().fold(f32::NEG_INFINITY, |a, &b| a.max(b));
-                    let avg = pixels.iter().sum::<f32>() / (pixels.len() as f32);
-                    debug!("Min value: {}", min);
-                    debug!("Max value: {}", max);
-                    debug!("Avg value: {}", avg);
-                }
-
-                // Convert f32 pixel image to u8 ImageBuffer.
-                let pixels_u8: Vec<u8> = pixels
-                    .iter()
-                    .map(|x| (convert_linear_to_srgb(*x as f32) * (u8::max_value() as f32)) as u8)
-                    .collect();
-                let img: image::ImageBuffer<image::Rgb<u8>, Vec<u8>> =
-                    match image::ImageBuffer::from_raw(width, height, pixels_u8) {
-                        Some(data) => data,
-                        _ => panic!("invalid image."),
-                    };
+                let img = pixel_block.to_image_buffer_rgb_u8();
 
                 debug!("Writing... {:?}", file_path);
                 let ok = match img.save(file_path) {

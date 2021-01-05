@@ -1,26 +1,31 @@
 use image;
 use image::GenericImageView;
+use image::RgbaImage;
 use log::{debug, error, info, log_enabled, warn, Level};
-use petgraph;
+use std::collections::hash_map::DefaultHasher;
 use std::fmt;
+use std::hash;
 use std::hash::{Hash, Hasher};
-use std::mem;
 
+use crate::colorutils::convert_linear_to_srgb;
 use crate::colorutils::convert_srgb_to_linear;
-
-pub type GraphIdx = usize;
-pub type NodeWeight = u64;
-pub type EdgeWeight = u8;
-pub type NodeIdx = petgraph::graph::NodeIndex<GraphIdx>;
-pub type EdgeIdx = petgraph::graph::EdgeIndex<GraphIdx>;
-pub type HashValue = u64;
-pub type Identifier = u64;
+use crate::cxxbridge::ffi::AttrState;
+use crate::cxxbridge::ffi::NodeStatus;
+use crate::cxxbridge::ffi::NodeType;
+use crate::cxxbridge::ffi::PixelDataType;
+use crate::cxxbridge::ffi::StreamDataImplShared;
+use crate::data::HashValue;
+use crate::data::Identifier;
+use crate::node::traits::AttrBlock;
+use crate::node::traits::Compute;
+use crate::node::NodeImpl;
 
 #[derive(Clone)]
 pub struct PixelBlock {
     pub width: u32,
     pub height: u32,
     pub num_channels: u8,
+    pub pixel_data_type: PixelDataType,
     pub pixels: Vec<f32>,
 }
 
@@ -28,15 +33,18 @@ impl PixelBlock {
     pub fn new(width: u32, height: u32, num_channels: u8) -> PixelBlock {
         let size = (width * height * num_channels as u32) as usize;
         let pixels = vec![0.5 as f32; size];
+        let pixel_data_type = PixelDataType::Float32;
         PixelBlock {
             width,
             height,
             num_channels,
+            pixel_data_type,
             pixels,
         }
     }
 
-    pub fn from_image(img: image::DynamicImage) -> PixelBlock {
+    /// Consumes a image::DynamicImage and produces a PixelBlock.
+    pub fn from_dynamic_image(img: image::DynamicImage) -> PixelBlock {
         let (width, height) = img.dimensions();
         let color_type = img.color();
         debug!("Resolution: {:?}x{:?}", width, height);
@@ -70,11 +78,42 @@ impl PixelBlock {
             debug!("Avg value: {}", avg);
         }
 
+        let pixel_data_type = PixelDataType::Float32;
         PixelBlock {
             width,
             height,
             num_channels,
+            pixel_data_type,
             pixels,
+        }
+    }
+
+    pub fn to_image_buffer_rgb_u8(&self) -> image::ImageBuffer<image::Rgb<u8>, Vec<u8>> {
+        let width = self.width;
+        let height = self.height;
+        // let num_channels = self.num_channels;
+        // let pixel_data_type = self.pixel_data_type;
+        let pixels = &self.pixels;
+
+        // Get pixel statistics
+        if log_enabled!(Level::Debug) {
+            let min = pixels.iter().fold(f32::INFINITY, |a, &b| a.min(b));
+            let max = pixels.iter().fold(f32::NEG_INFINITY, |a, &b| a.max(b));
+            let avg = pixels.iter().sum::<f32>() / (pixels.len() as f32);
+            debug!("Min value: {}", min);
+            debug!("Max value: {}", max);
+            debug!("Avg value: {}", avg);
+        }
+
+        // Convert f32 pixel image to u8 ImageBuffer.
+        let pixels_u8: Vec<u8> = pixels
+            .iter()
+            .map(|x| (convert_linear_to_srgb(*x as f32) * (u8::max_value() as f32)) as u8)
+            .collect();
+
+        match image::ImageBuffer::from_raw(width, height, pixels_u8) {
+            Some(data) => data,
+            _ => panic!("invalid image."),
         }
     }
 

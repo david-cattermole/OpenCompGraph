@@ -964,6 +964,7 @@ namespace open_comp_graph {
   struct Matrix4;
   enum class ExecuteStatus : ::std::uint8_t;
   enum class NodeType : ::std::uint8_t;
+  enum class PixelDataType : ::std::uint8_t;
   enum class NodeStatus : ::std::uint8_t;
   enum class AttrState : ::std::uint8_t;
   enum class StreamDataState : ::std::uint8_t;
@@ -1095,6 +1096,17 @@ enum class NodeType : ::std::uint8_t {
   kGrade = 3,
 };
 #endif // CXXBRIDGE1_ENUM_open_comp_graph$NodeType
+
+#ifndef CXXBRIDGE1_ENUM_open_comp_graph$PixelDataType
+#define CXXBRIDGE1_ENUM_open_comp_graph$PixelDataType
+enum class PixelDataType : ::std::uint8_t {
+  kFloat32 = 0,
+  kHalf16 = 1,
+  kUInt8 = 2,
+  kUInt16 = 3,
+  kUnknown = 255,
+};
+#endif // CXXBRIDGE1_ENUM_open_comp_graph$PixelDataType
 
 #ifndef CXXBRIDGE1_ENUM_open_comp_graph$NodeStatus
 #define CXXBRIDGE1_ENUM_open_comp_graph$NodeStatus
