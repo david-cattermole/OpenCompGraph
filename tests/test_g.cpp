@@ -3,8 +3,10 @@
 
 namespace ocg = open_comp_graph;
 
-int test_g(std::shared_ptr<ocg::Cache> cache) {
-    std::cout << "=========================================== test_g()" << '\n';
+int test_g(const bool debug_print, std::shared_ptr<ocg::Cache> cache) {
+    if (debug_print) {
+        std::cout << "=========================================== test_g()" << '\n';
+    }
     auto bench = ocg::internal::BenchmarkTime();
 
     auto graph = ocg::Graph();
@@ -13,8 +15,10 @@ int test_g(std::shared_ptr<ocg::Cache> cache) {
     auto null_node1 = graph.create_node(ocg::NodeType::kNull, "null1");
     auto null_node2 = graph.create_node(ocg::NodeType::kNull, "null2");
     auto write_node = graph.create_node(ocg::NodeType::kWriteImage, "write");
-    std::cout << "read_node=" << &read_node << '\n';
-    std::cout << "write_node=" << &write_node << '\n';
+    if (debug_print) {
+        std::cout << "read_node=" << &read_node << '\n';
+        std::cout << "write_node=" << &write_node << '\n';
+    }
 
     graph.set_node_attr_str(read_node, "file_path", "tests/data/checker_8bit_rgba_3840x2160.png");
     graph.set_node_attr_str(write_node, "file_path", "./tests/data/out/test_g_out.png");
@@ -25,10 +29,12 @@ int test_g(std::shared_ptr<ocg::Cache> cache) {
     auto null_node1_exists = graph.node_exists(null_node1);
     auto null_node2_exists = graph.node_exists(null_node2);
     auto write_node_exists = graph.node_exists(write_node);
-    std::cout << "read_node_exists=" << read_node_exists << '\n';
-    std::cout << "null_node1_exists=" << null_node1_exists << '\n';
-    std::cout << "null_node2_exists=" << null_node2_exists << '\n';
-    std::cout << "write_node_exists=" << write_node_exists << '\n';
+    if (debug_print) {
+        std::cout << "read_node_exists=" << read_node_exists << '\n';
+        std::cout << "null_node1_exists=" << null_node1_exists << '\n';
+        std::cout << "null_node2_exists=" << null_node2_exists << '\n';
+        std::cout << "write_node_exists=" << write_node_exists << '\n';
+    }
     assert(read_node_exists);
     assert(null_node1_exists);
     assert(null_node2_exists);
@@ -40,11 +46,13 @@ int test_g(std::shared_ptr<ocg::Cache> cache) {
     graph.connect(null_node2, write_node, 0);    
 
     graph.execute(write_node, cache);
-    std::cout << "Graph as string:\n"
-              << graph.data_debug_string();
+    if (debug_print) {
+        std::cout << "Graph as string:\n"
+                  << graph.data_debug_string();
 
-    bench.stop();
-    bench.print("Test G:");
 
+        bench.stop();
+        bench.print("Test G:");
+    }
     return 0;
 }

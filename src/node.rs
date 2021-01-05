@@ -61,7 +61,7 @@ impl NodeImpl {
         let value = self
             .compute
             .cache_hash(node_type_id, &self.attr_block, inputs);
-        warn!("Node.hash(): id={} hash={}", self.id, value);
+        debug!("Node.hash(): id={} hash={}", self.id, value);
         value
     }
 

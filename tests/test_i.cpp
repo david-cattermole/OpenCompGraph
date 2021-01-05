@@ -4,7 +4,8 @@
 
 namespace ocg = open_comp_graph;
 
-void generate_mesh(const uint32_t divisions_x,
+void generate_mesh(const bool debug_print,
+                   const uint32_t divisions_x,
                    const uint32_t divisions_y,
                    const char* file_path,
                    size_t &pos_count,
@@ -12,16 +13,20 @@ void generate_mesh(const uint32_t divisions_x,
                    size_t &tri_count) {
     assert(divisions_x > 1);
     assert(divisions_y > 1);
-    std::cout << "divisions: " << divisions_x << "x" << divisions_y << '\n';
+    if (debug_print) {
+        std::cout << "divisions: " << divisions_x << "x" << divisions_y << '\n';
+    }
     pos_count = ocg::internal::calc_buffer_size_vertex_positions(
         divisions_x, divisions_y);
     uv_count = ocg::internal::calc_buffer_size_vertex_uvs(
         divisions_x, divisions_y);
     tri_count = ocg::internal::calc_buffer_size_index_tris(
         divisions_x, divisions_y);
-    std::cout << "position count: " << pos_count << '\n';
-    std::cout << "      uv count: " << uv_count << '\n';
-    std::cout << "triangle count: " << tri_count << '\n';
+    if (debug_print) {
+        std::cout << "position count: " << pos_count << '\n';
+        std::cout << "      uv count: " << uv_count << '\n';
+        std::cout << "triangle count: " << tri_count << '\n';
+    }
 
     // Allocate exactly enough memory
     std::vector<float> vertex_pos;
@@ -62,8 +67,10 @@ void generate_mesh(const uint32_t divisions_x,
         file_path);
 }
 
-int test_i() {
-    std::cout << "=========================================== test_i()" << '\n';
+int test_i(const bool debug_print) {
+    if (debug_print) {
+        std::cout << "=========================================== test_i()" << '\n';
+    }
     auto bench = ocg::internal::BenchmarkTime();
 
     uint32_t divisions_x = 2;
@@ -77,6 +84,7 @@ int test_i() {
     divisions_y = 2;
     const char* file_path_2x2 = "./tests/data/out/test_i_2x2_out.obj";
     generate_mesh(
+        debug_print,
         divisions_x,
         divisions_y,
         file_path_2x2,
@@ -89,6 +97,7 @@ int test_i() {
     divisions_y = 3;
     const char* file_path_3x3 = "./tests/data/out/test_i_3x3_out.obj";
     generate_mesh(
+        debug_print,
         divisions_x,
         divisions_y,
         file_path_3x3,
@@ -101,6 +110,7 @@ int test_i() {
     divisions_y = 4;
     const char* file_path_4x4 = "./tests/data/out/test_i_4x4_out.obj";
     generate_mesh(
+        debug_print,
         divisions_x,
         divisions_y,
         file_path_4x4,
@@ -108,8 +118,10 @@ int test_i() {
         uv_count,
         tri_count);
 
-    bench.stop();
-    bench.print("Test I:");
+    if (debug_print) {
+        bench.stop();
+        bench.print("Test I:");
+    }
 
     return 0;
 }

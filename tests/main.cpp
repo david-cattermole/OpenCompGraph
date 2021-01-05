@@ -18,6 +18,8 @@ int main() {
     auto bench = ocg::internal::BenchmarkTime();
     bench.start();
 
+    const bool debug_print = false;
+
     // Create a cache for each test.
     auto cache_d = std::make_shared<ocg::Cache>();
     auto cache_e = std::make_shared<ocg::Cache>();
@@ -28,15 +30,15 @@ int main() {
     // Run tests.
     auto count = 20;
     for (auto i = 0; i < count; ++i) {
-        test_a();
-        test_b();
-        test_c();
-        test_d(cache_d);
-        test_e(cache_e);
-        test_f(cache_f);
-        test_g(cache_g);
-        test_h(cache_h);
-        test_i();
+        test_a(debug_print);
+        test_b(debug_print);
+        test_c(debug_print);
+        test_d(debug_print, cache_d);
+        test_e(debug_print, cache_e);
+        test_f(debug_print, cache_f);
+        test_g(debug_print, cache_g);
+        test_h(debug_print, cache_h);
+        test_i(debug_print);
     }
 
     bench.stop();

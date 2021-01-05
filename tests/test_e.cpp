@@ -3,8 +3,10 @@
 
 namespace ocg = open_comp_graph;
 
-int test_e(std::shared_ptr<ocg::Cache> cache) {
-    std::cout << "=========================================== test_e()" << '\n';
+int test_e(const bool debug_print, std::shared_ptr<ocg::Cache> cache) {
+    if (debug_print) {
+        std::cout << "=========================================== test_e()" << '\n';
+    }
     auto bench = ocg::internal::BenchmarkTime();
 
     auto graph = ocg::Graph();
@@ -15,8 +17,10 @@ int test_e(std::shared_ptr<ocg::Cache> cache) {
     auto null_node3 = graph.create_node(ocg::NodeType::kNull, "null3");
     auto null_node4 = graph.create_node(ocg::NodeType::kNull, "null4");
     auto write_node = graph.create_node(ocg::NodeType::kWriteImage, "write");
-    std::cout << "read_node=" << &read_node << '\n';
-    std::cout << "write_node=" << &write_node << '\n';
+    if (debug_print) {
+        std::cout << "read_node=" << &read_node << '\n';
+        std::cout << "write_node=" << &write_node << '\n';
+    }
 
     graph.set_node_attr_str(read_node,"file_path", "tests/data/oiio-images/tahoe-gps.jpg");
     graph.set_node_attr_str(write_node,"file_path", "./tests/data/out/test_e_out.png");
@@ -28,11 +32,13 @@ int test_e(std::shared_ptr<ocg::Cache> cache) {
     graph.connect(null_node4, write_node, 0);
 
     graph.execute(write_node, cache);
-    std::cout << "Graph as string:\n"
-              << graph.data_debug_string();
+    if (debug_print) {
+        std::cout << "Graph as string:\n"
+                  << graph.data_debug_string();
 
-    bench.stop();
-    bench.print("Test E:");
+        bench.stop();
+        bench.print("Test E:");
+    }
 
     return 0;
 }

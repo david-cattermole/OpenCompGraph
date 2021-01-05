@@ -3,8 +3,10 @@
 
 namespace ocg = open_comp_graph;
 
-int test_a() {
-    std::cout << "=========================================== test_a()" << '\n';
+int test_a(const bool debug_print) {
+    if (debug_print) {
+        std::cout << "=========================================== test_a()" << '\n';
+    }
     auto bench = ocg::internal::BenchmarkTime();
 
     int scene_id = 42;
@@ -12,7 +14,9 @@ int test_a() {
     ocg::cbindgen::scene_graph_delete(scene_graph);
 
     bench.stop();
-    bench.print("Test A:");
+    if (debug_print) {
+        bench.print("Test A:");
+    }
 
     return 0;
 }

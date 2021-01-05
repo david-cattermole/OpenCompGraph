@@ -1,1 +1,1 @@
-int test_b();
+int test_b(const bool debug_print);

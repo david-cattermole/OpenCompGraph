@@ -4,8 +4,10 @@
 
 namespace ocg = open_comp_graph;
 
-int test_f(std::shared_ptr<ocg::Cache> cache) {
-    std::cout << "====================================== test_f()" << '\n';
+int test_f(const bool debug_print, std::shared_ptr<ocg::Cache> cache) {
+    if (debug_print) {
+        std::cout << "====================================== test_f()" << '\n';
+    }
     auto bench = ocg::internal::BenchmarkTime();
 
     auto graph = ocg::Graph();
@@ -47,28 +49,37 @@ int test_f(std::shared_ptr<ocg::Cache> cache) {
     graph.connect(grade_light_node, write3_node, 0);
 
     // Execute 1. The image should appear unchanged.
-    std::cout << "Execute #1 =========================================" << '\n';
+    if (debug_print) {
+        std::cout << "Execute #1 =========================================" << '\n';
+    }
     auto status1 = graph.execute(write1_node, cache);
-    std::cout << "Graph as string:\n"
-              << graph.data_debug_string();
+    if (debug_print) {
+        std::cout << "Graph as string:\n"
+                  << graph.data_debug_string();
+    }
     assert(status1 == ocg::ExecuteStatus::kSuccess);
     auto stream_data1 = graph.output_stream();
     auto state_id1 = stream_data1.state_id();
     auto hash1 = stream_data1.hash();
-    std::cout << "state_id1=" << state_id1 << '\n';
-    std::cout << "hash1=" << hash1 << '\n';
+    if (debug_print) {
+        std::cout << "state_id1=" << state_id1 << '\n';
+        std::cout << "hash1=" << hash1 << '\n';
+    }
     const ocg::internal::PixelBlock &pixel_block1 = stream_data1.pixel_block();
     auto pixel_buffer1 = stream_data1.pixel_buffer();
-    std::cout << "pixel_buffer1"
-              << " data=" << &pixel_buffer1
-              << " size=" << pixel_buffer1.size() << '\n';
+    if (debug_print) {
+        std::cout << "pixel_buffer1"
+                  << " data=" << &pixel_buffer1
+                  << " size=" << pixel_buffer1.size() << '\n';
+    }
     auto width1 = stream_data1.pixel_width();
     auto height1 = stream_data1.pixel_height();
     auto num_channels1 = stream_data1.pixel_num_channels();
     auto color_matrix1 = stream_data1.color_matrix();
-    std::cout << "width1=" << width1 << '\n';
-    std::cout << "height1=" << height1 << '\n';
-    std::cout << "num_channels1=" << static_cast<uint32_t>(num_channels1) << '\n';
+    if (debug_print) {
+        std::cout << "width1=" << width1 << '\n';
+        std::cout << "height1=" << height1 << '\n';
+        std::cout << "num_channels1=" << static_cast<uint32_t>(num_channels1) << '\n';
         std::cout << "color_matrix1:\n"
                   << " row0="
                   << color_matrix1.m00 << ","
@@ -91,26 +102,34 @@ int test_f(std::shared_ptr<ocg::Cache> cache) {
                   << color_matrix1.m32 << ","
                   << color_matrix1.m33 << '\n'
                   << '\n';
+    }
 
     // Execute 2. The image should appear darker.
-    std::cout << "Execute #2 =========================================" << '\n';
+    if (debug_print) {
+        std::cout << "Execute #2 =========================================" << '\n';
+    }
     auto status2 = graph.execute(write2_node, cache);
-    std::cout << "Graph as string:\n"
-              << graph.data_debug_string();
+    if (debug_print) {
+        std::cout << "Graph as string:\n"
+                  << graph.data_debug_string();
+    }
     assert(status2 == ocg::ExecuteStatus::kSuccess);
     auto stream_data2 = graph.output_stream();
     const ocg::internal::PixelBlock &pixel_block2 = stream_data2.pixel_block();
     auto pixel_buffer2 = stream_data2.pixel_buffer();
-    std::cout << "pixel_buffer2"
-              << " data=" << &pixel_buffer2
-              << " size=" << pixel_buffer2.size() << '\n';
+    if (debug_print) {
+        std::cout << "pixel_buffer2"
+                  << " data=" << &pixel_buffer2
+                  << " size=" << pixel_buffer2.size() << '\n';
+    }
     auto width2 = stream_data2.pixel_width();
     auto height2 = stream_data2.pixel_height();
     auto num_channels2 = stream_data2.pixel_num_channels();
     auto color_matrix2 = stream_data2.color_matrix();
-    std::cout << "width2=" << width2 << '\n';
-    std::cout << "height2=" << height2 << '\n';
-    std::cout << "num_channels2=" << static_cast<uint32_t>(num_channels2) << '\n';
+    if (debug_print) {
+        std::cout << "width2=" << width2 << '\n';
+        std::cout << "height2=" << height2 << '\n';
+        std::cout << "num_channels2=" << static_cast<uint32_t>(num_channels2) << '\n';
         std::cout << "color_matrix2:\n"
                   << " row0="
                   << color_matrix2.m00 << ","
@@ -133,26 +152,34 @@ int test_f(std::shared_ptr<ocg::Cache> cache) {
                   << color_matrix2.m32 << ","
                   << color_matrix2.m33 << '\n'
                   << '\n';
+    }
 
     // Execute 3. The image should appear lighter.
-    std::cout << "Execute #3 =========================================" << '\n';
+    if (debug_print) {
+        std::cout << "Execute #3 =========================================" << '\n';
+    }
     auto status3 = graph.execute(write3_node, cache);
-    std::cout << "Graph as string:\n"
-              << graph.data_debug_string();
+    if (debug_print) {
+        std::cout << "Graph as string:\n"
+                  << graph.data_debug_string();
+    }
     assert(status3 == ocg::ExecuteStatus::kSuccess);
     auto stream_data3 = graph.output_stream();
     const ocg::internal::PixelBlock &pixel_block3 = stream_data3.pixel_block();
     auto pixel_buffer3 = stream_data3.pixel_buffer();
-    std::cout << "pixel_buffer3"
-              << " data=" << &pixel_buffer3
-              << " size=" << pixel_buffer3.size() << '\n';
+    if (debug_print) {
+        std::cout << "pixel_buffer3"
+                  << " data=" << &pixel_buffer3
+                  << " size=" << pixel_buffer3.size() << '\n';
+    }
     auto width3 = stream_data3.pixel_width();
     auto height3 = stream_data3.pixel_height();
     auto num_channels3 = stream_data3.pixel_num_channels();
     auto color_matrix3 = stream_data3.color_matrix();
-    std::cout << "width3=" << width3 << '\n';
-    std::cout << "height3=" << height3 << '\n';
-    std::cout << "num_channels3=" << static_cast<uint32_t>(num_channels3) << '\n';
+    if (debug_print) {
+        std::cout << "width3=" << width3 << '\n';
+        std::cout << "height3=" << height3 << '\n';
+        std::cout << "num_channels3=" << static_cast<uint32_t>(num_channels3) << '\n';
         std::cout << "color_matrix3:\n"
                   << " row0="
                   << color_matrix3.m00 << ","
@@ -176,8 +203,9 @@ int test_f(std::shared_ptr<ocg::Cache> cache) {
                   << color_matrix3.m33 << '\n'
                   << '\n';
 
-    bench.stop();
-    bench.print("Test F:");
+        bench.stop();
+        bench.print("Test F:");
+    }
 
     return 0;
 }
