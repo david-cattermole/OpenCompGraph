@@ -208,7 +208,7 @@ impl GraphImpl {
     }
 
     /// Check if a node with the given hash exists in the graph.
-    pub fn node_exists(&mut self, node_id: u64) -> bool {
+    pub fn node_exists(&self, node_id: u64) -> bool {
         let node_idx = self.find_node_index_from_id(node_id);
         let found = match node_idx {
             Some(value) => true,
