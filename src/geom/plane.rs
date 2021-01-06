@@ -40,7 +40,7 @@ pub fn fill_buffer_vertex_positions(
     for row in 0..divisions_y {
         for col in 0..divisions_x {
             buffer[index + 0] = -0.5 + ((col as f32) * square_size_x);
-            buffer[index + 1] = -0.5 + ((row as f32) * square_size_x);
+            buffer[index + 1] = -0.5 + ((row as f32) * square_size_y);
             buffer[index + 2] = 0.0;
             index += per_vertex_num;
         }
@@ -71,7 +71,7 @@ pub fn fill_buffer_index_tris(divisions_x: u32, divisions_y: u32, buffer: &mut [
     let mut index = 0;
     for col in 0..(divisions_y - 1) {
         for row in 0..(divisions_x - 1) {
-            let index_top_left = ((col * divisions_y) + row) as u32;
+            let index_top_left = ((col * divisions_x) + row) as u32;
             let index_bottom_left = (index_top_left + divisions_x) as u32;
             let index_top_right = index_top_left + 1;
             let index_bottom_right = index_bottom_left + 1;
