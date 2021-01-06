@@ -6,6 +6,8 @@ use crate::cxxbridge::ffi::BBox2Df;
 use crate::cxxbridge::ffi::Matrix4;
 use crate::cxxbridge::ffi::StreamDataState;
 use crate::data::HashValue;
+use crate::deformer::Deformer;
+use crate::deformutils;
 use crate::pixelblock::PixelBlock;
 
 #[derive(Debug, Clone, Hash)]
@@ -17,6 +19,7 @@ pub struct StreamDataImpl {
     color_matrix: Matrix4,
     transform_matrix: Matrix4,
     pixel_block: Rc<PixelBlock>,
+    deformers: Vec<Deformer>,
 }
 
 impl StreamDataImpl {
@@ -31,6 +34,7 @@ impl StreamDataImpl {
         let data_window = BBox2Df::new(0.0, 0.0, bbox_max_width, bbox_max_height);
         let color_matrix = Matrix4::identity();
         let transform_matrix = Matrix4::identity();
+        let deformers = Vec::new();
 
         StreamDataImpl {
             state,
@@ -40,6 +44,7 @@ impl StreamDataImpl {
             color_matrix,
             transform_matrix,
             pixel_block,
+            deformers,
         }
     }
 
@@ -95,6 +100,23 @@ impl StreamDataImpl {
 
     pub fn set_transform_matrix(&mut self, value: Matrix4) {
         self.transform_matrix = value;
+    }
+
+    pub fn apply_deformers(&self, buffer: &mut [f32]) {
+        debug!("StreamData.apply_deformers...");
+        deformutils::apply_deformers(&self.deformers, buffer);
+    }
+
+    pub fn deformers(&self) -> &Vec<Deformer> {
+        &self.deformers
+    }
+
+    pub fn deformers_len(&self) -> usize {
+        self.deformers.len()
+    }
+
+    pub fn push_deformer(&mut self, value: Deformer) {
+        self.deformers.push(value);
     }
 
     pub fn pixel_block(&self) -> &PixelBlock {

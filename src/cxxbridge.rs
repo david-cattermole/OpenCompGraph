@@ -144,8 +144,9 @@ pub mod ffi {
         #[cxx_name = "kGrade"]
         Grade = 3,
 
-        // // Deform / Warp
-        // LensDistort,
+        // Deform / Warp
+        #[cxx_name = "kLensDistort"]
+        LensDistort = 4,
     }
 
     // Each pixel has this type of data.
@@ -231,6 +232,8 @@ pub mod ffi {
         fn set_data_window(&mut self, value: BBox2Df);
         fn color_matrix(&self) -> Matrix4;
         fn transform_matrix(&self) -> Matrix4;
+        fn deformers_len(&self) -> usize;
+        fn apply_deformers(&self, buffer: &mut [f32]);
         fn pixel_block(&self) -> &PixelBlock;
         fn pixel_buffer(&self) -> &[f32];
         fn pixel_width(&self) -> u32;

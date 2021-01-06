@@ -4,6 +4,7 @@ include(OpenCompGraphUtils)
 # Add C++ test executable
 add_executable(${target_test_exe}
   ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/generate_mesh.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/test_a.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/test_b.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/test_c.cpp

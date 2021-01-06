@@ -1041,6 +1041,7 @@ enum class NodeType : ::std::uint8_t {
   kReadImage = 1,
   kWriteImage = 2,
   kGrade = 3,
+  kLensDistort = 4,
 };
 #endif // CXXBRIDGE1_ENUM_open_comp_graph$NodeType
 
@@ -1108,6 +1109,8 @@ struct StreamDataImpl final : public ::rust::Opaque {
   OPENCOMPGRAPH_SYMBOL_EXPORT void set_data_window(::open_comp_graph::BBox2Df value) noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::Matrix4 color_matrix() const noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::Matrix4 transform_matrix() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t deformers_len() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT void apply_deformers(::rust::Slice<float> buffer) const noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT const ::open_comp_graph::internal::PixelBlock &pixel_block() const noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT ::rust::Slice<const float> pixel_buffer() const noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint32_t pixel_width() const noexcept;

@@ -1095,6 +1095,7 @@ enum class NodeType : ::std::uint8_t {
   kReadImage = 1,
   kWriteImage = 2,
   kGrade = 3,
+  kLensDistort = 4,
 };
 #endif // CXXBRIDGE1_ENUM_open_comp_graph$NodeType
 
@@ -1162,6 +1163,8 @@ struct StreamDataImpl final : public ::rust::Opaque {
   OPENCOMPGRAPH_SYMBOL_EXPORT void set_data_window(::open_comp_graph::BBox2Df value) noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::Matrix4 color_matrix() const noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::Matrix4 transform_matrix() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t deformers_len() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT void apply_deformers(::rust::Slice<float> buffer) const noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT const ::open_comp_graph::internal::PixelBlock &pixel_block() const noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT ::rust::Slice<const float> pixel_buffer() const noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint32_t pixel_width() const noexcept;
@@ -1326,6 +1329,10 @@ void open_comp_graph$internal$cxxbridge1$StreamDataImpl$set_data_window(::open_c
 ::open_comp_graph::Matrix4 open_comp_graph$internal$cxxbridge1$StreamDataImpl$color_matrix(const ::open_comp_graph::internal::StreamDataImpl &self) noexcept;
 
 ::open_comp_graph::Matrix4 open_comp_graph$internal$cxxbridge1$StreamDataImpl$transform_matrix(const ::open_comp_graph::internal::StreamDataImpl &self) noexcept;
+
+::std::size_t open_comp_graph$internal$cxxbridge1$StreamDataImpl$deformers_len(const ::open_comp_graph::internal::StreamDataImpl &self) noexcept;
+
+void open_comp_graph$internal$cxxbridge1$StreamDataImpl$apply_deformers(const ::open_comp_graph::internal::StreamDataImpl &self, ::rust::Slice<float> buffer) noexcept;
 
 const ::open_comp_graph::internal::PixelBlock *open_comp_graph$internal$cxxbridge1$StreamDataImpl$pixel_block(const ::open_comp_graph::internal::StreamDataImpl &self) noexcept;
 
@@ -1610,6 +1617,14 @@ OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::Matrix4 StreamDataImpl::color_mat
 
 OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::Matrix4 StreamDataImpl::transform_matrix() const noexcept {
   return open_comp_graph$internal$cxxbridge1$StreamDataImpl$transform_matrix(*this);
+}
+
+OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t StreamDataImpl::deformers_len() const noexcept {
+  return open_comp_graph$internal$cxxbridge1$StreamDataImpl$deformers_len(*this);
+}
+
+OPENCOMPGRAPH_SYMBOL_EXPORT void StreamDataImpl::apply_deformers(::rust::Slice<float> buffer) const noexcept {
+  open_comp_graph$internal$cxxbridge1$StreamDataImpl$apply_deformers(*this, buffer);
 }
 
 OPENCOMPGRAPH_SYMBOL_EXPORT const ::open_comp_graph::internal::PixelBlock &StreamDataImpl::pixel_block() const noexcept {

@@ -21,6 +21,7 @@ int main() {
     const bool debug_print = false;
 
     // Create a cache for each test.
+    auto cache_a = std::make_shared<ocg::Cache>();
     auto cache_d = std::make_shared<ocg::Cache>();
     auto cache_e = std::make_shared<ocg::Cache>();
     auto cache_f = std::make_shared<ocg::Cache>();
@@ -30,7 +31,7 @@ int main() {
     // Run tests.
     auto count = 20;
     for (auto i = 0; i < count; ++i) {
-        test_a(debug_print);
+        test_a(debug_print, cache_a);
         test_b(debug_print);
         test_c(debug_print);
         test_d(debug_print, cache_d);
@@ -44,6 +45,7 @@ int main() {
     bench.stop();
     bench.print("All Tests:");
     bench.print("All Tests:", count);
+    std::cout << "CacheA Count: " << cache_a->count() << '\n';
     std::cout << "CacheD Count: " << cache_d->count() << '\n';
     std::cout << "CacheE Count: " << cache_e->count() << '\n';
     std::cout << "CacheF Count: " << cache_f->count() << '\n';

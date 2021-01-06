@@ -47,6 +47,12 @@ public:
     Matrix4 color_matrix() const noexcept;
 
     OPENCOMPGRAPH_SYMBOL_EXPORT
+    size_t deformers_len() const noexcept;
+
+    OPENCOMPGRAPH_SYMBOL_EXPORT
+    void apply_deformers(rust::Slice<float> &buffer) noexcept;
+
+    OPENCOMPGRAPH_SYMBOL_EXPORT
     const internal::PixelBlock& pixel_block() const noexcept;
 
     OPENCOMPGRAPH_SYMBOL_EXPORT

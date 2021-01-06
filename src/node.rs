@@ -16,6 +16,7 @@ use crate::data::NodeWeight;
 use crate::pixelblock::PixelBlock;
 
 pub mod grade;
+pub mod lens_distort;
 pub mod null;
 pub mod read_image;
 pub mod traits;
@@ -150,6 +151,7 @@ pub fn create_node(node_type: NodeType, id: Identifier) -> NodeImpl {
     match node_type {
         NodeType::ReadImage => read_image::new(id),
         NodeType::WriteImage => write_image::new(id),
+        NodeType::LensDistort => lens_distort::new(id),
         NodeType::Null => null::new(id),
         NodeType::Grade => grade::new(id),
         _ => panic!("Invalid NodeType: {:?}", node_type),

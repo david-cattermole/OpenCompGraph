@@ -9,6 +9,8 @@ pub mod colorutils;
 pub mod colorxform;
 pub mod cxxbridge;
 pub mod data;
+pub mod deformer;
+pub mod deformutils;
 pub mod geom;
 pub mod graph;
 pub mod graphiter;

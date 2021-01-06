@@ -56,6 +56,14 @@ Matrix4 StreamData::color_matrix() const noexcept {
     return this->inner.inner->color_matrix();
 };
 
+size_t StreamData::deformers_len() const noexcept {
+    return this->inner.inner->deformers_len();
+};
+
+void StreamData::apply_deformers(rust::Slice<float> &buffer) noexcept {
+    return this->inner.inner->apply_deformers(buffer);
+};
+
 const internal::PixelBlock& StreamData::pixel_block() const noexcept {
     return this->inner.inner->pixel_block();
 }
