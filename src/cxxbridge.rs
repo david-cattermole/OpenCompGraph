@@ -24,13 +24,6 @@ use crate::stream::StreamDataImpl;
 #[rustfmt::skip]
 #[cxx::bridge(namespace = "open_comp_graph")]
 pub mod ffi {
-    #[namespace = "open_comp_graph::shared"]
-    struct SharedThing {
-        z: i32,
-        y: Box<ThingR>,
-        x: UniquePtr<ThingC>,
-    }
-
     #[derive(Debug, Copy, Clone, Default, PartialEq, PartialOrd)]
     #[namespace = "open_comp_graph"]
     struct BBox2Df {
@@ -213,17 +206,10 @@ pub mod ffi {
         include!("opencompgraph/symbol_export.h");
         include!("opencompgraph/cpp.h");
 
-        type ThingC;
-        fn make_thingc(appname: &str) -> UniquePtr<ThingC>;
-        fn get_name(thing: &ThingC) -> &CxxString;
-        fn run_sharedthing(state: SharedThing);
-    }
-
-    // ThingR
-    #[namespace = "open_comp_graph::internal"]
-    extern "Rust" {
-        type ThingR;
-        fn print_r(r: &ThingR);
+        // type ThingC;
+        // fn make_thingc(appname: &str) -> UniquePtr<ThingC>;
+        // fn get_name(thing: &ThingC) -> &CxxString;
+        // fn run_sharedthing(state: SharedThing);
     }
 
     // PixelBlock
@@ -378,23 +364,6 @@ pub mod ffi {
         fn generate_random_id() -> u64;
         fn generate_id_from_name(name: &str) -> u64;
     }
-}
-
-pub struct ThingR(usize);
-
-fn print_r(r: &ThingR) {
-    println!("called back with r={}", r.0);
-}
-
-#[allow(dead_code)]
-fn my_test() {
-    let x = ffi::make_thingc("demo of cxx::bridge");
-    println!("this is a \"{}\"", ffi::get_name(x.as_ref().unwrap()));
-    ffi::run_sharedthing(ffi::SharedThing {
-        z: 222,
-        y: Box::new(ThingR(333)),
-        x,
-    });
 }
 
 fn create_cache_shared() -> ffi::CacheImplShared {

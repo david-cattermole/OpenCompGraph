@@ -8,7 +8,6 @@
 #include <cstdint>
 #include <initializer_list>
 #include <iterator>
-#include <memory>
 #include <new>
 #include <string>
 #include <type_traits>
@@ -908,14 +907,10 @@ namespace open_comp_graph {
   enum class NodeStatus : ::std::uint8_t;
   enum class AttrState : ::std::uint8_t;
   enum class StreamDataState : ::std::uint8_t;
-  namespace shared {
-    struct SharedThing;
-  }
   namespace internal {
     struct GraphImplShared;
     struct StreamDataImplShared;
     struct CacheImplShared;
-    struct ThingR;
     struct PixelBlock;
     struct StreamDataImpl;
     struct NodeImpl;
@@ -923,25 +918,9 @@ namespace open_comp_graph {
     struct GraphImpl;
     struct GeometryPlaneImpl;
   }
-  namespace cpp {
-    using ThingC = ::open_comp_graph::cpp::ThingC;
-  }
 }
 
 namespace open_comp_graph {
-namespace shared {
-#ifndef CXXBRIDGE1_STRUCT_open_comp_graph$shared$SharedThing
-#define CXXBRIDGE1_STRUCT_open_comp_graph$shared$SharedThing
-struct SharedThing final {
-  ::std::int32_t z;
-  ::rust::Box<::open_comp_graph::internal::ThingR> y;
-  ::std::unique_ptr<::open_comp_graph::cpp::ThingC> x;
-
-  using IsRelocatable = ::std::true_type;
-};
-#endif // CXXBRIDGE1_STRUCT_open_comp_graph$shared$SharedThing
-} // namespace shared
-
 #ifndef CXXBRIDGE1_STRUCT_open_comp_graph$BBox2Df
 #define CXXBRIDGE1_STRUCT_open_comp_graph$BBox2Df
 struct BBox2Df final {
@@ -1103,20 +1082,6 @@ enum class StreamDataState : ::std::uint8_t {
 #endif // CXXBRIDGE1_ENUM_open_comp_graph$StreamDataState
 
 namespace internal {
-#ifndef CXXBRIDGE1_STRUCT_open_comp_graph$internal$ThingR
-#define CXXBRIDGE1_STRUCT_open_comp_graph$internal$ThingR
-struct ThingR final : public ::rust::Opaque {
-  ~ThingR() = delete;
-
-private:
-  friend ::rust::layout;
-  struct layout {
-    static ::std::size_t size() noexcept;
-    static ::std::size_t align() noexcept;
-  };
-};
-#endif // CXXBRIDGE1_STRUCT_open_comp_graph$internal$ThingR
-
 #ifndef CXXBRIDGE1_STRUCT_open_comp_graph$internal$PixelBlock
 #define CXXBRIDGE1_STRUCT_open_comp_graph$internal$PixelBlock
 struct PixelBlock final : public ::rust::Opaque {
@@ -1258,8 +1223,6 @@ private:
   };
 };
 #endif // CXXBRIDGE1_STRUCT_open_comp_graph$internal$GeometryPlaneImpl
-
-OPENCOMPGRAPH_SYMBOL_EXPORT void print_r(const ::open_comp_graph::internal::ThingR &r) noexcept;
 
 OPENCOMPGRAPH_SYMBOL_EXPORT ::rust::Box<::open_comp_graph::internal::StreamDataImpl> create_stream_data_box() noexcept;
 

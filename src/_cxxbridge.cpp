@@ -8,7 +8,6 @@
 #include <functional>
 #include <initializer_list>
 #include <iterator>
-#include <memory>
 #include <new>
 #include <string>
 #include <type_traits>
@@ -947,14 +946,6 @@ public:
     return slice;
   }
 };
-
-template <bool> struct deleter_if {
-  template <typename T> void operator()(T *) {}
-};
-
-template <> struct deleter_if<true> {
-  template <typename T> void operator()(T *ptr) { ptr->~T(); }
-};
 } // namespace
 } // namespace cxxbridge1
 } // namespace rust
@@ -970,14 +961,10 @@ namespace open_comp_graph {
   enum class NodeStatus : ::std::uint8_t;
   enum class AttrState : ::std::uint8_t;
   enum class StreamDataState : ::std::uint8_t;
-  namespace shared {
-    struct SharedThing;
-  }
   namespace internal {
     struct GraphImplShared;
     struct StreamDataImplShared;
     struct CacheImplShared;
-    struct ThingR;
     struct PixelBlock;
     struct StreamDataImpl;
     struct NodeImpl;
@@ -985,25 +972,9 @@ namespace open_comp_graph {
     struct GraphImpl;
     struct GeometryPlaneImpl;
   }
-  namespace cpp {
-    using ThingC = ::open_comp_graph::cpp::ThingC;
-  }
 }
 
 namespace open_comp_graph {
-namespace shared {
-#ifndef CXXBRIDGE1_STRUCT_open_comp_graph$shared$SharedThing
-#define CXXBRIDGE1_STRUCT_open_comp_graph$shared$SharedThing
-struct SharedThing final {
-  ::std::int32_t z;
-  ::rust::Box<::open_comp_graph::internal::ThingR> y;
-  ::std::unique_ptr<::open_comp_graph::cpp::ThingC> x;
-
-  using IsRelocatable = ::std::true_type;
-};
-#endif // CXXBRIDGE1_STRUCT_open_comp_graph$shared$SharedThing
-} // namespace shared
-
 #ifndef CXXBRIDGE1_STRUCT_open_comp_graph$BBox2Df
 #define CXXBRIDGE1_STRUCT_open_comp_graph$BBox2Df
 struct BBox2Df final {
@@ -1165,20 +1136,6 @@ enum class StreamDataState : ::std::uint8_t {
 #endif // CXXBRIDGE1_ENUM_open_comp_graph$StreamDataState
 
 namespace internal {
-#ifndef CXXBRIDGE1_STRUCT_open_comp_graph$internal$ThingR
-#define CXXBRIDGE1_STRUCT_open_comp_graph$internal$ThingR
-struct ThingR final : public ::rust::Opaque {
-  ~ThingR() = delete;
-
-private:
-  friend ::rust::layout;
-  struct layout {
-    static ::std::size_t size() noexcept;
-    static ::std::size_t align() noexcept;
-  };
-};
-#endif // CXXBRIDGE1_STRUCT_open_comp_graph$internal$ThingR
-
 #ifndef CXXBRIDGE1_STRUCT_open_comp_graph$internal$PixelBlock
 #define CXXBRIDGE1_STRUCT_open_comp_graph$internal$PixelBlock
 struct PixelBlock final : public ::rust::Opaque {
@@ -1347,34 +1304,6 @@ bool open_comp_graph$cxxbridge1$Matrix4$operator$ge(const Matrix4 &, const Matri
 namespace internal {
 extern "C" {
 ::std::size_t open_comp_graph$internal$cxxbridge1$StreamDataImplShared$operator$hash(const StreamDataImplShared &) noexcept;
-} // extern "C"
-} // namespace internal
-
-namespace cpp {
-extern "C" {
-OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::cpp::ThingC *open_comp_graph$cpp$cxxbridge1$make_thingc(::rust::Str appname) noexcept {
-  ::std::unique_ptr<::open_comp_graph::cpp::ThingC> (*make_thingc$)(::rust::Str) = ::open_comp_graph::cpp::make_thingc;
-  return make_thingc$(appname).release();
-}
-
-OPENCOMPGRAPH_SYMBOL_EXPORT const ::std::string *open_comp_graph$cpp$cxxbridge1$get_name(const ::open_comp_graph::cpp::ThingC &thing) noexcept {
-  const ::std::string &(*get_name$)(const ::open_comp_graph::cpp::ThingC &) = ::open_comp_graph::cpp::get_name;
-  return &get_name$(thing);
-}
-
-OPENCOMPGRAPH_SYMBOL_EXPORT void open_comp_graph$cpp$cxxbridge1$run_sharedthing(::open_comp_graph::shared::SharedThing *state) noexcept {
-  void (*run_sharedthing$)(::open_comp_graph::shared::SharedThing) = ::open_comp_graph::cpp::run_sharedthing;
-  run_sharedthing$(::std::move(*state));
-}
-} // extern "C"
-} // namespace cpp
-
-namespace internal {
-extern "C" {
-::std::size_t open_comp_graph$internal$cxxbridge1$ThingR$operator$sizeof() noexcept;
-::std::size_t open_comp_graph$internal$cxxbridge1$ThingR$operator$alignof() noexcept;
-
-void open_comp_graph$internal$cxxbridge1$print_r(const ::open_comp_graph::internal::ThingR &r) noexcept;
 ::std::size_t open_comp_graph$internal$cxxbridge1$PixelBlock$operator$sizeof() noexcept;
 ::std::size_t open_comp_graph$internal$cxxbridge1$PixelBlock$operator$alignof() noexcept;
 ::std::size_t open_comp_graph$internal$cxxbridge1$StreamDataImpl$operator$sizeof() noexcept;
@@ -1631,18 +1560,6 @@ bool Matrix4::operator>=(const Matrix4 &rhs) const noexcept {
 }
 
 namespace internal {
-::std::size_t ThingR::layout::size() noexcept {
-  return open_comp_graph$internal$cxxbridge1$ThingR$operator$sizeof();
-}
-
-::std::size_t ThingR::layout::align() noexcept {
-  return open_comp_graph$internal$cxxbridge1$ThingR$operator$alignof();
-}
-
-OPENCOMPGRAPH_SYMBOL_EXPORT void print_r(const ::open_comp_graph::internal::ThingR &r) noexcept {
-  open_comp_graph$internal$cxxbridge1$print_r(r);
-}
-
 ::std::size_t PixelBlock::layout::size() noexcept {
   return open_comp_graph$internal$cxxbridge1$PixelBlock$operator$sizeof();
 }
@@ -2008,29 +1925,6 @@ const ::open_comp_graph::internal::StreamDataImplShared *cxxbridge1$rust_vec$ope
 void cxxbridge1$rust_vec$open_comp_graph$internal$StreamDataImplShared$reserve_total(::rust::Vec<::open_comp_graph::internal::StreamDataImplShared> *ptr, ::std::size_t cap) noexcept;
 void cxxbridge1$rust_vec$open_comp_graph$internal$StreamDataImplShared$set_len(::rust::Vec<::open_comp_graph::internal::StreamDataImplShared> *ptr, ::std::size_t len) noexcept;
 
-::open_comp_graph::internal::ThingR *cxxbridge1$box$open_comp_graph$internal$ThingR$alloc() noexcept;
-void cxxbridge1$box$open_comp_graph$internal$ThingR$dealloc(::open_comp_graph::internal::ThingR *) noexcept;
-void cxxbridge1$box$open_comp_graph$internal$ThingR$drop(::rust::Box<::open_comp_graph::internal::ThingR> *ptr) noexcept;
-
-static_assert(::rust::detail::is_complete<::open_comp_graph::cpp::ThingC>::value, "definition of ThingC is required");
-static_assert(sizeof(::std::unique_ptr<::open_comp_graph::cpp::ThingC>) == sizeof(void *), "");
-static_assert(alignof(::std::unique_ptr<::open_comp_graph::cpp::ThingC>) == alignof(void *), "");
-void cxxbridge1$unique_ptr$open_comp_graph$cpp$ThingC$null(::std::unique_ptr<::open_comp_graph::cpp::ThingC> *ptr) noexcept {
-  ::new (ptr) ::std::unique_ptr<::open_comp_graph::cpp::ThingC>();
-}
-void cxxbridge1$unique_ptr$open_comp_graph$cpp$ThingC$raw(::std::unique_ptr<::open_comp_graph::cpp::ThingC> *ptr, ::open_comp_graph::cpp::ThingC *raw) noexcept {
-  ::new (ptr) ::std::unique_ptr<::open_comp_graph::cpp::ThingC>(raw);
-}
-const ::open_comp_graph::cpp::ThingC *cxxbridge1$unique_ptr$open_comp_graph$cpp$ThingC$get(const ::std::unique_ptr<::open_comp_graph::cpp::ThingC>& ptr) noexcept {
-  return ptr.get();
-}
-::open_comp_graph::cpp::ThingC *cxxbridge1$unique_ptr$open_comp_graph$cpp$ThingC$release(::std::unique_ptr<::open_comp_graph::cpp::ThingC>& ptr) noexcept {
-  return ptr.release();
-}
-void cxxbridge1$unique_ptr$open_comp_graph$cpp$ThingC$drop(::std::unique_ptr<::open_comp_graph::cpp::ThingC> *ptr) noexcept {
-  ::rust::deleter_if<::rust::detail::is_complete<::open_comp_graph::cpp::ThingC>::value>{}(ptr);
-}
-
 ::open_comp_graph::internal::GraphImpl *cxxbridge1$box$open_comp_graph$internal$GraphImpl$alloc() noexcept;
 void cxxbridge1$box$open_comp_graph$internal$GraphImpl$dealloc(::open_comp_graph::internal::GraphImpl *) noexcept;
 void cxxbridge1$box$open_comp_graph$internal$GraphImpl$drop(::rust::Box<::open_comp_graph::internal::GraphImpl> *ptr) noexcept;
@@ -2081,18 +1975,6 @@ OPENCOMPGRAPH_SYMBOL_EXPORT void Vec<::open_comp_graph::internal::StreamDataImpl
 template <>
 OPENCOMPGRAPH_SYMBOL_EXPORT void Vec<::open_comp_graph::internal::StreamDataImplShared>::set_len(::std::size_t len) noexcept {
   return cxxbridge1$rust_vec$open_comp_graph$internal$StreamDataImplShared$set_len(this, len);
-}
-template <>
-OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::internal::ThingR *Box<::open_comp_graph::internal::ThingR>::allocation::alloc() noexcept {
-  return cxxbridge1$box$open_comp_graph$internal$ThingR$alloc();
-}
-template <>
-OPENCOMPGRAPH_SYMBOL_EXPORT void Box<::open_comp_graph::internal::ThingR>::allocation::dealloc(::open_comp_graph::internal::ThingR *ptr) noexcept {
-  cxxbridge1$box$open_comp_graph$internal$ThingR$dealloc(ptr);
-}
-template <>
-OPENCOMPGRAPH_SYMBOL_EXPORT void Box<::open_comp_graph::internal::ThingR>::drop() noexcept {
-  cxxbridge1$box$open_comp_graph$internal$ThingR$drop(this);
 }
 template <>
 OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::internal::GraphImpl *Box<::open_comp_graph::internal::GraphImpl>::allocation::alloc() noexcept {
