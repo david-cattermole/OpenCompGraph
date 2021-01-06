@@ -17,7 +17,7 @@ SET RUST_INCLUDE_DIR="%OCG_ROOT%\include"
 
 :: Build Rust
 ::
-:: Assumes 'cxxbridge-cmd' and 'cbindgen' is installed.
+:: Assumes 'cxxbridge-cmd' is installed.
 call %OCG_ROOT%\scripts\build_rust_windows64.bat
 
 :: Build C++

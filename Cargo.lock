@@ -387,7 +387,6 @@ dependencies = [
  "env_logger",
  "fastapprox",
  "image",
- "libc",
  "log",
  "nalgebra",
  "petgraph",

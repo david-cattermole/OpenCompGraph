@@ -14,12 +14,9 @@ cargo install cxxbridge-cmd --version 1.0.26
 
 :: Build Rust
 ::
-:: Assumes 'cxxbridge-cmd' and 'cbindgen' is installed.
+:: Assumes 'cxxbridge' (cxxbridge-cmd) is installed.
 ECHO Generating C++ Headers...
 cxxbridge --header --output "%ROOT%\include\rust\cxx.h"
-cbindgen --config cbindgen.toml ^
-         --crate "opencompgraph-rs" ^
-         --output "%ROOT%\include\opencompgraph\_cbindgen.h"
 ECHO Building Rust crate...
 cargo build --release
 

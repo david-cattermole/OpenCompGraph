@@ -9,9 +9,7 @@ int test_a(const bool debug_print) {
     }
     auto bench = ocg::internal::BenchmarkTime();
 
-    int scene_id = 42;
-    ocg::cbindgen::SceneGraph *scene_graph = ocg::cbindgen::scene_graph_new(scene_id);
-    ocg::cbindgen::scene_graph_delete(scene_graph);
+    // TODO: Add an interesting test here.
 
     bench.stop();
     if (debug_print) {

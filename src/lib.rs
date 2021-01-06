@@ -4,7 +4,6 @@
 #![allow(unused_mut)]
 pub mod bbox;
 pub mod cache;
-pub mod cbindgen;
 pub mod colorutils;
 pub mod colorxform;
 pub mod cxxbridge;
