@@ -14,7 +14,7 @@ use crate::data::HashValue;
 use crate::data::Identifier;
 use crate::hashutils::HashableF32;
 use crate::node::traits::AttrBlock;
-use crate::node::traits::Compute;
+use crate::node::traits::Operation;
 use crate::node::NodeImpl;
 
 pub fn new(id: Identifier) -> NodeImpl {
@@ -22,13 +22,13 @@ pub fn new(id: Identifier) -> NodeImpl {
         node_type: NodeType::Grade,
         id,
         status: NodeStatus::Uninitialized,
-        compute: Box::new(GradeCompute::new()),
+        compute: Box::new(GradeOperation::new()),
         attr_block: Box::new(GradeAttrs::new()),
     }
 }
 
 #[derive(Debug, Clone, Default)]
-pub struct GradeCompute {}
+pub struct GradeOperation {}
 
 #[derive(Debug, Clone, Default)]
 pub struct GradeAttrs {
@@ -42,9 +42,9 @@ impl hash::Hash for GradeAttrs {
     }
 }
 
-impl GradeCompute {
-    pub fn new() -> GradeCompute {
-        GradeCompute {}
+impl GradeOperation {
+    pub fn new() -> GradeOperation {
+        GradeOperation {}
     }
 }
 
@@ -57,7 +57,7 @@ impl GradeAttrs {
     }
 }
 
-impl Compute for GradeCompute {
+impl Operation for GradeOperation {
     fn compute(
         &mut self,
         node_type_id: u8,
@@ -65,7 +65,7 @@ impl Compute for GradeCompute {
         inputs: &Vec<StreamDataImplShared>,
         output: &mut StreamDataImplShared,
     ) -> NodeStatus {
-        debug!("GradeCompute.compute()");
+        debug!("GradeOperation.compute()");
         // debug!("AttrBlock: {:?}", attr_block);
         // debug!("Inputs: {:?}", inputs);
         // debug!("Output: {:?}", output);

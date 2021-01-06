@@ -16,7 +16,7 @@ use crate::cxxbridge::ffi::StreamDataImplShared;
 use crate::data::HashValue;
 use crate::data::Identifier;
 use crate::node::traits::AttrBlock;
-use crate::node::traits::Compute;
+use crate::node::traits::Operation;
 use crate::node::NodeImpl;
 
 pub fn new(id: Identifier) -> NodeImpl {
@@ -24,13 +24,13 @@ pub fn new(id: Identifier) -> NodeImpl {
         node_type: NodeType::WriteImage,
         id,
         status: NodeStatus::Uninitialized,
-        compute: Box::new(WriteImageCompute::new()),
+        compute: Box::new(WriteImageOperation::new()),
         attr_block: Box::new(WriteImageAttrs::new()),
     }
 }
 
 #[derive(Debug, Clone, Default)]
-pub struct WriteImageCompute {}
+pub struct WriteImageOperation {}
 
 #[derive(Debug, Clone, Default, Hash)]
 pub struct WriteImageAttrs {
@@ -38,9 +38,9 @@ pub struct WriteImageAttrs {
     pub file_path: String,
 }
 
-impl WriteImageCompute {
-    pub fn new() -> WriteImageCompute {
-        WriteImageCompute {}
+impl WriteImageOperation {
+    pub fn new() -> WriteImageOperation {
+        WriteImageOperation {}
     }
 }
 
@@ -53,7 +53,7 @@ impl WriteImageAttrs {
     }
 }
 
-impl Compute for WriteImageCompute {
+impl Operation for WriteImageOperation {
     fn compute(
         &mut self,
         node_type_id: u8,
@@ -61,7 +61,7 @@ impl Compute for WriteImageCompute {
         inputs: &Vec<StreamDataImplShared>,
         output: &mut StreamDataImplShared,
     ) -> NodeStatus {
-        debug!("WriteImageCompute.compute()");
+        debug!("WriteImageOperation.compute()");
         // debug!("AttrBlock: {:?}", attr_block);
         // debug!("Inputs: {:?}", inputs);
         // debug!("Output: {:?}", output);

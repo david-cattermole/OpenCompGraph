@@ -26,7 +26,7 @@ pub struct NodeImpl {
     id: Identifier,
     status: NodeStatus,
     attr_block: Box<dyn traits::AttrBlock>,
-    compute: Box<dyn traits::Compute>,
+    compute: Box<dyn traits::Operation>,
 }
 
 impl NodeImpl {

@@ -25,7 +25,7 @@ pub trait AttrBlock: std::fmt::Debug {
     fn set_attr_f32(&mut self, name: &str, value: f32);
 }
 
-pub trait Compute: std::fmt::Debug {
+pub trait Operation: std::fmt::Debug {
     fn cache_hash(
         &self,
         node_type_id: u8,

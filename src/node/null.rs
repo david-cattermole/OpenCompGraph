@@ -11,7 +11,7 @@ use crate::cxxbridge::ffi::StreamDataImplShared;
 use crate::data::HashValue;
 use crate::data::Identifier;
 use crate::node::traits::AttrBlock;
-use crate::node::traits::Compute;
+use crate::node::traits::Operation;
 use crate::node::NodeImpl;
 
 pub fn new(id: Identifier) -> NodeImpl {
@@ -19,20 +19,20 @@ pub fn new(id: Identifier) -> NodeImpl {
         node_type: NodeType::Null,
         id,
         status: NodeStatus::Uninitialized,
-        compute: Box::new(NullCompute::new()),
+        compute: Box::new(NullOperation::new()),
         attr_block: Box::new(NullAttrs::new()),
     }
 }
 
 #[derive(Debug, Clone, Default)]
-pub struct NullCompute {}
+pub struct NullOperation {}
 
 #[derive(Debug, Clone, Default, Hash)]
 pub struct NullAttrs {}
 
-impl NullCompute {
-    pub fn new() -> NullCompute {
-        NullCompute {}
+impl NullOperation {
+    pub fn new() -> NullOperation {
+        NullOperation {}
     }
 }
 
@@ -42,7 +42,7 @@ impl NullAttrs {
     }
 }
 
-impl Compute for NullCompute {
+impl Operation for NullOperation {
     fn compute(
         &mut self,
         node_type_id: u8,
@@ -50,7 +50,7 @@ impl Compute for NullCompute {
         inputs: &Vec<StreamDataImplShared>,
         output: &mut StreamDataImplShared,
     ) -> NodeStatus {
-        debug!("NullCompute.compute()");
+        debug!("NullOperation.compute()");
         // debug!("AttrBlock: {:?}", attr_block);
         // debug!("Inputs: {:?}", inputs);
         // debug!("Output: {:?}", output);

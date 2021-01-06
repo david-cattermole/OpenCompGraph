@@ -17,7 +17,7 @@ use crate::cxxbridge::ffi::StreamDataImplShared;
 use crate::data::HashValue;
 use crate::data::Identifier;
 use crate::node::traits::AttrBlock;
-use crate::node::traits::Compute;
+use crate::node::traits::Operation;
 use crate::node::NodeImpl;
 use crate::pixelblock::PixelBlock;
 
@@ -26,13 +26,13 @@ pub fn new(id: Identifier) -> NodeImpl {
         node_type: NodeType::ReadImage,
         id,
         status: NodeStatus::Uninitialized,
-        compute: Box::new(ReadImageCompute::new()),
+        compute: Box::new(ReadImageOperation::new()),
         attr_block: Box::new(ReadImageAttrs::new()),
     }
 }
 
 #[derive(Debug, Clone, Default)]
-pub struct ReadImageCompute {}
+pub struct ReadImageOperation {}
 
 #[derive(Debug, Clone, Default, hash::Hash)]
 pub struct ReadImageAttrs {
@@ -40,9 +40,9 @@ pub struct ReadImageAttrs {
     pub file_path: String,
 }
 
-impl ReadImageCompute {
-    pub fn new() -> ReadImageCompute {
-        ReadImageCompute {}
+impl ReadImageOperation {
+    pub fn new() -> ReadImageOperation {
+        ReadImageOperation {}
     }
 }
 
@@ -55,7 +55,7 @@ impl ReadImageAttrs {
     }
 }
 
-impl Compute for ReadImageCompute {
+impl Operation for ReadImageOperation {
     fn compute(
         &mut self,
         node_type_id: u8,
@@ -63,7 +63,7 @@ impl Compute for ReadImageCompute {
         inputs: &Vec<StreamDataImplShared>,
         output: &mut StreamDataImplShared,
     ) -> NodeStatus {
-        debug!("ReadImageCompute.compute()");
+        debug!("ReadImageOperation.compute()");
         // debug!("AttrBlock: {:?}", attr_block);
         // debug!("Inputs: {:?}", inputs);
         // debug!("Output: {:?}", output);

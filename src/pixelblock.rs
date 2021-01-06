@@ -21,7 +21,7 @@ use crate::data::COLOR_BARS_HEIGHT;
 use crate::data::COLOR_BARS_NUM_CHANNELS;
 use crate::data::COLOR_BARS_WIDTH;
 use crate::node::traits::AttrBlock;
-use crate::node::traits::Compute;
+use crate::node::traits::Operation;
 use crate::node::NodeImpl;
 
 #[derive(Clone)]
