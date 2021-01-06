@@ -69,9 +69,10 @@ impl Operation for ReadImageOperation {
         // debug!("Output: {:?}", output);
         let enable = attr_block.get_attr_i32("enable");
         if enable != 1 {
-            return NodeStatus::Error;
+            let hash_value = self.cache_hash(node_type_id, &attr_block, inputs);
+            output.inner.set_hash(hash_value);
+            return NodeStatus::Valid;
         }
-
         let file_path = attr_block.get_attr_str("file_path");
         // debug!("file_path {:?}", file_path);
 
@@ -99,7 +100,6 @@ impl Operation for ReadImageOperation {
             output.inner.set_hash(hash_value);
             output.inner.set_pixel_block(pixel_block);
         }
-
         NodeStatus::Valid
     }
 }

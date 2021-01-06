@@ -32,7 +32,7 @@ pub fn new(id: Identifier) -> NodeImpl {
 #[derive(Debug, Clone, Default)]
 pub struct WriteImageOperation {}
 
-#[derive(Debug, Clone, Default, Hash)]
+#[derive(Debug, Clone, Default, hash::Hash)]
 pub struct WriteImageAttrs {
     pub enable: i32,
     pub file_path: String,
@@ -67,7 +67,7 @@ impl Operation for WriteImageOperation {
         // debug!("Output: {:?}", output);
         let enable = attr_block.get_attr_i32("enable");
         if enable != 1 {
-            return NodeStatus::Error;
+            return NodeStatus::Valid;
         }
 
         match inputs.len() {

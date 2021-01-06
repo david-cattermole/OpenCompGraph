@@ -57,10 +57,7 @@ impl Operation for NullOperation {
         match inputs.len() {
             0 => NodeStatus::Error,
             _ => {
-                let hash_value = self.cache_hash(node_type_id, &attr_block, inputs);
-                let mut copy = inputs[0].inner.clone();
-                copy.set_hash(hash_value);
-                output.inner = copy;
+                output.inner = inputs[0].inner.clone();
                 NodeStatus::Valid
             }
         }
