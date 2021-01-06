@@ -15,3 +15,9 @@ pub fn apply_scale_rgba(
     let scale_matrix = na::Matrix4::<f32>::from_diagonal(&diagonal);
     scale_matrix * input_matrix
 }
+
+// TODO: Write an exposure matrix wrapper function, which calls
+// apply_scale_rgba, but with exposure values (EV) as input.
+//
+// float multiply = std::pow(2.0, exposure);  // Exposure Value
+// let multiply: f32 = (2.0).powf(exposure);  // Exposure Value

@@ -11,6 +11,21 @@ use crate::data::Identifier;
 use crate::node::NodeImpl;
 
 pub trait Operation: std::fmt::Debug {
+    // TODO: Add a "OperationCacheType". This will allow us to
+    // categorize the Operation in terms of cache.
+    //
+    // For example we could have a "Trivial" OperationCacheType, which
+    // would indicate that the operation is trivial to compute (ie. do
+    // not store this in the cache because we can easily re-compute
+    // it).
+    //
+    // Another example type might be "BoundByIO", which would indicate
+    // that the operation can be asynconously computed.
+    //
+    // Another example type might be "BoundByCPU", which would
+    // indicate that the operation should be multi-threaded to be
+    // computed in the shortest time possible.
+
     fn cache_hash(
         &self,
         node_type_id: u8,
