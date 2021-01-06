@@ -1407,6 +1407,14 @@ const ::open_comp_graph::internal::PixelBlock *open_comp_graph$internal$cxxbridg
 ::std::uint32_t open_comp_graph$internal$cxxbridge1$StreamDataImpl$pixel_height(const ::open_comp_graph::internal::StreamDataImpl &self) noexcept;
 
 ::std::uint8_t open_comp_graph$internal$cxxbridge1$StreamDataImpl$pixel_num_channels(const ::open_comp_graph::internal::StreamDataImpl &self) noexcept;
+
+::open_comp_graph::internal::StreamDataImpl *open_comp_graph$internal$cxxbridge1$create_stream_data_box() noexcept;
+
+void open_comp_graph$internal$cxxbridge1$create_stream_data_shared(::open_comp_graph::internal::StreamDataImplShared *return$) noexcept;
+
+void open_comp_graph$internal$cxxbridge1$create_stream_data_shared_box(::open_comp_graph::internal::StreamDataImpl *data, ::open_comp_graph::internal::StreamDataImplShared *return$) noexcept;
+
+void open_comp_graph$internal$cxxbridge1$create_vec_stream_data_shared(::rust::Vec<::open_comp_graph::internal::StreamDataImplShared> *return$) noexcept;
 ::std::size_t open_comp_graph$internal$cxxbridge1$NodeImpl$operator$sizeof() noexcept;
 ::std::size_t open_comp_graph$internal$cxxbridge1$NodeImpl$operator$alignof() noexcept;
 
@@ -1437,10 +1445,16 @@ void open_comp_graph$internal$cxxbridge1$NodeImpl$set_attr_f32(::open_comp_graph
 void open_comp_graph$internal$cxxbridge1$NodeImpl$set_attr_i32(::open_comp_graph::internal::NodeImpl &self, ::rust::Str name, ::std::int32_t value) noexcept;
 
 void open_comp_graph$internal$cxxbridge1$NodeImpl$set_attr_str(::open_comp_graph::internal::NodeImpl &self, ::rust::Str name, ::rust::Str value) noexcept;
+
+::open_comp_graph::internal::NodeImpl *open_comp_graph$internal$cxxbridge1$create_node_box_with_id(::open_comp_graph::NodeType node_type, ::std::uint64_t id) noexcept;
 ::std::size_t open_comp_graph$internal$cxxbridge1$CacheImpl$operator$sizeof() noexcept;
 ::std::size_t open_comp_graph$internal$cxxbridge1$CacheImpl$operator$alignof() noexcept;
 
 ::std::size_t open_comp_graph$internal$cxxbridge1$CacheImpl$len(const ::open_comp_graph::internal::CacheImpl &self) noexcept;
+
+::open_comp_graph::internal::CacheImpl *open_comp_graph$internal$cxxbridge1$create_cache_box() noexcept;
+
+void open_comp_graph$internal$cxxbridge1$create_cache_shared(::open_comp_graph::internal::CacheImplShared *return$) noexcept;
 ::std::size_t open_comp_graph$internal$cxxbridge1$GraphImpl$operator$sizeof() noexcept;
 ::std::size_t open_comp_graph$internal$cxxbridge1$GraphImpl$operator$alignof() noexcept;
 
@@ -1478,29 +1492,9 @@ void open_comp_graph$internal$cxxbridge1$GraphImpl$data_debug_string(const ::ope
 
 void open_comp_graph$internal$cxxbridge1$GraphImpl$output_stream(const ::open_comp_graph::internal::GraphImpl &self, ::open_comp_graph::internal::StreamDataImplShared *return$) noexcept;
 
-::open_comp_graph::internal::NodeImpl *open_comp_graph$internal$cxxbridge1$create_node_box_with_id(::open_comp_graph::NodeType node_type, ::std::uint64_t id) noexcept;
-
-::open_comp_graph::internal::CacheImpl *open_comp_graph$internal$cxxbridge1$create_cache_box() noexcept;
-
-void open_comp_graph$internal$cxxbridge1$create_cache_shared(::open_comp_graph::internal::CacheImplShared *return$) noexcept;
-
 ::open_comp_graph::internal::GraphImpl *open_comp_graph$internal$cxxbridge1$create_graph_box() noexcept;
 
 void open_comp_graph$internal$cxxbridge1$create_graph_shared(::open_comp_graph::internal::GraphImplShared *return$) noexcept;
-
-::open_comp_graph::internal::StreamDataImpl *open_comp_graph$internal$cxxbridge1$create_stream_data_box() noexcept;
-
-void open_comp_graph$internal$cxxbridge1$create_stream_data_shared(::open_comp_graph::internal::StreamDataImplShared *return$) noexcept;
-
-void open_comp_graph$internal$cxxbridge1$create_stream_data_shared_box(::open_comp_graph::internal::StreamDataImpl *data, ::open_comp_graph::internal::StreamDataImplShared *return$) noexcept;
-
-void open_comp_graph$internal$cxxbridge1$create_vec_stream_data_shared(::rust::Vec<::open_comp_graph::internal::StreamDataImplShared> *return$) noexcept;
-
-::open_comp_graph::internal::GeometryPlaneImpl *open_comp_graph$internal$cxxbridge1$create_geometry_plane_box(::std::uint32_t divisions_x, ::std::uint32_t divisions_y) noexcept;
-
-::std::uint64_t open_comp_graph$internal$cxxbridge1$generate_random_id() noexcept;
-
-::std::uint64_t open_comp_graph$internal$cxxbridge1$generate_id_from_name(::rust::Str name) noexcept;
 ::std::size_t open_comp_graph$internal$cxxbridge1$GeometryPlaneImpl$operator$sizeof() noexcept;
 ::std::size_t open_comp_graph$internal$cxxbridge1$GeometryPlaneImpl$operator$alignof() noexcept;
 
@@ -1528,6 +1522,8 @@ bool open_comp_graph$internal$cxxbridge1$GeometryPlaneImpl$fill_buffer_vertex_uv
 
 bool open_comp_graph$internal$cxxbridge1$GeometryPlaneImpl$fill_buffer_index_tris(const ::open_comp_graph::internal::GeometryPlaneImpl &self, ::rust::Slice<::std::uint32_t> buffer_index_tris) noexcept;
 
+::open_comp_graph::internal::GeometryPlaneImpl *open_comp_graph$internal$cxxbridge1$create_geometry_plane_box(::std::uint32_t divisions_x, ::std::uint32_t divisions_y) noexcept;
+
 void open_comp_graph$internal$cxxbridge1$export_mesh(::rust::Slice<const float> buffer_vertex_positions, ::rust::Slice<const float> buffer_vertex_uvs, ::rust::Slice<const ::std::uint32_t> buffer_index_tris, ::rust::Str file_path) noexcept;
 } // extern "C"
 } // namespace internal
@@ -1537,6 +1533,14 @@ extern "C" {
 bool open_comp_graph$log$cxxbridge1$initialize() noexcept;
 } // extern "C"
 } // namespace log
+
+namespace internal {
+extern "C" {
+::std::uint64_t open_comp_graph$internal$cxxbridge1$generate_random_id() noexcept;
+
+::std::uint64_t open_comp_graph$internal$cxxbridge1$generate_id_from_name(::rust::Str name) noexcept;
+} // extern "C"
+} // namespace internal
 } // namespace open_comp_graph
 
 namespace std {
@@ -1711,6 +1715,28 @@ OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint8_t StreamDataImpl::pixel_num_channels() 
   return open_comp_graph$internal$cxxbridge1$StreamDataImpl$pixel_num_channels(*this);
 }
 
+OPENCOMPGRAPH_SYMBOL_EXPORT ::rust::Box<::open_comp_graph::internal::StreamDataImpl> create_stream_data_box() noexcept {
+  return ::rust::Box<::open_comp_graph::internal::StreamDataImpl>::from_raw(open_comp_graph$internal$cxxbridge1$create_stream_data_box());
+}
+
+OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::internal::StreamDataImplShared create_stream_data_shared() noexcept {
+  ::rust::MaybeUninit<::open_comp_graph::internal::StreamDataImplShared> return$;
+  open_comp_graph$internal$cxxbridge1$create_stream_data_shared(&return$.value);
+  return ::std::move(return$.value);
+}
+
+OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::internal::StreamDataImplShared create_stream_data_shared_box(::rust::Box<::open_comp_graph::internal::StreamDataImpl> data) noexcept {
+  ::rust::MaybeUninit<::open_comp_graph::internal::StreamDataImplShared> return$;
+  open_comp_graph$internal$cxxbridge1$create_stream_data_shared_box(data.into_raw(), &return$.value);
+  return ::std::move(return$.value);
+}
+
+OPENCOMPGRAPH_SYMBOL_EXPORT ::rust::Vec<::open_comp_graph::internal::StreamDataImplShared> create_vec_stream_data_shared() noexcept {
+  ::rust::MaybeUninit<::rust::Vec<::open_comp_graph::internal::StreamDataImplShared>> return$;
+  open_comp_graph$internal$cxxbridge1$create_vec_stream_data_shared(&return$.value);
+  return ::std::move(return$.value);
+}
+
 ::std::size_t NodeImpl::layout::size() noexcept {
   return open_comp_graph$internal$cxxbridge1$NodeImpl$operator$sizeof();
 }
@@ -1775,6 +1801,10 @@ OPENCOMPGRAPH_SYMBOL_EXPORT void NodeImpl::set_attr_str(::rust::Str name, ::rust
   open_comp_graph$internal$cxxbridge1$NodeImpl$set_attr_str(*this, name, value);
 }
 
+OPENCOMPGRAPH_SYMBOL_EXPORT ::rust::Box<::open_comp_graph::internal::NodeImpl> create_node_box(::open_comp_graph::NodeType node_type, ::std::uint64_t id) noexcept {
+  return ::rust::Box<::open_comp_graph::internal::NodeImpl>::from_raw(open_comp_graph$internal$cxxbridge1$create_node_box_with_id(node_type, id));
+}
+
 ::std::size_t CacheImpl::layout::size() noexcept {
   return open_comp_graph$internal$cxxbridge1$CacheImpl$operator$sizeof();
 }
@@ -1785,6 +1815,16 @@ OPENCOMPGRAPH_SYMBOL_EXPORT void NodeImpl::set_attr_str(::rust::Str name, ::rust
 
 OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t CacheImpl::len() const noexcept {
   return open_comp_graph$internal$cxxbridge1$CacheImpl$len(*this);
+}
+
+OPENCOMPGRAPH_SYMBOL_EXPORT ::rust::Box<::open_comp_graph::internal::CacheImpl> create_cache_box() noexcept {
+  return ::rust::Box<::open_comp_graph::internal::CacheImpl>::from_raw(open_comp_graph$internal$cxxbridge1$create_cache_box());
+}
+
+OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::internal::CacheImplShared create_cache_shared() noexcept {
+  ::rust::MaybeUninit<::open_comp_graph::internal::CacheImplShared> return$;
+  open_comp_graph$internal$cxxbridge1$create_cache_shared(&return$.value);
+  return ::std::move(return$.value);
 }
 
 ::std::size_t GraphImpl::layout::size() noexcept {
@@ -1867,20 +1907,6 @@ OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::internal::StreamDataImplShared Gr
   return ::std::move(return$.value);
 }
 
-OPENCOMPGRAPH_SYMBOL_EXPORT ::rust::Box<::open_comp_graph::internal::NodeImpl> create_node_box(::open_comp_graph::NodeType node_type, ::std::uint64_t id) noexcept {
-  return ::rust::Box<::open_comp_graph::internal::NodeImpl>::from_raw(open_comp_graph$internal$cxxbridge1$create_node_box_with_id(node_type, id));
-}
-
-OPENCOMPGRAPH_SYMBOL_EXPORT ::rust::Box<::open_comp_graph::internal::CacheImpl> create_cache_box() noexcept {
-  return ::rust::Box<::open_comp_graph::internal::CacheImpl>::from_raw(open_comp_graph$internal$cxxbridge1$create_cache_box());
-}
-
-OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::internal::CacheImplShared create_cache_shared() noexcept {
-  ::rust::MaybeUninit<::open_comp_graph::internal::CacheImplShared> return$;
-  open_comp_graph$internal$cxxbridge1$create_cache_shared(&return$.value);
-  return ::std::move(return$.value);
-}
-
 OPENCOMPGRAPH_SYMBOL_EXPORT ::rust::Box<::open_comp_graph::internal::GraphImpl> create_graph_box() noexcept {
   return ::rust::Box<::open_comp_graph::internal::GraphImpl>::from_raw(open_comp_graph$internal$cxxbridge1$create_graph_box());
 }
@@ -1889,40 +1915,6 @@ OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::internal::GraphImplShared create_
   ::rust::MaybeUninit<::open_comp_graph::internal::GraphImplShared> return$;
   open_comp_graph$internal$cxxbridge1$create_graph_shared(&return$.value);
   return ::std::move(return$.value);
-}
-
-OPENCOMPGRAPH_SYMBOL_EXPORT ::rust::Box<::open_comp_graph::internal::StreamDataImpl> create_stream_data_box() noexcept {
-  return ::rust::Box<::open_comp_graph::internal::StreamDataImpl>::from_raw(open_comp_graph$internal$cxxbridge1$create_stream_data_box());
-}
-
-OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::internal::StreamDataImplShared create_stream_data_shared() noexcept {
-  ::rust::MaybeUninit<::open_comp_graph::internal::StreamDataImplShared> return$;
-  open_comp_graph$internal$cxxbridge1$create_stream_data_shared(&return$.value);
-  return ::std::move(return$.value);
-}
-
-OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::internal::StreamDataImplShared create_stream_data_shared_box(::rust::Box<::open_comp_graph::internal::StreamDataImpl> data) noexcept {
-  ::rust::MaybeUninit<::open_comp_graph::internal::StreamDataImplShared> return$;
-  open_comp_graph$internal$cxxbridge1$create_stream_data_shared_box(data.into_raw(), &return$.value);
-  return ::std::move(return$.value);
-}
-
-OPENCOMPGRAPH_SYMBOL_EXPORT ::rust::Vec<::open_comp_graph::internal::StreamDataImplShared> create_vec_stream_data_shared() noexcept {
-  ::rust::MaybeUninit<::rust::Vec<::open_comp_graph::internal::StreamDataImplShared>> return$;
-  open_comp_graph$internal$cxxbridge1$create_vec_stream_data_shared(&return$.value);
-  return ::std::move(return$.value);
-}
-
-OPENCOMPGRAPH_SYMBOL_EXPORT ::rust::Box<::open_comp_graph::internal::GeometryPlaneImpl> create_geometry_plane_box(::std::uint32_t divisions_x, ::std::uint32_t divisions_y) noexcept {
-  return ::rust::Box<::open_comp_graph::internal::GeometryPlaneImpl>::from_raw(open_comp_graph$internal$cxxbridge1$create_geometry_plane_box(divisions_x, divisions_y));
-}
-
-OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint64_t generate_random_id() noexcept {
-  return open_comp_graph$internal$cxxbridge1$generate_random_id();
-}
-
-OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint64_t generate_id_from_name(::rust::Str name) noexcept {
-  return open_comp_graph$internal$cxxbridge1$generate_id_from_name(name);
 }
 
 ::std::size_t GeometryPlaneImpl::layout::size() noexcept {
@@ -1981,6 +1973,10 @@ OPENCOMPGRAPH_SYMBOL_EXPORT bool GeometryPlaneImpl::fill_buffer_index_tris(::rus
   return open_comp_graph$internal$cxxbridge1$GeometryPlaneImpl$fill_buffer_index_tris(*this, buffer_index_tris);
 }
 
+OPENCOMPGRAPH_SYMBOL_EXPORT ::rust::Box<::open_comp_graph::internal::GeometryPlaneImpl> create_geometry_plane_box(::std::uint32_t divisions_x, ::std::uint32_t divisions_y) noexcept {
+  return ::rust::Box<::open_comp_graph::internal::GeometryPlaneImpl>::from_raw(open_comp_graph$internal$cxxbridge1$create_geometry_plane_box(divisions_x, divisions_y));
+}
+
 OPENCOMPGRAPH_SYMBOL_EXPORT void export_mesh(::rust::Slice<const float> buffer_vertex_positions, ::rust::Slice<const float> buffer_vertex_uvs, ::rust::Slice<const ::std::uint32_t> buffer_index_tris, ::rust::Str file_path) noexcept {
   open_comp_graph$internal$cxxbridge1$export_mesh(buffer_vertex_positions, buffer_vertex_uvs, buffer_index_tris, file_path);
 }
@@ -1991,6 +1987,16 @@ OPENCOMPGRAPH_SYMBOL_EXPORT bool initialize() noexcept {
   return open_comp_graph$log$cxxbridge1$initialize();
 }
 } // namespace log
+
+namespace internal {
+OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint64_t generate_random_id() noexcept {
+  return open_comp_graph$internal$cxxbridge1$generate_random_id();
+}
+
+OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint64_t generate_id_from_name(::rust::Str name) noexcept {
+  return open_comp_graph$internal$cxxbridge1$generate_id_from_name(name);
+}
+} // namespace internal
 } // namespace open_comp_graph
 
 extern "C" {

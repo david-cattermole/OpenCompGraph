@@ -44,6 +44,11 @@ impl CacheImpl {
     pub fn evict(&mut self) {}
 }
 
+pub fn create_cache_box() -> Box<CacheImpl> {
+    debug!("create_cache_box()");
+    Box::new(CacheImpl::new())
+}
+
 /*
  * // Disk-based cache.
  * ocg::DiskCache<ocg::Hash, ocg::BaseNodeResult> cacheB();

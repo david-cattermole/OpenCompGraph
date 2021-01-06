@@ -120,6 +120,11 @@ impl GeometryPlaneImpl {
     }
 }
 
+pub fn create_geometry_plane_box(divisions_x: u32, divisions_y: u32) -> Box<GeometryPlaneImpl> {
+    debug!("create_geometry_plane_box()");
+    Box::new(GeometryPlaneImpl::new(divisions_x, divisions_y))
+}
+
 /// Export arrays of data as an .obj file - for debug.
 pub fn export_mesh(positions: &[f32], uvs: &[f32], indices: &[u32], file_path: &str) {
     debug!("Exporting Mesh: {}", file_path);

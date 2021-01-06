@@ -1,19 +1,24 @@
 use cxx::{CxxString, UniquePtr};
 use log::{debug, error, info, warn};
 
+use crate::cache::create_cache_box;
 use crate::cache::CacheImpl;
 use crate::data::HashValue;
 use crate::data::Identifier;
+use crate::geom::plane::create_geometry_plane_box;
 use crate::geom::plane::export_mesh;
 use crate::geom::plane::GeometryPlaneImpl;
+use crate::graph::create_graph_box;
 use crate::graph::GraphImpl;
 use crate::hashutils::calculate_hash;
 use crate::hashutils::generate_id_from_name;
 use crate::hashutils::generate_random_id;
 use crate::logger::initialize;
 use crate::node::create_node;
+use crate::node::create_node_box_with_id;
 use crate::node::NodeImpl;
 use crate::pixelblock::PixelBlock;
+use crate::stream::create_stream_data_box;
 use crate::stream::StreamDataImpl;
 
 #[rustfmt::skip]
@@ -245,6 +250,12 @@ pub mod ffi {
         fn pixel_width(&self) -> u32;
         fn pixel_height(&self) -> u32;
         fn pixel_num_channels(&self) -> u8;
+
+        // Creation
+        fn create_stream_data_box() -> Box<StreamDataImpl>;
+        fn create_stream_data_shared() -> StreamDataImplShared;
+        fn create_stream_data_shared_box(data: Box<StreamDataImpl>) -> StreamDataImplShared;
+        fn create_vec_stream_data_shared() -> Vec<StreamDataImplShared>;
     }
 
     // Node
@@ -269,6 +280,10 @@ pub mod ffi {
         fn set_attr_f32(&mut self, name: &str, value: f32);
         fn set_attr_i32(&mut self, name: &str, value: i32);
         fn set_attr_str(&mut self, name: &str, value: &str);
+
+        // Creation
+        #[cxx_name = "create_node_box"]
+        fn create_node_box_with_id(node_type: NodeType, id: u64) -> Box<NodeImpl>;
     }
 
     // Cache
@@ -276,6 +291,10 @@ pub mod ffi {
     extern "Rust" {
         type CacheImpl;
         fn len(&self) -> usize;
+
+        // Creation
+        fn create_cache_box() -> Box<CacheImpl>;
+        fn create_cache_shared() -> CacheImplShared;
     }
 
     // Graph
@@ -301,32 +320,10 @@ pub mod ffi {
         fn execute(&mut self, node_id: u64, cache: &mut Box<CacheImpl>) -> ExecuteStatus;
         fn data_debug_string(&self) -> String;
         fn output_stream(&self) -> StreamDataImplShared;
-    }
 
-    // Struct Creation
-    #[namespace = "open_comp_graph::internal"]
-    extern "Rust" {
-        #[cxx_name = "create_node_box"]
-        fn create_node_box_with_id(node_type: NodeType, id: u64) -> Box<NodeImpl>;
-
-        fn create_cache_box() -> Box<CacheImpl>;
-        fn create_cache_shared() -> CacheImplShared;
-
+        // Creation
         fn create_graph_box() -> Box<GraphImpl>;
         fn create_graph_shared() -> GraphImplShared;
-
-        fn create_stream_data_box() -> Box<StreamDataImpl>;
-        fn create_stream_data_shared() -> StreamDataImplShared;
-        fn create_stream_data_shared_box(data: Box<StreamDataImpl>) -> StreamDataImplShared;
-        fn create_vec_stream_data_shared() -> Vec<StreamDataImplShared>;
-
-        fn create_geometry_plane_box(
-            divisions_x: u32,
-            divisions_y: u32
-        ) -> Box<GeometryPlaneImpl>;
-
-        fn generate_random_id() -> u64;
-        fn generate_id_from_name(name: &str) -> u64;
     }
 
     // Geometry Plane
@@ -345,18 +342,15 @@ pub mod ffi {
         fn calc_buffer_size_vertex_uvs(&self) -> usize;
         fn calc_buffer_size_index_tris(&self) -> usize;
 
-        fn fill_buffer_vertex_positions(
-            &self,
-            buffer_vertex_positions: &mut [f32],
-        ) -> bool;
-        fn fill_buffer_vertex_uvs(
-            &self,
-            buffer_vertex_uvs: &mut [f32],
-        ) -> bool;
-        fn fill_buffer_index_tris(
-            &self,
-            buffer_index_tris: &mut [u32],
-        ) -> bool;
+        fn fill_buffer_vertex_positions(&self, buffer_vertex_positions: &mut [f32]) -> bool;
+        fn fill_buffer_vertex_uvs(&self, buffer_vertex_uvs: &mut [f32]) -> bool;
+        fn fill_buffer_index_tris(&self, buffer_index_tris: &mut [u32]) -> bool;
+
+        // Creation
+        fn create_geometry_plane_box(
+            divisions_x: u32,
+            divisions_y: u32
+        ) -> Box<GeometryPlaneImpl>;
     }
 
     // Geometry
@@ -377,6 +371,13 @@ pub mod ffi {
     extern "Rust" {
         fn initialize() -> bool;
     }
+
+    // Hashing Utilities
+    #[namespace = "open_comp_graph::internal"]
+    extern "Rust" {
+        fn generate_random_id() -> u64;
+        fn generate_id_from_name(name: &str) -> u64;
+    }
 }
 
 pub struct ThingR(usize);
@@ -396,11 +397,6 @@ fn my_test() {
     });
 }
 
-pub fn create_node_box_with_id(node_type: ffi::NodeType, id: Identifier) -> Box<NodeImpl> {
-    debug!("create_node_box(node_type={:?}, id={:?})", node_type, id);
-    Box::new(create_node(node_type, id))
-}
-
 fn create_cache_shared() -> ffi::CacheImplShared {
     debug!("create_cache_shared()");
     ffi::CacheImplShared {
@@ -408,21 +404,11 @@ fn create_cache_shared() -> ffi::CacheImplShared {
     }
 }
 
-pub fn create_cache_box() -> Box<CacheImpl> {
-    debug!("create_cache_box()");
-    Box::new(CacheImpl::new())
-}
-
 fn create_graph_shared() -> ffi::GraphImplShared {
     debug!("create_graph_shared()");
     ffi::GraphImplShared {
         inner: create_graph_box(),
     }
-}
-
-fn create_graph_box() -> Box<GraphImpl> {
-    debug!("create_graph_box()");
-    Box::new(GraphImpl::new())
 }
 
 pub fn create_vec_stream_data_shared() -> Vec<ffi::StreamDataImplShared> {
@@ -440,14 +426,4 @@ pub fn create_stream_data_shared() -> ffi::StreamDataImplShared {
 pub fn create_stream_data_shared_box(data: Box<StreamDataImpl>) -> ffi::StreamDataImplShared {
     debug!("create_stream_data_shared_box()");
     ffi::StreamDataImplShared { inner: data }
-}
-
-pub fn create_stream_data_box() -> Box<StreamDataImpl> {
-    debug!("create_stream_data_box()");
-    Box::new(StreamDataImpl::new())
-}
-
-pub fn create_geometry_plane_box(divisions_x: u32, divisions_y: u32) -> Box<GeometryPlaneImpl> {
-    debug!("create_geometry_plane_box()");
-    Box::new(GeometryPlaneImpl::new(divisions_x, divisions_y))
 }

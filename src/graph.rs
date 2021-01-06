@@ -392,3 +392,8 @@ impl GraphImpl {
         self.output.clone()
     }
 }
+
+pub fn create_graph_box() -> Box<GraphImpl> {
+    debug!("create_graph_box()");
+    Box::new(GraphImpl::new())
+}

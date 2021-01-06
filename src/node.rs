@@ -154,3 +154,8 @@ pub fn create_node(node_type: NodeType, id: Identifier) -> NodeImpl {
         _ => panic!("Invalid NodeType: {:?}", node_type),
     }
 }
+
+pub fn create_node_box_with_id(node_type: NodeType, id: Identifier) -> Box<NodeImpl> {
+    debug!("create_node_box(node_type={:?}, id={:?})", node_type, id);
+    Box::new(create_node(node_type, id))
+}

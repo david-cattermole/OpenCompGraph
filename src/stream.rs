@@ -129,3 +129,8 @@ impl StreamDataImpl {
         self.pixel_block.num_channels
     }
 }
+
+pub fn create_stream_data_box() -> Box<StreamDataImpl> {
+    debug!("create_stream_data_box()");
+    Box::new(StreamDataImpl::new())
+}
