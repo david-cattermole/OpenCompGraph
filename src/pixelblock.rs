@@ -16,6 +16,10 @@ use crate::cxxbridge::ffi::PixelDataType;
 use crate::cxxbridge::ffi::StreamDataImplShared;
 use crate::data::HashValue;
 use crate::data::Identifier;
+use crate::data::COLOR_BARS;
+use crate::data::COLOR_BARS_HEIGHT;
+use crate::data::COLOR_BARS_NUM_CHANNELS;
+use crate::data::COLOR_BARS_WIDTH;
 use crate::node::traits::AttrBlock;
 use crate::node::traits::Compute;
 use crate::node::NodeImpl;
@@ -33,6 +37,23 @@ impl PixelBlock {
     pub fn new(width: u32, height: u32, num_channels: u8) -> PixelBlock {
         let size = (width * height * num_channels as u32) as usize;
         let pixels = vec![0.5 as f32; size];
+        let pixel_data_type = PixelDataType::Float32;
+        PixelBlock {
+            width,
+            height,
+            num_channels,
+            pixel_data_type,
+            pixels,
+        }
+    }
+
+    pub fn new_color_bars() -> PixelBlock {
+        let width = COLOR_BARS_WIDTH;
+        let height = COLOR_BARS_HEIGHT;
+        let num_channels = COLOR_BARS_NUM_CHANNELS;
+        let size = (width * height * num_channels as u32) as usize;
+        // let pixels = vec![0.5 as f32; size];
+        let pixels = COLOR_BARS.to_vec();
         let pixel_data_type = PixelDataType::Float32;
         PixelBlock {
             width,

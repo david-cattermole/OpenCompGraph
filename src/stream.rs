@@ -24,13 +24,11 @@ impl StreamDataImpl {
         let state = StreamDataState::Invalid;
         let hash = 0;
 
-        let width = 2;
-        let height = 2;
-        let num_channels = 3;
-        let pixel_block = Rc::new(PixelBlock::new(width, height, num_channels));
-
-        let display_window = BBox2Df::new(0.0, 0.0, 1.0, 1.0);
-        let data_window = BBox2Df::new(0.0, 0.0, 1.0, 1.0);
+        let pixel_block = Rc::new(PixelBlock::new_color_bars());
+        let bbox_max_width = (pixel_block.width - 1) as f32;
+        let bbox_max_height = (pixel_block.height - 1) as f32;
+        let display_window = BBox2Df::new(0.0, 0.0, bbox_max_width, bbox_max_height);
+        let data_window = BBox2Df::new(0.0, 0.0, bbox_max_width, bbox_max_height);
         let color_matrix = Matrix4::identity();
         let transform_matrix = Matrix4::identity();
 
