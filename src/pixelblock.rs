@@ -7,6 +7,7 @@ use std::fmt;
 use std::hash;
 use std::hash::{Hash, Hasher};
 
+use crate::attrblock::AttrBlock;
 use crate::colorutils::convert_linear_to_srgb;
 use crate::colorutils::convert_srgb_to_linear;
 use crate::cxxbridge::ffi::AttrState;
@@ -20,7 +21,6 @@ use crate::data::COLOR_BARS;
 use crate::data::COLOR_BARS_HEIGHT;
 use crate::data::COLOR_BARS_NUM_CHANNELS;
 use crate::data::COLOR_BARS_WIDTH;
-use crate::node::traits::AttrBlock;
 use crate::node::traits::Operation;
 use crate::node::NodeImpl;
 

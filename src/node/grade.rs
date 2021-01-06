@@ -3,6 +3,7 @@ use std::collections::hash_map::DefaultHasher;
 use std::hash;
 use std::hash::Hash;
 
+use crate::attrblock::AttrBlock;
 use crate::colorutils;
 use crate::colorxform;
 use crate::cxxbridge::ffi::AttrState;
@@ -13,7 +14,6 @@ use crate::cxxbridge::ffi::StreamDataImplShared;
 use crate::data::HashValue;
 use crate::data::Identifier;
 use crate::hashutils::HashableF32;
-use crate::node::traits::AttrBlock;
 use crate::node::traits::Operation;
 use crate::node::NodeImpl;
 

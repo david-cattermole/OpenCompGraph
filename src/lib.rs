@@ -2,6 +2,7 @@
 #![allow(unused_variables)]
 #![allow(dead_code)]
 #![allow(unused_mut)]
+pub mod attrblock;
 pub mod bbox;
 pub mod cache;
 pub mod colorutils;

@@ -9,6 +9,7 @@ use std::hash::Hash;
 use std::path::Path;
 use std::string::String;
 
+use crate::attrblock::AttrBlock;
 use crate::cxxbridge::ffi::AttrState;
 use crate::cxxbridge::ffi::BBox2Df;
 use crate::cxxbridge::ffi::NodeStatus;
@@ -16,7 +17,6 @@ use crate::cxxbridge::ffi::NodeType;
 use crate::cxxbridge::ffi::StreamDataImplShared;
 use crate::data::HashValue;
 use crate::data::Identifier;
-use crate::node::traits::AttrBlock;
 use crate::node::traits::Operation;
 use crate::node::NodeImpl;
 use crate::pixelblock::PixelBlock;

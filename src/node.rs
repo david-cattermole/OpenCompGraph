@@ -1,5 +1,6 @@
 use log::{debug, error, info, warn};
 
+use crate::attrblock::AttrBlock;
 use crate::cxxbridge::ffi::AttrState;
 use crate::cxxbridge::ffi::NodeStatus;
 use crate::cxxbridge::ffi::NodeType;
@@ -25,7 +26,7 @@ pub struct NodeImpl {
     node_type: NodeType,
     id: Identifier,
     status: NodeStatus,
-    attr_block: Box<dyn traits::AttrBlock>,
+    attr_block: Box<dyn AttrBlock>,
     compute: Box<dyn traits::Operation>,
 }
 
