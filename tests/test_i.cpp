@@ -16,12 +16,12 @@ void generate_mesh(const bool debug_print,
     if (debug_print) {
         std::cout << "divisions: " << divisions_x << "x" << divisions_y << '\n';
     }
-    pos_count = ocg::internal::calc_buffer_size_vertex_positions(
-        divisions_x, divisions_y);
-    uv_count = ocg::internal::calc_buffer_size_vertex_uvs(
-        divisions_x, divisions_y);
-    tri_count = ocg::internal::calc_buffer_size_index_tris(
-        divisions_x, divisions_y);
+
+    auto geom = ocg::internal::create_geometry_plane_box(divisions_x, divisions_y);
+
+    pos_count = geom->calc_buffer_size_vertex_positions();
+    uv_count = geom->calc_buffer_size_vertex_uvs();
+    tri_count = geom->calc_buffer_size_index_tris();
     if (debug_print) {
         std::cout << "position count: " << pos_count << '\n';
         std::cout << "      uv count: " << uv_count << '\n';
@@ -40,18 +40,9 @@ void generate_mesh(const bool debug_print,
     rust::Slice<float> slice_vertex_pos{vertex_pos.data(), vertex_pos.capacity()};
     rust::Slice<float> slice_vertex_uvs{vertex_uvs.data(), vertex_uvs.capacity()};
     rust::Slice<uint32_t> slice_index_tris{index_tris.data(), index_tris.capacity()};
-    ocg::internal::fill_buffer_vertex_positions(
-        divisions_x,
-        divisions_y,
-        slice_vertex_pos);
-    ocg::internal::fill_buffer_vertex_uvs(
-        divisions_x,
-        divisions_y,
-        slice_vertex_uvs);
-    ocg::internal::fill_buffer_index_tris(
-        divisions_x,
-        divisions_y,
-        slice_index_tris);
+    geom->fill_buffer_vertex_positions(slice_vertex_pos);
+    geom->fill_buffer_vertex_uvs(slice_vertex_uvs);
+    geom->fill_buffer_index_tris(slice_index_tris);
 
     // Export
     rust::Slice<const float> const_slice_vertex_pos(

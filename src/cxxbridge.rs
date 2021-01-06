@@ -4,15 +4,8 @@ use log::{debug, error, info, warn};
 use crate::cache::CacheImpl;
 use crate::data::HashValue;
 use crate::data::Identifier;
-use crate::geom::plane::calc_buffer_size_index_tris;
-use crate::geom::plane::calc_buffer_size_vertex_positions;
-use crate::geom::plane::calc_buffer_size_vertex_uvs;
-use crate::geom::plane::calc_count_vertex_positions;
-use crate::geom::plane::calc_count_vertex_uvs;
 use crate::geom::plane::export_mesh;
-use crate::geom::plane::fill_buffer_index_tris;
-use crate::geom::plane::fill_buffer_vertex_positions;
-use crate::geom::plane::fill_buffer_vertex_uvs;
+use crate::geom::plane::GeometryPlaneImpl;
 use crate::graph::GraphImpl;
 use crate::hashutils::calculate_hash;
 use crate::hashutils::generate_id_from_name;
@@ -327,51 +320,48 @@ pub mod ffi {
         fn create_stream_data_shared_box(data: Box<StreamDataImpl>) -> StreamDataImplShared;
         fn create_vec_stream_data_shared() -> Vec<StreamDataImplShared>;
 
+        fn create_geometry_plane_box(
+            divisions_x: u32,
+            divisions_y: u32
+        ) -> Box<GeometryPlaneImpl>;
+
         fn generate_random_id() -> u64;
         fn generate_id_from_name(name: &str) -> u64;
+    }
+
+    // Geometry Plane
+    #[namespace = "open_comp_graph::internal"]
+    extern "Rust" {
+        type GeometryPlaneImpl;
+        fn divisions_x(&self) -> u32;
+        fn divisions_y(&self) -> u32;
+        fn set_divisions_x(&mut self, value: u32);
+        fn set_divisions_y(&mut self, value: u32);
+
+        fn calc_count_vertex_positions(&self) -> usize;
+        fn calc_count_vertex_uvs(&self) -> usize;
+
+        fn calc_buffer_size_vertex_positions(&self) -> usize;
+        fn calc_buffer_size_vertex_uvs(&self) -> usize;
+        fn calc_buffer_size_index_tris(&self) -> usize;
+
+        fn fill_buffer_vertex_positions(
+            &self,
+            buffer_vertex_positions: &mut [f32],
+        ) -> bool;
+        fn fill_buffer_vertex_uvs(
+            &self,
+            buffer_vertex_uvs: &mut [f32],
+        ) -> bool;
+        fn fill_buffer_index_tris(
+            &self,
+            buffer_index_tris: &mut [u32],
+        ) -> bool;
     }
 
     // Geometry
     #[namespace = "open_comp_graph::internal"]
     extern "Rust" {
-        fn calc_count_vertex_positions(
-            divisions_x: u32,
-            divisions_y: u32,
-        ) -> usize;
-        fn calc_count_vertex_uvs(
-            divisions_x: u32,
-            divisions_y: u32,
-        ) -> usize;
-
-        fn calc_buffer_size_vertex_positions(
-            divisions_x: u32,
-            divisions_y: u32,
-        ) -> usize;
-        fn calc_buffer_size_vertex_uvs(
-            divisions_x: u32,
-            divisions_y: u32,
-        ) -> usize;
-        fn calc_buffer_size_index_tris(
-            divisions_x: u32,
-            divisions_y: u32,
-        ) -> usize;
-
-        fn fill_buffer_vertex_positions(
-            divisions_x: u32,
-            divisions_y: u32,
-            buffer_vertex_positions: &mut [f32],
-        ) -> bool;
-        fn fill_buffer_vertex_uvs(
-            divisions_x: u32,
-            divisions_y: u32,
-            buffer_vertex_uvs: &mut [f32],
-        ) -> bool;
-        fn fill_buffer_index_tris(
-            divisions_x: u32,
-            divisions_y: u32,
-            buffer_index_tris: &mut [u32],
-        ) -> bool;
-
         fn export_mesh(
             buffer_vertex_positions: &[f32],
             buffer_vertex_uvs: &[f32],
@@ -455,4 +445,9 @@ pub fn create_stream_data_shared_box(data: Box<StreamDataImpl>) -> ffi::StreamDa
 pub fn create_stream_data_box() -> Box<StreamDataImpl> {
     debug!("create_stream_data_box()");
     Box::new(StreamDataImpl::new())
+}
+
+pub fn create_geometry_plane_box(divisions_x: u32, divisions_y: u32) -> Box<GeometryPlaneImpl> {
+    debug!("create_geometry_plane_box()");
+    Box::new(GeometryPlaneImpl::new(divisions_x, divisions_y))
 }

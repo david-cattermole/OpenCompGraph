@@ -983,6 +983,7 @@ namespace open_comp_graph {
     struct NodeImpl;
     struct CacheImpl;
     struct GraphImpl;
+    struct GeometryPlaneImpl;
   }
   namespace cpp {
     using ThingC = ::open_comp_graph::cpp::ThingC;
@@ -1293,6 +1294,32 @@ private:
   };
 };
 #endif // CXXBRIDGE1_STRUCT_open_comp_graph$internal$GraphImpl
+
+#ifndef CXXBRIDGE1_STRUCT_open_comp_graph$internal$GeometryPlaneImpl
+#define CXXBRIDGE1_STRUCT_open_comp_graph$internal$GeometryPlaneImpl
+struct GeometryPlaneImpl final : public ::rust::Opaque {
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint32_t divisions_x() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint32_t divisions_y() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT void set_divisions_x(::std::uint32_t value) noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT void set_divisions_y(::std::uint32_t value) noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t calc_count_vertex_positions() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t calc_count_vertex_uvs() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t calc_buffer_size_vertex_positions() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t calc_buffer_size_vertex_uvs() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t calc_buffer_size_index_tris() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT bool fill_buffer_vertex_positions(::rust::Slice<float> buffer_vertex_positions) const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT bool fill_buffer_vertex_uvs(::rust::Slice<float> buffer_vertex_uvs) const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT bool fill_buffer_index_tris(::rust::Slice<::std::uint32_t> buffer_index_tris) const noexcept;
+  ~GeometryPlaneImpl() = delete;
+
+private:
+  friend ::rust::layout;
+  struct layout {
+    static ::std::size_t size() noexcept;
+    static ::std::size_t align() noexcept;
+  };
+};
+#endif // CXXBRIDGE1_STRUCT_open_comp_graph$internal$GeometryPlaneImpl
 } // namespace internal
 
 extern "C" {
@@ -1469,25 +1496,37 @@ void open_comp_graph$internal$cxxbridge1$create_stream_data_shared_box(::open_co
 
 void open_comp_graph$internal$cxxbridge1$create_vec_stream_data_shared(::rust::Vec<::open_comp_graph::internal::StreamDataImplShared> *return$) noexcept;
 
+::open_comp_graph::internal::GeometryPlaneImpl *open_comp_graph$internal$cxxbridge1$create_geometry_plane_box(::std::uint32_t divisions_x, ::std::uint32_t divisions_y) noexcept;
+
 ::std::uint64_t open_comp_graph$internal$cxxbridge1$generate_random_id() noexcept;
 
 ::std::uint64_t open_comp_graph$internal$cxxbridge1$generate_id_from_name(::rust::Str name) noexcept;
+::std::size_t open_comp_graph$internal$cxxbridge1$GeometryPlaneImpl$operator$sizeof() noexcept;
+::std::size_t open_comp_graph$internal$cxxbridge1$GeometryPlaneImpl$operator$alignof() noexcept;
 
-::std::size_t open_comp_graph$internal$cxxbridge1$calc_count_vertex_positions(::std::uint32_t divisions_x, ::std::uint32_t divisions_y) noexcept;
+::std::uint32_t open_comp_graph$internal$cxxbridge1$GeometryPlaneImpl$divisions_x(const ::open_comp_graph::internal::GeometryPlaneImpl &self) noexcept;
 
-::std::size_t open_comp_graph$internal$cxxbridge1$calc_count_vertex_uvs(::std::uint32_t divisions_x, ::std::uint32_t divisions_y) noexcept;
+::std::uint32_t open_comp_graph$internal$cxxbridge1$GeometryPlaneImpl$divisions_y(const ::open_comp_graph::internal::GeometryPlaneImpl &self) noexcept;
 
-::std::size_t open_comp_graph$internal$cxxbridge1$calc_buffer_size_vertex_positions(::std::uint32_t divisions_x, ::std::uint32_t divisions_y) noexcept;
+void open_comp_graph$internal$cxxbridge1$GeometryPlaneImpl$set_divisions_x(::open_comp_graph::internal::GeometryPlaneImpl &self, ::std::uint32_t value) noexcept;
 
-::std::size_t open_comp_graph$internal$cxxbridge1$calc_buffer_size_vertex_uvs(::std::uint32_t divisions_x, ::std::uint32_t divisions_y) noexcept;
+void open_comp_graph$internal$cxxbridge1$GeometryPlaneImpl$set_divisions_y(::open_comp_graph::internal::GeometryPlaneImpl &self, ::std::uint32_t value) noexcept;
 
-::std::size_t open_comp_graph$internal$cxxbridge1$calc_buffer_size_index_tris(::std::uint32_t divisions_x, ::std::uint32_t divisions_y) noexcept;
+::std::size_t open_comp_graph$internal$cxxbridge1$GeometryPlaneImpl$calc_count_vertex_positions(const ::open_comp_graph::internal::GeometryPlaneImpl &self) noexcept;
 
-bool open_comp_graph$internal$cxxbridge1$fill_buffer_vertex_positions(::std::uint32_t divisions_x, ::std::uint32_t divisions_y, ::rust::Slice<float> buffer_vertex_positions) noexcept;
+::std::size_t open_comp_graph$internal$cxxbridge1$GeometryPlaneImpl$calc_count_vertex_uvs(const ::open_comp_graph::internal::GeometryPlaneImpl &self) noexcept;
 
-bool open_comp_graph$internal$cxxbridge1$fill_buffer_vertex_uvs(::std::uint32_t divisions_x, ::std::uint32_t divisions_y, ::rust::Slice<float> buffer_vertex_uvs) noexcept;
+::std::size_t open_comp_graph$internal$cxxbridge1$GeometryPlaneImpl$calc_buffer_size_vertex_positions(const ::open_comp_graph::internal::GeometryPlaneImpl &self) noexcept;
 
-bool open_comp_graph$internal$cxxbridge1$fill_buffer_index_tris(::std::uint32_t divisions_x, ::std::uint32_t divisions_y, ::rust::Slice<::std::uint32_t> buffer_index_tris) noexcept;
+::std::size_t open_comp_graph$internal$cxxbridge1$GeometryPlaneImpl$calc_buffer_size_vertex_uvs(const ::open_comp_graph::internal::GeometryPlaneImpl &self) noexcept;
+
+::std::size_t open_comp_graph$internal$cxxbridge1$GeometryPlaneImpl$calc_buffer_size_index_tris(const ::open_comp_graph::internal::GeometryPlaneImpl &self) noexcept;
+
+bool open_comp_graph$internal$cxxbridge1$GeometryPlaneImpl$fill_buffer_vertex_positions(const ::open_comp_graph::internal::GeometryPlaneImpl &self, ::rust::Slice<float> buffer_vertex_positions) noexcept;
+
+bool open_comp_graph$internal$cxxbridge1$GeometryPlaneImpl$fill_buffer_vertex_uvs(const ::open_comp_graph::internal::GeometryPlaneImpl &self, ::rust::Slice<float> buffer_vertex_uvs) noexcept;
+
+bool open_comp_graph$internal$cxxbridge1$GeometryPlaneImpl$fill_buffer_index_tris(const ::open_comp_graph::internal::GeometryPlaneImpl &self, ::rust::Slice<::std::uint32_t> buffer_index_tris) noexcept;
 
 void open_comp_graph$internal$cxxbridge1$export_mesh(::rust::Slice<const float> buffer_vertex_positions, ::rust::Slice<const float> buffer_vertex_uvs, ::rust::Slice<const ::std::uint32_t> buffer_index_tris, ::rust::Str file_path) noexcept;
 } // extern "C"
@@ -1874,6 +1913,10 @@ OPENCOMPGRAPH_SYMBOL_EXPORT ::rust::Vec<::open_comp_graph::internal::StreamDataI
   return ::std::move(return$.value);
 }
 
+OPENCOMPGRAPH_SYMBOL_EXPORT ::rust::Box<::open_comp_graph::internal::GeometryPlaneImpl> create_geometry_plane_box(::std::uint32_t divisions_x, ::std::uint32_t divisions_y) noexcept {
+  return ::rust::Box<::open_comp_graph::internal::GeometryPlaneImpl>::from_raw(open_comp_graph$internal$cxxbridge1$create_geometry_plane_box(divisions_x, divisions_y));
+}
+
 OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint64_t generate_random_id() noexcept {
   return open_comp_graph$internal$cxxbridge1$generate_random_id();
 }
@@ -1882,36 +1925,60 @@ OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint64_t generate_id_from_name(::rust::Str na
   return open_comp_graph$internal$cxxbridge1$generate_id_from_name(name);
 }
 
-OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t calc_count_vertex_positions(::std::uint32_t divisions_x, ::std::uint32_t divisions_y) noexcept {
-  return open_comp_graph$internal$cxxbridge1$calc_count_vertex_positions(divisions_x, divisions_y);
+::std::size_t GeometryPlaneImpl::layout::size() noexcept {
+  return open_comp_graph$internal$cxxbridge1$GeometryPlaneImpl$operator$sizeof();
 }
 
-OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t calc_count_vertex_uvs(::std::uint32_t divisions_x, ::std::uint32_t divisions_y) noexcept {
-  return open_comp_graph$internal$cxxbridge1$calc_count_vertex_uvs(divisions_x, divisions_y);
+::std::size_t GeometryPlaneImpl::layout::align() noexcept {
+  return open_comp_graph$internal$cxxbridge1$GeometryPlaneImpl$operator$alignof();
 }
 
-OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t calc_buffer_size_vertex_positions(::std::uint32_t divisions_x, ::std::uint32_t divisions_y) noexcept {
-  return open_comp_graph$internal$cxxbridge1$calc_buffer_size_vertex_positions(divisions_x, divisions_y);
+OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint32_t GeometryPlaneImpl::divisions_x() const noexcept {
+  return open_comp_graph$internal$cxxbridge1$GeometryPlaneImpl$divisions_x(*this);
 }
 
-OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t calc_buffer_size_vertex_uvs(::std::uint32_t divisions_x, ::std::uint32_t divisions_y) noexcept {
-  return open_comp_graph$internal$cxxbridge1$calc_buffer_size_vertex_uvs(divisions_x, divisions_y);
+OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint32_t GeometryPlaneImpl::divisions_y() const noexcept {
+  return open_comp_graph$internal$cxxbridge1$GeometryPlaneImpl$divisions_y(*this);
 }
 
-OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t calc_buffer_size_index_tris(::std::uint32_t divisions_x, ::std::uint32_t divisions_y) noexcept {
-  return open_comp_graph$internal$cxxbridge1$calc_buffer_size_index_tris(divisions_x, divisions_y);
+OPENCOMPGRAPH_SYMBOL_EXPORT void GeometryPlaneImpl::set_divisions_x(::std::uint32_t value) noexcept {
+  open_comp_graph$internal$cxxbridge1$GeometryPlaneImpl$set_divisions_x(*this, value);
 }
 
-OPENCOMPGRAPH_SYMBOL_EXPORT bool fill_buffer_vertex_positions(::std::uint32_t divisions_x, ::std::uint32_t divisions_y, ::rust::Slice<float> buffer_vertex_positions) noexcept {
-  return open_comp_graph$internal$cxxbridge1$fill_buffer_vertex_positions(divisions_x, divisions_y, buffer_vertex_positions);
+OPENCOMPGRAPH_SYMBOL_EXPORT void GeometryPlaneImpl::set_divisions_y(::std::uint32_t value) noexcept {
+  open_comp_graph$internal$cxxbridge1$GeometryPlaneImpl$set_divisions_y(*this, value);
 }
 
-OPENCOMPGRAPH_SYMBOL_EXPORT bool fill_buffer_vertex_uvs(::std::uint32_t divisions_x, ::std::uint32_t divisions_y, ::rust::Slice<float> buffer_vertex_uvs) noexcept {
-  return open_comp_graph$internal$cxxbridge1$fill_buffer_vertex_uvs(divisions_x, divisions_y, buffer_vertex_uvs);
+OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t GeometryPlaneImpl::calc_count_vertex_positions() const noexcept {
+  return open_comp_graph$internal$cxxbridge1$GeometryPlaneImpl$calc_count_vertex_positions(*this);
 }
 
-OPENCOMPGRAPH_SYMBOL_EXPORT bool fill_buffer_index_tris(::std::uint32_t divisions_x, ::std::uint32_t divisions_y, ::rust::Slice<::std::uint32_t> buffer_index_tris) noexcept {
-  return open_comp_graph$internal$cxxbridge1$fill_buffer_index_tris(divisions_x, divisions_y, buffer_index_tris);
+OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t GeometryPlaneImpl::calc_count_vertex_uvs() const noexcept {
+  return open_comp_graph$internal$cxxbridge1$GeometryPlaneImpl$calc_count_vertex_uvs(*this);
+}
+
+OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t GeometryPlaneImpl::calc_buffer_size_vertex_positions() const noexcept {
+  return open_comp_graph$internal$cxxbridge1$GeometryPlaneImpl$calc_buffer_size_vertex_positions(*this);
+}
+
+OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t GeometryPlaneImpl::calc_buffer_size_vertex_uvs() const noexcept {
+  return open_comp_graph$internal$cxxbridge1$GeometryPlaneImpl$calc_buffer_size_vertex_uvs(*this);
+}
+
+OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t GeometryPlaneImpl::calc_buffer_size_index_tris() const noexcept {
+  return open_comp_graph$internal$cxxbridge1$GeometryPlaneImpl$calc_buffer_size_index_tris(*this);
+}
+
+OPENCOMPGRAPH_SYMBOL_EXPORT bool GeometryPlaneImpl::fill_buffer_vertex_positions(::rust::Slice<float> buffer_vertex_positions) const noexcept {
+  return open_comp_graph$internal$cxxbridge1$GeometryPlaneImpl$fill_buffer_vertex_positions(*this, buffer_vertex_positions);
+}
+
+OPENCOMPGRAPH_SYMBOL_EXPORT bool GeometryPlaneImpl::fill_buffer_vertex_uvs(::rust::Slice<float> buffer_vertex_uvs) const noexcept {
+  return open_comp_graph$internal$cxxbridge1$GeometryPlaneImpl$fill_buffer_vertex_uvs(*this, buffer_vertex_uvs);
+}
+
+OPENCOMPGRAPH_SYMBOL_EXPORT bool GeometryPlaneImpl::fill_buffer_index_tris(::rust::Slice<::std::uint32_t> buffer_index_tris) const noexcept {
+  return open_comp_graph$internal$cxxbridge1$GeometryPlaneImpl$fill_buffer_index_tris(*this, buffer_index_tris);
 }
 
 OPENCOMPGRAPH_SYMBOL_EXPORT void export_mesh(::rust::Slice<const float> buffer_vertex_positions, ::rust::Slice<const float> buffer_vertex_uvs, ::rust::Slice<const ::std::uint32_t> buffer_index_tris, ::rust::Str file_path) noexcept {
@@ -1973,6 +2040,10 @@ void cxxbridge1$box$open_comp_graph$internal$CacheImpl$drop(::rust::Box<::open_c
 ::open_comp_graph::internal::NodeImpl *cxxbridge1$box$open_comp_graph$internal$NodeImpl$alloc() noexcept;
 void cxxbridge1$box$open_comp_graph$internal$NodeImpl$dealloc(::open_comp_graph::internal::NodeImpl *) noexcept;
 void cxxbridge1$box$open_comp_graph$internal$NodeImpl$drop(::rust::Box<::open_comp_graph::internal::NodeImpl> *ptr) noexcept;
+
+::open_comp_graph::internal::GeometryPlaneImpl *cxxbridge1$box$open_comp_graph$internal$GeometryPlaneImpl$alloc() noexcept;
+void cxxbridge1$box$open_comp_graph$internal$GeometryPlaneImpl$dealloc(::open_comp_graph::internal::GeometryPlaneImpl *) noexcept;
+void cxxbridge1$box$open_comp_graph$internal$GeometryPlaneImpl$drop(::rust::Box<::open_comp_graph::internal::GeometryPlaneImpl> *ptr) noexcept;
 } // extern "C"
 
 namespace rust {
@@ -2064,6 +2135,18 @@ OPENCOMPGRAPH_SYMBOL_EXPORT void Box<::open_comp_graph::internal::NodeImpl>::all
 template <>
 OPENCOMPGRAPH_SYMBOL_EXPORT void Box<::open_comp_graph::internal::NodeImpl>::drop() noexcept {
   cxxbridge1$box$open_comp_graph$internal$NodeImpl$drop(this);
+}
+template <>
+OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::internal::GeometryPlaneImpl *Box<::open_comp_graph::internal::GeometryPlaneImpl>::allocation::alloc() noexcept {
+  return cxxbridge1$box$open_comp_graph$internal$GeometryPlaneImpl$alloc();
+}
+template <>
+OPENCOMPGRAPH_SYMBOL_EXPORT void Box<::open_comp_graph::internal::GeometryPlaneImpl>::allocation::dealloc(::open_comp_graph::internal::GeometryPlaneImpl *ptr) noexcept {
+  cxxbridge1$box$open_comp_graph$internal$GeometryPlaneImpl$dealloc(ptr);
+}
+template <>
+OPENCOMPGRAPH_SYMBOL_EXPORT void Box<::open_comp_graph::internal::GeometryPlaneImpl>::drop() noexcept {
+  cxxbridge1$box$open_comp_graph$internal$GeometryPlaneImpl$drop(this);
 }
 } // namespace cxxbridge1
 } // namespace rust

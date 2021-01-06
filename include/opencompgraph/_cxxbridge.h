@@ -921,6 +921,7 @@ namespace open_comp_graph {
     struct NodeImpl;
     struct CacheImpl;
     struct GraphImpl;
+    struct GeometryPlaneImpl;
   }
   namespace cpp {
     using ThingC = ::open_comp_graph::cpp::ThingC;
@@ -1232,6 +1233,32 @@ private:
 };
 #endif // CXXBRIDGE1_STRUCT_open_comp_graph$internal$GraphImpl
 
+#ifndef CXXBRIDGE1_STRUCT_open_comp_graph$internal$GeometryPlaneImpl
+#define CXXBRIDGE1_STRUCT_open_comp_graph$internal$GeometryPlaneImpl
+struct GeometryPlaneImpl final : public ::rust::Opaque {
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint32_t divisions_x() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint32_t divisions_y() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT void set_divisions_x(::std::uint32_t value) noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT void set_divisions_y(::std::uint32_t value) noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t calc_count_vertex_positions() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t calc_count_vertex_uvs() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t calc_buffer_size_vertex_positions() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t calc_buffer_size_vertex_uvs() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t calc_buffer_size_index_tris() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT bool fill_buffer_vertex_positions(::rust::Slice<float> buffer_vertex_positions) const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT bool fill_buffer_vertex_uvs(::rust::Slice<float> buffer_vertex_uvs) const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT bool fill_buffer_index_tris(::rust::Slice<::std::uint32_t> buffer_index_tris) const noexcept;
+  ~GeometryPlaneImpl() = delete;
+
+private:
+  friend ::rust::layout;
+  struct layout {
+    static ::std::size_t size() noexcept;
+    static ::std::size_t align() noexcept;
+  };
+};
+#endif // CXXBRIDGE1_STRUCT_open_comp_graph$internal$GeometryPlaneImpl
+
 OPENCOMPGRAPH_SYMBOL_EXPORT void print_r(const ::open_comp_graph::internal::ThingR &r) noexcept;
 
 OPENCOMPGRAPH_SYMBOL_EXPORT ::rust::Box<::open_comp_graph::internal::NodeImpl> create_node_box(::open_comp_graph::NodeType node_type, ::std::uint64_t id) noexcept;
@@ -1252,25 +1279,11 @@ OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::internal::StreamDataImplShared cr
 
 OPENCOMPGRAPH_SYMBOL_EXPORT ::rust::Vec<::open_comp_graph::internal::StreamDataImplShared> create_vec_stream_data_shared() noexcept;
 
+OPENCOMPGRAPH_SYMBOL_EXPORT ::rust::Box<::open_comp_graph::internal::GeometryPlaneImpl> create_geometry_plane_box(::std::uint32_t divisions_x, ::std::uint32_t divisions_y) noexcept;
+
 OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint64_t generate_random_id() noexcept;
 
 OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint64_t generate_id_from_name(::rust::Str name) noexcept;
-
-OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t calc_count_vertex_positions(::std::uint32_t divisions_x, ::std::uint32_t divisions_y) noexcept;
-
-OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t calc_count_vertex_uvs(::std::uint32_t divisions_x, ::std::uint32_t divisions_y) noexcept;
-
-OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t calc_buffer_size_vertex_positions(::std::uint32_t divisions_x, ::std::uint32_t divisions_y) noexcept;
-
-OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t calc_buffer_size_vertex_uvs(::std::uint32_t divisions_x, ::std::uint32_t divisions_y) noexcept;
-
-OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t calc_buffer_size_index_tris(::std::uint32_t divisions_x, ::std::uint32_t divisions_y) noexcept;
-
-OPENCOMPGRAPH_SYMBOL_EXPORT bool fill_buffer_vertex_positions(::std::uint32_t divisions_x, ::std::uint32_t divisions_y, ::rust::Slice<float> buffer_vertex_positions) noexcept;
-
-OPENCOMPGRAPH_SYMBOL_EXPORT bool fill_buffer_vertex_uvs(::std::uint32_t divisions_x, ::std::uint32_t divisions_y, ::rust::Slice<float> buffer_vertex_uvs) noexcept;
-
-OPENCOMPGRAPH_SYMBOL_EXPORT bool fill_buffer_index_tris(::std::uint32_t divisions_x, ::std::uint32_t divisions_y, ::rust::Slice<::std::uint32_t> buffer_index_tris) noexcept;
 
 OPENCOMPGRAPH_SYMBOL_EXPORT void export_mesh(::rust::Slice<const float> buffer_vertex_positions, ::rust::Slice<const float> buffer_vertex_uvs, ::rust::Slice<const ::std::uint32_t> buffer_index_tris, ::rust::Str file_path) noexcept;
 } // namespace internal
