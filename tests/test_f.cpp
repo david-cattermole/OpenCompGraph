@@ -24,10 +24,10 @@ int test_f(const bool debug_print, std::shared_ptr<ocg::Cache> cache) {
     auto write3_node = graph.create_node(ocg::NodeType::kWriteImage, "writeimage3");
 
     graph.set_node_attr_str(read_node, "file_path", "tests/data/oiio-images/tahoe-gps.jpg");
-    graph.set_node_attr_f32(grade_overexpose_node, "multiply", 2.0f);
-    graph.set_node_attr_f32(grade_underexpose_node, "multiply", 0.5f);
-    graph.set_node_attr_f32(grade_dark_node, "multiply", 0.25f);
-    graph.set_node_attr_f32(grade_light_node, "multiply", 1.2f);
+    graph.set_node_attr_f32(grade_overexpose_node, "multiply_r", 2.0f);
+    graph.set_node_attr_f32(grade_underexpose_node, "multiply_r", 0.5f);
+    graph.set_node_attr_f32(grade_dark_node, "multiply_r", 0.25f);
+    graph.set_node_attr_f32(grade_light_node, "multiply_r", 1.2f);
     graph.set_node_attr_str(write1_node, "file_path", "./tests/data/out/test_f_out1.png");
     graph.set_node_attr_str(write2_node, "file_path", "./tests/data/out/test_f_out2.png");
     graph.set_node_attr_str(write3_node, "file_path", "./tests/data/out/test_f_out3.png");

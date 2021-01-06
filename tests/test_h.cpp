@@ -16,7 +16,7 @@ int test_h(const bool debug_print, std::shared_ptr<ocg::Cache> cache) {
 
     graph.set_node_attr_str(
         read_node, "file_path", "tests/data/checker_8bit_rgba_8x8.png");
-    graph.set_node_attr_f32(grade_node, "multiply", 2.0);
+    graph.set_node_attr_f32(grade_node, "multiply_g", 2.0);
 
     // Connect nodes together and execute
     graph.connect(read_node, grade_node, 0);
