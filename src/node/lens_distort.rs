@@ -81,30 +81,30 @@ impl Operation for LensDistortOperation {
         // debug!("AttrBlock: {:?}", attr_block);
         // debug!("Inputs: {:?}", inputs);
         // debug!("Output: {:?}", output);
-        let enable = attr_block.get_attr_i32("enable");
-        if enable != 1 {
-            return NodeStatus::Error;
-        }
 
         match inputs.len() {
             0 => NodeStatus::Error,
             _ => {
                 let input = &inputs[0].inner;
+                let mut copy = input.clone();
 
-                // Calculate Deformation.
-                let mut deformer = Deformer::new(DeformerType::Brownian);
-                let k1 = attr_block.get_attr_f32("k1");
-                let k2 = attr_block.get_attr_f32("k2");
-                let center_x = attr_block.get_attr_f32("center_x");
-                let center_y = attr_block.get_attr_f32("center_y");
-                deformer.set_attr_f32("k1", k1);
-                deformer.set_attr_f32("k2", k2);
-                deformer.set_attr_f32("center_x", center_x);
-                deformer.set_attr_f32("center_y", center_y);
+                let enable = attr_block.get_attr_i32("enable");
+                if enable != 1 {
+                } else {
+                    // Calculate Deformation.
+                    let mut deformer = Deformer::new(DeformerType::Brownian);
+                    let k1 = attr_block.get_attr_f32("k1");
+                    let k2 = attr_block.get_attr_f32("k2");
+                    let center_x = attr_block.get_attr_f32("center_x");
+                    let center_y = attr_block.get_attr_f32("center_y");
+                    deformer.set_attr_f32("k1", k1);
+                    deformer.set_attr_f32("k2", k2);
+                    deformer.set_attr_f32("center_x", center_x);
+                    deformer.set_attr_f32("center_y", center_y);
+                    copy.push_deformer(deformer);
+                }
 
                 // Set Output data
-                let mut copy = input.clone();
-                copy.push_deformer(deformer);
                 let hash_value = self.cache_hash(node_type_id, &attr_block, inputs);
                 copy.set_hash(hash_value);
                 output.inner = copy;
