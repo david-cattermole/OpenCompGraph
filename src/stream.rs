@@ -85,12 +85,10 @@ impl StreamDataImpl {
     }
 
     pub fn color_matrix(&self) -> Matrix4 {
-        debug!("StreamDataImpl.color_matrix: {:#?}", self.color_matrix);
         self.color_matrix
     }
 
     pub fn set_color_matrix(&mut self, value: Matrix4) {
-        debug!("StreamDataImpl.set_color_matrix: {:#?}", value);
         self.color_matrix = value;
     }
 
