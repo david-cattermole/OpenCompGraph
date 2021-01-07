@@ -16,6 +16,7 @@ use crate::cxxbridge::ffi::NodeType;
 use crate::cxxbridge::ffi::StreamDataImplShared;
 use crate::data::HashValue;
 use crate::data::Identifier;
+use crate::deformutils;
 use crate::node::traits::Operation;
 use crate::node::NodeImpl;
 
@@ -78,15 +79,48 @@ impl Operation for WriteImageOperation {
                 // Copy input data
                 let mut copy = &mut input.clone();
                 let num_channels = copy.pixel_num_channels();
+                let width = copy.pixel_width();
+                let height = copy.pixel_height();
+                let display_window = copy.display_window();
+                let data_window = copy.data_window();
+                let transform_matrix = copy.transform_matrix().to_na_matrix();
+                let src_pixel_block = copy.pixel_block();
+                let mut pixel_block = copy.pixel_block().clone();
+
+                {
+                    // Apply Deformations.
+                    //
+                    // TODO: Apply 'transform_matrix' as part of the
+                    // deformation, so we only resample the image once.
+                    //
+                    // TODO: Determine the destination size and
+                    // pre-allocate memory for it.
+                    let src_pixels = &src_pixel_block.pixels[..];
+                    let mut pixels = &mut pixel_block.pixels;
+                    deformutils::apply_deformers_to_pixels(
+                        &copy.deformers(),
+                        // display_window,
+                        // data_window,
+                        width,
+                        height,
+                        num_channels,
+                        &src_pixels,
+                        width,
+                        height,
+                        num_channels,
+                        &mut pixels[..],
+                    );
+                }
 
                 // Apply Color Matrix
-                let color_matrix = copy.color_matrix().to_na_matrix();
-                let pixel_block = copy.pixel_block_as_mut();
-                let mut pixels = &mut pixel_block.pixels;
-                colorutils::apply_color_matrix_inplace(pixels, num_channels, color_matrix);
+                {
+                    let color_matrix = copy.color_matrix().to_na_matrix();
+                    let mut pixels = &mut pixel_block.pixels;
+                    colorutils::apply_color_matrix_inplace(pixels, num_channels, color_matrix);
+                }
 
+                // Write pixels
                 let img = pixel_block.to_image_buffer_rgb_u8();
-
                 let file_path = attr_block.get_attr_str("file_path");
                 debug!("Writing... {:?}", file_path);
                 let ok = match img.save(file_path) {

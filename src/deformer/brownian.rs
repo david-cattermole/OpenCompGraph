@@ -1,20 +1,11 @@
 use log::{debug, error, info, warn};
-use std::collections::hash_map::DefaultHasher;
-use std::hash;
-use std::hash::Hash;
-
-use crate::attrblock::AttrBlock;
-use crate::cxxbridge::ffi::AttrState;
-use crate::data::HashValue;
-use crate::data::Identifier;
-use crate::hashutils::HashableF32;
 
 #[derive(Debug)]
 pub struct Parameters {
-    xc: f32,
-    yc: f32,
-    k1: f32,
-    k2: f32,
+    pub xc: f32,
+    pub yc: f32,
+    pub k1: f32,
+    pub k2: f32,
 }
 
 impl Parameters {
@@ -37,7 +28,7 @@ impl Parameters {
 ///   r = sqrt(pow(xd - xc, 2) + pow(yd - yc, 2))
 ///
 #[inline]
-fn apply_distortion_model_brownian_degree4(
+pub fn apply_distortion_model_brownian_degree4(
     xd: f32,
     yd: f32,
     xc: f32,
@@ -53,33 +44,4 @@ fn apply_distortion_model_brownian_degree4(
     let yu = yd + ((yd - yc) * ((k1 * r2) + (k2 * r4)));
 
     (xu, yu)
-}
-
-/// Given a slice of values, each 3 elements are expected to be a XYZ,
-/// where only X and Y are deformed.
-pub fn deform_slice_by_3_in_place(buffer: &mut [f32], parameters: Parameters) {
-    debug!(
-        "deform_slice_by_3_in_place: {} {:#?}",
-        buffer.len(),
-        parameters
-    );
-    let xc = parameters.xc;
-    let yc = parameters.yc;
-    let k1 = parameters.k1;
-    let k2 = parameters.k2;
-
-    let step_num = 3;
-    let count = buffer.len() / step_num;
-    for i in 0..count {
-        let index = i * step_num;
-
-        let x = buffer[index + 0];
-        let y = buffer[index + 1];
-        // Z is never changed, only X and Y are modified.
-
-        let (xu, yu) = apply_distortion_model_brownian_degree4(x, y, xc, yc, k1, k2);
-
-        buffer[index + 0] = xu;
-        buffer[index + 1] = yu;
-    }
 }

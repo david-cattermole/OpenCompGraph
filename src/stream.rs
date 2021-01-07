@@ -100,9 +100,49 @@ impl StreamDataImpl {
         self.transform_matrix = value;
     }
 
+    // pub fn apply_deformers(&self, src: &[f32], dst: &mut [f32]) {
+    //     deformutils::apply_deformers(&self.deformers, &src, dst);
+    // }
+
+    // TODO: Rename this (and in the C++ wrapper code).
     pub fn apply_deformers(&self, buffer: &mut [f32]) {
         debug!("StreamData.apply_deformers...");
-        deformutils::apply_deformers(&self.deformers, buffer);
+        deformutils::apply_deformers_to_positions(&self.deformers, buffer);
+    }
+
+    pub fn apply_deformers_to_pixels(
+        &self,
+        src: &[f32],
+        src_width: u32,
+        src_height: u32,
+        src_num_channels: u8,
+    ) -> Box<Vec<f32>> {
+        debug!("StreamData.apply_deformers...");
+
+        // TODO: Calculate the needed image dimensions here using the
+        // bounding box, then allocate enough memory.
+        let dst_width = src_width;
+        let dst_height = src_height;
+        let dst_num_channels = src_num_channels;
+        let dst_size = (dst_width * dst_height * dst_num_channels as u32) as usize;
+        let mut dst_box = Box::new(vec![0.0 as f32; dst_size]);
+        let mut dst = &mut dst_box[..];
+
+        deformutils::apply_deformers_to_pixels(
+            &self.deformers,
+            // display_window,
+            // data_window,
+            src_width,
+            src_height,
+            src_num_channels,
+            src,
+            dst_width,
+            dst_height,
+            dst_num_channels,
+            dst,
+        );
+
+        dst_box
     }
 
     pub fn deformers(&self) -> &Vec<Deformer> {
