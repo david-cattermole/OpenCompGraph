@@ -124,6 +124,8 @@ impl AttrBlock for LensDistortAttrs {
             "enable" => AttrState::Exists,
             "k1" => AttrState::Exists,
             "k2" => AttrState::Exists,
+            "center_x" => AttrState::Exists,
+            "center_y" => AttrState::Exists,
             _ => AttrState::Missing,
         }
     }
