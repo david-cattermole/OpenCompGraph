@@ -20,6 +20,7 @@ pub mod lens_distort;
 pub mod null;
 pub mod read_image;
 pub mod traits;
+pub mod transform;
 pub mod write_image;
 
 #[derive(Debug)]
@@ -154,6 +155,7 @@ pub fn create_node(node_type: NodeType, id: Identifier) -> NodeImpl {
         NodeType::LensDistort => lens_distort::new(id),
         NodeType::Null => null::new(id),
         NodeType::Grade => grade::new(id),
+        NodeType::Transform => transform::new(id),
         _ => panic!("Invalid NodeType: {:?}", node_type),
     }
 }

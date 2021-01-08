@@ -131,8 +131,9 @@ pub mod ffi {
         // // Time????
         // FrameHold,
 
-        // // Transform
-        // TransformImage,
+        // Transform
+        #[cxx_name = "kTransform"]
+        Transform = 5,
         // CropImage,
         // ReformatImage,
 

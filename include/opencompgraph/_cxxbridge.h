@@ -1040,6 +1040,7 @@ enum class NodeType : ::std::uint8_t {
   kNull = 0,
   kReadImage = 1,
   kWriteImage = 2,
+  kTransform = 5,
   kGrade = 3,
   kLensDistort = 4,
 };

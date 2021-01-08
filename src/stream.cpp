@@ -56,6 +56,10 @@ Matrix4 StreamData::color_matrix() const noexcept {
     return this->inner.inner->color_matrix();
 };
 
+Matrix4 StreamData::transform_matrix() const noexcept {
+    return this->inner.inner->transform_matrix();
+};
+
 size_t StreamData::deformers_len() const noexcept {
     return this->inner.inner->deformers_len();
 };

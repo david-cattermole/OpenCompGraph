@@ -37,7 +37,7 @@ void generate_mesh(const bool debug_print,
     vertex_uvs.reserve(uv_count);
     index_tris.reserve(tri_count);
 
-    // Generate mesh.
+    // Generate mesh data.
     rust::Slice<float> slice_vertex_pos{vertex_pos.data(), vertex_pos.capacity()};
     rust::Slice<float> slice_vertex_uvs{vertex_uvs.data(), vertex_uvs.capacity()};
     rust::Slice<uint32_t> slice_index_tris{index_tris.data(), index_tris.capacity()};
@@ -49,6 +49,10 @@ void generate_mesh(const bool debug_print,
     if (stream_data.deformers_len() > 0) {
         stream_data.apply_deformers(slice_vertex_pos);
     }
+
+    // TODO: Apply the image 2D transforms (from the StreamData).
+
+    // TODO: Apply the 3D transform (from the StreamData).
 
     // Export
     rust::Slice<const float> const_slice_vertex_pos(

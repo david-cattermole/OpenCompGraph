@@ -21,3 +21,4 @@ pub mod node;
 pub mod pathutils;
 pub mod pixelblock;
 pub mod stream;
+pub mod xform;
