@@ -32,8 +32,8 @@ pub type Identifier = u64;
 // Note: To make things even (only 8 entries), we skip the "75% white"
 // value.
 //
-pub static COLOR_BARS_WIDTH: u32 = 8;
-pub static COLOR_BARS_HEIGHT: u32 = 8;
+pub static COLOR_BARS_WIDTH: u32 = 4;
+pub static COLOR_BARS_HEIGHT: u32 = 4;
 pub static COLOR_BARS_NUM_CHANNELS: u8 = 3;
 pub static COLOR_BARS: &'static [f32] = &[
     // Row 0
