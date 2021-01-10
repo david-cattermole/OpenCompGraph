@@ -16,8 +16,9 @@ int test_a(const bool debug_print, std::shared_ptr<ocg::Cache> cache) {
     auto lens_node = graph.create_node(ocg::NodeType::kLensDistort, "lens_node");
     auto write_node = graph.create_node(ocg::NodeType::kWriteImage, "write_node");
     graph.set_node_attr_str(read_node, "file_path", "./tests/data/checker_8bit_rgba_3840x2160.png");
-    graph.set_node_attr_f32(lens_node, "k1", 0.2f);
+    graph.set_node_attr_f32(lens_node, "k1", -0.2f);
     graph.set_node_attr_f32(lens_node, "k2", -0.05f);
+    graph.set_node_attr_f32(lens_node, "center_x", 0.0f);
     graph.set_node_attr_str(write_node, "file_path", "./tests/data/out/test_a_out1.jpg");
 
     graph.connect(read_node, lens_node, 0);
