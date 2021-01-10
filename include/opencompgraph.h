@@ -3,7 +3,6 @@
 
 #include <rust/cxx.h>
 #include <opencompgraph/_cxxbridge.h>
-#include <opencompgraph/cpp.h>
 #include <opencompgraph/cache.h>
 #include <opencompgraph/debug.h>
 #include <opencompgraph/graph.h>
