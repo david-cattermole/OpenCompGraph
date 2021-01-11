@@ -61,6 +61,7 @@ worked on.
 | OpenColorIO integration for accurate and configurable color workflow.        | To be started |
 | Create a Python API to wrap the library.                                     | To be started |
 | R&D - Decrease RAM usage while still working in floating-point linear color. | To be started |
+| Write out cached data as loadable files for improved read-performance.       | To be started |
 
 These are the nodes that are planed or currently implemented.
 
