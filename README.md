@@ -49,7 +49,7 @@ worked on.
 | Pixel Deformer node data concatenation (lens distortion)                     |          Done |
 | Color Matrix node data concatenation (lens distortion)                       |          Done |
 | Image Sequence caching and real-time playback.                               |   In progress |
-| Multi-threaded/asyncronous execution.                                        | To be started |
+| Multi-threaded/asyncronous graph execution.                                  | To be started |
 | Configuration with files and environment variables.                          |   In progress |
 | Internal Unsigned Integer 8-bit Pixel Format.                                | To be started |
 | Internal Unsigned Integer 16-bit Pixel Format.                               | To be started |
