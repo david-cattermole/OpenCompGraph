@@ -8,6 +8,13 @@ pub type EdgeIdx = petgraph::graph::EdgeIndex<GraphIdx>;
 pub type HashValue = u64;
 pub type Identifier = u64;
 
+// Memory Conversion
+pub const BYTES_TO_KILOBYTES: usize = 1024; // int(pow(2, 10))
+pub const BYTES_TO_MEGABYTES: usize = 1048576; // int(pow(2, 20))
+pub const BYTES_TO_GIGABYTES: usize = 1073741824; // int(pow(2, 30))
+pub const KILOBYTES_TO_MEGABYTES: usize = 1024; // int(pow(2, 10))
+pub const KILOBYTES_TO_GIGABYTES: usize = 1048576; // int(pow(2, 20))
+
 // Color Bars Texture, for debug.
 //
 // https://en.wikipedia.org/wiki/SMPTE_color_bars
