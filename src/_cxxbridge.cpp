@@ -1,6 +1,7 @@
 #include "rust/cxx.h"
 #include "opencompgraph/symbol_export.h"
 #include "opencompgraph/cpp.h"
+#include "opencompgraph/systemmemory.h"
 #include <algorithm>
 #include <array>
 #include <cstddef>

@@ -215,6 +215,13 @@ pub mod ffi {
         // fn run_sharedthing(state: SharedThing);
     }
 
+    // System Memory Utilities
+    #[namespace = "open_comp_graph::internal"]
+    unsafe extern "C++" {
+        include!("opencompgraph/systemmemory.h");
+        fn get_total_system_memory_as_bytes() -> usize;
+    }
+
     // PixelBlock
     #[namespace = "open_comp_graph::internal"]
     extern "Rust" {
