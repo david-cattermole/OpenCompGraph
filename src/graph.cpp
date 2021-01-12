@@ -7,7 +7,8 @@
 
 namespace open_comp_graph {
 
-Graph::Graph() noexcept : inner{internal::create_graph_shared()} {
+Graph::Graph() noexcept
+        : inner{internal::create_graph_shared()} {
     // std::cout << "Graph()" << '\n';
 }
 
@@ -73,7 +74,6 @@ rust::Str Graph::get_node_attr_str(const Node &node, rust::Str name) const noexc
 
 void Graph::set_node_attr_f32(const Node &node, rust::Str name, float value) noexcept {
     auto node_id = node.get_id();
-    // std::cout << "Graph::set_node_attr_f32: name=" << name << " value="  << value << '\n';
     return this->inner.inner->set_node_attr_f32(node_id, name, value);
 }
 
@@ -82,7 +82,7 @@ void Graph::set_node_attr_i32(const Node &node, rust::Str name, int32_t value) n
     return this->inner.inner->set_node_attr_i32(node_id, name, value);
 }
 
-void Graph::set_node_attr_str(const Node& node, rust::Str name, rust::Str value) noexcept {
+void Graph::set_node_attr_str(const Node &node, rust::Str name, rust::Str value) noexcept {
     auto node_id = node.get_id();
     return this->inner.inner->set_node_attr_str(node_id, name, value);
 }
@@ -92,7 +92,7 @@ NodeStatus Graph::node_status(const Node &node) const noexcept {
     return this->inner.inner->node_status(node_id);
 }
 
-bool Graph::node_exists(const Node& node) noexcept {
+bool Graph::node_exists(const Node &node) noexcept {
     auto node_id = node.get_id();
     return this->inner.inner->node_exists(node_id);
 }
