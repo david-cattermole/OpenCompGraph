@@ -404,7 +404,6 @@ impl GraphImpl {
     /// Get the output stream from the last executed graph node.
     pub fn output_stream(&self) -> StreamDataImplShared {
         debug!("Query Stream Output...");
-        assert_eq!(self.status, ExecuteStatus::Success);
         self.output.clone()
     }
 }
