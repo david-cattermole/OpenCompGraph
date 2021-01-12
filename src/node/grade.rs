@@ -93,8 +93,7 @@ impl Operation for GradeOperation {
                 let mut copy = input.clone();
 
                 let enable = attr_block.get_attr_i32("enable");
-                if enable != 1 {
-                } else {
+                if enable == 1 {
                     // Calculate Color Matrix
                     let in_matrix = input.color_matrix().to_na_matrix();
                     let r_multiply = attr_block.get_attr_f32("multiply_r");

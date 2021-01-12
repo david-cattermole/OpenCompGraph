@@ -90,8 +90,7 @@ impl Operation for LensDistortOperation {
                 let mut copy = input.clone();
 
                 let enable = attr_block.get_attr_i32("enable");
-                if enable != 1 {
-                } else {
+                if enable == 1 {
                     // Calculate Deformation.
                     let mut deformer = Deformer::new(DeformerType::Brownian);
                     let k1 = attr_block.get_attr_f32("k1");
