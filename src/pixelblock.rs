@@ -141,6 +141,20 @@ impl PixelBlock {
     pub fn set_pixels(&mut self, pixels: Vec<f32>) {
         self.pixels = pixels;
     }
+
+    pub fn size_bytes(&self) -> usize {
+        let n_bytes_in_f32 = match self.pixel_data_type {
+            PixelDataType::Float32 => std::mem::size_of::<f32>(),
+            PixelDataType::Half16 => std::mem::size_of::<i16>(), // TODO: Support "half" properly.
+            PixelDataType::UInt8 => std::mem::size_of::<u8>(),
+            PixelDataType::UInt16 => std::mem::size_of::<u16>(),
+            _ => {
+                error!("Invalid PixelDataType: {:?}", self.pixel_data_type);
+                0
+            }
+        };
+        n_bytes_in_f32 * (self.width * self.height * self.num_channels as u32) as usize
+    }
 }
 
 impl Hash for PixelBlock {

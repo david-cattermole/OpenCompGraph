@@ -60,6 +60,10 @@ impl StreamDataImpl {
         self.state = value;
     }
 
+    pub fn size_bytes(&self) -> usize {
+        self.pixel_block.size_bytes()
+    }
+
     pub fn hash(&self) -> HashValue {
         self.hash
     }
