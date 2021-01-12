@@ -7,6 +7,7 @@
 #include <sstream>
 #include <string>
 #include <opencompgraph.h>
+#include "generate_frame_range.h"
 
 namespace ocg = open_comp_graph;
 

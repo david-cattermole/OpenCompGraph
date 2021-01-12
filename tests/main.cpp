@@ -9,50 +9,58 @@
 #include "test_g.h"
 #include "test_h.h"
 #include "test_i.h"
+#include "test_j.h"
 
 namespace ocg = open_comp_graph;
 
 int main() {
-    std::cout << "Starting Tests..." << '\n';
+    std::cout << "Starting Tests...\n";
     ocg::log::initialize();
-    auto bench = ocg::internal::BenchmarkTime();
-    bench.start();
+    const bool debug_print = true;
 
-    const bool debug_print = false;
+    // Run single frame tests.
+    {
+        std::cout << "Starting Single-Frame Tests...\n";
+        auto bench = ocg::internal::BenchmarkTime();
+        bench.start();
 
-    // Create a cache for each test.
-    auto cache_a = std::make_shared<ocg::Cache>();
-    auto cache_b = std::make_shared<ocg::Cache>();
-    auto cache_d = std::make_shared<ocg::Cache>();
-    auto cache_e = std::make_shared<ocg::Cache>();
-    auto cache_f = std::make_shared<ocg::Cache>();
-    auto cache_g = std::make_shared<ocg::Cache>();
-    auto cache_h = std::make_shared<ocg::Cache>();
+        auto cache = std::make_shared<ocg::Cache>();
+        const size_t kBytesToGigabytes = 1073741824;  // int(pow(2, 30))
+        auto capacity = 1 * kBytesToGigabytes;
+        cache->set_capacity_bytes(capacity);
 
-    // Run tests.
-    auto count = 20;
-    for (auto i = 0; i < count; ++i) {
-        test_a(debug_print, cache_a);
-        test_c(debug_print);
-        test_d(debug_print, cache_d);
-        test_e(debug_print, cache_e);
-        test_f(debug_print, cache_f);
-        test_g(debug_print, cache_g);
-        test_h(debug_print, cache_h);
-        test_i(debug_print);
-        test_b(debug_print, cache_b);
+        auto count = 1;
+        for (auto i = 0; i < count; ++i) {
+            test_a(debug_print, cache);
+            test_b(debug_print, cache);
+            test_c(debug_print);
+            test_d(debug_print, cache);
+            test_e(debug_print, cache);
+            test_f(debug_print, cache);
+            test_g(debug_print, cache);
+            test_h(debug_print, cache);
+            test_i(debug_print);
+        }
+
+        bench.stop();
+        bench.print("Single Frame Tests:");
+        bench.print("Single Frame Tests:", count);
+        std::cout << "Single Frame Cache Count: "
+                  << cache->count() << '\n';
     }
 
-    bench.stop();
-    bench.print("All Tests:");
-    bench.print("All Tests:", count);
-    std::cout << "CacheA Count: " << cache_a->count() << '\n';
-    std::cout << "CacheB Count: " << cache_b->count() << '\n';
-    std::cout << "CacheD Count: " << cache_d->count() << '\n';
-    std::cout << "CacheE Count: " << cache_e->count() << '\n';
-    std::cout << "CacheF Count: " << cache_f->count() << '\n';
-    std::cout << "CacheG Count: " << cache_g->count() << '\n';
-    std::cout << "CacheH Count: " << cache_h->count() << '\n';
+    // Multi-Frame tests.
+    {
+        std::cout << "Starting Multi-Frame Tests...\n";
+        auto bench = ocg::internal::BenchmarkTime();
+        bench.start();
+
+        test_j(debug_print);
+
+        bench.stop();
+        bench.print("Mult-Frame Tests:");
+    }
+
     std::cout << "Completed Tests!" << std::endl;
 
     return 0;

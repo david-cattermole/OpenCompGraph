@@ -75,6 +75,7 @@ impl GradeAttrs {
 impl Operation for GradeOperation {
     fn compute(
         &mut self,
+        frame: i32,
         node_type_id: u8,
         attr_block: &Box<dyn AttrBlock>,
         inputs: &Vec<StreamDataImplShared>,
@@ -105,8 +106,9 @@ impl Operation for GradeOperation {
                     );
                     copy.set_color_matrix(Matrix4::from_na_matrix(out_matrix));
                 }
+
                 // Set Output data
-                let hash_value = self.cache_hash(node_type_id, &attr_block, inputs);
+                let hash_value = self.cache_hash(frame, node_type_id, &attr_block, inputs);
                 copy.set_hash(hash_value);
                 output.inner = copy;
                 NodeStatus::Valid
@@ -116,7 +118,7 @@ impl Operation for GradeOperation {
 }
 
 impl AttrBlock for GradeAttrs {
-    fn attr_hash(&self, state: &mut DefaultHasher) {
+    fn attr_hash(&self, frame: i32, state: &mut DefaultHasher) {
         self.hash(state)
     }
 

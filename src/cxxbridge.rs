@@ -1,7 +1,6 @@
-// use cxx::{CxxString, UniquePtr};
 use log::{debug, error, info, warn};
 
-use crate::cache::create_cache_box;
+use crate::cache::create_cache_box_with_capacity;
 use crate::cache::CacheImpl;
 use crate::data::HashValue;
 use crate::data::Identifier;
@@ -175,10 +174,12 @@ pub mod ffi {
         Error = 0,
         #[cxx_name = "kValid"]
         Valid = 1,
-        #[cxx_name = "kUninitialized"]
-        Uninitialized = 2,
+        #[cxx_name = "kWarning"]
+        Warning = 2,
         #[cxx_name = "kNonExistent"]
         NonExistent = 3,
+        #[cxx_name = "kUninitialized"]
+        Uninitialized = 255,
     }
 
     #[repr(u8)]
@@ -259,8 +260,8 @@ pub mod ffi {
         fn get_status_id(&self) -> u8;
 
         // Compute
-        fn hash(&self, inputs: &Vec<StreamDataImplShared>) -> u64;
-        fn compute(&mut self, inputs: &Vec<StreamDataImplShared>, output: &mut StreamDataImplShared) -> NodeStatus;
+        fn hash(&self, frame: i32, inputs: &Vec<StreamDataImplShared>) -> u64;
+        fn compute(&mut self, frame: i32, inputs: &Vec<StreamDataImplShared>, output: &mut StreamDataImplShared) -> NodeStatus;
 
         // AttrBlock
         fn attr_exists(&self, name: &str) -> AttrState;
@@ -281,10 +282,14 @@ pub mod ffi {
     extern "Rust" {
         type CacheImpl;
         fn len(&self) -> usize;
+        fn used_bytes(&self) -> usize;
+        fn capacity_bytes(&self) -> usize;
+        fn set_capacity_bytes(&mut self, value: usize);
+        fn data_debug_string(&self) -> String;
 
         // Creation
-        fn create_cache_box() -> Box<CacheImpl>;
-        fn create_cache_shared() -> CacheImplShared;
+        fn create_cache_box_with_capacity(capacity_bytes: usize) -> Box<CacheImpl>;
+        fn create_cache_shared_with_capacity(capacity_bytes: usize) -> CacheImplShared;
     }
 
     // Graph
@@ -307,7 +312,11 @@ pub mod ffi {
 
         fn node_exists(&mut self, node_id: u64) -> bool;
         fn connect(&mut self, src_node_id: u64, dst_node_id: u64, input_num: u8);
-        fn execute(&mut self, node_id: u64, cache: &mut Box<CacheImpl>) -> ExecuteStatus;
+        fn execute(
+            &mut self,
+            node_id: u64,
+            frames: &[i32],
+            cache: &mut Box<CacheImpl>) -> ExecuteStatus;
         fn data_debug_string(&self) -> String;
         fn output_stream(&self) -> StreamDataImplShared;
 
@@ -370,10 +379,10 @@ pub mod ffi {
     }
 }
 
-fn create_cache_shared() -> ffi::CacheImplShared {
-    debug!("create_cache_shared()");
+fn create_cache_shared_with_capacity(capacity_bytes: usize) -> ffi::CacheImplShared {
+    debug!("create_cache_shared_with_capacity()");
     ffi::CacheImplShared {
-        inner: create_cache_box(),
+        inner: create_cache_box_with_capacity(capacity_bytes),
     }
 }
 

@@ -22,6 +22,18 @@ public:
     OPENCOMPGRAPH_SYMBOL_EXPORT
     std::uint64_t count() const noexcept;
 
+    OPENCOMPGRAPH_SYMBOL_EXPORT
+    std::size_t used_bytes() const noexcept;
+
+    OPENCOMPGRAPH_SYMBOL_EXPORT
+    std::size_t capacity_bytes() const noexcept;
+
+    OPENCOMPGRAPH_SYMBOL_EXPORT
+    void set_capacity_bytes(std::size_t value) noexcept;
+
+    OPENCOMPGRAPH_SYMBOL_EXPORT
+    std::string data_debug_string() const noexcept;
+
 private:
     internal::CacheImplShared inner;
 

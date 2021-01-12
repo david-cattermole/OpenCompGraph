@@ -19,6 +19,7 @@ use crate::data::Identifier;
 use crate::deformutils;
 use crate::node::traits::Operation;
 use crate::node::NodeImpl;
+use crate::pathutils;
 
 pub fn new(id: Identifier) -> NodeImpl {
     NodeImpl {
@@ -57,6 +58,7 @@ impl WriteImageAttrs {
 impl Operation for WriteImageOperation {
     fn compute(
         &mut self,
+        frame: i32,
         node_type_id: u8,
         attr_block: &Box<dyn AttrBlock>,
         inputs: &Vec<StreamDataImplShared>,
@@ -119,11 +121,15 @@ impl Operation for WriteImageOperation {
                     colorutils::apply_color_matrix_inplace(pixels, num_channels, color_matrix);
                 }
 
+                let file_path = attr_block.get_attr_str("file_path");
+                let path_expanded = pathutils::expand_string(file_path.to_string(), frame);
+                debug!("file_path: {:?}", file_path);
+                debug!("path_expanded: {:?}", path_expanded);
+
                 // Write pixels
                 let img = pixel_block.to_image_buffer_rgb_u8();
-                let file_path = attr_block.get_attr_str("file_path");
-                debug!("Writing... {:?}", file_path);
-                let ok = match img.save(file_path) {
+                debug!("Writing... {:?}", path_expanded);
+                let ok = match img.save(path_expanded) {
                     Ok(value) => true,
                     Err(_) => false,
                 };
@@ -135,7 +141,7 @@ impl Operation for WriteImageOperation {
 }
 
 impl AttrBlock for WriteImageAttrs {
-    fn attr_hash(&self, state: &mut DefaultHasher) {
+    fn attr_hash(&self, frame: i32, state: &mut DefaultHasher) {
         self.hash(state)
     }
 

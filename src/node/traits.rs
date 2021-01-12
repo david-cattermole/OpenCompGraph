@@ -28,13 +28,14 @@ pub trait Operation: std::fmt::Debug {
 
     fn cache_hash(
         &self,
+        frame: i32,
         node_type_id: u8,
         attr_block: &Box<dyn AttrBlock>,
         inputs: &Vec<StreamDataImplShared>,
     ) -> HashValue {
         let mut state = DefaultHasher::new();
         node_type_id.hash(&mut state);
-        attr_block.attr_hash(&mut state);
+        attr_block.attr_hash(frame, &mut state);
         for input in inputs {
             input.inner.hash(&mut state);
         }
@@ -43,6 +44,7 @@ pub trait Operation: std::fmt::Debug {
 
     fn compute(
         &mut self,
+        frame: i32,
         node_type_id: u8,
         attr_block: &Box<dyn AttrBlock>,
         inputs: &Vec<StreamDataImplShared>,

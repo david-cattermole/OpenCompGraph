@@ -72,6 +72,7 @@ impl LensDistortAttrs {
 impl Operation for LensDistortOperation {
     fn compute(
         &mut self,
+        frame: i32,
         node_type_id: u8,
         attr_block: &Box<dyn AttrBlock>,
         inputs: &Vec<StreamDataImplShared>,
@@ -105,7 +106,7 @@ impl Operation for LensDistortOperation {
                 }
 
                 // Set Output data
-                let hash_value = self.cache_hash(node_type_id, &attr_block, inputs);
+                let hash_value = self.cache_hash(frame, node_type_id, &attr_block, inputs);
                 copy.set_hash(hash_value);
                 output.inner = copy;
                 NodeStatus::Valid
@@ -115,7 +116,7 @@ impl Operation for LensDistortOperation {
 }
 
 impl AttrBlock for LensDistortAttrs {
-    fn attr_hash(&self, state: &mut DefaultHasher) {
+    fn attr_hash(&self, frame: i32, state: &mut DefaultHasher) {
         self.hash(state)
     }
 

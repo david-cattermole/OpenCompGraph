@@ -1,5 +1,6 @@
 #include <iostream>
 #include <opencompgraph.h>
+#include "generate_frame_range.h"
 
 namespace ocg = open_comp_graph;
 
@@ -9,6 +10,7 @@ int test_d(const bool debug_print, std::shared_ptr<ocg::Cache> cache) {
     }
     auto bench = ocg::internal::BenchmarkTime();
 
+    auto frames = generate_frame_range(1, 1);
     auto graph = ocg::Graph();
 
     auto read_node = graph.create_node(ocg::NodeType::kReadImage, "my_read_node");
@@ -23,7 +25,7 @@ int test_d(const bool debug_print, std::shared_ptr<ocg::Cache> cache) {
     graph.set_node_attr_str(write_node, "file_path", "./tests/data/out/test_d_out1.png");
 
     graph.connect(read_node, write_node, 0);
-    graph.execute(write_node, cache);
+    graph.execute(write_node, frames, cache);
     if (debug_print) {
         std::cout << "Graph as string:\n"
                   << graph.data_debug_string();

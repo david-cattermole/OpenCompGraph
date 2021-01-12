@@ -5,6 +5,7 @@ include(OpenCompGraphUtils)
 add_executable(${target_test_exe}
   ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/generate_mesh.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/generate_frame_range.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/test_a.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/test_b.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/test_c.cpp
@@ -14,6 +15,7 @@ add_executable(${target_test_exe}
   ${CMAKE_CURRENT_SOURCE_DIR}/test_g.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/test_h.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/test_i.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/test_j.cpp
   )
 target_link_libraries(${target_test_exe} ${target_lib})
 target_include_directories(${target_test_exe}

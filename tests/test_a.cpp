@@ -1,6 +1,7 @@
 #include <iostream>
 #include <opencompgraph.h>
 #include "generate_mesh.h"
+#include "generate_frame_range.h"
 
 namespace ocg = open_comp_graph;
 
@@ -11,6 +12,7 @@ int test_a(const bool debug_print, std::shared_ptr<ocg::Cache> cache) {
     }
     auto bench = ocg::internal::BenchmarkTime();
 
+    auto frames = generate_frame_range(1, 1);
     auto graph = ocg::Graph();
     auto read_node = graph.create_node(ocg::NodeType::kReadImage, "my_read_node");
     auto lens_node = graph.create_node(ocg::NodeType::kLensDistort, "lens_node");
@@ -23,7 +25,8 @@ int test_a(const bool debug_print, std::shared_ptr<ocg::Cache> cache) {
 
     graph.connect(read_node, lens_node, 0);
     graph.connect(lens_node, write_node, 0);
-    auto status = graph.execute(lens_node, cache);
+
+    auto status = graph.execute(lens_node, frames, cache);
     if (debug_print) {
         std::cout << "Graph as string:\n"
                   << graph.data_debug_string();
@@ -151,16 +154,15 @@ int test_a(const bool debug_print, std::shared_ptr<ocg::Cache> cache) {
         uv_count,
         tri_count);
 
-    status = graph.execute(write_node, cache);
+    status = graph.execute(write_node, frames, cache);
     if (status != ocg::ExecuteStatus::kSuccess) {
+        std::cout << "ERROR=" << static_cast<uint32_t>(status) << '\n';
         return 1;
     }
     if (debug_print) {
         std::cout << "Graph as string:\n"
                   << graph.data_debug_string();
-    }
 
-    if (debug_print) {
         bench.stop();
         bench.print("Test A:");
     }

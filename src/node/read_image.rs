@@ -19,6 +19,7 @@ use crate::data::HashValue;
 use crate::data::Identifier;
 use crate::node::traits::Operation;
 use crate::node::NodeImpl;
+use crate::pathutils;
 use crate::pixelblock::PixelBlock;
 
 pub fn new(id: Identifier) -> NodeImpl {
@@ -34,7 +35,7 @@ pub fn new(id: Identifier) -> NodeImpl {
 #[derive(Debug, Clone, Default)]
 pub struct ReadImageOperation {}
 
-#[derive(Debug, Clone, Default, hash::Hash)]
+#[derive(Debug, Clone, Default)]
 pub struct ReadImageAttrs {
     pub enable: i32,
     pub file_path: String,
@@ -58,6 +59,7 @@ impl ReadImageAttrs {
 impl Operation for ReadImageOperation {
     fn compute(
         &mut self,
+        frame: i32,
         node_type_id: u8,
         attr_block: &Box<dyn AttrBlock>,
         inputs: &Vec<StreamDataImplShared>,
@@ -69,16 +71,22 @@ impl Operation for ReadImageOperation {
         // debug!("Output: {:?}", output);
         let enable = attr_block.get_attr_i32("enable");
         if enable != 1 {
-            let hash_value = self.cache_hash(node_type_id, &attr_block, inputs);
+            let hash_value = self.cache_hash(frame, node_type_id, &attr_block, inputs);
             output.inner.set_hash(hash_value);
-            return NodeStatus::Valid;
+            return NodeStatus::Warning;
         }
         let file_path = attr_block.get_attr_str("file_path");
-        // debug!("file_path {:?}", file_path);
+        let path_expanded = pathutils::expand_string(file_path.to_string(), frame);
+        debug!("file_path: {:?}", file_path);
+        debug!("path_expanded: {:?}", path_expanded);
 
-        let path = match Path::new(&file_path).canonicalize() {
+        let path = match Path::new(&path_expanded).canonicalize() {
             Ok(full_path) => full_path,
-            Err(_) => return NodeStatus::Error,
+            Err(_) => {
+                let hash_value = self.cache_hash(frame, node_type_id, &attr_block, inputs);
+                output.inner.set_hash(hash_value);
+                return NodeStatus::Warning;
+            }
         };
         debug!("Opening... {:?}", path);
         if path.is_file() == true {
@@ -94,7 +102,7 @@ impl Operation for ReadImageOperation {
             );
             let data_window = display_window.clone();
 
-            let hash_value = self.cache_hash(node_type_id, &attr_block, inputs);
+            let hash_value = self.cache_hash(frame, node_type_id, &attr_block, inputs);
             output.inner.set_display_window(display_window);
             output.inner.set_data_window(data_window);
             output.inner.set_hash(hash_value);
@@ -105,8 +113,12 @@ impl Operation for ReadImageOperation {
 }
 
 impl AttrBlock for ReadImageAttrs {
-    fn attr_hash(&self, state: &mut DefaultHasher) {
-        self.hash(state)
+    fn attr_hash(&self, frame: i32, state: &mut DefaultHasher) {
+        if self.enable == 1 {
+            self.enable.hash(state);
+            let path_expanded = pathutils::expand_string(self.file_path.to_string(), frame);
+            path_expanded.hash(state);
+        }
     }
 
     fn attr_exists(&self, name: &str) -> AttrState {

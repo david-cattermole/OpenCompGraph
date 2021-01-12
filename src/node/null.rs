@@ -45,6 +45,7 @@ impl NullAttrs {
 impl Operation for NullOperation {
     fn compute(
         &mut self,
+        frame: i32,
         node_type_id: u8,
         attr_block: &Box<dyn AttrBlock>,
         inputs: &Vec<StreamDataImplShared>,
@@ -65,7 +66,7 @@ impl Operation for NullOperation {
 }
 
 impl AttrBlock for NullAttrs {
-    fn attr_hash(&self, state: &mut DefaultHasher) {
+    fn attr_hash(&self, frame: i32, state: &mut DefaultHasher) {
         self.hash(state)
     }
 

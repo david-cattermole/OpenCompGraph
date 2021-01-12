@@ -5,7 +5,7 @@ use std::hash::Hasher;
 use crate::cxxbridge::ffi::AttrState;
 
 pub trait AttrBlock: std::fmt::Debug {
-    fn attr_hash(&self, state: &mut DefaultHasher);
+    fn attr_hash(&self, frame: i32, state: &mut DefaultHasher);
 
     fn attr_exists(&self, name: &str) -> AttrState;
 

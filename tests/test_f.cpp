@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cassert>
 #include <opencompgraph.h>
+#include "generate_frame_range.h"
 
 namespace ocg = open_comp_graph;
 
@@ -10,6 +11,7 @@ int test_f(const bool debug_print, std::shared_ptr<ocg::Cache> cache) {
     }
     auto bench = ocg::internal::BenchmarkTime();
 
+    auto frames = generate_frame_range(1, 1);
     auto graph = ocg::Graph();
 
     auto read_node = graph.create_node(ocg::NodeType::kReadImage, "readimage1");
@@ -52,7 +54,7 @@ int test_f(const bool debug_print, std::shared_ptr<ocg::Cache> cache) {
     if (debug_print) {
         std::cout << "Execute #1 =========================================" << '\n';
     }
-    auto status1 = graph.execute(write1_node, cache);
+    auto status1 = graph.execute(write1_node, frames, cache);
     if (debug_print) {
         std::cout << "Graph as string:\n"
                   << graph.data_debug_string();
@@ -108,7 +110,7 @@ int test_f(const bool debug_print, std::shared_ptr<ocg::Cache> cache) {
     if (debug_print) {
         std::cout << "Execute #2 =========================================" << '\n';
     }
-    auto status2 = graph.execute(write2_node, cache);
+    auto status2 = graph.execute(write2_node, frames, cache);
     if (debug_print) {
         std::cout << "Graph as string:\n"
                   << graph.data_debug_string();
@@ -158,7 +160,7 @@ int test_f(const bool debug_print, std::shared_ptr<ocg::Cache> cache) {
     if (debug_print) {
         std::cout << "Execute #3 =========================================" << '\n';
     }
-    auto status3 = graph.execute(write3_node, cache);
+    auto status3 = graph.execute(write3_node, frames, cache);
     if (debug_print) {
         std::cout << "Graph as string:\n"
                   << graph.data_debug_string();

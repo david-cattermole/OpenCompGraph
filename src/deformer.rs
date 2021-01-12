@@ -49,7 +49,7 @@ impl DeformerAttrs {
 }
 
 impl AttrBlock for DeformerAttrs {
-    fn attr_hash(&self, state: &mut DefaultHasher) {
+    fn attr_hash(&self, frame: i32, state: &mut DefaultHasher) {
         self.hash(state)
     }
 

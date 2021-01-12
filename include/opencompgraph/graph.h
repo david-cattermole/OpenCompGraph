@@ -65,7 +65,10 @@ public:
     void connect(const Node& src_node, const Node& dst_node, uint8_t input_num) noexcept;
 
     OPENCOMPGRAPH_SYMBOL_EXPORT
-    ExecuteStatus execute(const Node& node, std::shared_ptr<Cache> &cache) noexcept;
+    ExecuteStatus execute(
+        const Node& node,
+        std::vector<int32_t> &frames,
+        std::shared_ptr<Cache> &cache) noexcept;
 
     OPENCOMPGRAPH_SYMBOL_EXPORT
     NodeStatus node_status(const Node &node) const noexcept;

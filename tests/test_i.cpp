@@ -1,6 +1,7 @@
 #include <iostream>
 #include <opencompgraph.h>
 #include "generate_mesh.h"
+#include "generate_frame_range.h"
 
 namespace ocg = open_comp_graph;
 
