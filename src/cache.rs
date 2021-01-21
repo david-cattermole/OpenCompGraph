@@ -149,7 +149,7 @@ impl CacheImpl {
         // in the heap and will be removed as needed.
         let entry_timestamp = self.last_timestamp + 1;
         self.lru_timestamps.push(OldestTimestamp(entry_timestamp));
-        self.timestamp_to_key.insert(entry_timestamp, key)
+        self.timestamp_to_key.insert(entry_timestamp, key);
 
         // Put our value into the map.
         let entry = CacheEntry {
