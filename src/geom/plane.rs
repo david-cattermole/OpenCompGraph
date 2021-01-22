@@ -82,7 +82,6 @@ impl GeometryPlaneImpl {
     /// Vertex Buffer Positions
     pub fn fill_buffer_vertex_positions(&self, buffer: &mut [f32]) -> bool {
         let mut index = 0;
-        let per_vertex_num = 3;
         let square_size_x: f32 = 1.0 / ((self.divisions_x - 1) as f32);
         let square_size_y: f32 = 1.0 / ((self.divisions_y - 1) as f32);
         for row in 0..self.divisions_y {
@@ -90,7 +89,7 @@ impl GeometryPlaneImpl {
                 buffer[index + 0] = -0.5 + ((col as f32) * square_size_x);
                 buffer[index + 1] = -0.5 + ((row as f32) * square_size_y);
                 buffer[index + 2] = 0.0;
-                index += per_vertex_num;
+                index += 3;
             }
         }
         true
@@ -99,7 +98,6 @@ impl GeometryPlaneImpl {
     /// Vertex Buffer UVs
     pub fn fill_buffer_vertex_uvs(&self, buffer: &mut [f32]) -> bool {
         let mut index = 0;
-        let per_vertex_num = 2;
         let square_size_x: f32 = 1.0 / ((self.divisions_x - 1) as f32);
         let square_size_y: f32 = 1.0 / ((self.divisions_y - 1) as f32);
         for row in 0..self.divisions_y {
@@ -108,7 +106,7 @@ impl GeometryPlaneImpl {
                 // top-left, but our UVs start at bottom-left.
                 buffer[index + 0] = (col as f32) * square_size_x;
                 buffer[index + 1] = 1.0 + ((row as f32) * square_size_y * -1.0);
-                index += per_vertex_num;
+                index += 2;
             }
         }
         true
