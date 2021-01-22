@@ -1274,9 +1274,13 @@ struct GeometryPlaneImpl final : public ::rust::Opaque {
   OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t calc_buffer_size_vertex_positions() const noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t calc_buffer_size_vertex_uvs() const noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t calc_buffer_size_index_tris() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t calc_buffer_size_index_border_lines() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t calc_buffer_size_index_wire_lines() const noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT bool fill_buffer_vertex_positions(::rust::Slice<float> buffer_vertex_positions) const noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT bool fill_buffer_vertex_uvs(::rust::Slice<float> buffer_vertex_uvs) const noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT bool fill_buffer_index_tris(::rust::Slice<::std::uint32_t> buffer_index_tris) const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT bool fill_buffer_index_border_lines(::rust::Slice<::std::uint32_t> buffer_index_border_lines) const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT bool fill_buffer_index_wire_lines(::rust::Slice<::std::uint32_t> buffer_index_wire_lines) const noexcept;
   ~GeometryPlaneImpl() = delete;
 
 private:
@@ -1472,11 +1476,19 @@ void open_comp_graph$internal$cxxbridge1$GeometryPlaneImpl$set_divisions_y(::ope
 
 ::std::size_t open_comp_graph$internal$cxxbridge1$GeometryPlaneImpl$calc_buffer_size_index_tris(const ::open_comp_graph::internal::GeometryPlaneImpl &self) noexcept;
 
+::std::size_t open_comp_graph$internal$cxxbridge1$GeometryPlaneImpl$calc_buffer_size_index_border_lines(const ::open_comp_graph::internal::GeometryPlaneImpl &self) noexcept;
+
+::std::size_t open_comp_graph$internal$cxxbridge1$GeometryPlaneImpl$calc_buffer_size_index_wire_lines(const ::open_comp_graph::internal::GeometryPlaneImpl &self) noexcept;
+
 bool open_comp_graph$internal$cxxbridge1$GeometryPlaneImpl$fill_buffer_vertex_positions(const ::open_comp_graph::internal::GeometryPlaneImpl &self, ::rust::Slice<float> buffer_vertex_positions) noexcept;
 
 bool open_comp_graph$internal$cxxbridge1$GeometryPlaneImpl$fill_buffer_vertex_uvs(const ::open_comp_graph::internal::GeometryPlaneImpl &self, ::rust::Slice<float> buffer_vertex_uvs) noexcept;
 
 bool open_comp_graph$internal$cxxbridge1$GeometryPlaneImpl$fill_buffer_index_tris(const ::open_comp_graph::internal::GeometryPlaneImpl &self, ::rust::Slice<::std::uint32_t> buffer_index_tris) noexcept;
+
+bool open_comp_graph$internal$cxxbridge1$GeometryPlaneImpl$fill_buffer_index_border_lines(const ::open_comp_graph::internal::GeometryPlaneImpl &self, ::rust::Slice<::std::uint32_t> buffer_index_border_lines) noexcept;
+
+bool open_comp_graph$internal$cxxbridge1$GeometryPlaneImpl$fill_buffer_index_wire_lines(const ::open_comp_graph::internal::GeometryPlaneImpl &self, ::rust::Slice<::std::uint32_t> buffer_index_wire_lines) noexcept;
 
 ::open_comp_graph::internal::GeometryPlaneImpl *open_comp_graph$internal$cxxbridge1$create_geometry_plane_box(::std::uint32_t divisions_x, ::std::uint32_t divisions_y) noexcept;
 
@@ -1931,6 +1943,14 @@ OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t GeometryPlaneImpl::calc_buffer_size_in
   return open_comp_graph$internal$cxxbridge1$GeometryPlaneImpl$calc_buffer_size_index_tris(*this);
 }
 
+OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t GeometryPlaneImpl::calc_buffer_size_index_border_lines() const noexcept {
+  return open_comp_graph$internal$cxxbridge1$GeometryPlaneImpl$calc_buffer_size_index_border_lines(*this);
+}
+
+OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t GeometryPlaneImpl::calc_buffer_size_index_wire_lines() const noexcept {
+  return open_comp_graph$internal$cxxbridge1$GeometryPlaneImpl$calc_buffer_size_index_wire_lines(*this);
+}
+
 OPENCOMPGRAPH_SYMBOL_EXPORT bool GeometryPlaneImpl::fill_buffer_vertex_positions(::rust::Slice<float> buffer_vertex_positions) const noexcept {
   return open_comp_graph$internal$cxxbridge1$GeometryPlaneImpl$fill_buffer_vertex_positions(*this, buffer_vertex_positions);
 }
@@ -1941,6 +1961,14 @@ OPENCOMPGRAPH_SYMBOL_EXPORT bool GeometryPlaneImpl::fill_buffer_vertex_uvs(::rus
 
 OPENCOMPGRAPH_SYMBOL_EXPORT bool GeometryPlaneImpl::fill_buffer_index_tris(::rust::Slice<::std::uint32_t> buffer_index_tris) const noexcept {
   return open_comp_graph$internal$cxxbridge1$GeometryPlaneImpl$fill_buffer_index_tris(*this, buffer_index_tris);
+}
+
+OPENCOMPGRAPH_SYMBOL_EXPORT bool GeometryPlaneImpl::fill_buffer_index_border_lines(::rust::Slice<::std::uint32_t> buffer_index_border_lines) const noexcept {
+  return open_comp_graph$internal$cxxbridge1$GeometryPlaneImpl$fill_buffer_index_border_lines(*this, buffer_index_border_lines);
+}
+
+OPENCOMPGRAPH_SYMBOL_EXPORT bool GeometryPlaneImpl::fill_buffer_index_wire_lines(::rust::Slice<::std::uint32_t> buffer_index_wire_lines) const noexcept {
+  return open_comp_graph$internal$cxxbridge1$GeometryPlaneImpl$fill_buffer_index_wire_lines(*this, buffer_index_wire_lines);
 }
 
 OPENCOMPGRAPH_SYMBOL_EXPORT ::rust::Box<::open_comp_graph::internal::GeometryPlaneImpl> create_geometry_plane_box(::std::uint32_t divisions_x, ::std::uint32_t divisions_y) noexcept {

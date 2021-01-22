@@ -1220,9 +1220,13 @@ struct GeometryPlaneImpl final : public ::rust::Opaque {
   OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t calc_buffer_size_vertex_positions() const noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t calc_buffer_size_vertex_uvs() const noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t calc_buffer_size_index_tris() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t calc_buffer_size_index_border_lines() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t calc_buffer_size_index_wire_lines() const noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT bool fill_buffer_vertex_positions(::rust::Slice<float> buffer_vertex_positions) const noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT bool fill_buffer_vertex_uvs(::rust::Slice<float> buffer_vertex_uvs) const noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT bool fill_buffer_index_tris(::rust::Slice<::std::uint32_t> buffer_index_tris) const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT bool fill_buffer_index_border_lines(::rust::Slice<::std::uint32_t> buffer_index_border_lines) const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT bool fill_buffer_index_wire_lines(::rust::Slice<::std::uint32_t> buffer_index_wire_lines) const noexcept;
   ~GeometryPlaneImpl() = delete;
 
 private:

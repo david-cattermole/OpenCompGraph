@@ -347,10 +347,14 @@ pub mod ffi {
         fn calc_buffer_size_vertex_positions(&self) -> usize;
         fn calc_buffer_size_vertex_uvs(&self) -> usize;
         fn calc_buffer_size_index_tris(&self) -> usize;
+        fn calc_buffer_size_index_border_lines(&self) -> usize;
+        fn calc_buffer_size_index_wire_lines(&self) -> usize;
 
         fn fill_buffer_vertex_positions(&self, buffer_vertex_positions: &mut [f32]) -> bool;
         fn fill_buffer_vertex_uvs(&self, buffer_vertex_uvs: &mut [f32]) -> bool;
         fn fill_buffer_index_tris(&self, buffer_index_tris: &mut [u32]) -> bool;
+        fn fill_buffer_index_border_lines(&self, buffer_index_border_lines: &mut [u32]) -> bool;
+        fn fill_buffer_index_wire_lines(&self, buffer_index_wire_lines: &mut [u32]) -> bool;
 
         // Creation
         fn create_geometry_plane_box(
