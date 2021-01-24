@@ -10,6 +10,7 @@
 #include "test_h.h"
 #include "test_i.h"
 #include "test_j.h"
+#include "test_k.h"
 
 namespace ocg = open_comp_graph;
 
@@ -18,6 +19,7 @@ int main() {
     ocg::log::initialize();
     const bool debug_print = true;
 
+    test_k(debug_print);
     // Run single frame tests.
     {
         std::cout << "Starting Single-Frame Tests...\n";

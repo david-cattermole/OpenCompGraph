@@ -966,12 +966,14 @@ namespace open_comp_graph {
     struct GraphImplShared;
     struct StreamDataImplShared;
     struct CacheImplShared;
+    struct ConfigImplShared;
     struct PixelBlock;
     struct StreamDataImpl;
     struct NodeImpl;
     struct CacheImpl;
     struct GraphImpl;
     struct GeometryPlaneImpl;
+    struct ConfigImpl;
   }
 }
 
@@ -1069,6 +1071,15 @@ struct CacheImplShared final {
   using IsRelocatable = ::std::true_type;
 };
 #endif // CXXBRIDGE1_STRUCT_open_comp_graph$internal$CacheImplShared
+
+#ifndef CXXBRIDGE1_STRUCT_open_comp_graph$internal$ConfigImplShared
+#define CXXBRIDGE1_STRUCT_open_comp_graph$internal$ConfigImplShared
+struct ConfigImplShared final {
+  ::rust::Box<::open_comp_graph::internal::ConfigImpl> inner;
+
+  using IsRelocatable = ::std::true_type;
+};
+#endif // CXXBRIDGE1_STRUCT_open_comp_graph$internal$ConfigImplShared
 } // namespace internal
 
 #ifndef CXXBRIDGE1_ENUM_open_comp_graph$GraphState
@@ -1291,6 +1302,22 @@ private:
   };
 };
 #endif // CXXBRIDGE1_STRUCT_open_comp_graph$internal$GeometryPlaneImpl
+
+#ifndef CXXBRIDGE1_STRUCT_open_comp_graph$internal$ConfigImpl
+#define CXXBRIDGE1_STRUCT_open_comp_graph$internal$ConfigImpl
+struct ConfigImpl final : public ::rust::Opaque {
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t cache_ram_capacity_bytes() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT float cache_ram_capacity_percent() const noexcept;
+  ~ConfigImpl() = delete;
+
+private:
+  friend ::rust::layout;
+  struct layout {
+    static ::std::size_t size() noexcept;
+    static ::std::size_t align() noexcept;
+  };
+};
+#endif // CXXBRIDGE1_STRUCT_open_comp_graph$internal$ConfigImpl
 } // namespace internal
 
 extern "C" {
@@ -1504,6 +1531,15 @@ bool open_comp_graph$log$cxxbridge1$initialize() noexcept;
 
 namespace internal {
 extern "C" {
+::std::size_t open_comp_graph$internal$cxxbridge1$ConfigImpl$operator$sizeof() noexcept;
+::std::size_t open_comp_graph$internal$cxxbridge1$ConfigImpl$operator$alignof() noexcept;
+
+::std::size_t open_comp_graph$internal$cxxbridge1$ConfigImpl$cache_ram_capacity_bytes(const ::open_comp_graph::internal::ConfigImpl &self) noexcept;
+
+float open_comp_graph$internal$cxxbridge1$ConfigImpl$cache_ram_capacity_percent(const ::open_comp_graph::internal::ConfigImpl &self) noexcept;
+
+void open_comp_graph$internal$cxxbridge1$get_config(::open_comp_graph::internal::ConfigImplShared *return$) noexcept;
+
 ::std::uint64_t open_comp_graph$internal$cxxbridge1$generate_random_id() noexcept;
 
 ::std::uint64_t open_comp_graph$internal$cxxbridge1$generate_id_from_name(::rust::Str name) noexcept;
@@ -1987,6 +2023,28 @@ OPENCOMPGRAPH_SYMBOL_EXPORT bool initialize() noexcept {
 } // namespace log
 
 namespace internal {
+::std::size_t ConfigImpl::layout::size() noexcept {
+  return open_comp_graph$internal$cxxbridge1$ConfigImpl$operator$sizeof();
+}
+
+::std::size_t ConfigImpl::layout::align() noexcept {
+  return open_comp_graph$internal$cxxbridge1$ConfigImpl$operator$alignof();
+}
+
+OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t ConfigImpl::cache_ram_capacity_bytes() const noexcept {
+  return open_comp_graph$internal$cxxbridge1$ConfigImpl$cache_ram_capacity_bytes(*this);
+}
+
+OPENCOMPGRAPH_SYMBOL_EXPORT float ConfigImpl::cache_ram_capacity_percent() const noexcept {
+  return open_comp_graph$internal$cxxbridge1$ConfigImpl$cache_ram_capacity_percent(*this);
+}
+
+OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::internal::ConfigImplShared get_config() noexcept {
+  ::rust::MaybeUninit<::open_comp_graph::internal::ConfigImplShared> return$;
+  open_comp_graph$internal$cxxbridge1$get_config(&return$.value);
+  return ::std::move(return$.value);
+}
+
 OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint64_t generate_random_id() noexcept {
   return open_comp_graph$internal$cxxbridge1$generate_random_id();
 }
@@ -2017,6 +2075,10 @@ void cxxbridge1$box$open_comp_graph$internal$StreamDataImpl$drop(::rust::Box<::o
 ::open_comp_graph::internal::CacheImpl *cxxbridge1$box$open_comp_graph$internal$CacheImpl$alloc() noexcept;
 void cxxbridge1$box$open_comp_graph$internal$CacheImpl$dealloc(::open_comp_graph::internal::CacheImpl *) noexcept;
 void cxxbridge1$box$open_comp_graph$internal$CacheImpl$drop(::rust::Box<::open_comp_graph::internal::CacheImpl> *ptr) noexcept;
+
+::open_comp_graph::internal::ConfigImpl *cxxbridge1$box$open_comp_graph$internal$ConfigImpl$alloc() noexcept;
+void cxxbridge1$box$open_comp_graph$internal$ConfigImpl$dealloc(::open_comp_graph::internal::ConfigImpl *) noexcept;
+void cxxbridge1$box$open_comp_graph$internal$ConfigImpl$drop(::rust::Box<::open_comp_graph::internal::ConfigImpl> *ptr) noexcept;
 
 ::open_comp_graph::internal::NodeImpl *cxxbridge1$box$open_comp_graph$internal$NodeImpl$alloc() noexcept;
 void cxxbridge1$box$open_comp_graph$internal$NodeImpl$dealloc(::open_comp_graph::internal::NodeImpl *) noexcept;
@@ -2092,6 +2154,18 @@ OPENCOMPGRAPH_SYMBOL_EXPORT void Box<::open_comp_graph::internal::CacheImpl>::al
 template <>
 OPENCOMPGRAPH_SYMBOL_EXPORT void Box<::open_comp_graph::internal::CacheImpl>::drop() noexcept {
   cxxbridge1$box$open_comp_graph$internal$CacheImpl$drop(this);
+}
+template <>
+OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::internal::ConfigImpl *Box<::open_comp_graph::internal::ConfigImpl>::allocation::alloc() noexcept {
+  return cxxbridge1$box$open_comp_graph$internal$ConfigImpl$alloc();
+}
+template <>
+OPENCOMPGRAPH_SYMBOL_EXPORT void Box<::open_comp_graph::internal::ConfigImpl>::allocation::dealloc(::open_comp_graph::internal::ConfigImpl *ptr) noexcept {
+  cxxbridge1$box$open_comp_graph$internal$ConfigImpl$dealloc(ptr);
+}
+template <>
+OPENCOMPGRAPH_SYMBOL_EXPORT void Box<::open_comp_graph::internal::ConfigImpl>::drop() noexcept {
+  cxxbridge1$box$open_comp_graph$internal$ConfigImpl$drop(this);
 }
 template <>
 OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::internal::NodeImpl *Box<::open_comp_graph::internal::NodeImpl>::allocation::alloc() noexcept {

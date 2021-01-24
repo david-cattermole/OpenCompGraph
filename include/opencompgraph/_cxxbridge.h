@@ -912,12 +912,14 @@ namespace open_comp_graph {
     struct GraphImplShared;
     struct StreamDataImplShared;
     struct CacheImplShared;
+    struct ConfigImplShared;
     struct PixelBlock;
     struct StreamDataImpl;
     struct NodeImpl;
     struct CacheImpl;
     struct GraphImpl;
     struct GeometryPlaneImpl;
+    struct ConfigImpl;
   }
 }
 
@@ -1015,6 +1017,15 @@ struct CacheImplShared final {
   using IsRelocatable = ::std::true_type;
 };
 #endif // CXXBRIDGE1_STRUCT_open_comp_graph$internal$CacheImplShared
+
+#ifndef CXXBRIDGE1_STRUCT_open_comp_graph$internal$ConfigImplShared
+#define CXXBRIDGE1_STRUCT_open_comp_graph$internal$ConfigImplShared
+struct ConfigImplShared final {
+  ::rust::Box<::open_comp_graph::internal::ConfigImpl> inner;
+
+  using IsRelocatable = ::std::true_type;
+};
+#endif // CXXBRIDGE1_STRUCT_open_comp_graph$internal$ConfigImplShared
 } // namespace internal
 
 #ifndef CXXBRIDGE1_ENUM_open_comp_graph$GraphState
@@ -1238,6 +1249,22 @@ private:
 };
 #endif // CXXBRIDGE1_STRUCT_open_comp_graph$internal$GeometryPlaneImpl
 
+#ifndef CXXBRIDGE1_STRUCT_open_comp_graph$internal$ConfigImpl
+#define CXXBRIDGE1_STRUCT_open_comp_graph$internal$ConfigImpl
+struct ConfigImpl final : public ::rust::Opaque {
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t cache_ram_capacity_bytes() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT float cache_ram_capacity_percent() const noexcept;
+  ~ConfigImpl() = delete;
+
+private:
+  friend ::rust::layout;
+  struct layout {
+    static ::std::size_t size() noexcept;
+    static ::std::size_t align() noexcept;
+  };
+};
+#endif // CXXBRIDGE1_STRUCT_open_comp_graph$internal$ConfigImpl
+
 OPENCOMPGRAPH_SYMBOL_EXPORT ::rust::Box<::open_comp_graph::internal::StreamDataImpl> create_stream_data_box() noexcept;
 
 OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::internal::StreamDataImplShared create_stream_data_shared() noexcept;
@@ -1266,6 +1293,8 @@ OPENCOMPGRAPH_SYMBOL_EXPORT bool initialize() noexcept;
 } // namespace log
 
 namespace internal {
+OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::internal::ConfigImplShared get_config() noexcept;
+
 OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint64_t generate_random_id() noexcept;
 
 OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint64_t generate_id_from_name(::rust::Str name) noexcept;

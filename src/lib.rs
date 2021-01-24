@@ -7,6 +7,7 @@ pub mod bbox;
 pub mod cache;
 pub mod colorutils;
 pub mod colorxform;
+pub mod config;
 pub mod cxxbridge;
 pub mod data;
 pub mod deformer;

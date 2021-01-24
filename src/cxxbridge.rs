@@ -2,6 +2,8 @@ use log::{debug, error, info, warn};
 
 use crate::cache::create_cache_box_with_capacity;
 use crate::cache::CacheImpl;
+use crate::config::get_config;
+use crate::config::ConfigImpl;
 use crate::data::HashValue;
 use crate::data::Identifier;
 use crate::geom::export_mesh;
@@ -83,6 +85,12 @@ pub mod ffi {
     #[namespace = "open_comp_graph::internal"]
     pub(crate) struct CacheImplShared {
         inner: Box<CacheImpl>,
+    }
+
+    #[derive(Debug)]
+    #[namespace = "open_comp_graph::internal"]
+    pub(crate) struct ConfigImplShared {
+        inner: Box<ConfigImpl>,
     }
 
     #[repr(u8)]
@@ -380,6 +388,16 @@ pub mod ffi {
     #[namespace = "open_comp_graph::log"]
     extern "Rust" {
         fn initialize() -> bool;
+    }
+
+    // Configuration
+    #[namespace = "open_comp_graph::internal"]
+    extern "Rust" {
+        type ConfigImpl;
+        fn cache_ram_capacity_bytes(&self) -> usize;
+        fn cache_ram_capacity_percent(&self) -> f32;
+
+        fn get_config() -> ConfigImplShared;
     }
 
     // Hashing Utilities
