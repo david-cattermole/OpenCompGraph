@@ -396,8 +396,9 @@ pub mod ffi {
         type ConfigImpl;
         fn cache_ram_capacity_bytes(&self) -> usize;
         fn cache_ram_capacity_percent(&self) -> f32;
+        fn data_debug_string(&self) -> String;
 
-        fn get_config() -> ConfigImplShared;
+        fn get_config(file_name: &str) -> ConfigImplShared;
     }
 
     // Hashing Utilities

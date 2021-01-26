@@ -4,7 +4,9 @@
 // pipeline in mind.
 //
 
+use log::{debug, error, info, warn};
 use serde::Deserialize;
+use std::default::Default;
 use std::env;
 use std::fs;
 
@@ -16,6 +18,14 @@ struct ConfigCache {
     /// How much System RAM to use for the cache? (This does not
     /// account for or use Swap/Page memory.)
     ram_capacity_percent: f32,
+}
+
+impl Default for ConfigCache {
+    fn default() -> Self {
+        ConfigCache {
+            ram_capacity_percent: 0.0,
+        }
+    }
 }
 
 impl ConfigCache {
@@ -31,7 +41,7 @@ impl ConfigCache {
     }
 }
 
-#[derive(Debug, PartialEq, Deserialize)]
+#[derive(Debug, Default, PartialEq, Deserialize)]
 pub struct ConfigImpl {
     cache: ConfigCache,
 }
@@ -50,11 +60,54 @@ impl ConfigImpl {
     pub fn cache_ram_capacity_percent(&self) -> f32 {
         self.cache.ram_capacity_percent()
     }
+
+    /// Convert the graph into a human-readable string, for debug
+    /// printing.
+    pub fn data_debug_string(&self) -> String {
+        debug!("Config Debug");
+        let string = format!(
+            "cache_ram_capacity_percent={} cache_ram_capacity_bytes={}",
+            self.cache_ram_capacity_percent(),
+            self.cache_ram_capacity_bytes(),
+        );
+        string
+    }
 }
 
-pub fn get_config() -> ConfigImplShared {
-    let config = load_config("C:\\OpenCompGraph\\config\\open_comp_graph.yaml")
-        .expect("Config file should exist.");
+/// Get a valid file path for the file name and environment variable.
+fn get_config_path(file_name: &str, envvar_name: &str) -> String {
+    // let envvar_name = var_name;
+    let mut config_path = String::new();
+    match env::var_os(envvar_name) {
+        Some(paths) => {
+            for split_path_buf in env::split_paths(&paths) {
+                // println!("'{}'", split_path_buf.display());
+                let mut path_buf = split_path_buf.clone();
+                path_buf.push(file_name);
+                let path = path_buf.as_path();
+                if path.is_file() {
+                    match path.to_str() {
+                        Some(v) => {
+                            config_path = v.to_string();
+                            break;
+                        }
+                        None => println!("{} is not defined in the environment.", envvar_name),
+                    }
+                }
+            }
+        }
+        None => println!("{} is not defined in the environment.", envvar_name),
+    }
+    config_path
+}
+
+pub fn get_config(file_name: &str) -> ConfigImplShared {
+    let envvar_name = "OPENCOMPGRAPH_CONFIG_PATH";
+    let path = get_config_path(&file_name, envvar_name);
+    let config = match path.as_str() {
+        "" => ConfigImpl::default(),
+        _ => load_config(&path).expect("Config file should exist."),
+    };
     ConfigImplShared {
         inner: Box::new(config),
     }

@@ -1254,6 +1254,7 @@ private:
 struct ConfigImpl final : public ::rust::Opaque {
   OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t cache_ram_capacity_bytes() const noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT float cache_ram_capacity_percent() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::rust::String data_debug_string() const noexcept;
   ~ConfigImpl() = delete;
 
 private:
@@ -1293,7 +1294,7 @@ OPENCOMPGRAPH_SYMBOL_EXPORT bool initialize() noexcept;
 } // namespace log
 
 namespace internal {
-OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::internal::ConfigImplShared get_config() noexcept;
+OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::internal::ConfigImplShared get_config(::rust::Str file_name) noexcept;
 
 OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint64_t generate_random_id() noexcept;
 

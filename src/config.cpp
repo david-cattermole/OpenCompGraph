@@ -5,7 +5,11 @@
 namespace open_comp_graph {
 
 Config::Config() noexcept
-        : inner{internal::get_config()} {
+        : inner{internal::get_config("open_comp_graph.yaml")} {
+}
+
+Config::Config(const char* file_name) noexcept
+        : inner{internal::get_config(file_name)} {
 }
 
 rust::Box<internal::ConfigImpl> Config::get_box() noexcept {
@@ -20,9 +24,13 @@ float Config::cache_ram_capacity_percent() const noexcept {
     return this->inner.inner->cache_ram_capacity_percent();
 }
 
-
 std::size_t Config::cache_ram_capacity_bytes() const noexcept {
     return this->inner.inner->cache_ram_capacity_bytes();
+}
+
+std::string Config::data_debug_string() const noexcept {
+    auto rust_string = this->inner.inner->data_debug_string();
+    return std::string(rust_string);
 }
 
 } // namespace open_comp_graph

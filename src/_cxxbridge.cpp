@@ -1308,6 +1308,7 @@ private:
 struct ConfigImpl final : public ::rust::Opaque {
   OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t cache_ram_capacity_bytes() const noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT float cache_ram_capacity_percent() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::rust::String data_debug_string() const noexcept;
   ~ConfigImpl() = delete;
 
 private:
@@ -1538,7 +1539,9 @@ extern "C" {
 
 float open_comp_graph$internal$cxxbridge1$ConfigImpl$cache_ram_capacity_percent(const ::open_comp_graph::internal::ConfigImpl &self) noexcept;
 
-void open_comp_graph$internal$cxxbridge1$get_config(::open_comp_graph::internal::ConfigImplShared *return$) noexcept;
+void open_comp_graph$internal$cxxbridge1$ConfigImpl$data_debug_string(const ::open_comp_graph::internal::ConfigImpl &self, ::rust::String *return$) noexcept;
+
+void open_comp_graph$internal$cxxbridge1$get_config(::rust::Str file_name, ::open_comp_graph::internal::ConfigImplShared *return$) noexcept;
 
 ::std::uint64_t open_comp_graph$internal$cxxbridge1$generate_random_id() noexcept;
 
@@ -2039,9 +2042,15 @@ OPENCOMPGRAPH_SYMBOL_EXPORT float ConfigImpl::cache_ram_capacity_percent() const
   return open_comp_graph$internal$cxxbridge1$ConfigImpl$cache_ram_capacity_percent(*this);
 }
 
-OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::internal::ConfigImplShared get_config() noexcept {
+OPENCOMPGRAPH_SYMBOL_EXPORT ::rust::String ConfigImpl::data_debug_string() const noexcept {
+  ::rust::MaybeUninit<::rust::String> return$;
+  open_comp_graph$internal$cxxbridge1$ConfigImpl$data_debug_string(*this, &return$.value);
+  return ::std::move(return$.value);
+}
+
+OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::internal::ConfigImplShared get_config(::rust::Str file_name) noexcept {
   ::rust::MaybeUninit<::open_comp_graph::internal::ConfigImplShared> return$;
-  open_comp_graph$internal$cxxbridge1$get_config(&return$.value);
+  open_comp_graph$internal$cxxbridge1$get_config(file_name, &return$.value);
   return ::std::move(return$.value);
 }
 

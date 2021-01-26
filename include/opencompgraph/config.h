@@ -14,6 +14,9 @@ public:
     Config() noexcept;
 
     OPENCOMPGRAPH_SYMBOL_EXPORT
+    Config(const char* file_name) noexcept;
+
+    OPENCOMPGRAPH_SYMBOL_EXPORT
     rust::Box<internal::ConfigImpl> get_box() noexcept;
 
     OPENCOMPGRAPH_SYMBOL_EXPORT
@@ -24,6 +27,9 @@ public:
 
     OPENCOMPGRAPH_SYMBOL_EXPORT
     std::size_t cache_ram_capacity_bytes() const noexcept;
+
+    OPENCOMPGRAPH_SYMBOL_EXPORT
+    std::string data_debug_string() const noexcept;
 
 private:
     internal::ConfigImplShared inner;
