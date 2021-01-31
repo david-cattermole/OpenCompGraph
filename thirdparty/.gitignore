@@ -1,5 +1,5 @@
 install/
-libjpeg-turbo/
+libjpeg_turbo/
 libpng/
 libtiff/
 zlib/
