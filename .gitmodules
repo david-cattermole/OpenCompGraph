@@ -1,3 +1,6 @@
 [submodule "tests/data/oiio-images"]
 	path = tests/data/oiio-images
 	url = https://github.com/OpenImageIO/oiio-images.git
+[submodule "tests/data/openexr-images"]
+	path = tests/data/openexr-images
+	url = https://github.com/AcademySoftwareFoundation/openexr-images
