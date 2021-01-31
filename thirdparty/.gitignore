@@ -1,0 +1,6 @@
+install/
+libjpeg-turbo/
+libpng/
+libtiff/
+zlib/
+build_*/
