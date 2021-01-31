@@ -1,3 +1,4 @@
+use anyhow::Result;
 use log::{debug, error, info, warn};
 use petgraph;
 use petgraph::dot::{Config, Dot};
@@ -14,6 +15,7 @@ use crate::cxxbridge::ffi::NodeStatus;
 use crate::cxxbridge::ffi::StreamDataImplShared;
 use crate::data::EdgeIdx;
 use crate::data::EdgeWeight;
+use crate::data::ErrorCode;
 use crate::data::GraphIdx;
 use crate::data::Identifier;
 use crate::data::NodeIdx;
@@ -272,7 +274,114 @@ impl GraphImpl {
         }
     }
 
+    // Get the stack of indices to be computed, going upstream
+    // from the starting index.
+    fn find_upstream_indexes(&self, start_node_idx: usize) -> Vec<NodeIdx> {
+        let mut sorted_node_indexes = Vec::<NodeIdx>::new();
+        let start_index = NodeIdx::new(start_node_idx);
+        let mut walker = UpstreamEvalSearch::new(&self.graph, start_index);
+        while let Some(nx) = walker.next(&self.graph) {
+            let index = nx.index();
+            let node = &self.nodes[index];
+            sorted_node_indexes.push(nx);
+            debug!("walk index: {}", index);
+        }
+        sorted_node_indexes
+    }
+
+    /// Get upstream parent inputs (so we can calculate the node hash)
+    fn compute_node_metadata(
+        &mut self,
+        nx: NodeIdx,
+        frame: i32,
+        parent_inputs: &mut Vec<StreamDataImplShared>,
+        cache: &mut Box<CacheImpl>,
+    ) -> Result<(GraphIdx, Vec<StreamDataImplShared>), ErrorCode> {
+        let mut inputs = Vec::<StreamDataImplShared>::new();
+        let parents = self.graph.neighbors_directed(nx, Direction::Incoming);
+        for parent_node_index in parents {
+            let parent_index = parent_node_index.index();
+            debug!("parent index: {}", parent_index);
+            let parent_node = &self.nodes[parent_index];
+            let parent_hash = parent_node.hash(frame, &parent_inputs);
+
+            match cache.get(&parent_hash) {
+                Some(value) => {
+                    debug!("Got hash: {}", parent_hash);
+                    let mut stream_data = create_stream_data_shared();
+                    stream_data.inner = value.inner.clone();
+                    inputs.push(stream_data);
+                }
+                _ => warn!("Missing from cache: {}", parent_hash),
+            }
+        }
+        let node_index = nx.index();
+        Ok((node_index, inputs))
+    }
+
+    /// Compute the node.
+    fn compute_node_output(
+        &mut self,
+        inputs: &Vec<StreamDataImplShared>,
+        node_index: GraphIdx,
+        frame: i32,
+        cache: &mut Box<CacheImpl>,
+    ) -> Result<(), ErrorCode> {
+        let node = &mut self.nodes[node_index];
+        let node_hash = node.hash(frame, &inputs);
+        let mut cached_output = cache.get(&node_hash);
+        match cached_output {
+            Some(value) => {
+                debug!("Reuse Hash: {}", node_hash);
+                self.output = value.clone();
+                Ok(())
+            }
+            None => {
+                debug!("Cache Miss: {}", node_hash);
+                self.output = create_stream_data_shared();
+                match node.compute(frame, &inputs, &mut self.output) {
+                    NodeStatus::Valid | NodeStatus::Warning => {
+                        cache.insert(node_hash, self.output.clone());
+                        Ok(())
+                    }
+                    NodeStatus::Uninitialized => {
+                        error!("Node is uninitialized: node_index={}", node_index);
+                        return Err(ErrorCode::Uninitialized);
+                    }
+                    NodeStatus::Error => {
+                        error!("Failed to compute node: node_index={}", node_index);
+                        return Err(ErrorCode::Failure);
+                    }
+                    _ => {
+                        error!("Unknown error: node_index={}", node_index);
+                        return Err(ErrorCode::Failure);
+                    }
+                }
+            }
+        }
+    }
+
+    fn execute_frame(
+        &mut self,
+        sorted_node_indexes: &Vec<NodeIdx>,
+        frame: i32,
+        cache: &mut Box<CacheImpl>,
+    ) -> Result<(), ErrorCode> {
+        info!("Execute Frame Context: {}", frame);
+
+        let mut parent_inputs = Vec::<StreamDataImplShared>::new();
+        for nx in sorted_node_indexes.iter().rev() {
+            debug!("Compute Node Index: {:?}", nx);
+            let (node_index, node_inputs) =
+                self.compute_node_metadata(*nx, frame, &mut parent_inputs, cache)?;
+            self.compute_node_output(&node_inputs, node_index, frame, cache)?;
+            parent_inputs = node_inputs.to_vec();
+        }
+        Ok(())
+    }
+
     /// Compute the graph!
+    //
     // TODO: Add an "executor" variable to this method to as the
     // manager of the (CPU and/or GPU) resources. This is to avoid two
     // different graphs trying to evaluate at the same time and
@@ -297,82 +406,25 @@ impl GraphImpl {
                 return self.status;
             }
         };
+        let sorted_node_indexes = self.find_upstream_indexes(start_node_idx);
 
         for frame in frames {
-            info!("Execute Frame Context: {}", frame);
-            let mut sorted_node_indexes = Vec::<NodeIdx>::new();
-
-            // Get the stack of indices to be computed, going upstream
-            // from the starting index.
-            let start_index = NodeIdx::new(start_node_idx);
-            let mut walker = UpstreamEvalSearch::new(&self.graph, start_index);
-            while let Some(nx) = walker.next(&self.graph) {
-                let index = nx.index();
-                let node = &self.nodes[index];
-                sorted_node_indexes.push(nx);
-                debug!("walk index: {}", index);
-            }
-
-            let mut parent_inputs = Vec::<StreamDataImplShared>::new();
-            for nx in sorted_node_indexes.iter().rev() {
-                debug!("Compute Node Index: {:?}", nx);
-
-                // Get upstream parent inputs (so we can calculate the node hash)
-                let mut inputs = Vec::<StreamDataImplShared>::new();
-                let parents = self.graph.neighbors_directed(*nx, Direction::Incoming);
-                for parent_node_index in parents {
-                    let parent_index = parent_node_index.index();
-                    debug!("parent index: {}", parent_index);
-                    let parent_node = &self.nodes[parent_index];
-                    let parent_hash = parent_node.hash(*frame, &parent_inputs);
-
-                    match cache.get(&parent_hash) {
-                        Some(value) => {
-                            debug!("Got hash: {}", parent_hash);
-                            let mut stream_data = create_stream_data_shared();
-                            stream_data.inner = value.inner.clone();
-                            inputs.push(stream_data);
+            match self.execute_frame(&sorted_node_indexes, *frame, cache) {
+                Err(e) => {
+                    match e {
+                        ErrorCode::Failure => {
+                            self.status = ExecuteStatus::Error;
                         }
-                        _ => warn!("Missing from cache: {}", parent_hash),
-                    }
-                }
-                parent_inputs = inputs.to_vec();
-                let node_index = nx.index();
-                let node = &mut self.nodes[node_index];
-                let node_hash = node.hash(*frame, &inputs);
-
-                // Compute the node
-                let mut cached_output = cache.get(&node_hash);
-                match cached_output {
-                    Some(value) => {
-                        debug!("Reuse Hash: {}", node_hash);
-                        self.output = value.clone();
-                    }
-                    None => {
-                        debug!("Cache Miss: {}", node_hash);
-                        self.output = create_stream_data_shared();
-                        match node.compute(*frame, &inputs, &mut self.output) {
-                            NodeStatus::Valid | NodeStatus::Warning => {
-                                cache.insert(node_hash, self.output.clone())
-                            }
-                            NodeStatus::Uninitialized => {
-                                self.status = ExecuteStatus::Uninitialized;
-                                error!("Node is uninitialized: node_index={}", node_index);
-                                return self.status;
-                            }
-                            NodeStatus::Error => {
-                                self.status = ExecuteStatus::Error;
-                                error!("Failed to compute node: node_index={}", node_index);
-                                return self.status;
-                            }
-                            _ => {
-                                self.status = ExecuteStatus::Error;
-                                error!("Unknown error: node_index={}", node_index);
-                                return self.status;
-                            }
+                        ErrorCode::Invalid => {
+                            self.status = ExecuteStatus::Error;
+                        }
+                        ErrorCode::Uninitialized => {
+                            self.status = ExecuteStatus::Uninitialized;
                         }
                     }
+                    return self.status;
                 }
+                _ => (),
             }
         }
 

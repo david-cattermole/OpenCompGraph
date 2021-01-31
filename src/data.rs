@@ -64,3 +64,9 @@ pub static COLOR_BARS: &'static [f32] = &[
     0.0627, 0.0627, 0.9215, // 16, 16, 235   - Blue
     0.0627, 0.0627, 0.0627, // 16, 16, 16    - Black
 ];
+
+pub enum ErrorCode {
+    Failure,
+    Invalid,
+    Uninitialized,
+}
