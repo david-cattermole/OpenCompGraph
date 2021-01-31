@@ -41,15 +41,15 @@ ExternalProject_Add(zlib
 #     https://github.com/OpenImageIO/oiio/blob/master/src/build-scripts/build_libjpeg-turbo.bash
 #
 ExternalProject_Add(libjpeg_turbo
-    PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/libjpeg-turbo
+    PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/libjpeg_turbo
     GIT_REPOSITORY "https://github.com/libjpeg-turbo/libjpeg-turbo.git"
     GIT_TAG "2.0.5"
-    INSTALL_DIR ${THIRDPARTY_INSTALL_PREFIX}/libjpeg-turbo
+    INSTALL_DIR ${THIRDPARTY_INSTALL_PREFIX}/libjpeg_turbo
     CMAKE_ARGS
         -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
         -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
         -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}
-        -DCMAKE_INSTALL_PREFIX=${THIRDPARTY_INSTALL_PREFIX}/libjpeg-turbo
+        -DCMAKE_INSTALL_PREFIX=${THIRDPARTY_INSTALL_PREFIX}/libjpeg_turbo
 )
 
 
