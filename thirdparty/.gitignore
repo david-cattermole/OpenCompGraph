@@ -3,4 +3,6 @@ libjpeg_turbo/
 libpng/
 libtiff/
 zlib/
+ilmbase/
+openexr/
 build_*/

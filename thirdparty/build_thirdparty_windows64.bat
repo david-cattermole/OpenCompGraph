@@ -34,6 +34,9 @@ SET BUILD_TYPE=Release
 :: The root of this project.
 ECHO THIRDPARTY Root: %CD%
 
+:: The path to where IlmBase will be installed, once it is finally built.
+SET ILMBASE_LIB_PATH=%CD%\install\ilmbase\lib
+
 :: Build plugin
 MKDIR build_windows64_thirdparty_%BUILD_TYPE%
 CHDIR build_windows64_thirdparty_%BUILD_TYPE%
@@ -41,6 +44,11 @@ IF "%FRESH_BUILD%"=="1" (
     DEL /S /Q *
     FOR /D %%G in ("*") DO RMDIR /S /Q "%%~nxG"
 )
+
+:: HACK: Adjust the runtime PATH environment variable before CMake
+:: runs so that OpenEXR will know where IlmBase libraries will exist,
+:: so, that "b44ExpLogTable" and "dwaLookups" executables can exist.
+SET PATH=%PATH%;%ILMBASE_LIB_PATH%
 
 cmake -G "NMake Makefiles" ^
     -DCMAKE_BUILD_TYPE=%BUILD_TYPE% ^
