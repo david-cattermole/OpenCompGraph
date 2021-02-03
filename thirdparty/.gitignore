@@ -5,4 +5,5 @@ libtiff/
 zlib/
 ilmbase/
 openexr/
+openimageio/
 build_*/

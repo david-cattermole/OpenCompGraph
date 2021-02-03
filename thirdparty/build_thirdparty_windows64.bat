@@ -35,7 +35,20 @@ SET BUILD_TYPE=Release
 ECHO THIRDPARTY Root: %CD%
 
 :: The path to where IlmBase will be installed, once it is finally built.
-SET ILMBASE_LIB_PATH=%CD%\install\ilmbase\lib
+SET ILMBASE_LIB_PATH=%CD%\install\ilmbase_openexr\lib
+
+:: Packages
+SET BOOST_ROOT="C:\Program Files\boost_1_61_0"
+SET ZLIB_ROOT="%CD%\install\zlib"
+SET LIBJPEGTURBO_ROOT="%CD%\install\libjpeg_turbo"
+SET LIBPNG_ROOT="%CD%\install\libpng"
+SET LIBTIFF_ROOT="%CD%\install\libtiff"
+SET ILMBASE_ROOT="%CD%\install\ilmbase_openexr"
+SET OPENEXR_ROOT="%CD%\install\ilmbase_openexr"
+SET PREFIX_PATH=%BOOST_ROOT%;%ZLIB_ROOT%;%LIBJPEGTURBO_ROOT%;%LIBPNG_ROOT%;%LIBTIFF_ROOT%;%ILMBASE_ROOT%;%OPENEXR_ROOT%
+
+:: Ignore these paths.
+SET IGNORE_PATH="C:\Program Files\emacs\emacs-26.3-x86_64\lib"
 
 :: Build plugin
 MKDIR build_windows64_thirdparty_%BUILD_TYPE%
@@ -48,10 +61,12 @@ IF "%FRESH_BUILD%"=="1" (
 :: HACK: Adjust the runtime PATH environment variable before CMake
 :: runs so that OpenEXR will know where IlmBase libraries will exist,
 :: so, that "b44ExpLogTable" and "dwaLookups" executables can exist.
-SET PATH=%PATH%;%ILMBASE_LIB_PATH%
+SET PATH=%PATH%\;%ILMBASE_LIB_PATH%
 
 cmake -G "NMake Makefiles" ^
     -DCMAKE_BUILD_TYPE=%BUILD_TYPE% ^
+    -DCMAKE_PREFIX_PATH=%PREFIX_PATH% ^
+    -DCMAKE_IGNORE_PATH=%IGNORE_PATH% ^
     ..
 
 nmake /F Makefile clean
