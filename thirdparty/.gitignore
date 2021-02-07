@@ -2,8 +2,10 @@ install/
 libjpeg_turbo/
 libpng/
 libtiff/
+bzip2/
 zlib/
 ilmbase/
 openexr/
+opencolorio/
 openimageio/
 build_*/

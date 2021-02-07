@@ -48,7 +48,7 @@ SET OPENEXR_ROOT="%CD%\install\ilmbase_openexr"
 SET PREFIX_PATH=%BOOST_ROOT%;%ZLIB_ROOT%;%LIBJPEGTURBO_ROOT%;%LIBPNG_ROOT%;%LIBTIFF_ROOT%;%ILMBASE_ROOT%;%OPENEXR_ROOT%
 
 :: Ignore these paths.
-SET IGNORE_PATH="C:\Program Files\emacs\emacs-26.3-x86_64\lib"
+SET IGNORE_PATH="C:\\MinGW\;C:\\MinGW\\bin\;C:\\MinGW\\lib\;C:\\MinGW\\include\;C:\\Program Files\\emacs\\emacs-26.3-x86_64\;C:\\Program Files\\emacs\\emacs-26.3-x86_64\\bin\;C:\\Program Files\\emacs\\emacs-26.3-x86_64\\lib\;C:\\Program Files\\emacs\\emacs-26.3-x86_64\\include\;C:\\Program Files\\Autodesk\\Maya2017\\lib\;"
 
 :: Build plugin
 MKDIR build_windows64_thirdparty_%BUILD_TYPE%
