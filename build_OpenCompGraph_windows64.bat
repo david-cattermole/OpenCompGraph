@@ -10,10 +10,27 @@ CHDIR %OCG_ROOT%
 
 :: Install directory
 SET INSTALL_DIR="%OCG_ROOT%\install"
+SET THIRDPARTY_INSTALL_DIR="%OCG_ROOT%\thirdparty/install/"
+
+:: Should we build tests?
+SET BUILD_TESTS=1
 
 :: Where to find the Rust libraries and headers.
 SET RUST_BUILD_DIR="%OCG_ROOT%\target\release"
 SET RUST_INCLUDE_DIR="%OCG_ROOT%\include"
+
+:: Install root paths for various third-party components.
+SET ZLIB_ROOT="%THIRDPARTY_INSTALL_DIR%\zlib"
+SET TIFF_ROOT="%THIRDPARTY_INSTALL_DIR%\libtiff"
+SET PNG_ROOT="%THIRDPARTY_INSTALL_DIR%\libpng"
+SET JPEG_TURBO_ROOT="%THIRDPARTY_INSTALL_DIR%\libjpeg_turbo"
+SET ILMBASE_ROOT="%THIRDPARTY_INSTALL_DIR%\ilmbase_openexr"
+SET OPENEXR_ROOT="%THIRDPARTY_INSTALL_DIR%\ilmbase_openexr"
+SET OPENCOLORIO_ROOT="%THIRDPARTY_INSTALL_DIR%\opencolorio"
+SET OPENIMAGEIO_ROOT="%THIRDPARTY_INSTALL_DIR%\openimageio"
+
+:: Special env-vars that is picked up by build scripts.
+SET OpenImageIO_ROOT=%OPENIMAGEIO_ROOT%
 
 :: Build Rust
 ::
@@ -30,8 +47,10 @@ cmake -G "NMake Makefiles" ^
     -DCMAKE_BUILD_TYPE=Release ^
     -DCMAKE_INSTALL_PREFIX=%INSTALL_DIR% ^
     -DCMAKE_CXX_STANDARD=11 ^
-    -DRUST_BUILD_DIR=%RUST_BUILD_DIR% ^
-    -DRUST_INCLUDE_DIR=%RUST_INCLUDE_DIR% ^
+    -DOpenCompGraph_BUILD_TESTS=%BUILD_TESTS% ^
+    -DOpenCompGraph_RUST_BUILD_DIR=%RUST_BUILD_DIR% ^
+    -DOpenCompGraph_RUST_INCLUDE_DIR=%RUST_INCLUDE_DIR% ^
+    -DOPENIMAGEIO_ROOT=%OPENIMAGEIO_ROOT% ^
     ..
 
 nmake /F Makefile clean

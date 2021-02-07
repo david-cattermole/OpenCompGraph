@@ -25,8 +25,25 @@ endif()
 
 set(target_lib "opencompgraph")
 set(target_test_exe "opencompgraph_tests")
-set(OpenCompGraph_INSTALL_PREFIX "" CACHE STRING "String added to the install path for libraries and binaries.")
+set(OpenCompGraph_INSTALL_PREFIX ""
+  CACHE STRING "String added to the install path for libraries and binaries.")
+set(OpenCompGraph_BUILD_TESTS OFF
+  CACHE BOOL "builds Tests for OpenCompGraph?.")
+
+set(OPENIMAGEIO_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/install/openimageio"
+  CACHE STRING "Root path to installed OpenImageIO.")
+
+# Third-party packages.
+find_package(OpenImageIO REQUIRED
+  HINTS ${OPENIMAGEIO_ROOT})
+message(STATUS "OpenImageIO Found: ${OpenImageIO_FOUND}")
+message(STATUS "OpenImageIO Version: ${OpenImageIO_VERSION}")
 
 add_subdirectory(src)
 add_subdirectory(include)
-add_subdirectory(tests)
+if(OpenCompGraph_BUILD_TESTS)
+  message(STATUS "Build Tests: ON")
+  add_subdirectory(tests)
+elseif()
+  message(STATUS "Build Tests: OFF")
+endif()

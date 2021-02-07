@@ -1,14 +1,14 @@
 # Expected inputs.
-set(RUST_BUILD_DIR "/path/to/rust/build/directory/" CACHE PATH
+set(OpenCompGraph_RUST_BUILD_DIR "/path/to/rust/build/directory/" CACHE PATH
   "The path to the compiled rust directory.")
-set(RUST_INCLUDE_DIR "/path/to/rust/include/directory/" CACHE PATH
+set(OpenCompGraph_RUST_INCLUDE_DIR "/path/to/rust/include/directory/" CACHE PATH
   "The path to the generated include.")
 
 include(OpenCompGraphUtils)
 
 # Find the Rust Library
 set(rust_linktime_file "NOT-FOUND")
-find_rust_library("opencompgraph_rs" ${RUST_BUILD_DIR} rust_linktime_file)
+find_rust_library("opencompgraph_rs" ${OpenCompGraph_RUST_BUILD_DIR} rust_linktime_file)
 message(STATUS "Rust Library: " ${rust_linktime_file})
 
 # Generate CXX Bridge files.
@@ -40,14 +40,20 @@ set(opencompgraph_source_files
 add_library(${target_lib} SHARED ${opencompgraph_source_files})
 target_link_libraries(${target_lib}
   ${rust_linktime_file})
+target_link_libraries(${target_lib}
+  OpenImageIO::OpenImageIO
+  ${rust_linktime_file})
+
 target_include_directories(${target_lib}
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include>
         $<INSTALL_INTERFACE:include>
+        ${OpenCompGraph_RUST_INCLUDE_DIR}
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}
+        ${OPENIMAGEIO_INCLUDES}
 )
-target_include_directories(${target_lib} PUBLIC ${RUST_INCLUDE_DIR})
+
 if (MSVC)
   target_link_libraries(${target_lib} ws2_32 userenv advapi32 shell32)
   if (CMAKE_BUILD_TYPE STREQUAL "Release")
