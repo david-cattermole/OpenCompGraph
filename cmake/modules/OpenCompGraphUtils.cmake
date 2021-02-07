@@ -19,17 +19,6 @@
 # CMake utilities for mmSolver.
 #
 
-# Enable c++11
-macro(set_cxx_standard_cpp_11)
-  if (CMAKE_VERSION VERSION_LESS "3.1")
-    if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-      set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-    endif ()
-  else ()
-    set (CMAKE_CXX_STANDARD 11)
-  endif ()
-endmacro()
-
 
 # Find the Rust compiled library
 function(find_rust_library lib_name build_dir out_linktime_file)

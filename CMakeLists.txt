@@ -16,7 +16,12 @@ set(PROJECT_COPYRIGHT "2019, 2020, David Cattermole.")
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules)
 include(OpenCompGraphUtils)
 
-set_cxx_standard_cpp_11()
+# Enable C++11 as minimum
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+if (CMAKE_CXX_STANDARD EQUAL "")
+  info("OpenCompGraph does not support less than C++11.")
+  set (CMAKE_CXX_STANDARD 11)
+endif()
 
 set(target_lib "opencompgraph")
 set(target_test_exe "opencompgraph_tests")

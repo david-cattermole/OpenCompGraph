@@ -29,6 +29,7 @@ cmake -E touch "%OCG_ROOT%\src\_cxxbridge.cpp"
 cmake -G "NMake Makefiles" ^
     -DCMAKE_BUILD_TYPE=Release ^
     -DCMAKE_INSTALL_PREFIX=%INSTALL_DIR% ^
+    -DCMAKE_CXX_STANDARD=11 ^
     -DRUST_BUILD_DIR=%RUST_BUILD_DIR% ^
     -DRUST_INCLUDE_DIR=%RUST_INCLUDE_DIR% ^
     ..
