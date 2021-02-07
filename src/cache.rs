@@ -1,49 +1,22 @@
+use linked_hash_map::LinkedHashMap;
 use log::{debug, error, info, warn};
 use rustc_hash::FxHashMap;
+use rustc_hash::FxHasher;
 use std::cmp::Ordering;
 use std::cmp::Reverse;
 use std::collections::BinaryHeap;
+use std::hash::BuildHasherDefault;
 
 use crate::cxxbridge::ffi::StreamDataImplShared;
 use crate::data::BYTES_TO_GIGABYTES;
 
-type CacheTimestamp = usize;
-type CacheIndex = usize;
+type LruHashMap<K, V> = LinkedHashMap<K, V, BuildHasherDefault<FxHasher>>;
 type CacheKey = u64;
 type CacheValue = StreamDataImplShared;
 
-#[derive(Debug, PartialEq)]
-struct OldestTimestamp(CacheTimestamp);
-
-impl Eq for OldestTimestamp {}
-
-impl PartialOrd for OldestTimestamp {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        other.0.partial_cmp(&self.0)
-    }
-}
-
-impl Ord for OldestTimestamp {
-    fn cmp(&self, other: &OldestTimestamp) -> Ordering {
-        self.partial_cmp(other).unwrap()
-    }
-}
-
-#[derive(Debug)]
-struct CacheEntry {
-    timestamp: CacheTimestamp,
-    value: CacheValue,
-}
-
 #[derive(Debug)]
 pub struct CacheImpl {
-    // Mapping data structure.
-    key_to_entry: FxHashMap<CacheKey, CacheEntry>,
-
-    // Least Recently Used priority queue.
-    lru_timestamps: BinaryHeap<OldestTimestamp>,
-    timestamp_to_key: FxHashMap<CacheTimestamp, CacheKey>,
-    last_timestamp: usize,
+    lru_hash_map: LinkedHashMap<CacheKey, CacheValue>,
 
     // Keep track of how much memory is used in the cache.
     capacity_bytes: usize,
@@ -65,23 +38,17 @@ impl CacheImpl {
 
     /// Create a new cache with the given capacity (in bytes).
     pub fn with_capacity(capacity_bytes: usize) -> CacheImpl {
-        let key_to_entry = FxHashMap::default();
-        let lru_timestamps = BinaryHeap::new();
-        let timestamp_to_key = FxHashMap::default();
+        let lru_hash_map = LinkedHashMap::new();
 
         let used_bytes = 0;
         let capacity_bytes = 0;
-        let last_timestamp = 0;
         let hits = 0;
         let misses = 0;
         let inserts = 0;
         let evictions = 0;
 
         CacheImpl {
-            key_to_entry,
-            lru_timestamps,
-            timestamp_to_key,
-            last_timestamp,
+            lru_hash_map,
             capacity_bytes,
             used_bytes,
             hits,
@@ -93,7 +60,7 @@ impl CacheImpl {
 
     /// Number of entries in the cache.
     pub fn len(&self) -> usize {
-        let value = self.key_to_entry.len();
+        let value = self.lru_hash_map.len();
         debug!("count value: {}", value);
         value
     }
@@ -144,21 +111,7 @@ impl CacheImpl {
             self.evict_bytes(free_bytes_needed);
         }
 
-        // Register the newest key to be "used" by our cache. This key
-        // is therefore "hot", where as only "cold" keys will be lower
-        // in the heap and will be removed as needed.
-        let entry_timestamp = self.last_timestamp + 1;
-        self.lru_timestamps.push(OldestTimestamp(entry_timestamp));
-        self.timestamp_to_key.insert(entry_timestamp, key);
-
-        // Put our value into the map.
-        let entry = CacheEntry {
-            timestamp: entry_timestamp,
-            value,
-        };
-        self.key_to_entry.insert(key, entry);
-
-        self.last_timestamp = entry_timestamp;
+        self.lru_hash_map.insert(key, value);
         self.used_bytes += value_bytes;
         self.inserts += 1;
     }
@@ -166,19 +119,11 @@ impl CacheImpl {
     /// Get a value from the Cache, if it exists.
     pub fn get(&mut self, key: &CacheKey) -> Option<&CacheValue> {
         debug!("Query Cache: key={}", key);
-        let entry = self.key_to_entry.get(key);
-        match entry {
-            Some(entry) => {
-                // TODO: Remove the timestamp from
-                // 'self.lru_timestamps' heap (which is not possible
-                // in the Rust API).
-                self.timestamp_to_key.remove(&entry.timestamp);
-                let entry_timestamp = self.last_timestamp + 1;
-                self.timestamp_to_key.insert(entry_timestamp, *key);
-                self.lru_timestamps.push(OldestTimestamp(entry_timestamp));
+        let value = self.lru_hash_map.get_refresh(key);
+        match value {
+            Some(value) => {
                 self.hits += 1;
-                self.last_timestamp = entry_timestamp;
-                Some(&entry.value)
+                Some(value)
             }
             None => {
                 self.misses += 1;
@@ -191,7 +136,7 @@ impl CacheImpl {
     ///
     /// Strategy for removing items is Least Recently Used (LRU).
     pub fn evict_bytes(&mut self, n_bytes: usize) {
-        if self.lru_timestamps.len() == 0 {
+        if self.lru_hash_map.len() == 0 {
             debug!("Cache Data: {}", self.data_debug_string());
             error!("Could not evict bytes, no timestamps!");
             return;
@@ -217,32 +162,17 @@ impl CacheImpl {
             false => self.used_bytes - n_bytes,
         };
 
-        while (self.used_bytes >= requested_capacity) && (self.lru_timestamps.len() > 0) {
+        while (self.used_bytes >= requested_capacity) && (self.lru_hash_map.len() > 0) {
             self.evict();
         }
     }
 
     pub fn evict_all(&mut self) {
-        debug!("EVICT ALL: count={}", self.lru_timestamps.len());
+        debug!("EVICT ALL: count={}", self.lru_hash_map.len());
         // Keep evicting until all entries are removed from the cache.
-        while self.lru_timestamps.len() > 0 {
+        while self.lru_hash_map.len() > 0 {
             self.evict();
         }
-    }
-
-    fn pop_next_valid_key_to_evict(&mut self) -> Option<CacheKey> {
-        let mut valid_timestamp_key = None;
-        while let Some(next_oldest_timestamp) = self.lru_timestamps.pop() {
-            let next_oldest_entry = next_oldest_timestamp.0;
-            if let Some(key) = self.timestamp_to_key.remove(&next_oldest_entry) {
-                valid_timestamp_key = Some(key);
-                break;
-            }
-            // If no key exists, the timestamp has already been
-            // evicted and we can pop another timestamp off and try to
-            // evict that one instead.
-        }
-        valid_timestamp_key
     }
 
     pub fn evict(&mut self) -> bool {
@@ -252,20 +182,17 @@ impl CacheImpl {
         // always decrease after each call.
         //
         // Identify least recently used key, and remove the key.
-        if let Some(key) = self.pop_next_valid_key_to_evict() {
-            if let Some(entry) = self.key_to_entry.remove(&key) {
-                let value = entry.value;
-                let value_bytes = value.inner.size_bytes();
-                // There should not be any overflow problems with this
-                // subtraction since we add and subtract exactly goes
-                // into the cache. If there is an overflow here, it
-                // means we must have skipped counting a cache entry's
-                // size somewhere.
-                self.used_bytes -= value_bytes;
+        if let Some((key, value)) = self.lru_hash_map.pop_front() {
+            let value_bytes = value.inner.size_bytes();
+            // There should not be any overflow problems with this
+            // subtraction since we add and subtract exactly goes
+            // into the cache. If there is an overflow here, it
+            // means we must have skipped counting a cache entry's
+            // size somewhere.
+            self.used_bytes -= value_bytes;
 
-                success = true;
-                self.evictions += 1;
-            }
+            success = true;
+            self.evictions += 1;
         };
         success
     }
@@ -284,7 +211,7 @@ impl CacheImpl {
             (self.inserts as f64 / self.evictions as f64) * 100.0,
             self.inserts,
             self.evictions,
-            self.key_to_entry.len()
+            self.lru_hash_map.len()
         );
         string
     }

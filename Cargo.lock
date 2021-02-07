@@ -406,6 +406,7 @@ dependencies = [
  "env_logger",
  "fastapprox",
  "image",
+ "linked-hash-map",
  "log",
  "nalgebra",
  "petgraph",
