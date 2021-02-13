@@ -36,19 +36,19 @@ uint64_t StreamData::hash() const noexcept {
     return this->inner.inner->hash();
 }
 
-BBox2Df StreamData::display_window() const noexcept {
+BBox2Di StreamData::display_window() const noexcept {
     return this->inner.inner->display_window();
 };
 
-void StreamData::set_display_window(BBox2Df value) noexcept {
+void StreamData::set_display_window(BBox2Di value) noexcept {
     this->inner.inner->set_display_window(value);
 };
 
-BBox2Df StreamData::data_window() const noexcept {
+BBox2Di StreamData::data_window() const noexcept {
     return this->inner.inner->data_window();
 };
 
-void StreamData::set_data_window(BBox2Df value) noexcept {
+void StreamData::set_data_window(BBox2Di value) noexcept {
     this->inner.inner->set_data_window(value);
 };
 
@@ -76,15 +76,15 @@ rust::Slice<const float> StreamData::pixel_buffer() const noexcept {
     return this->inner.inner->pixel_buffer();
 };
 
-uint32_t StreamData::pixel_width() const noexcept {
+int32_t StreamData::pixel_width() const noexcept {
     return this->inner.inner->pixel_width();
 };
 
-uint32_t StreamData::pixel_height() const noexcept {
+int32_t StreamData::pixel_height() const noexcept {
     return this->inner.inner->pixel_height();
 };
 
-uint8_t StreamData::pixel_num_channels() const noexcept {
+int32_t StreamData::pixel_num_channels() const noexcept {
     return this->inner.inner->pixel_num_channels();
 };
 

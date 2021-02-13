@@ -39,9 +39,9 @@ pub const KILOBYTES_TO_GIGABYTES: usize = 1048576; // int(pow(2, 20))
 // Note: To make things even (only 8 entries), we skip the "75% white"
 // value.
 //
-pub static COLOR_BARS_WIDTH: u32 = 4;
-pub static COLOR_BARS_HEIGHT: u32 = 4;
-pub static COLOR_BARS_NUM_CHANNELS: u8 = 3;
+pub static COLOR_BARS_WIDTH: i32 = 4;
+pub static COLOR_BARS_HEIGHT: i32 = 4;
+pub static COLOR_BARS_NUM_CHANNELS: i32 = 3;
 pub static COLOR_BARS: &'static [f32] = &[
     // Row 0
     0.9215, 0.9215, 0.9215, // 235, 235, 235 - 100% White

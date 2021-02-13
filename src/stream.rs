@@ -2,7 +2,7 @@ use image;
 use log::{debug, error, info, warn};
 use std::rc::Rc;
 
-use crate::cxxbridge::ffi::BBox2Df;
+use crate::cxxbridge::ffi::BBox2Di;
 use crate::cxxbridge::ffi::Matrix4;
 use crate::cxxbridge::ffi::StreamDataState;
 use crate::data::HashValue;
@@ -14,8 +14,8 @@ use crate::pixelblock::PixelBlock;
 pub struct StreamDataImpl {
     state: StreamDataState,
     hash: HashValue,
-    display_window: BBox2Df,
-    data_window: BBox2Df,
+    display_window: BBox2Di,
+    data_window: BBox2Di,
     color_matrix: Matrix4,
     transform_matrix: Matrix4,
     pixel_block: Rc<PixelBlock>,
@@ -28,10 +28,10 @@ impl StreamDataImpl {
         let hash = 0;
 
         let pixel_block = Rc::new(PixelBlock::new_color_bars());
-        let bbox_max_width = (pixel_block.width - 1) as f32;
-        let bbox_max_height = (pixel_block.height - 1) as f32;
-        let display_window = BBox2Df::new(0.0, 0.0, bbox_max_width, bbox_max_height);
-        let data_window = BBox2Df::new(0.0, 0.0, bbox_max_width, bbox_max_height);
+        let bbox_max_width = pixel_block.width - 1;
+        let bbox_max_height = pixel_block.height - 1;
+        let display_window = BBox2Di::new(0, 0, bbox_max_width, bbox_max_height);
+        let data_window = BBox2Di::new(0, 0, bbox_max_width, bbox_max_height);
         let color_matrix = Matrix4::identity();
         let transform_matrix = Matrix4::identity();
         let deformers = Vec::new();
@@ -72,19 +72,19 @@ impl StreamDataImpl {
         self.hash = value;
     }
 
-    pub fn display_window(&self) -> BBox2Df {
+    pub fn display_window(&self) -> BBox2Di {
         self.display_window
     }
 
-    pub fn set_display_window(&mut self, value: BBox2Df) {
+    pub fn set_display_window(&mut self, value: BBox2Di) {
         self.display_window = value;
     }
 
-    pub fn data_window(&self) -> BBox2Df {
+    pub fn data_window(&self) -> BBox2Di {
         self.data_window
     }
 
-    pub fn set_data_window(&mut self, value: BBox2Df) {
+    pub fn set_data_window(&mut self, value: BBox2Di) {
         self.data_window = value;
     }
 
@@ -117,9 +117,9 @@ impl StreamDataImpl {
     pub fn apply_deformers_to_pixels(
         &self,
         src: &[f32],
-        src_width: u32,
-        src_height: u32,
-        src_num_channels: u8,
+        src_width: i32,
+        src_height: i32,
+        src_num_channels: i32,
     ) -> Box<Vec<f32>> {
         debug!("StreamData.apply_deformers...");
 
@@ -128,7 +128,7 @@ impl StreamDataImpl {
         let dst_width = src_width;
         let dst_height = src_height;
         let dst_num_channels = src_num_channels;
-        let dst_size = (dst_width * dst_height * dst_num_channels as u32) as usize;
+        let dst_size = (dst_width * dst_height * dst_num_channels) as usize;
         let mut dst_box = Box::new(vec![0.0 as f32; dst_size]);
         let mut dst = &mut dst_box[..];
 
@@ -181,15 +181,15 @@ impl StreamDataImpl {
         &self.pixel_block.pixels.as_slice()
     }
 
-    pub fn pixel_width(&self) -> u32 {
+    pub fn pixel_width(&self) -> i32 {
         self.pixel_block.width
     }
 
-    pub fn pixel_height(&self) -> u32 {
+    pub fn pixel_height(&self) -> i32 {
         self.pixel_block.height
     }
 
-    pub fn pixel_num_channels(&self) -> u8 {
+    pub fn pixel_num_channels(&self) -> i32 {
         self.pixel_block.num_channels
     }
 }

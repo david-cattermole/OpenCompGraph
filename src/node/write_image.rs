@@ -1,4 +1,3 @@
-use image::RgbaImage;
 use log::{debug, error, info, log_enabled, warn, Level};
 use std::collections::hash_map::DefaultHasher;
 use std::hash;
@@ -11,15 +10,18 @@ use crate::colorutils;
 use crate::colorutils::convert_linear_to_srgb;
 use crate::colorxform;
 use crate::cxxbridge::ffi::AttrState;
+use crate::cxxbridge::ffi::ImageShared;
 use crate::cxxbridge::ffi::NodeStatus;
 use crate::cxxbridge::ffi::NodeType;
 use crate::cxxbridge::ffi::StreamDataImplShared;
 use crate::data::HashValue;
 use crate::data::Identifier;
 use crate::deformutils;
+use crate::imageio;
 use crate::node::traits::Operation;
 use crate::node::NodeImpl;
 use crate::pathutils;
+use crate::pixelblock::PixelBlock;
 
 pub fn new(id: Identifier) -> NodeImpl {
     NodeImpl {
@@ -127,12 +129,13 @@ impl Operation for WriteImageOperation {
                 debug!("path_expanded: {:?}", path_expanded);
 
                 // Write pixels
-                let img = pixel_block.to_image_buffer_rgb_u8();
-                debug!("Writing... {:?}", path_expanded);
-                let ok = match img.save(path_expanded) {
-                    Ok(value) => true,
-                    Err(_) => false,
+                let pixel_block_box = Box::new(pixel_block);
+                let image = ImageShared {
+                    pixel_block: pixel_block_box,
+                    display_window,
+                    data_window,
                 };
+                let ok = imageio::write_image(&image, &path_expanded);
                 debug!("Succcess: {}", ok);
                 NodeStatus::Valid
             }

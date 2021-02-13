@@ -26,7 +26,7 @@ pub fn convert_linear_to_srgb(x: f32) -> f32 {
     }
 }
 
-pub fn apply_color_matrix_inplace(pixels: &mut [f32], num_channels: u8, matrix: na::Matrix4<f32>) {
+pub fn apply_color_matrix_inplace(pixels: &mut [f32], num_channels: i32, matrix: na::Matrix4<f32>) {
     let pixel_count = pixels.len() / (num_channels as usize);
     match num_channels {
         3 => {

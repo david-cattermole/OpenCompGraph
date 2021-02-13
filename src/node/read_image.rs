@@ -1,6 +1,3 @@
-use image;
-use image::GenericImageView;
-use image::ImageBuffer;
 use log::{debug, error, info, warn};
 use rustc_hash::FxHasher;
 use std::collections::hash_map::DefaultHasher;
@@ -17,6 +14,7 @@ use crate::cxxbridge::ffi::NodeType;
 use crate::cxxbridge::ffi::StreamDataImplShared;
 use crate::data::HashValue;
 use crate::data::Identifier;
+use crate::imageio;
 use crate::node::traits::Operation;
 use crate::node::NodeImpl;
 use crate::pathutils;
@@ -90,23 +88,15 @@ impl Operation for ReadImageOperation {
         };
         debug!("Opening... {:?}", path);
         if path.is_file() == true {
-            // Read image
-            let img = image::open(path).unwrap();
-            let pixel_block = PixelBlock::from_dynamic_image(img);
-
-            let display_window = BBox2Df::new(
-                0.0,
-                0.0,
-                (pixel_block.width - 1) as f32,
-                (pixel_block.height - 1) as f32,
-            );
-            let data_window = display_window.clone();
-
+            let image = imageio::read_image(&path_expanded);
+            let pixel_block = image.pixel_block;
+            let display_window = image.display_window;
+            let data_window = image.data_window;
             let hash_value = self.cache_hash(frame, node_type_id, &attr_block, inputs);
             output.inner.set_display_window(display_window);
             output.inner.set_data_window(data_window);
             output.inner.set_hash(hash_value);
-            output.inner.set_pixel_block(pixel_block);
+            output.inner.set_pixel_block(*pixel_block);
         }
         NodeStatus::Valid
     }

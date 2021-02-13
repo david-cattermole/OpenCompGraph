@@ -1,5 +1,6 @@
 use log::{debug, error, info, warn};
 
+use crate::cxxbridge::ffi::BBox2Di;
 use crate::deformer::brownian;
 use crate::deformer::Deformer;
 use crate::deformer::DeformerType;
@@ -34,15 +35,15 @@ pub fn apply_deformers_to_positions(deformers: &Vec<Deformer>, buffer: &mut [f32
 // before using this function.
 pub fn apply_deformers_to_pixels(
     deformers: &Vec<Deformer>,
-    // display_window: BBox2Df,
-    // data_window: BBox2Df,
-    src_width: u32,
-    src_height: u32,
-    src_num_channels: u8,
+    // display_window: BBox2Di,
+    // data_window: BBox2Di,
+    src_width: i32,
+    src_height: i32,
+    src_num_channels: i32,
     src: &[f32],
-    dst_width: u32,
-    dst_height: u32,
-    dst_num_channels: u8,
+    dst_width: i32,
+    dst_height: i32,
+    dst_num_channels: i32,
     dst: &mut [f32],
 ) {
     if src.len() != dst.len() {
@@ -88,12 +89,12 @@ pub fn deform_image_slice_by_3(
     src: &[f32],
     dst: &mut [f32],
     parameters: brownian::Parameters,
-    src_width: u32,
-    src_height: u32,
-    src_num_channels: u8,
-    dst_width: u32,
-    dst_height: u32,
-    dst_num_channels: u8,
+    src_width: i32,
+    src_height: i32,
+    src_num_channels: i32,
+    dst_width: i32,
+    dst_height: i32,
+    dst_num_channels: i32,
 ) {
     let xc = parameters.xc;
     let yc = parameters.yc;

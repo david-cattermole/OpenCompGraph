@@ -2,6 +2,10 @@
 SETLOCAL
 :: Builds project under MS Windows
 
+:: Clear all build information before re-compiling.
+:: Turn this off when wanting to make small changes and recompile.
+SET FRESH_BUILD=1
+
 :: The root of this project.
 SET THIS_DIR=%~dp0
 SET OCG_ROOT=%THIS_DIR%
@@ -40,6 +44,10 @@ call %OCG_ROOT%\scripts\build_rust_windows64.bat
 :: Build C++
 MKDIR build_windows
 CHDIR build_windows
+IF "%FRESH_BUILD%"=="1" (
+    DEL /S /Q *
+    FOR /D %%G in ("*") DO RMDIR /S /Q "%%~nxG"
+)
 :: HACK: Create empty file so that CMake can use add_executable, but
 :: the file contents have not yet been written.
 cmake -E touch "%OCG_ROOT%\src\_cxxbridge.cpp"

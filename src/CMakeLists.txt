@@ -31,6 +31,7 @@ set(opencompgraph_source_files
   ${CMAKE_CURRENT_SOURCE_DIR}/systemmemory.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/config.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/cache.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/imageio.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/node.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/graph.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/stream.cpp)

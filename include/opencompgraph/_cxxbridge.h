@@ -2,6 +2,7 @@
 #include "rust/cxx.h"
 #include "opencompgraph/symbol_export.h"
 #include "opencompgraph/cpp.h"
+#include "opencompgraph/imageio.h"
 #include "opencompgraph/systemmemory.h"
 #include <algorithm>
 #include <array>
@@ -913,6 +914,7 @@ namespace open_comp_graph {
     struct StreamDataImplShared;
     struct CacheImplShared;
     struct ConfigImplShared;
+    struct ImageShared;
     struct PixelBlock;
     struct StreamDataImpl;
     struct NodeImpl;
@@ -1026,6 +1028,17 @@ struct ConfigImplShared final {
   using IsRelocatable = ::std::true_type;
 };
 #endif // CXXBRIDGE1_STRUCT_open_comp_graph$internal$ConfigImplShared
+
+#ifndef CXXBRIDGE1_STRUCT_open_comp_graph$internal$ImageShared
+#define CXXBRIDGE1_STRUCT_open_comp_graph$internal$ImageShared
+struct ImageShared final {
+  ::rust::Box<::open_comp_graph::internal::PixelBlock> pixel_block;
+  ::open_comp_graph::BBox2Di display_window;
+  ::open_comp_graph::BBox2Di data_window;
+
+  using IsRelocatable = ::std::true_type;
+};
+#endif // CXXBRIDGE1_STRUCT_open_comp_graph$internal$ImageShared
 } // namespace internal
 
 #ifndef CXXBRIDGE1_ENUM_open_comp_graph$GraphState
@@ -1100,6 +1113,13 @@ namespace internal {
 #ifndef CXXBRIDGE1_STRUCT_open_comp_graph$internal$PixelBlock
 #define CXXBRIDGE1_STRUCT_open_comp_graph$internal$PixelBlock
 struct PixelBlock final : public ::rust::Opaque {
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::std::int32_t width() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::std::int32_t height() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::std::int32_t num_channels() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::PixelDataType pixel_data_type() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::rust::Slice<const float> as_slice() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::rust::Slice<float> as_slice_mut() noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT void data_resize(::std::int32_t width, ::std::int32_t height, ::std::int32_t num_channels, ::open_comp_graph::PixelDataType pixel_data_type) noexcept;
   ~PixelBlock() = delete;
 
 private:
@@ -1117,19 +1137,19 @@ struct StreamDataImpl final : public ::rust::Opaque {
   OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::StreamDataState state() const noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint8_t state_id() const noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint64_t hash() const noexcept;
-  OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::BBox2Df display_window() const noexcept;
-  OPENCOMPGRAPH_SYMBOL_EXPORT void set_display_window(::open_comp_graph::BBox2Df value) noexcept;
-  OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::BBox2Df data_window() const noexcept;
-  OPENCOMPGRAPH_SYMBOL_EXPORT void set_data_window(::open_comp_graph::BBox2Df value) noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::BBox2Di display_window() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT void set_display_window(::open_comp_graph::BBox2Di value) noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::BBox2Di data_window() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT void set_data_window(::open_comp_graph::BBox2Di value) noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::Matrix4 color_matrix() const noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::Matrix4 transform_matrix() const noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t deformers_len() const noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT void apply_deformers(::rust::Slice<float> buffer) const noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT const ::open_comp_graph::internal::PixelBlock &pixel_block() const noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT ::rust::Slice<const float> pixel_buffer() const noexcept;
-  OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint32_t pixel_width() const noexcept;
-  OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint32_t pixel_height() const noexcept;
-  OPENCOMPGRAPH_SYMBOL_EXPORT ::std::uint8_t pixel_num_channels() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::std::int32_t pixel_width() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::std::int32_t pixel_height() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::std::int32_t pixel_num_channels() const noexcept;
   ~StreamDataImpl() = delete;
 
 private:

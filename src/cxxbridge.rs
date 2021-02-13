@@ -25,6 +25,13 @@ use crate::stream::StreamDataImpl;
 #[rustfmt::skip]
 #[cxx::bridge(namespace = "open_comp_graph")]
 pub mod ffi {
+    // C++ includes needed for all files.
+    #[namespace = "open_comp_graph"]
+    unsafe extern "C++" {
+        include!("rust/cxx.h");
+        include!("opencompgraph/symbol_export.h");
+    }
+
     #[derive(Debug, Copy, Clone, Default, PartialEq, PartialOrd)]
     #[namespace = "open_comp_graph"]
     struct BBox2Df {
@@ -73,7 +80,6 @@ pub mod ffi {
         inner: Box<GraphImpl>,
     }
 
-
     #[derive(Debug, Hash, Clone)]
     #[namespace = "open_comp_graph::internal"]
     pub(crate) struct StreamDataImplShared {
@@ -91,6 +97,14 @@ pub mod ffi {
     #[namespace = "open_comp_graph::internal"]
     pub(crate) struct ConfigImplShared {
         inner: Box<ConfigImpl>,
+    }
+
+    #[derive(Debug)]
+    #[namespace = "open_comp_graph::internal"]
+    pub(crate) struct ImageShared {
+        pixel_block: Box<PixelBlock>,
+        display_window: BBox2Di,
+        data_window: BBox2Di,
     }
 
     #[repr(u8)]
@@ -213,14 +227,21 @@ pub mod ffi {
     // ThingC
     #[namespace = "open_comp_graph::cpp"]
     unsafe extern "C++" {
-        include!("rust/cxx.h");
-        include!("opencompgraph/symbol_export.h");
         include!("opencompgraph/cpp.h");
 
         // type ThingC;
         // fn make_thingc(appname: &str) -> UniquePtr<ThingC>;
         // fn get_name(thing: &ThingC) -> &CxxString;
         // fn run_sharedthing(state: SharedThing);
+    }
+
+    // Image IO
+    #[namespace = "open_comp_graph::internal"]
+    unsafe extern "C++" {
+        include!("opencompgraph/imageio.h");
+
+        fn oiio_read_image(file_path: &String, image: &mut ImageShared);
+        fn oiio_write_image(file_path: &String, image: &ImageShared) -> bool;
     }
 
     // System Memory Utilities
@@ -230,10 +251,26 @@ pub mod ffi {
         fn get_total_system_memory_as_bytes() -> usize;
     }
 
+
     // PixelBlock
     #[namespace = "open_comp_graph::internal"]
     extern "Rust" {
         type PixelBlock;
+
+        fn width(&self) -> i32;
+        fn height(&self) -> i32;
+        fn num_channels(&self) -> i32;
+        fn pixel_data_type(&self) -> PixelDataType;
+
+        fn as_slice(&self) -> &[f32];
+        fn as_slice_mut(&mut self) -> &mut [f32];
+
+        fn data_resize(
+            &mut self,
+            width: i32,
+            height: i32,
+            num_channels: i32,
+            pixel_data_type: PixelDataType);
     }
 
     // StreamData
@@ -243,19 +280,19 @@ pub mod ffi {
         fn state(&self) -> StreamDataState;
         fn state_id(&self) -> u8;
         fn hash(&self) -> u64;
-        fn display_window(&self) -> BBox2Df;
-        fn set_display_window(&mut self, value: BBox2Df);
-        fn data_window(&self) -> BBox2Df;
-        fn set_data_window(&mut self, value: BBox2Df);
+        fn display_window(&self) -> BBox2Di;
+        fn set_display_window(&mut self, value: BBox2Di);
+        fn data_window(&self) -> BBox2Di;
+        fn set_data_window(&mut self, value: BBox2Di);
         fn color_matrix(&self) -> Matrix4;
         fn transform_matrix(&self) -> Matrix4;
         fn deformers_len(&self) -> usize;
         fn apply_deformers(&self, buffer: &mut [f32]);
         fn pixel_block(&self) -> &PixelBlock;
         fn pixel_buffer(&self) -> &[f32];
-        fn pixel_width(&self) -> u32;
-        fn pixel_height(&self) -> u32;
-        fn pixel_num_channels(&self) -> u8;
+        fn pixel_width(&self) -> i32;
+        fn pixel_height(&self) -> i32;
+        fn pixel_num_channels(&self) -> i32;
 
         // Creation
         fn create_stream_data_box() -> Box<StreamDataImpl>;

@@ -7,6 +7,7 @@
 #include <opencompgraph/config.h>
 #include <opencompgraph/debug.h>
 #include <opencompgraph/graph.h>
+#include <opencompgraph/imageio.h>
 #include <opencompgraph/node.h>
 #include <opencompgraph/stream.h>
 

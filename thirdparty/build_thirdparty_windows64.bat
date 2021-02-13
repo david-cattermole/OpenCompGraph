@@ -23,7 +23,7 @@ SETLOCAL
 
 :: Clear all build information before re-compiling.
 :: Turn this off when wanting to make small changes and recompile.
-SET FRESH_BUILD=0
+SET FRESH_BUILD=1
 
 :: Do not edit below, unless you know what you're doing.
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

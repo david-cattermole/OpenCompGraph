@@ -16,6 +16,7 @@ pub mod geom;
 pub mod graph;
 pub mod graphiter;
 pub mod hashutils;
+pub mod imageio;
 pub mod logger;
 pub mod matrix;
 pub mod node;

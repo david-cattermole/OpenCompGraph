@@ -31,5 +31,5 @@ SET BOOST_ROOT=C:\Program Files\boost_1_61_0
 SET PATH=%ZLIB_ROOT%\bin;%TIFF_ROOT%\bin;%JPEG_TURBO_ROOT%\bin;%PNG_ROOT%\bin;%ILMBASE_ROOT%\lib;%OPENEXR_ROOT%\lib;%OPENCOLORIO_ROOT%\bin;%OPENIMAGEIO_ROOT%\bin;%BOOST_ROOT%\lib64-msvc-14.0;%PATH%
 
 :: Run test!
-ECHO %PATH%
+SET OPENCOMPGRAPH_LOG=warn
 CALL %INSTALL_DIR%\bin\opencompgraph_tests
