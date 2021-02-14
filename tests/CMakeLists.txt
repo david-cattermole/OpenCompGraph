@@ -17,6 +17,7 @@ add_executable(${target_test_exe}
   ${CMAKE_CURRENT_SOURCE_DIR}/test_i.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/test_j.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/test_k.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/test_l.cpp
   )
 target_link_libraries(${target_test_exe} ${target_lib})
 target_include_directories(${target_test_exe}
