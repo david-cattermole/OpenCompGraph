@@ -115,7 +115,7 @@ impl Operation for ReadImageOperation {
                     )
                 }
                 _ => {
-                    warn!("Cache Miss");
+                    debug!("Cache Miss");
                     let img = imageio::read_image(&path_expanded);
                     let pixel_block_rc = Rc::new(*img.pixel_block);
                     let cached_img = CachedImage {
