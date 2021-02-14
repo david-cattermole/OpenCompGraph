@@ -70,7 +70,7 @@ int test_j(const bool debug_print) {
         start_frame, end_frame, playback_n_times, sequence_skips);
 
     const size_t kBytesToGigabytes = 1073741824;  // int(pow(2, 30))
-    auto capacity = 1 * kBytesToGigabytes;
+    auto capacity = 4 * kBytesToGigabytes;
 
     // Execute the *Read node*, in sequential order.
     {
