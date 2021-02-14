@@ -14,6 +14,9 @@ CHDIR %OCG_ROOT%
 SET INSTALL_DIR=%OCG_ROOT%\install
 SET THIRDPARTY_INSTALL_DIR=%OCG_ROOT%\thirdparty\install\
 
+:: Default config path
+SET CONFIG_DIR=%OCG_ROOT%\config
+
 :: Install root paths for various third-party components.
 SET ZLIB_ROOT=%THIRDPARTY_INSTALL_DIR%\zlib
 SET JPEG_TURBO_ROOT=%THIRDPARTY_INSTALL_DIR%\libjpeg_turbo
@@ -32,4 +35,5 @@ SET PATH=%ZLIB_ROOT%\bin;%TIFF_ROOT%\bin;%JPEG_TURBO_ROOT%\bin;%PNG_ROOT%\bin;%I
 
 :: Run test!
 SET OPENCOMPGRAPH_LOG=warn
+SET OPENCOMPGRAPH_CONFIG_PATH=%CONFIG_DIR%
 CALL %INSTALL_DIR%\bin\opencompgraph_tests
