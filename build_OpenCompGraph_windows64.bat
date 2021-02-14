@@ -14,7 +14,7 @@ CHDIR %OCG_ROOT%
 
 :: Install directory
 SET INSTALL_DIR="%OCG_ROOT%\install"
-SET THIRDPARTY_INSTALL_DIR="%OCG_ROOT%\thirdparty\install\"
+SET THIRDPARTY_INSTALL_DIR="%OCG_ROOT%\thirdparty\install"
 
 :: Should we build tests?
 SET BUILD_TESTS=1
