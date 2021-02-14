@@ -29,8 +29,6 @@ use crate::node::NodeImpl;
 
 #[derive(Clone)]
 pub struct PixelBlock {
-    // data_window: BBox2Di,
-    // display_window: BBox2Di,
     width: i32,
     height: i32,
     num_channels: i32,
@@ -66,12 +64,7 @@ impl PixelBlock {
     ) -> PixelBlock {
         let size = (width * height * num_channels) as usize;
         let pixels = vec![0.0 as f32; size];
-        // let pixel_data_type = PixelDataType::Float32;
-        // let data_window = BBox2Di::new(0, 0, width, height);
-        // let display_window = BBox2Di::new(0, 0, width, height);
         PixelBlock {
-            // data_window,
-            // display_window,
             width,
             height,
             num_channels,
@@ -90,14 +83,10 @@ impl PixelBlock {
     pub fn new_constant_pixel_rgba(r: f32, g: f32, b: f32, a: f32) -> PixelBlock {
         let width = 1;
         let height = 1;
-        // let data_window = BBox2Di::new(0, 0, width, height);
-        // let display_window = BBox2Di::new(0, 0, width, height);
         let num_channels = 4;
         let pixels = vec![r, g, b, a];
         let pixel_data_type = PixelDataType::Float32;
         PixelBlock {
-            // data_window,
-            // display_window,
             width,
             height,
             num_channels,
@@ -109,15 +98,11 @@ impl PixelBlock {
     pub fn new_color_bars() -> PixelBlock {
         let width = COLOR_BARS_WIDTH;
         let height = COLOR_BARS_HEIGHT;
-        // let data_window = BBox2Di::new(0, 0, width, height);
-        // let display_window = BBox2Di::new(0, 0, width, height);
         let num_channels = COLOR_BARS_NUM_CHANNELS;
         let size = (width * height * num_channels) as usize;
         let pixels = COLOR_BARS.to_vec();
         let pixel_data_type = PixelDataType::Float32;
         PixelBlock {
-            // data_window,
-            // display_window,
             width,
             height,
             num_channels,
@@ -139,12 +124,10 @@ impl PixelBlock {
     }
 
     pub fn width(&self) -> i32 {
-        // self.data_window.width()
         self.width
     }
 
     pub fn height(&self) -> i32 {
-        // self.data_window.height()
         self.height
     }
 
@@ -172,8 +155,6 @@ impl PixelBlock {
         num_channels: i32,
         pixel_data_type: PixelDataType,
     ) {
-        // self.data_window = BBox2Di::new(0, 0, width, height);
-        // self.display_window = BBox2Di::new(0, 0, width, height);
         self.width = width;
         self.height = height;
         self.num_channels = num_channels;
@@ -246,8 +227,6 @@ pub fn from_dynamic_image(img: image::DynamicImage) -> PixelBlock {
     let data_window = BBox2Di::new(0, 0, width, height);
     let display_window = BBox2Di::new(0, 0, width, height);
     PixelBlock {
-        // data_window,
-        // display_window,
         width,
         height,
         num_channels,
@@ -259,8 +238,6 @@ pub fn from_dynamic_image(img: image::DynamicImage) -> PixelBlock {
 pub fn create_image_buffer_rgb_u8(
     pixel_block: &PixelBlock,
 ) -> image::ImageBuffer<image::Rgb<u8>, Vec<u8>> {
-    // let width = pixel_block.data_window.width();
-    // let height = pixel_block.data_window.height();
     let width = pixel_block.width();
     let height = pixel_block.height();
     let pixels = &pixel_block.pixels;
@@ -290,8 +267,6 @@ pub fn create_image_buffer_rgb_u8(
 pub fn create_image_buffer_rgba_u8(
     pixel_block: &PixelBlock,
 ) -> image::ImageBuffer<image::Rgba<u8>, Vec<u8>> {
-    // let width = pixel_block.data_window.width();
-    // let height = pixel_block.data_window.height();
     let width = pixel_block.width();
     let height = pixel_block.height();
     let pixels = &pixel_block.pixels;
@@ -327,8 +302,6 @@ pub fn create_image_buffer_rgba_u8(
 
 impl Hash for PixelBlock {
     fn hash<H: Hasher>(&self, state: &mut H) {
-        // self.data_window.hash(state);
-        // self.display_window.hash(state);
         self.width.hash(state);
         self.height.hash(state);
         self.num_channels.hash(state);
@@ -340,8 +313,6 @@ impl Hash for PixelBlock {
 impl fmt::Debug for PixelBlock {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("PixelBlock")
-            // .field("data_window", &self.data_window)
-            // .field("display_window", &self.display_window)
             .field("width", &self.width)
             .field("height", &self.height)
             .field("num_channels", &self.num_channels)
