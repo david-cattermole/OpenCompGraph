@@ -1,10 +1,11 @@
 use log::{debug, error, info, warn};
+use std::rc::Rc;
 
 use crate::attrblock::AttrBlock;
+use crate::cache::CacheImpl;
 use crate::cxxbridge::ffi::AttrState;
 use crate::cxxbridge::ffi::NodeStatus;
 use crate::cxxbridge::ffi::NodeType;
-use crate::cxxbridge::ffi::StreamDataImplShared;
 use crate::cxxbridge::ffi::StreamDataState;
 use crate::data::EdgeIdx;
 use crate::data::EdgeWeight;
@@ -14,6 +15,7 @@ use crate::data::Identifier;
 use crate::data::NodeIdx;
 use crate::data::NodeWeight;
 use crate::pixelblock::PixelBlock;
+use crate::stream::StreamDataImpl;
 
 pub mod grade;
 pub mod lens_distort;
@@ -59,7 +61,7 @@ impl NodeImpl {
 
     // This method is used to determine "has this node changed?
     // If I re-compute this Node, do I expect a different value?"
-    pub fn hash(&self, frame: i32, inputs: &Vec<StreamDataImplShared>) -> HashValue {
+    pub fn hash(&self, frame: i32, inputs: &Vec<Rc<StreamDataImpl>>) -> HashValue {
         let node_type_id = self.get_node_type_id();
         let value = self
             .compute
@@ -71,13 +73,14 @@ impl NodeImpl {
     pub fn compute(
         &mut self,
         frame: i32,
-        inputs: &Vec<StreamDataImplShared>,
-        output: &mut StreamDataImplShared,
+        inputs: &Vec<Rc<StreamDataImpl>>,
+        output: &mut Rc<StreamDataImpl>,
+        cache: &mut Box<CacheImpl>,
     ) -> NodeStatus {
         let node_type_id = self.get_node_type_id();
-        let status = self
-            .compute
-            .compute(frame, node_type_id, &self.attr_block, inputs, output);
+        let status =
+            self.compute
+                .compute(frame, node_type_id, &self.attr_block, inputs, output, cache);
         self.status = status;
         status
     }

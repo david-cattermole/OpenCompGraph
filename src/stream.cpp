@@ -11,16 +11,16 @@ StreamData::StreamData() noexcept
     // std::cout << "StreamData()" << '\n';
 }
 
-StreamData::StreamData(rust::Box<internal::StreamDataImpl> box) noexcept
+StreamData::StreamData(rust::Box<internal::StreamDataImplRc> box) noexcept
         : inner{internal::create_stream_data_shared_box(std::move(box))} {
     // std::cout << "StreamData(box)" << '\n';
 }
 
-rust::Box<internal::StreamDataImpl> StreamData::get_box() noexcept {
+rust::Box<internal::StreamDataImplRc> StreamData::get_box() noexcept {
     return std::move(this->inner.inner);
 }
 
-void StreamData::set_box(rust::Box<internal::StreamDataImpl> box) noexcept {
+void StreamData::set_box(rust::Box<internal::StreamDataImplRc> box) noexcept {
     this->inner.inner = std::move(box);
 }
 
@@ -40,16 +40,8 @@ BBox2Di StreamData::display_window() const noexcept {
     return this->inner.inner->display_window();
 };
 
-void StreamData::set_display_window(BBox2Di value) noexcept {
-    this->inner.inner->set_display_window(value);
-};
-
 BBox2Di StreamData::data_window() const noexcept {
     return this->inner.inner->data_window();
-};
-
-void StreamData::set_data_window(BBox2Di value) noexcept {
-    this->inner.inner->set_data_window(value);
 };
 
 Matrix4 StreamData::color_matrix() const noexcept {
@@ -67,10 +59,6 @@ size_t StreamData::deformers_len() const noexcept {
 void StreamData::apply_deformers(rust::Slice<float> &buffer) noexcept {
     return this->inner.inner->apply_deformers(buffer);
 };
-
-const internal::PixelBlock& StreamData::pixel_block() const noexcept {
-    return this->inner.inner->pixel_block();
-}
 
 rust::Slice<const float> StreamData::pixel_buffer() const noexcept {
     return this->inner.inner->pixel_buffer();

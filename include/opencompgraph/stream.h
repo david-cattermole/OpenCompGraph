@@ -14,13 +14,13 @@ public:
     StreamData() noexcept;
 
     OPENCOMPGRAPH_SYMBOL_EXPORT
-    explicit StreamData(rust::Box<internal::StreamDataImpl> box) noexcept;
+    explicit StreamData(rust::Box<internal::StreamDataImplRc> box) noexcept;
 
     OPENCOMPGRAPH_SYMBOL_EXPORT
-    rust::Box<internal::StreamDataImpl> get_box() noexcept;
+    rust::Box<internal::StreamDataImplRc> get_box() noexcept;
 
     OPENCOMPGRAPH_SYMBOL_EXPORT
-    void set_box(rust::Box<internal::StreamDataImpl> box) noexcept;
+    void set_box(rust::Box<internal::StreamDataImplRc> box) noexcept;
 
     OPENCOMPGRAPH_SYMBOL_EXPORT
     StreamDataState state() const noexcept;
@@ -35,13 +35,7 @@ public:
     BBox2Di display_window() const noexcept;
 
     OPENCOMPGRAPH_SYMBOL_EXPORT
-    void set_display_window(BBox2Di value) noexcept;
-
-    OPENCOMPGRAPH_SYMBOL_EXPORT
     BBox2Di data_window() const noexcept;
-
-    OPENCOMPGRAPH_SYMBOL_EXPORT
-    void set_data_window(BBox2Di value) noexcept;
 
     OPENCOMPGRAPH_SYMBOL_EXPORT
     Matrix4 color_matrix() const noexcept;
@@ -54,9 +48,6 @@ public:
 
     OPENCOMPGRAPH_SYMBOL_EXPORT
     void apply_deformers(rust::Slice<float> &buffer) noexcept;
-
-    OPENCOMPGRAPH_SYMBOL_EXPORT
-    const internal::PixelBlock& pixel_block() const noexcept;
 
     OPENCOMPGRAPH_SYMBOL_EXPORT
     rust::Slice<const float> pixel_buffer() const noexcept;

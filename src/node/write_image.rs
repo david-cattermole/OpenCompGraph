@@ -3,9 +3,11 @@ use std::collections::hash_map::DefaultHasher;
 use std::hash;
 use std::hash::Hash;
 use std::path::Path;
+use std::rc::Rc;
 use std::string::String;
 
 use crate::attrblock::AttrBlock;
+use crate::cache::CacheImpl;
 use crate::colorutils;
 use crate::colorutils::convert_linear_to_srgb;
 use crate::colorxform;
@@ -13,7 +15,6 @@ use crate::cxxbridge::ffi::AttrState;
 use crate::cxxbridge::ffi::ImageShared;
 use crate::cxxbridge::ffi::NodeStatus;
 use crate::cxxbridge::ffi::NodeType;
-use crate::cxxbridge::ffi::StreamDataImplShared;
 use crate::data::HashValue;
 use crate::data::Identifier;
 use crate::deformutils;
@@ -22,6 +23,7 @@ use crate::node::traits::Operation;
 use crate::node::NodeImpl;
 use crate::pathutils;
 use crate::pixelblock::PixelBlock;
+use crate::stream::StreamDataImpl;
 
 pub fn new(id: Identifier) -> NodeImpl {
     NodeImpl {
@@ -63,8 +65,9 @@ impl Operation for WriteImageOperation {
         frame: i32,
         node_type_id: u8,
         attr_block: &Box<dyn AttrBlock>,
-        inputs: &Vec<StreamDataImplShared>,
-        output: &mut StreamDataImplShared,
+        inputs: &Vec<Rc<StreamDataImpl>>,
+        output: &mut Rc<StreamDataImpl>,
+        cache: &mut Box<CacheImpl>,
     ) -> NodeStatus {
         debug!("WriteImageOperation.compute()");
         // debug!("AttrBlock: {:?}", attr_block);
@@ -78,18 +81,18 @@ impl Operation for WriteImageOperation {
         match inputs.len() {
             0 => NodeStatus::Error,
             _ => {
-                let input = &inputs[0].inner;
+                let input = &inputs[0].clone();
+                let src_pixel_block = input.pixel_block();
 
                 // Copy input data
-                let mut copy = &mut input.clone();
+                let mut copy = &mut (**input).clone();
                 let num_channels = copy.pixel_num_channels();
                 let width = copy.pixel_width();
                 let height = copy.pixel_height();
                 let display_window = copy.display_window();
                 let data_window = copy.data_window();
                 let transform_matrix = copy.transform_matrix().to_na_matrix();
-                let src_pixel_block = copy.pixel_block();
-                let mut pixel_block = copy.pixel_block().clone();
+                let mut pixel_block = copy.clone_pixel_block();
 
                 {
                     // Apply Deformations.
@@ -99,8 +102,8 @@ impl Operation for WriteImageOperation {
                     //
                     // TODO: Determine the destination size and
                     // pre-allocate memory for it.
-                    let src_pixels = &src_pixel_block.pixels[..];
-                    let mut pixels = &mut pixel_block.pixels;
+                    let src_pixels = src_pixel_block.as_slice();
+                    let mut pixels = &mut pixel_block.as_slice_mut();
                     deformutils::apply_deformers_to_pixels(
                         &copy.deformers(),
                         // display_window,
@@ -119,7 +122,7 @@ impl Operation for WriteImageOperation {
                 // Apply Color Matrix
                 {
                     let color_matrix = copy.color_matrix().to_na_matrix();
-                    let mut pixels = &mut pixel_block.pixels;
+                    let mut pixels = &mut pixel_block.as_slice_mut();
                     colorutils::apply_color_matrix_inplace(pixels, num_channels, color_matrix);
                 }
 
@@ -129,6 +132,7 @@ impl Operation for WriteImageOperation {
                 debug!("path_expanded: {:?}", path_expanded);
 
                 // Write pixels
+                *output = inputs[0].clone();
                 let pixel_block_box = Box::new(pixel_block);
                 let image = ImageShared {
                     pixel_block: pixel_block_box,

@@ -67,7 +67,6 @@ int test_f(const bool debug_print, std::shared_ptr<ocg::Cache> cache) {
         std::cout << "state_id1=" << state_id1 << '\n';
         std::cout << "hash1=" << hash1 << '\n';
     }
-    const ocg::internal::PixelBlock &pixel_block1 = stream_data1.pixel_block();
     auto pixel_buffer1 = stream_data1.pixel_buffer();
     if (debug_print) {
         std::cout << "pixel_buffer1"
@@ -117,7 +116,6 @@ int test_f(const bool debug_print, std::shared_ptr<ocg::Cache> cache) {
     }
     assert(status2 == ocg::ExecuteStatus::kSuccess);
     auto stream_data2 = graph.output_stream();
-    const ocg::internal::PixelBlock &pixel_block2 = stream_data2.pixel_block();
     auto pixel_buffer2 = stream_data2.pixel_buffer();
     if (debug_print) {
         std::cout << "pixel_buffer2"
@@ -167,7 +165,6 @@ int test_f(const bool debug_print, std::shared_ptr<ocg::Cache> cache) {
     }
     assert(status3 == ocg::ExecuteStatus::kSuccess);
     auto stream_data3 = graph.output_stream();
-    const ocg::internal::PixelBlock &pixel_block3 = stream_data3.pixel_block();
     auto pixel_buffer3 = stream_data3.pixel_buffer();
     if (debug_print) {
         std::cout << "pixel_buffer3"

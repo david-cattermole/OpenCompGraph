@@ -4,14 +4,17 @@ use std::collections::hash_map::DefaultHasher;
 use std::hash;
 use std::hash::Hash;
 use std::path::Path;
+use std::rc::Rc;
 use std::string::String;
 
 use crate::attrblock::AttrBlock;
+use crate::cache::CacheImpl;
+use crate::cache::CachedImage;
 use crate::cxxbridge::ffi::AttrState;
 use crate::cxxbridge::ffi::BBox2Df;
+use crate::cxxbridge::ffi::BBox2Di;
 use crate::cxxbridge::ffi::NodeStatus;
 use crate::cxxbridge::ffi::NodeType;
-use crate::cxxbridge::ffi::StreamDataImplShared;
 use crate::data::HashValue;
 use crate::data::Identifier;
 use crate::imageio;
@@ -19,6 +22,8 @@ use crate::node::traits::Operation;
 use crate::node::NodeImpl;
 use crate::pathutils;
 use crate::pixelblock::PixelBlock;
+use crate::stream::StreamDataImpl;
+use crate::stream::StreamDataImplRc;
 
 pub fn new(id: Identifier) -> NodeImpl {
     NodeImpl {
@@ -60,8 +65,9 @@ impl Operation for ReadImageOperation {
         frame: i32,
         node_type_id: u8,
         attr_block: &Box<dyn AttrBlock>,
-        inputs: &Vec<StreamDataImplShared>,
-        output: &mut StreamDataImplShared,
+        inputs: &Vec<Rc<StreamDataImpl>>,
+        output: &mut Rc<StreamDataImpl>,
+        cache: &mut Box<CacheImpl>,
     ) -> NodeStatus {
         debug!("ReadImageOperation.compute()");
         // debug!("AttrBlock: {:?}", attr_block);
@@ -70,7 +76,9 @@ impl Operation for ReadImageOperation {
         let enable = attr_block.get_attr_i32("enable");
         if enable != 1 {
             let hash_value = self.cache_hash(frame, node_type_id, &attr_block, inputs);
-            output.inner.set_hash(hash_value);
+            let mut stream_data = StreamDataImpl::new();
+            stream_data.set_hash(hash_value);
+            *output = std::rc::Rc::new(stream_data);
             return NodeStatus::Warning;
         }
         let file_path = attr_block.get_attr_str("file_path");
@@ -82,21 +90,57 @@ impl Operation for ReadImageOperation {
             Ok(full_path) => full_path,
             Err(_) => {
                 let hash_value = self.cache_hash(frame, node_type_id, &attr_block, inputs);
-                output.inner.set_hash(hash_value);
+
+                let mut stream_data = StreamDataImpl::new();
+                stream_data.set_hash(hash_value);
+                *output = std::rc::Rc::new(stream_data);
                 return NodeStatus::Warning;
             }
         };
+
         debug!("Opening... {:?}", path);
         if path.is_file() == true {
-            let image = imageio::read_image(&path_expanded);
-            let pixel_block = image.pixel_block;
-            let display_window = image.display_window;
-            let data_window = image.data_window;
+            let mut stream_data = StreamDataImpl::new();
+
             let hash_value = self.cache_hash(frame, node_type_id, &attr_block, inputs);
-            output.inner.set_display_window(display_window);
-            output.inner.set_data_window(data_window);
-            output.inner.set_hash(hash_value);
-            output.inner.set_pixel_block(*pixel_block);
+            debug!("hash_value: {:?}", hash_value);
+
+            let (pixel_block, data_window, display_window) = match cache.get(&hash_value) {
+                Some(cached_img) => {
+                    debug!("Cache Hit");
+                    (
+                        cached_img.pixel_block.clone(),
+                        cached_img.data_window,
+                        cached_img.display_window,
+                    )
+                }
+                _ => {
+                    warn!("Cache Miss");
+                    let img = imageio::read_image(&path_expanded);
+                    let pixel_block_rc = Rc::new(*img.pixel_block);
+                    let cached_img = CachedImage {
+                        pixel_block: pixel_block_rc.clone(),
+                        data_window: img.data_window,
+                        display_window: img.display_window,
+                    };
+                    cache.insert(hash_value, cached_img);
+                    (pixel_block_rc.clone(), img.data_window, img.display_window)
+                }
+            };
+
+            debug!(
+                "pixel_block: {:?} x {:?} x {:?}",
+                pixel_block.width(),
+                pixel_block.height(),
+                pixel_block.num_channels()
+            );
+
+            stream_data.set_data_window(data_window);
+            stream_data.set_display_window(display_window);
+            stream_data.set_hash(hash_value);
+            stream_data.set_pixel_block(pixel_block);
+
+            *output = std::rc::Rc::new(stream_data);
         }
         NodeStatus::Valid
     }

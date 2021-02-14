@@ -18,9 +18,8 @@ use crate::cxxbridge::ffi::StreamDataState;
 use crate::data::HashValue;
 use crate::deformer::Deformer;
 use crate::deformutils;
-use crate::pixelblock::PixelBlock;
+use crate::pixelblock;
 
-// Read image
 pub fn read_image(path: &String) -> ImageShared {
     debug!("Reading... {:?}", path);
     let start = Instant::now();
@@ -30,9 +29,9 @@ pub fn read_image(path: &String) -> ImageShared {
         true => {
             // Use OpenImageIO C++ library to read the image path.
             let mut image = ImageShared {
-                pixel_block: Box::new(PixelBlock::new(1, 1, 1, PixelDataType::Float32)),
-                display_window: BBox2Di::new(0, 0, 1, 1),
-                data_window: BBox2Di::new(0, 0, 1, 1),
+                pixel_block: Box::new(pixelblock::PixelBlock::empty(PixelDataType::Float32)),
+                display_window: BBox2Di::new(0, 0, 0, 0),
+                data_window: BBox2Di::new(0, 0, 0, 0),
             };
             oiio_read_image(&path, &mut image);
             image
@@ -40,8 +39,8 @@ pub fn read_image(path: &String) -> ImageShared {
         false => {
             // Use Rust "image" Crate.
             let img = image::open(path).unwrap();
-            let pixel_block = Box::new(PixelBlock::from_dynamic_image(img));
-            let display_window = BBox2Di::new(0, 0, pixel_block.width - 1, pixel_block.height - 1);
+            let pixel_block = Box::new(pixelblock::from_dynamic_image(img));
+            let display_window = BBox2Di::new(0, 0, pixel_block.width(), pixel_block.height());
             let data_window = display_window.clone();
             ImageShared {
                 pixel_block,
@@ -56,7 +55,6 @@ pub fn read_image(path: &String) -> ImageShared {
     image
 }
 
-// Write image
 pub fn write_image(image: &ImageShared, path: &String) -> bool {
     // TODO: use the display and data windows.
     debug!("Writing... {:?}", path);
@@ -71,15 +69,16 @@ pub fn write_image(image: &ImageShared, path: &String) -> bool {
         false => {
             // Use Rust "image" Crate.
             let mut ok = false;
-            if image.pixel_block.num_channels == 3 {
-                let img = image.pixel_block.to_image_buffer_rgb_u8();
+            let num_channels = image.pixel_block.num_channels();
+            if num_channels == 3 {
+                let img = pixelblock::create_image_buffer_rgb_u8(&image.pixel_block);
                 ok = match img.save(path) {
                     Ok(value) => true,
                     Err(_) => false,
                 };
             }
-            if image.pixel_block.num_channels == 4 {
-                let img = image.pixel_block.to_image_buffer_rgba_u8();
+            if num_channels == 4 {
+                let img = pixelblock::create_image_buffer_rgba_u8(&image.pixel_block);
                 ok = match img.save(path) {
                     Ok(value) => true,
                     Err(_) => false,

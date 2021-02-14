@@ -2,20 +2,22 @@ use log::{debug, error, info, warn};
 use std::collections::hash_map::DefaultHasher;
 use std::hash;
 use std::hash::Hash;
+use std::rc::Rc;
 
 use crate::attrblock::AttrBlock;
+use crate::cache::CacheImpl;
 use crate::colorutils;
 use crate::colorxform;
 use crate::cxxbridge::ffi::AttrState;
 use crate::cxxbridge::ffi::Matrix4;
 use crate::cxxbridge::ffi::NodeStatus;
 use crate::cxxbridge::ffi::NodeType;
-use crate::cxxbridge::ffi::StreamDataImplShared;
 use crate::data::HashValue;
 use crate::data::Identifier;
 use crate::hashutils::HashableF32;
 use crate::node::traits::Operation;
 use crate::node::NodeImpl;
+use crate::stream::StreamDataImpl;
 
 pub fn new(id: Identifier) -> NodeImpl {
     NodeImpl {
@@ -78,8 +80,9 @@ impl Operation for GradeOperation {
         frame: i32,
         node_type_id: u8,
         attr_block: &Box<dyn AttrBlock>,
-        inputs: &Vec<StreamDataImplShared>,
-        output: &mut StreamDataImplShared,
+        inputs: &Vec<Rc<StreamDataImpl>>,
+        output: &mut Rc<StreamDataImpl>,
+        cache: &mut Box<CacheImpl>,
     ) -> NodeStatus {
         debug!("GradeOperation.compute()");
         // debug!("AttrBlock: {:?}", attr_block);
@@ -89,8 +92,8 @@ impl Operation for GradeOperation {
         match inputs.len() {
             0 => NodeStatus::Error,
             _ => {
-                let input = &inputs[0].inner;
-                let mut copy = input.clone();
+                let input = &inputs[0].clone();
+                let mut copy = (**input).clone();
 
                 let enable = attr_block.get_attr_i32("enable");
                 if enable == 1 {
@@ -109,7 +112,7 @@ impl Operation for GradeOperation {
                 // Set Output data
                 let hash_value = self.cache_hash(frame, node_type_id, &attr_block, inputs);
                 copy.set_hash(hash_value);
-                output.inner = copy;
+                *output = std::rc::Rc::new(copy);
                 NodeStatus::Valid
             }
         }

@@ -1,4 +1,5 @@
 use log::{debug, error, info, warn};
+use std::rc::Rc;
 
 use crate::cache::create_cache_box_with_capacity;
 use crate::cache::CacheImpl;
@@ -20,7 +21,9 @@ use crate::node::create_node_box_with_id;
 use crate::node::NodeImpl;
 use crate::pixelblock::PixelBlock;
 use crate::stream::create_stream_data_box;
+use crate::stream::create_stream_data_box_rc;
 use crate::stream::StreamDataImpl;
+use crate::stream::StreamDataImplRc;
 
 #[rustfmt::skip]
 #[cxx::bridge(namespace = "open_comp_graph")]
@@ -83,7 +86,7 @@ pub mod ffi {
     #[derive(Debug, Hash, Clone)]
     #[namespace = "open_comp_graph::internal"]
     pub(crate) struct StreamDataImplShared {
-        inner: Box<StreamDataImpl>,
+        inner: Box<StreamDataImplRc>,
     }
     impl Vec<StreamDataImplShared> {}
 
@@ -273,31 +276,39 @@ pub mod ffi {
             pixel_data_type: PixelDataType);
     }
 
-    // StreamData
+    // StreamData (Rc)
     #[namespace = "open_comp_graph::internal"]
     extern "Rust" {
-        type StreamDataImpl;
+        type StreamDataImplRc;
+
         fn state(&self) -> StreamDataState;
         fn state_id(&self) -> u8;
         fn hash(&self) -> u64;
         fn display_window(&self) -> BBox2Di;
-        fn set_display_window(&mut self, value: BBox2Di);
         fn data_window(&self) -> BBox2Di;
-        fn set_data_window(&mut self, value: BBox2Di);
         fn color_matrix(&self) -> Matrix4;
         fn transform_matrix(&self) -> Matrix4;
         fn deformers_len(&self) -> usize;
         fn apply_deformers(&self, buffer: &mut [f32]);
-        fn pixel_block(&self) -> &PixelBlock;
         fn pixel_buffer(&self) -> &[f32];
         fn pixel_width(&self) -> i32;
         fn pixel_height(&self) -> i32;
         fn pixel_num_channels(&self) -> i32;
 
         // Creation
+        fn create_stream_data_box_rc() -> Box<StreamDataImplRc>;
+    }
+
+
+    // StreamData
+    #[namespace = "open_comp_graph::internal"]
+    extern "Rust" {
+        type StreamDataImpl;
+
+        // Creation
         fn create_stream_data_box() -> Box<StreamDataImpl>;
         fn create_stream_data_shared() -> StreamDataImplShared;
-        fn create_stream_data_shared_box(data: Box<StreamDataImpl>) -> StreamDataImplShared;
+        fn create_stream_data_shared_box(data: Box<StreamDataImplRc>) -> StreamDataImplShared;
         fn create_vec_stream_data_shared() -> Vec<StreamDataImplShared>;
     }
 
@@ -305,24 +316,6 @@ pub mod ffi {
     #[namespace = "open_comp_graph::internal"]
     extern "Rust" {
         type NodeImpl;
-        fn get_id(&self) -> u64;
-        fn get_node_type(&self) -> NodeType;
-        fn get_node_type_id(&self) -> u8;
-        fn get_status(&self) -> NodeStatus;
-        fn get_status_id(&self) -> u8;
-
-        // Compute
-        fn hash(&self, frame: i32, inputs: &Vec<StreamDataImplShared>) -> u64;
-        fn compute(&mut self, frame: i32, inputs: &Vec<StreamDataImplShared>, output: &mut StreamDataImplShared) -> NodeStatus;
-
-        // AttrBlock
-        fn attr_exists(&self, name: &str) -> AttrState;
-        fn get_attr_f32(&self, name: &str) -> f32;
-        fn get_attr_i32(&self, name: &str) -> i32;
-        unsafe fn get_attr_str<'a, 'b>(&'b self, name: &'a str) -> &'b str;
-        fn set_attr_f32(&mut self, name: &str, value: f32);
-        fn set_attr_i32(&mut self, name: &str, value: i32);
-        fn set_attr_str(&mut self, name: &str, value: &str);
 
         // Creation
         #[cxx_name = "create_node_box"]
@@ -468,11 +461,11 @@ pub fn create_vec_stream_data_shared() -> Vec<ffi::StreamDataImplShared> {
 pub fn create_stream_data_shared() -> ffi::StreamDataImplShared {
     debug!("create_stream_data_shared()");
     ffi::StreamDataImplShared {
-        inner: create_stream_data_box(),
+        inner: create_stream_data_box_rc(),
     }
 }
 
-pub fn create_stream_data_shared_box(data: Box<StreamDataImpl>) -> ffi::StreamDataImplShared {
+pub fn create_stream_data_shared_box(data: Box<StreamDataImplRc>) -> ffi::StreamDataImplShared {
     debug!("create_stream_data_shared_box()");
     ffi::StreamDataImplShared { inner: data }
 }

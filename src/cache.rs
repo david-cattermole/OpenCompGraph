@@ -6,13 +6,29 @@ use std::cmp::Ordering;
 use std::cmp::Reverse;
 use std::collections::BinaryHeap;
 use std::hash::BuildHasherDefault;
+use std::rc::Rc;
 
-use crate::cxxbridge::ffi::StreamDataImplShared;
+use crate::cxxbridge::ffi::BBox2Di;
+use crate::cxxbridge::ffi::ImageShared;
 use crate::data::BYTES_TO_GIGABYTES;
+use crate::pixelblock::PixelBlock;
+
+#[derive(Debug, Clone)]
+pub struct CachedImage {
+    pub pixel_block: Rc<PixelBlock>,
+    pub display_window: BBox2Di,
+    pub data_window: BBox2Di,
+}
+
+impl CachedImage {
+    pub fn size_bytes(&self) -> usize {
+        self.pixel_block.size_bytes()
+    }
+}
 
 type LruHashMap<K, V> = LinkedHashMap<K, V, BuildHasherDefault<FxHasher>>;
 type CacheKey = u64;
-type CacheValue = StreamDataImplShared;
+type CacheValue = CachedImage;
 
 #[derive(Debug)]
 pub struct CacheImpl {
@@ -101,7 +117,7 @@ impl CacheImpl {
             return;
         }
 
-        let value_bytes = value.inner.size_bytes();
+        let mut value_bytes = value.size_bytes();
 
         // Make space if necessary
         let expected_bytes = self.used_bytes + value_bytes;
@@ -183,7 +199,7 @@ impl CacheImpl {
         //
         // Identify least recently used key, and remove the key.
         if let Some((key, value)) = self.lru_hash_map.pop_front() {
-            let value_bytes = value.inner.size_bytes();
+            let value_bytes = value.size_bytes();
             // There should not be any overflow problems with this
             // subtraction since we add and subtract exactly goes
             // into the cache. If there is an overflow here, it

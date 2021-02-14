@@ -2,17 +2,19 @@ use log::{debug, error, info, warn};
 use std::collections::hash_map::DefaultHasher;
 use std::hash;
 use std::hash::Hash;
+use std::rc::Rc;
 use std::string::String;
 
 use crate::attrblock::AttrBlock;
+use crate::cache::CacheImpl;
 use crate::cxxbridge::ffi::AttrState;
 use crate::cxxbridge::ffi::NodeStatus;
 use crate::cxxbridge::ffi::NodeType;
-use crate::cxxbridge::ffi::StreamDataImplShared;
 use crate::data::HashValue;
 use crate::data::Identifier;
 use crate::node::traits::Operation;
 use crate::node::NodeImpl;
+use crate::stream::StreamDataImpl;
 
 pub fn new(id: Identifier) -> NodeImpl {
     NodeImpl {
@@ -48,8 +50,9 @@ impl Operation for NullOperation {
         frame: i32,
         node_type_id: u8,
         attr_block: &Box<dyn AttrBlock>,
-        inputs: &Vec<StreamDataImplShared>,
-        output: &mut StreamDataImplShared,
+        inputs: &Vec<Rc<StreamDataImpl>>,
+        output: &mut Rc<StreamDataImpl>,
+        cache: &mut Box<CacheImpl>,
     ) -> NodeStatus {
         debug!("NullOperation.compute()");
         // debug!("AttrBlock: {:?}", attr_block);
@@ -58,7 +61,7 @@ impl Operation for NullOperation {
         match inputs.len() {
             0 => NodeStatus::Error,
             _ => {
-                output.inner = inputs[0].inner.clone();
+                *output = inputs[0].clone();
                 NodeStatus::Valid
             }
         }

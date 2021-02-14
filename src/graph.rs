@@ -3,7 +3,11 @@ use log::{debug, error, info, warn};
 use petgraph;
 use petgraph::dot::{Config, Dot};
 use petgraph::Direction;
-use std::hash::{Hash, Hasher};
+use rustc_hash::FxHashMap;
+use std::collections::HashMap;
+use std::hash::Hash;
+use std::hash::Hasher;
+use std::rc::Rc;
 
 use crate::cache::CacheImpl;
 use crate::cxxbridge::create_stream_data_shared;
@@ -23,7 +27,9 @@ use crate::data::NodeWeight;
 use crate::graphiter::UpstreamEvalSearch;
 use crate::node::NodeImpl;
 use crate::stream::StreamDataImpl;
+use crate::stream::StreamDataImplRc;
 
+type HashValue = u64;
 type NodeGraph =
     petgraph::stable_graph::StableGraph<NodeWeight, EdgeWeight, petgraph::Directed, GraphIdx>;
 
@@ -32,7 +38,7 @@ pub struct GraphImpl {
     nodes: Vec<Box<NodeImpl>>,
     ids: Vec<Identifier>,
     graph: NodeGraph,
-    output: StreamDataImplShared,
+    output: Rc<StreamDataImpl>,
     state: GraphState,
     status: ExecuteStatus,
 }
@@ -43,7 +49,7 @@ impl GraphImpl {
         let nodes = Vec::new();
         let ids = Vec::new();
         let graph = NodeGraph::with_capacity(0, 0);
-        let output = create_stream_data_shared();
+        let output = Rc::new(StreamDataImpl::new());
         let state = GraphState::Uninitialized;
         let status = ExecuteStatus::Uninitialized;
         GraphImpl {
@@ -294,25 +300,23 @@ impl GraphImpl {
         &mut self,
         nx: NodeIdx,
         frame: i32,
-        parent_inputs: &mut Vec<StreamDataImplShared>,
-        cache: &mut Box<CacheImpl>,
-    ) -> Result<(GraphIdx, Vec<StreamDataImplShared>), ErrorCode> {
-        let mut inputs = Vec::<StreamDataImplShared>::new();
+        parent_inputs: &mut Vec<Rc<StreamDataImpl>>,
+        stream_data_cache: &FxHashMap<HashValue, Rc<StreamDataImpl>>,
+    ) -> Result<(GraphIdx, Vec<Rc<StreamDataImpl>>), ErrorCode> {
+        let mut inputs = Vec::<Rc<StreamDataImpl>>::new();
         let parents = self.graph.neighbors_directed(nx, Direction::Incoming);
         for parent_node_index in parents {
             let parent_index = parent_node_index.index();
             debug!("parent index: {}", parent_index);
-            let parent_node = &self.nodes[parent_index];
-            let parent_hash = parent_node.hash(frame, &parent_inputs);
 
-            match cache.get(&parent_hash) {
-                Some(value) => {
-                    debug!("Got hash: {}", parent_hash);
-                    let mut stream_data = create_stream_data_shared();
-                    stream_data.inner = value.inner.clone();
-                    inputs.push(stream_data);
-                }
-                _ => warn!("Missing from cache: {}", parent_hash),
+            let parent_node = &self.nodes[parent_index];
+            let parent_hash = parent_node.hash(frame, parent_inputs);
+            debug!("Parent node hash: {}", parent_hash);
+
+            if let Some(stream_data) = stream_data_cache.get(&parent_hash) {
+                inputs.push(stream_data.clone());
+            } else {
+                panic!("Parent node hash is missing: {}", parent_hash);
             }
         }
         let node_index = nx.index();
@@ -322,41 +326,33 @@ impl GraphImpl {
     /// Compute the node.
     fn compute_node_output(
         &mut self,
-        inputs: &Vec<StreamDataImplShared>,
+        inputs: &Vec<Rc<StreamDataImpl>>,
         node_index: GraphIdx,
         frame: i32,
         cache: &mut Box<CacheImpl>,
+        stream_data_cache: &mut FxHashMap<HashValue, Rc<StreamDataImpl>>,
     ) -> Result<(), ErrorCode> {
         let node = &mut self.nodes[node_index];
-        let node_hash = node.hash(frame, &inputs);
-        let mut cached_output = cache.get(&node_hash);
-        match cached_output {
-            Some(value) => {
-                debug!("Reuse Hash: {}", node_hash);
-                self.output = value.clone();
+
+        match node.compute(frame, &inputs, &mut self.output, cache) {
+            NodeStatus::Valid | NodeStatus::Warning => {
+                let node_hash = node.hash(frame, &inputs);
+                // debug!("Node hash: {}", node_hash);
+
+                stream_data_cache.insert(node_hash, self.output.clone());
                 Ok(())
             }
-            None => {
-                debug!("Cache Miss: {}", node_hash);
-                self.output = create_stream_data_shared();
-                match node.compute(frame, &inputs, &mut self.output) {
-                    NodeStatus::Valid | NodeStatus::Warning => {
-                        cache.insert(node_hash, self.output.clone());
-                        Ok(())
-                    }
-                    NodeStatus::Uninitialized => {
-                        error!("Node is uninitialized: node_index={}", node_index);
-                        return Err(ErrorCode::Uninitialized);
-                    }
-                    NodeStatus::Error => {
-                        error!("Failed to compute node: node_index={}", node_index);
-                        return Err(ErrorCode::Failure);
-                    }
-                    _ => {
-                        error!("Unknown error: node_index={}", node_index);
-                        return Err(ErrorCode::Failure);
-                    }
-                }
+            NodeStatus::Uninitialized => {
+                error!("Node is uninitialized: node_index={}", node_index);
+                Err(ErrorCode::Uninitialized)
+            }
+            NodeStatus::Error => {
+                error!("Failed to compute node: node_index={}", node_index);
+                Err(ErrorCode::Failure)
+            }
+            _ => {
+                error!("Unknown error: node_index={}", node_index);
+                Err(ErrorCode::Failure)
             }
         }
     }
@@ -369,12 +365,19 @@ impl GraphImpl {
     ) -> Result<(), ErrorCode> {
         info!("Execute Frame Context: {}", frame);
 
-        let mut parent_inputs = Vec::<StreamDataImplShared>::new();
+        let mut stream_data_cache = FxHashMap::<HashValue, Rc<StreamDataImpl>>::default();
+        let mut parent_inputs = Vec::<Rc<StreamDataImpl>>::new();
         for nx in sorted_node_indexes.iter().rev() {
             debug!("Compute Node Index: {:?}", nx);
             let (node_index, node_inputs) =
-                self.compute_node_metadata(*nx, frame, &mut parent_inputs, cache)?;
-            self.compute_node_output(&node_inputs, node_index, frame, cache)?;
+                self.compute_node_metadata(*nx, frame, &mut parent_inputs, &stream_data_cache)?;
+            self.compute_node_output(
+                &node_inputs,
+                node_index,
+                frame,
+                cache,
+                &mut stream_data_cache,
+            )?;
             parent_inputs = node_inputs.to_vec();
         }
         Ok(())
@@ -456,7 +459,9 @@ impl GraphImpl {
     /// Get the output stream from the last executed graph node.
     pub fn output_stream(&self) -> StreamDataImplShared {
         debug!("Query Stream Output...");
-        self.output.clone()
+        StreamDataImplShared {
+            inner: Box::new(StreamDataImplRc::from_rc_data(self.output.clone())),
+        }
     }
 }
 

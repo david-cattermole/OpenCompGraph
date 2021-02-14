@@ -33,4 +33,12 @@ impl BBox2Di {
             max_y,
         }
     }
+
+    pub fn width(&self) -> i32 {
+        self.max_x - self.min_x
+    }
+
+    pub fn height(&self) -> i32 {
+        self.max_y - self.min_y
+    }
 }
