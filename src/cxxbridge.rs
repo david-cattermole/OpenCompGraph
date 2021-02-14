@@ -243,7 +243,7 @@ pub mod ffi {
     unsafe extern "C++" {
         include!("opencompgraph/imageio.h");
 
-        fn oiio_read_image(file_path: &String, image: &mut ImageShared);
+        fn oiio_read_image(file_path: &String, image: &mut ImageShared) -> bool;
         fn oiio_write_image(file_path: &String, image: &ImageShared) -> bool;
     }
 

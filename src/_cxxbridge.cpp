@@ -1365,9 +1365,9 @@ namespace internal {
 extern "C" {
 ::std::size_t open_comp_graph$internal$cxxbridge1$StreamDataImplShared$operator$hash(const StreamDataImplShared &) noexcept;
 
-OPENCOMPGRAPH_SYMBOL_EXPORT void open_comp_graph$internal$cxxbridge1$oiio_read_image(const ::rust::String &file_path, ::open_comp_graph::internal::ImageShared &image) noexcept {
-  void (*oiio_read_image$)(const ::rust::String &, ::open_comp_graph::internal::ImageShared &) = ::open_comp_graph::internal::oiio_read_image;
-  oiio_read_image$(file_path, image);
+OPENCOMPGRAPH_SYMBOL_EXPORT bool open_comp_graph$internal$cxxbridge1$oiio_read_image(const ::rust::String &file_path, ::open_comp_graph::internal::ImageShared &image) noexcept {
+  bool (*oiio_read_image$)(const ::rust::String &, ::open_comp_graph::internal::ImageShared &) = ::open_comp_graph::internal::oiio_read_image;
+  return oiio_read_image$(file_path, image);
 }
 
 OPENCOMPGRAPH_SYMBOL_EXPORT bool open_comp_graph$internal$cxxbridge1$oiio_write_image(const ::rust::String &file_path, const ::open_comp_graph::internal::ImageShared &image) noexcept {

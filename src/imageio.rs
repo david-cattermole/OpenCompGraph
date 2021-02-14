@@ -33,7 +33,7 @@ pub fn read_image(path: &String) -> ImageShared {
                 display_window: BBox2Di::new(0, 0, 0, 0),
                 data_window: BBox2Di::new(0, 0, 0, 0),
             };
-            oiio_read_image(&path, &mut image);
+            let ok = oiio_read_image(&path, &mut image);
             image
         }
         false => {

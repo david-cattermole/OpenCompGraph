@@ -7,24 +7,25 @@
 namespace open_comp_graph {
 namespace internal {
 
-void oiio_read_image(const rust::String &file_path, ImageShared &image) {
+bool oiio_read_image(const rust::String &file_path, ImageShared &image) {
     // TODO: Read and set the display and data windows.
     const int num_threads = 0;
     bool ok = OIIO::attribute("threads", OIIO::TypeDesc::INT, &num_threads);
     if (!ok){
-        return;
+        return false;
     }
 
     auto filename = std::string(file_path);
+    // std::cout<< "filename: " << filename << std::endl;
     auto in = OIIO::ImageInput::open(filename);
     if (!in) {
-        return;
+        return false;
     }
     int subimage = 0;
     int miplevel = 0;
     bool seek_ok = in->seek_subimage(subimage, miplevel);
     if (!seek_ok) {
-        return;
+        return false;
     }
 
     const OIIO::ImageSpec &spec = in->spec();
@@ -53,6 +54,7 @@ void oiio_read_image(const rust::String &file_path, ImageShared &image) {
         pixel_data,
         xstride, ystride, zstride);
     in->close();
+    return true;
 }
 
 bool oiio_write_image(const rust::String &file_path, const ImageShared &image) {

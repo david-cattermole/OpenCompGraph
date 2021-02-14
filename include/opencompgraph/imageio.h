@@ -12,7 +12,7 @@ namespace internal {
 struct ImageShared;
 
 OPENCOMPGRAPH_SYMBOL_EXPORT
-void oiio_read_image(const rust::String &file_path, ImageShared &image);
+bool oiio_read_image(const rust::String &file_path, ImageShared &image);
 
 OPENCOMPGRAPH_SYMBOL_EXPORT
 bool oiio_write_image(const rust::String &file_path, const ImageShared &image);
