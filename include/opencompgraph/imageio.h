@@ -12,6 +12,12 @@ namespace internal {
 struct ImageShared;
 
 OPENCOMPGRAPH_SYMBOL_EXPORT
+bool oiio_get_thread_count(int &num_threads);
+
+OPENCOMPGRAPH_SYMBOL_EXPORT
+bool oiio_set_thread_count(const int32_t num_threads);
+
+OPENCOMPGRAPH_SYMBOL_EXPORT
 bool oiio_read_image(const rust::String &file_path, ImageShared &image);
 
 OPENCOMPGRAPH_SYMBOL_EXPORT

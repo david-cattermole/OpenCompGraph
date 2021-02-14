@@ -7,13 +7,15 @@
 namespace open_comp_graph {
 namespace internal {
 
-bool oiio_read_image(const rust::String &file_path, ImageShared &image) {
-    const int num_threads = 0;
-    bool ok = OIIO::attribute("threads", OIIO::TypeDesc::INT, &num_threads);
-    if (!ok){
-        return false;
-    }
+bool oiio_get_thread_count(int32_t &num_threads) {
+    return OIIO::getattribute("threads", num_threads);
+}
 
+bool oiio_set_thread_count(const int num_threads) {
+    return OIIO::attribute("threads", OIIO::TypeDesc::INT, &num_threads);
+}
+
+bool oiio_read_image(const rust::String &file_path, ImageShared &image) {
     auto filename = std::string(file_path);
     // std::cout<< "filename: " << filename << std::endl;
     auto in = OIIO::ImageInput::open(filename);
@@ -71,11 +73,6 @@ bool oiio_read_image(const rust::String &file_path, ImageShared &image) {
 }
 
 bool oiio_write_image(const rust::String &file_path, const ImageShared &image) {
-    const int num_threads = 0;
-    bool ok = OIIO::attribute("threads", OIIO::TypeDesc::INT, &num_threads);
-    if (!ok){
-        return false;
-    }
 
     auto filename = std::string(file_path);
     const int32_t xres = image.pixel_block->width();

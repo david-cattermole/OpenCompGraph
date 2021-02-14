@@ -243,6 +243,8 @@ pub mod ffi {
     unsafe extern "C++" {
         include!("opencompgraph/imageio.h");
 
+        fn oiio_get_thread_count(num_threads: &mut i32) -> bool;
+        fn oiio_set_thread_count(num_threads: i32) -> bool;
         fn oiio_read_image(file_path: &String, image: &mut ImageShared) -> bool;
         fn oiio_write_image(file_path: &String, image: &ImageShared) -> bool;
     }
