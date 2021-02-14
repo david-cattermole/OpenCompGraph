@@ -8,7 +8,6 @@ namespace open_comp_graph {
 namespace internal {
 
 bool oiio_read_image(const rust::String &file_path, ImageShared &image) {
-    // TODO: Read and set the display and data windows.
     const int num_threads = 0;
     bool ok = OIIO::attribute("threads", OIIO::TypeDesc::INT, &num_threads);
     if (!ok){
@@ -28,10 +27,24 @@ bool oiio_read_image(const rust::String &file_path, ImageShared &image) {
         return false;
     }
 
+    // Note: OpenImageIO assumes the coordinate system origin is upper
+    // left corner of the pixel data
     const OIIO::ImageSpec &spec = in->spec();
     int width = spec.width;
     int height = spec.height;
     int num_channels = spec.nchannels;
+
+    // Read the data window.
+    image.data_window.min_x = spec.x;
+    image.data_window.min_y = spec.y;
+    image.data_window.max_x = spec.x + spec.width;
+    image.data_window.max_y = spec.y + spec.height;
+
+    // Read the display window.
+    image.display_window.min_x = spec.full_x;
+    image.display_window.min_y = spec.full_y;
+    image.display_window.max_x = spec.full_x + spec.full_width;
+    image.display_window.max_y = spec.full_y + spec.full_height;
 
     // Allocate pixel memory with Rust data structure.
     auto pixel_data_type = PixelDataType::kFloat32;

@@ -135,6 +135,26 @@ impl Operation for ReadImageOperation {
                 pixel_block.num_channels()
             );
 
+            debug!(
+                "data_window: {},{} to {},{} | {}x{}",
+                data_window.min_x,
+                data_window.min_y,
+                data_window.max_x,
+                data_window.max_y,
+                data_window.width(),
+                data_window.height(),
+            );
+
+            debug!(
+                "display_window: {},{} to {},{} | {}x{}",
+                display_window.min_x,
+                display_window.min_y,
+                display_window.max_x,
+                display_window.max_y,
+                display_window.width(),
+                display_window.height(),
+            );
+
             stream_data.set_data_window(data_window);
             stream_data.set_display_window(display_window);
             stream_data.set_hash(hash_value);
