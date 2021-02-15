@@ -1,3 +1,4 @@
+use half::f16;
 use image;
 use image::GenericImageView;
 use image::RgbaImage;
@@ -33,9 +34,36 @@ pub struct PixelBlock {
     height: i32,
     num_channels: i32,
     pixel_data_type: PixelDataType,
+
+    /// The pixel data may *not* be f32 values, but rather the values
+    /// may be u8 or u16 or 'half'. We use 'f32' here as the maximum
+    /// number of bytes that could be needed. Rust's Vec will ensure
+    /// that the f32 values are a byte aligned for us.
     pixels: Vec<f32>,
 }
 
+#[inline]
+fn size_bytes_aligned_to<T>(size_bytes: usize) -> usize {
+    let align_type = std::mem::align_of::<T>();
+    let extra_align_bytes = align_type - size_bytes.rem_euclid(align_type).rem_euclid(align_type);
+    let size_bytes_aligned = size_bytes + extra_align_bytes;
+    size_bytes_aligned
+}
+
+#[inline]
+fn size_aligned_to<T>(size_bytes: usize) -> usize {
+    let align_type = std::mem::align_of::<T>();
+    let size = size_bytes_aligned_to::<T>(size_bytes) / align_type;
+    size
+}
+
+#[inline]
+fn pixel_block_size(width: i32, height: i32, num_channels: i32) -> usize {
+    let size = (width * height * num_channels) as usize;
+    size
+}
+
+#[inline]
 fn pixel_block_size_bytes(
     width: i32,
     height: i32,
@@ -44,7 +72,7 @@ fn pixel_block_size_bytes(
 ) -> usize {
     let num_bytes = match pixel_data_type {
         PixelDataType::Float32 => std::mem::size_of::<f32>(),
-        PixelDataType::Half16 => std::mem::size_of::<i16>(), // TODO: Support "half" properly.
+        PixelDataType::Half16 => std::mem::size_of::<f16>(),
         PixelDataType::UInt8 => std::mem::size_of::<u8>(),
         PixelDataType::UInt16 => std::mem::size_of::<u16>(),
         _ => {
@@ -52,7 +80,8 @@ fn pixel_block_size_bytes(
             0
         }
     };
-    num_bytes * (width * height * num_channels) as usize
+    let size_bytes = num_bytes * pixel_block_size(width, height, num_channels) as usize;
+    size_bytes
 }
 
 impl PixelBlock {
@@ -62,8 +91,10 @@ impl PixelBlock {
         num_channels: i32,
         pixel_data_type: PixelDataType,
     ) -> PixelBlock {
-        let size = (width * height * num_channels) as usize;
-        let pixels = vec![0.0 as f32; size];
+        let size = pixel_block_size_bytes(width, height, num_channels, pixel_data_type);
+        let size_aligned = size_aligned_to::<f32>(size);
+        let pixels = vec![0.0 as f32; size_aligned];
+
         PixelBlock {
             width,
             height,
@@ -80,12 +111,18 @@ impl PixelBlock {
         PixelBlock::new(width, height, num_channels, pixel_data_type)
     }
 
-    pub fn new_constant_pixel_rgba(r: f32, g: f32, b: f32, a: f32) -> PixelBlock {
+    pub fn new_constant_pixel_rgba_f32(r: f32, g: f32, b: f32, a: f32) -> PixelBlock {
         let width = 1;
         let height = 1;
         let num_channels = 4;
-        let pixels = vec![r, g, b, a];
         let pixel_data_type = PixelDataType::Float32;
+
+        let size = pixel_block_size_bytes(width, height, num_channels, pixel_data_type);
+        let size_aligned = size_aligned_to::<f32>(size);
+        let mut pixels = Vec::<f32>::with_capacity(size_aligned);
+        let single_pixel = [r, g, b, a];
+        pixels.extend_from_slice(&single_pixel);
+
         PixelBlock {
             width,
             height,
@@ -99,7 +136,6 @@ impl PixelBlock {
         let width = COLOR_BARS_WIDTH;
         let height = COLOR_BARS_HEIGHT;
         let num_channels = COLOR_BARS_NUM_CHANNELS;
-        let size = (width * height * num_channels) as usize;
         let pixels = COLOR_BARS.to_vec();
         let pixel_data_type = PixelDataType::Float32;
         PixelBlock {
@@ -108,6 +144,55 @@ impl PixelBlock {
             num_channels,
             pixel_data_type,
             pixels,
+        }
+    }
+
+    pub fn convert_into_f32_data(&mut self) {
+        debug!("into_f32_data: {:#?}", self.pixel_data_type);
+        if self.pixel_data_type == PixelDataType::Float32 {
+            return;
+        } else {
+            let old_pixel_data_type = self.pixel_data_type;
+            let old_size_bytes = self.size_bytes();
+            let size = self.size();
+
+            let new_pixel_data_type = PixelDataType::Float32;
+            let new_size_bytes = pixel_block_size_bytes(
+                self.width,
+                self.height,
+                self.num_channels,
+                new_pixel_data_type,
+            );
+
+            let pixel_slice = self.pixels.as_slice();
+            let new_pixels: Vec<f32> = match old_pixel_data_type {
+                PixelDataType::UInt8 => {
+                    // SAFETY: It is safe to convert the pixel data structure
+                    let pixels_u8 = unsafe { std::mem::transmute::<&[f32], &[u8]>(pixel_slice) };
+                    debug!("pixels_u8.len(): {}", pixels_u8.len());
+                    pixels_u8
+                        .into_iter()
+                        .map(|x| (*x as f32) / (u8::max_value() as f32))
+                        .collect()
+                }
+                PixelDataType::UInt16 => {
+                    let pixels_u16 = unsafe { std::mem::transmute::<&[f32], &[u16]>(pixel_slice) };
+                    debug!("pixels_u16.len(): {}", pixels_u16.len());
+                    pixels_u16
+                        .into_iter()
+                        .map(|x| (*x as f32) / (u16::max_value() as f32))
+                        .collect()
+                }
+                PixelDataType::Half16 => {
+                    let pixels_f16 = unsafe { std::mem::transmute::<&[f32], &[f16]>(pixel_slice) };
+                    debug!("pixels_f16.len(): {}", pixels_f16.len());
+                    pixels_f16.into_iter().map(|x| (*x).to_f32()).collect()
+                }
+                _ => panic!("Unsupported pixel data type: {:#?}", old_pixel_data_type),
+            };
+
+            self.pixels = new_pixels;
+            self.pixel_data_type = new_pixel_data_type;
         }
     }
 
@@ -139,6 +224,10 @@ impl PixelBlock {
         self.pixel_data_type
     }
 
+    pub fn size(&self) -> usize {
+        pixel_block_size(self.width, self.height, self.num_channels)
+    }
+
     pub fn size_bytes(&self) -> usize {
         pixel_block_size_bytes(
             self.width,
@@ -160,11 +249,12 @@ impl PixelBlock {
         self.num_channels = num_channels;
         self.pixel_data_type = pixel_data_type;
 
+        let new_capacity = pixel_block_size(width, height, num_channels);
+
         // Reserve ("exactly") enough memory to hold our pixels. We do
         // not expect needing to append more pixels later in the
         // future and we don't want to waste memory with unneeded
         // pixels allocated that will never be used.
-        let new_capacity = (width * height * num_channels) as usize;
         let additional_num_elements = cmp::max(0, new_capacity - self.pixels.capacity());
         self.pixels.reserve_exact(additional_num_elements);
 

@@ -1,6 +1,7 @@
 #include "rust/cxx.h"
 #include "opencompgraph/symbol_export.h"
 #include "opencompgraph/cpp.h"
+#include "opencompgraph/colorspace.h"
 #include "opencompgraph/imageio.h"
 #include "opencompgraph/systemmemory.h"
 #include <algorithm>
@@ -1364,6 +1365,16 @@ bool open_comp_graph$cxxbridge1$Matrix4$operator$ge(const Matrix4 &, const Matri
 namespace internal {
 extern "C" {
 ::std::size_t open_comp_graph$internal$cxxbridge1$StreamDataImplShared$operator$hash(const StreamDataImplShared &) noexcept;
+
+OPENCOMPGRAPH_SYMBOL_EXPORT bool open_comp_graph$internal$cxxbridge1$ocio_print_color_spaces() noexcept {
+  bool (*ocio_print_color_spaces$)() = ::open_comp_graph::internal::ocio_print_color_spaces;
+  return ocio_print_color_spaces$();
+}
+
+OPENCOMPGRAPH_SYMBOL_EXPORT bool open_comp_graph$internal$cxxbridge1$ocio_color_convert_inplace(::rust::Slice<float> pixel_data, ::std::int32_t width, ::std::int32_t height, ::std::int32_t num_channels, const ::rust::String &src_color_space, const ::rust::String &dst_color_space) noexcept {
+  bool (*ocio_color_convert_inplace$)(::rust::Slice<float>, ::std::int32_t, ::std::int32_t, ::std::int32_t, const ::rust::String &, const ::rust::String &) = ::open_comp_graph::internal::ocio_color_convert_inplace;
+  return ocio_color_convert_inplace$(pixel_data, width, height, num_channels, src_color_space, dst_color_space);
+}
 
 OPENCOMPGRAPH_SYMBOL_EXPORT bool open_comp_graph$internal$cxxbridge1$oiio_get_thread_count(::std::int32_t &num_threads) noexcept {
   bool (*oiio_get_thread_count$)(::std::int32_t &) = ::open_comp_graph::internal::oiio_get_thread_count;

@@ -45,10 +45,12 @@ SET LIBPNG_ROOT="%CD%\install\libpng"
 SET LIBTIFF_ROOT="%CD%\install\libtiff"
 SET ILMBASE_ROOT="%CD%\install\ilmbase_openexr"
 SET OPENEXR_ROOT="%CD%\install\ilmbase_openexr"
-SET PREFIX_PATH=%BOOST_ROOT%;%ZLIB_ROOT%;%LIBJPEGTURBO_ROOT%;%LIBPNG_ROOT%;%LIBTIFF_ROOT%;%ILMBASE_ROOT%;%OPENEXR_ROOT%
+SET OPENCOLORIO_ROOT="%CD%\install\opencolorio"
+SET OPENIMAGEIO_ROOT="%CD%\install\openimageio"
+SET PREFIX_PATH=%BOOST_ROOT%;%ZLIB_ROOT%;%LIBJPEGTURBO_ROOT%;%LIBPNG_ROOT%;%LIBTIFF_ROOT%;%ILMBASE_ROOT%;%OPENEXR_ROOT%;%OPENCOLORIO_ROOT%;%OPENIMAGEIO_ROOT%
 
 :: Ignore these paths.
-SET IGNORE_PATH="C:\\MinGW\;C:\\MinGW\\bin\;C:\\MinGW\\lib\;C:\\MinGW\\include\;C:\\Program Files\\emacs\\emacs-26.3-x86_64\;C:\\Program Files\\emacs\\emacs-26.3-x86_64\\bin\;C:\\Program Files\\emacs\\emacs-26.3-x86_64\\lib\;C:\\Program Files\\emacs\\emacs-26.3-x86_64\\include\;C:\\Program Files\\Autodesk\\Maya2017\\lib\;"
+SET IGNORE_PATH="C:\\MinGW\;C:\\MinGW\\bin\;C:\\MinGW\\lib\;C:\\MinGW\\include\;C:\\Program Files\\emacs\\emacs-26.3-x86_64\;C:\\Program Files\\emacs\\emacs-26.3-x86_64\\bin\;C:\\Program Files\\emacs\\emacs-26.3-x86_64\\lib\;C:\\Program Files\\emacs\\emacs-26.3-x86_64\\include\;C:\\Program Files\\Autodesk\\Maya2017\\lib\;C:\\Program Files\\Autodesk\\Maya2018\\lib\;C:\\Program Files\\Autodesk\\Maya2019\\lib\;C:\\Program Files\\Autodesk\\Maya2020\\lib\;"
 
 :: Build plugin
 MKDIR build_windows64_thirdparty_%BUILD_TYPE%

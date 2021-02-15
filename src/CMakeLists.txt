@@ -28,10 +28,12 @@ add_custom_command(
 set(opencompgraph_source_files
   ${CMAKE_CURRENT_SOURCE_DIR}/_cxxbridge.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/cpp.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/colorspace.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/systemmemory.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/config.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/cache.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/imageio.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/oiio_utils.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/node.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/graph.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/stream.cpp)
@@ -40,10 +42,10 @@ set(opencompgraph_source_files
 # library.
 add_library(${target_lib} SHARED ${opencompgraph_source_files})
 target_link_libraries(${target_lib}
-  ${rust_linktime_file})
-target_link_libraries(${target_lib}
+  ${rust_linktime_file}
   OpenImageIO::OpenImageIO
-  ${rust_linktime_file})
+  OpenColorIO
+)
 
 target_include_directories(${target_lib}
     PUBLIC
@@ -53,6 +55,7 @@ target_include_directories(${target_lib}
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}
         ${OPENIMAGEIO_INCLUDES}
+        ${OpenColorIO_INCLUDE_DIR}
 )
 
 if (MSVC)

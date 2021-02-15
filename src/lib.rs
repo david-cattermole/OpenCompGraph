@@ -5,6 +5,7 @@
 pub mod attrblock;
 pub mod bbox;
 pub mod cache;
+pub mod colorspace;
 pub mod colorutils;
 pub mod colorxform;
 pub mod config;

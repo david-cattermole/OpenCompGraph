@@ -8,8 +8,8 @@ use std::string::String;
 
 use crate::attrblock::AttrBlock;
 use crate::cache::CacheImpl;
+use crate::colorspace;
 use crate::colorutils;
-use crate::colorutils::convert_linear_to_srgb;
 use crate::colorxform;
 use crate::cxxbridge::ffi::AttrState;
 use crate::cxxbridge::ffi::ImageShared;
@@ -93,6 +93,25 @@ impl Operation for WriteImageOperation {
                 let data_window = copy.data_window();
                 let transform_matrix = copy.transform_matrix().to_na_matrix();
                 let mut pixel_block = copy.clone_pixel_block();
+
+                // Convert to f32 data and convert to linear color space.
+                //
+                // Before applying any changes to the pixels we
+                // must ensure we work in 32-bit floating-point linear
+                // color space.
+                pixel_block.convert_into_f32_data();
+
+                let width = pixel_block.width();
+                let height = pixel_block.height();
+                let num_channels = pixel_block.num_channels();
+                let ok = colorspace::color_convert_inplace(
+                    &mut pixel_block.as_slice_mut(),
+                    width,
+                    height,
+                    num_channels,
+                    &"Utility - sRGB - Texture".to_string(),
+                    &"ACES - ACEScg".to_string(),
+                );
 
                 {
                     // Apply Deformations.

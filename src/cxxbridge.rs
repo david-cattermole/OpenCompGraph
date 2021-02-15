@@ -238,6 +238,22 @@ pub mod ffi {
         // fn run_sharedthing(state: SharedThing);
     }
 
+    // Color Spaces
+    #[namespace = "open_comp_graph::internal"]
+    unsafe extern "C++" {
+        include!("opencompgraph/colorspace.h");
+
+        fn ocio_print_color_spaces() -> bool;
+
+        fn ocio_color_convert_inplace(
+            pixel_data: &mut [f32],
+            width: i32,
+            height: i32,
+            num_channels: i32,
+            src_color_space: &String,
+            dst_color_space: &String) -> bool;
+    }
+
     // Image IO
     #[namespace = "open_comp_graph::internal"]
     unsafe extern "C++" {

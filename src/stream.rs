@@ -4,6 +4,7 @@ use std::rc::Rc;
 
 use crate::cxxbridge::ffi::BBox2Di;
 use crate::cxxbridge::ffi::Matrix4;
+use crate::cxxbridge::ffi::PixelDataType;
 use crate::cxxbridge::ffi::StreamDataState;
 use crate::data::HashValue;
 use crate::deformer::Deformer;
@@ -196,6 +197,10 @@ impl StreamDataImpl {
     pub fn pixel_num_channels(&self) -> i32 {
         self.pixel_block.num_channels()
     }
+
+    pub fn pixel_data_type(&self) -> PixelDataType {
+        self.pixel_block.pixel_data_type()
+    }
 }
 
 pub fn create_stream_data_box() -> Box<StreamDataImpl> {
@@ -295,6 +300,10 @@ impl StreamDataImplRc {
 
     pub fn pixel_num_channels(&self) -> i32 {
         self.inner.pixel_num_channels()
+    }
+
+    pub fn pixel_data_type(&self) -> PixelDataType {
+        self.inner.pixel_data_type()
     }
 }
 

@@ -196,6 +196,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "half"
+version = "1.7.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "62aca2aba2d62b4a7f5b33f3712cb1b0692779a56fb510499d5c0aa594daeaf3"
+
+[[package]]
 name = "hashbrown"
 version = "0.9.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -405,6 +411,7 @@ dependencies = [
  "cxx",
  "env_logger",
  "fastapprox",
+ "half",
  "image",
  "linked-hash-map",
  "log",

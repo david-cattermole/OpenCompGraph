@@ -2,6 +2,7 @@
 #include <memory>
 #include <rust/cxx.h>
 #include <opencompgraph.h>
+#include <opencompgraph/oiio_utils.h>
 #include <OpenImageIO/imageio.h>
 
 namespace open_comp_graph {
@@ -15,9 +16,9 @@ bool oiio_set_thread_count(const int num_threads) {
     return OIIO::attribute("threads", OIIO::TypeDesc::INT, &num_threads);
 }
 
+
 bool oiio_read_image(const rust::String &file_path, ImageShared &image) {
     auto filename = std::string(file_path);
-    // std::cout<< "filename: " << filename << std::endl;
     auto in = OIIO::ImageInput::open(filename);
     if (!in) {
         return false;
@@ -35,6 +36,7 @@ bool oiio_read_image(const rust::String &file_path, ImageShared &image) {
     int width = spec.width;
     int height = spec.height;
     int num_channels = spec.nchannels;
+    auto oiio_data_type = spec.format;
 
     // Read the data window.
     image.data_window.min_x = spec.x;
@@ -49,7 +51,7 @@ bool oiio_read_image(const rust::String &file_path, ImageShared &image) {
     image.display_window.max_y = spec.full_y + spec.full_height;
 
     // Allocate pixel memory with Rust data structure.
-    auto pixel_data_type = PixelDataType::kFloat32;
+    auto pixel_data_type = oiio_format_to_ocg_format(oiio_data_type);
     image.pixel_block->data_resize(width, height, num_channels, pixel_data_type);
     auto pixels = image.pixel_block->as_slice_mut();
     auto pixel_data = pixels.data();
@@ -62,10 +64,7 @@ bool oiio_read_image(const rust::String &file_path, ImageShared &image) {
     in->read_image(
         subimage, miplevel,
         chbegin, chend,
-        // For now, we will force convert to float/f32 data types. In
-        // the future it would be nice to stay as the native type
-        // instead.
-        OIIO::TypeDesc::FLOAT,
+        oiio_data_type,
         pixel_data,
         xstride, ystride, zstride);
     in->close();

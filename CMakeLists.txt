@@ -39,6 +39,22 @@ find_package(OpenImageIO REQUIRED
 message(STATUS "OpenImageIO Found: ${OpenImageIO_FOUND}")
 message(STATUS "OpenImageIO Version: ${OpenImageIO_VERSION}")
 
+find_package(OpenColorIO REQUIRED
+  HINTS ${OPENCOLORIO_ROOT})
+message(STATUS "OpenColorIO Found: ${OpenColorIO_FOUND}")
+message(STATUS "OpenColorIO Library: ${OpenColorIO_LIBRARY}")
+message(STATUS "OpenColorIO Libraries: ${OpenColorIO_LIBRARIES}")
+message(STATUS "OpenColorIO Include: ${OpenColorIO_INCLUDE_DIRS}")
+
+# HACK: OpenColorIO's installed CMake configs set
+# "IMPORTED_LINK_INTERFACE_LIBRARIES_RELEASE" to
+# "TINYXML_LIB;YAML_CPP_LIB" which are invalid library file names
+# because they are statically linked with OpenColorIO. Invalid library
+# names cause a linking error, therefore we need to remove these
+# libraries before they are linked and cause the problem.
+set_target_properties(OpenColorIO PROPERTIES
+  IMPORTED_LINK_INTERFACE_LIBRARIES_RELEASE "")
+
 add_subdirectory(src)
 add_subdirectory(include)
 if(OpenCompGraph_BUILD_TESTS)
