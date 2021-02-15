@@ -29,8 +29,8 @@ impl StreamDataImpl {
         let hash = 0;
 
         let pixel_block = Rc::new(PixelBlock::new_color_bars());
-        let bbox_max_width = pixel_block.width() - 1;
-        let bbox_max_height = pixel_block.height() - 1;
+        let bbox_max_width = pixel_block.width();
+        let bbox_max_height = pixel_block.height();
         let display_window = BBox2Di::new(0, 0, bbox_max_width, bbox_max_height);
         let data_window = BBox2Di::new(0, 0, bbox_max_width, bbox_max_height);
         let color_matrix = Matrix4::identity();
