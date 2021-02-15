@@ -3,7 +3,7 @@ use log::{debug, error, info, warn};
 use nalgebra as na;
 
 use crate::colorxform;
-use crate::cxxbridge::ffi::oiio_color_convert_inplace;
+use crate::cxxbridge::ffi::ocio_color_convert_inplace;
 use crate::cxxbridge::ffi::BBox2Di;
 use crate::cxxbridge::ffi::ImageShared;
 use crate::cxxbridge::ffi::Matrix4;
@@ -17,7 +17,7 @@ pub fn color_convert_inplace(
     src_color_space: &String,
     dst_color_space: &String,
 ) -> bool {
-    oiio_color_convert_inplace(
+    ocio_color_convert_inplace(
         pixel_data,
         width,
         height,
