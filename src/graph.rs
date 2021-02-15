@@ -8,6 +8,7 @@ use std::collections::HashMap;
 use std::hash::Hash;
 use std::hash::Hasher;
 use std::rc::Rc;
+use std::time::{Duration, Instant};
 
 use crate::cache::CacheImpl;
 use crate::cxxbridge::create_stream_data_shared;
@@ -364,6 +365,7 @@ impl GraphImpl {
         cache: &mut Box<CacheImpl>,
     ) -> Result<(), ErrorCode> {
         info!("Execute Frame Context: {}", frame);
+        let start = Instant::now();
 
         let mut stream_data_cache = FxHashMap::<HashValue, Rc<StreamDataImpl>>::default();
         let mut parent_inputs = Vec::<Rc<StreamDataImpl>>::new();
@@ -380,6 +382,9 @@ impl GraphImpl {
             )?;
             parent_inputs = node_inputs.to_vec();
         }
+        let duration = start.elapsed();
+        debug!("Frame Execute {} total time: {:?}", frame, duration);
+
         Ok(())
     }
 
@@ -401,6 +406,8 @@ impl GraphImpl {
         cache: &mut Box<CacheImpl>,
     ) -> ExecuteStatus {
         info!("Execute: {}", start_node_id);
+        let start = Instant::now();
+
         let start_node_idx = match self.find_node_index_from_id(start_node_id) {
             Some(value) => value,
             None => {
@@ -430,6 +437,12 @@ impl GraphImpl {
                 _ => (),
             }
         }
+        let duration = start.elapsed();
+        debug!(
+            "Execute {} Frames | total time: {:?}",
+            frames.len(),
+            duration
+        );
 
         self.state = GraphState::Clean;
         self.status = ExecuteStatus::Success;
