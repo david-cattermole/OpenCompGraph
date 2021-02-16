@@ -61,6 +61,9 @@ public:
     OPENCOMPGRAPH_SYMBOL_EXPORT
     int32_t pixel_num_channels() const noexcept;
 
+    OPENCOMPGRAPH_SYMBOL_EXPORT
+    PixelDataType pixel_data_type() const noexcept;
+
 private:
     internal::StreamDataImplShared inner;
 };

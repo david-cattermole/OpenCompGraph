@@ -76,4 +76,8 @@ int32_t StreamData::pixel_num_channels() const noexcept {
     return this->inner.inner->pixel_num_channels();
 };
 
+PixelDataType StreamData::pixel_data_type() const noexcept {
+    return this->inner.inner->pixel_data_type();
+};
+
 } // namespace open_comp_graph

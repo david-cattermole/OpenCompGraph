@@ -1149,6 +1149,7 @@ struct StreamDataImplRc final : public ::rust::Opaque {
   OPENCOMPGRAPH_SYMBOL_EXPORT ::std::int32_t pixel_width() const noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT ::std::int32_t pixel_height() const noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT ::std::int32_t pixel_num_channels() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::PixelDataType pixel_data_type() const noexcept;
   ~StreamDataImplRc() = delete;
 
 private:

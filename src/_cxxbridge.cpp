@@ -1203,6 +1203,7 @@ struct StreamDataImplRc final : public ::rust::Opaque {
   OPENCOMPGRAPH_SYMBOL_EXPORT ::std::int32_t pixel_width() const noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT ::std::int32_t pixel_height() const noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT ::std::int32_t pixel_num_channels() const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::PixelDataType pixel_data_type() const noexcept;
   ~StreamDataImplRc() = delete;
 
 private:
@@ -1444,6 +1445,8 @@ void open_comp_graph$internal$cxxbridge1$StreamDataImplRc$apply_deformers(const 
 ::std::int32_t open_comp_graph$internal$cxxbridge1$StreamDataImplRc$pixel_height(const ::open_comp_graph::internal::StreamDataImplRc &self) noexcept;
 
 ::std::int32_t open_comp_graph$internal$cxxbridge1$StreamDataImplRc$pixel_num_channels(const ::open_comp_graph::internal::StreamDataImplRc &self) noexcept;
+
+::open_comp_graph::PixelDataType open_comp_graph$internal$cxxbridge1$StreamDataImplRc$pixel_data_type(const ::open_comp_graph::internal::StreamDataImplRc &self) noexcept;
 
 ::open_comp_graph::internal::StreamDataImplRc *open_comp_graph$internal$cxxbridge1$create_stream_data_box_rc() noexcept;
 ::std::size_t open_comp_graph$internal$cxxbridge1$StreamDataImpl$operator$sizeof() noexcept;
@@ -1765,6 +1768,10 @@ OPENCOMPGRAPH_SYMBOL_EXPORT ::std::int32_t StreamDataImplRc::pixel_height() cons
 
 OPENCOMPGRAPH_SYMBOL_EXPORT ::std::int32_t StreamDataImplRc::pixel_num_channels() const noexcept {
   return open_comp_graph$internal$cxxbridge1$StreamDataImplRc$pixel_num_channels(*this);
+}
+
+OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::PixelDataType StreamDataImplRc::pixel_data_type() const noexcept {
+  return open_comp_graph$internal$cxxbridge1$StreamDataImplRc$pixel_data_type(*this);
 }
 
 OPENCOMPGRAPH_SYMBOL_EXPORT ::rust::Box<::open_comp_graph::internal::StreamDataImplRc> create_stream_data_box_rc() noexcept {
