@@ -78,6 +78,7 @@ These are the nodes that are planed or currently implemented.
 | Exposure      | Change the colors of an image using exposure values (EV)           | To be started |
 | MergeImage    | Blend/Combine 1 or more images together into a single image.       | To be started |
 | CropImage     | Remove pixel data outside a square region.                         | To be started |
+| Keyer         | Calculate an alpha channel for a green/blue-screen image           | To be started |
 
 
 ## Building
