@@ -19,6 +19,8 @@ use crate::logger::initialize;
 use crate::node::create_node;
 use crate::node::create_node_box_with_id;
 use crate::node::NodeImpl;
+use crate::pixelblock::channel_size_bytes;
+use crate::pixelblock::stride_num_channels;
 use crate::pixelblock::PixelBlock;
 use crate::stream::create_stream_data_box;
 use crate::stream::create_stream_data_box_rc;
@@ -286,6 +288,9 @@ pub mod ffi {
         fn as_slice(&self) -> &[f32];
         fn as_slice_mut(&mut self) -> &mut [f32];
 
+        fn stride_num_channels(num_channels: i32, pixel_data_type: PixelDataType) -> usize;
+        fn channel_size_bytes(pixel_data_type: PixelDataType) -> usize;
+
         fn data_resize(
             &mut self,
             width: i32,
@@ -312,11 +317,11 @@ pub mod ffi {
         fn pixel_width(&self) -> i32;
         fn pixel_height(&self) -> i32;
         fn pixel_num_channels(&self) -> i32;
+        fn pixel_data_type(&self) -> PixelDataType;
 
         // Creation
         fn create_stream_data_box_rc() -> Box<StreamDataImplRc>;
     }
-
 
     // StreamData
     #[namespace = "open_comp_graph::internal"]

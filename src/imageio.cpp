@@ -16,7 +16,6 @@ bool oiio_set_thread_count(const int num_threads) {
     return OIIO::attribute("threads", OIIO::TypeDesc::INT, &num_threads);
 }
 
-
 bool oiio_read_image(const rust::String &file_path, ImageShared &image) {
     auto filename = std::string(file_path);
     auto in = OIIO::ImageInput::open(filename);
@@ -38,6 +37,13 @@ bool oiio_read_image(const rust::String &file_path, ImageShared &image) {
     int num_channels = spec.nchannels;
     auto oiio_data_type = spec.format;
 
+    // We do not support images with channels less than RGB or more
+    // than RGBA.
+    if (num_channels < 3) {
+        return false;
+    }
+    std::max(num_channels, 4);
+
     // Read the data window.
     image.data_window.min_x = spec.x;
     image.data_window.min_y = spec.y;
@@ -51,14 +57,23 @@ bool oiio_read_image(const rust::String &file_path, ImageShared &image) {
     image.display_window.max_y = spec.full_y + spec.full_height;
 
     // Allocate pixel memory with Rust data structure.
+    //
+    // Make sure the data read is compatible with OpenGL without
+    // needing "GL_UNPACK_ALIGNMENT". Maya does not support any pixel
+    // formats that align to 48-bytes (such as RGB 8-bit), so we must
+    // pad the channels.
     auto pixel_data_type = oiio_format_to_ocg_format(oiio_data_type);
-    image.pixel_block->data_resize(width, height, num_channels, pixel_data_type);
+    auto padded_num_channels = stride_num_channels(num_channels, pixel_data_type);
+    auto channel_num_bytes = channel_size_bytes(pixel_data_type);
+    image.pixel_block->data_resize(
+        width, height, padded_num_channels, pixel_data_type);
     auto pixels = image.pixel_block->as_slice_mut();
     auto pixel_data = pixels.data();
 
     int chbegin = 0;
     int chend = num_channels;
-    OIIO::stride_t xstride = OIIO::AutoStride;
+    auto pixel_size_bytes = padded_num_channels * channel_num_bytes;
+    OIIO::stride_t xstride = pixel_size_bytes;
     OIIO::stride_t ystride = OIIO::AutoStride;
     OIIO::stride_t zstride = OIIO::AutoStride;
     in->read_image(

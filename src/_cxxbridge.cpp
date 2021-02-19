@@ -1416,6 +1416,10 @@ OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t open_comp_graph$internal$cxxbridge1$ge
 
 ::rust::repr::Fat open_comp_graph$internal$cxxbridge1$PixelBlock$as_slice_mut(::open_comp_graph::internal::PixelBlock &self) noexcept;
 
+::std::size_t open_comp_graph$internal$cxxbridge1$stride_num_channels(::std::int32_t num_channels, ::open_comp_graph::PixelDataType pixel_data_type) noexcept;
+
+::std::size_t open_comp_graph$internal$cxxbridge1$channel_size_bytes(::open_comp_graph::PixelDataType pixel_data_type) noexcept;
+
 void open_comp_graph$internal$cxxbridge1$PixelBlock$data_resize(::open_comp_graph::internal::PixelBlock &self, ::std::int32_t width, ::std::int32_t height, ::std::int32_t num_channels, ::open_comp_graph::PixelDataType pixel_data_type) noexcept;
 ::std::size_t open_comp_graph$internal$cxxbridge1$StreamDataImplRc$operator$sizeof() noexcept;
 ::std::size_t open_comp_graph$internal$cxxbridge1$StreamDataImplRc$operator$alignof() noexcept;
@@ -1704,6 +1708,14 @@ OPENCOMPGRAPH_SYMBOL_EXPORT ::rust::Slice<const float> PixelBlock::as_slice() co
 
 OPENCOMPGRAPH_SYMBOL_EXPORT ::rust::Slice<float> PixelBlock::as_slice_mut() noexcept {
   return ::rust::impl<::rust::Slice<float>>::slice(open_comp_graph$internal$cxxbridge1$PixelBlock$as_slice_mut(*this));
+}
+
+OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t stride_num_channels(::std::int32_t num_channels, ::open_comp_graph::PixelDataType pixel_data_type) noexcept {
+  return open_comp_graph$internal$cxxbridge1$stride_num_channels(num_channels, pixel_data_type);
+}
+
+OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t channel_size_bytes(::open_comp_graph::PixelDataType pixel_data_type) noexcept {
+  return open_comp_graph$internal$cxxbridge1$channel_size_bytes(pixel_data_type);
 }
 
 OPENCOMPGRAPH_SYMBOL_EXPORT void PixelBlock::data_resize(::std::int32_t width, ::std::int32_t height, ::std::int32_t num_channels, ::open_comp_graph::PixelDataType pixel_data_type) noexcept {

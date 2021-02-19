@@ -1286,6 +1286,10 @@ private:
 };
 #endif // CXXBRIDGE1_STRUCT_open_comp_graph$internal$ConfigImpl
 
+OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t stride_num_channels(::std::int32_t num_channels, ::open_comp_graph::PixelDataType pixel_data_type) noexcept;
+
+OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t channel_size_bytes(::open_comp_graph::PixelDataType pixel_data_type) noexcept;
+
 OPENCOMPGRAPH_SYMBOL_EXPORT ::rust::Box<::open_comp_graph::internal::StreamDataImplRc> create_stream_data_box_rc() noexcept;
 
 OPENCOMPGRAPH_SYMBOL_EXPORT ::rust::Box<::open_comp_graph::internal::StreamDataImpl> create_stream_data_box() noexcept;

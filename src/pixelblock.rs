@@ -58,9 +58,57 @@ fn size_aligned_to<T>(size_bytes: usize) -> usize {
 }
 
 #[inline]
-fn pixel_block_size(width: i32, height: i32, num_channels: i32) -> usize {
-    let size = (width * height * num_channels) as usize;
-    size
+pub fn stride_num_channels(num_channels: i32, pixel_data_type: PixelDataType) -> usize {
+    // num_channels as usize
+    match pixel_data_type {
+        // Force all 8-bit image pixels to be 4-byte aligned. Add
+        // an extra channel for RGB images.
+        //
+        // 8 + 8 + 8 + 8 = 32 bytes per-pixel (aligns to 4-bytes)
+        PixelDataType::UInt8 => 4,
+
+        // Force all 16-bit image pixels to be 4-byte aligned. Add
+        // an extra channel for RGB images.
+        //
+        // 16 + 16 + 16 + 16 = 64 bytes per-pixel (aligns to 4-bytes)
+        PixelDataType::Half16 => 4,
+        PixelDataType::UInt16 => 4,
+
+        // A 32-bit-per-channel image pixel is always 4-byte aligned,
+        // so we can handle either 3 or 4 channels without any
+        // padding.
+        //
+        // 32 + 32 + 32 + 32 = 128 bytes per-pixel (aligns to 4-bytes)
+        // 32 + 32 + 32      = 96 bytes per-pixel (aligns to 4-bytes)
+        PixelDataType::Float32 => num_channels as usize,
+        _ => panic!("Invalid PixelDataType: {:?}", pixel_data_type),
+    }
+}
+
+#[inline]
+pub fn channel_size_bytes(pixel_data_type: PixelDataType) -> usize {
+    let num_bytes = match pixel_data_type {
+        PixelDataType::UInt8 => std::mem::size_of::<u8>(),
+        PixelDataType::Half16 => std::mem::size_of::<f16>(),
+        PixelDataType::Float32 => std::mem::size_of::<f32>(),
+        PixelDataType::UInt16 => std::mem::size_of::<u16>(),
+        _ => {
+            error!("Invalid PixelDataType: {:?}", pixel_data_type);
+            0
+        }
+    };
+    num_bytes
+}
+
+#[inline]
+fn pixel_block_size(
+    width: i32,
+    height: i32,
+    num_channels: i32,
+    pixel_data_type: PixelDataType,
+) -> usize {
+    let stride_num_channels: usize = stride_num_channels(num_channels, pixel_data_type);
+    (width * height) as usize * stride_num_channels
 }
 
 #[inline]
@@ -70,18 +118,35 @@ fn pixel_block_size_bytes(
     num_channels: i32,
     pixel_data_type: PixelDataType,
 ) -> usize {
-    let num_bytes = match pixel_data_type {
-        PixelDataType::Float32 => std::mem::size_of::<f32>(),
-        PixelDataType::Half16 => std::mem::size_of::<f16>(),
-        PixelDataType::UInt8 => std::mem::size_of::<u8>(),
-        PixelDataType::UInt16 => std::mem::size_of::<u16>(),
-        _ => {
-            error!("Invalid PixelDataType: {:?}", pixel_data_type);
-            0
-        }
-    };
-    let size_bytes = num_bytes * pixel_block_size(width, height, num_channels) as usize;
+    let num_bytes = channel_size_bytes(pixel_data_type);
+    let size_bytes =
+        num_bytes * pixel_block_size(width, height, num_channels, pixel_data_type) as usize;
     size_bytes
+}
+
+#[inline]
+fn convert_value_to_f32_bytes(value: f32, pixel_data_type: PixelDataType) -> f32 {
+    match pixel_data_type {
+        PixelDataType::UInt8 => {
+            let v: u8 = (value * (u8::MAX as f32)) as u8;
+            let array: [u8; 4] = [v, v, v, v];
+            f32::from_ne_bytes(array)
+        }
+        PixelDataType::UInt16 => {
+            let v: u16 = (value * (u16::MAX as f32)) as u16;
+            let array = v.to_ne_bytes();
+            let bytes: [u8; 4] = [array[0], array[1], array[0], array[1]];
+            f32::from_ne_bytes(bytes)
+        }
+        PixelDataType::Half16 => {
+            let v: f16 = f16::from_f32(value);
+            let array = v.to_ne_bytes();
+            let bytes: [u8; 4] = [array[0], array[1], array[0], array[1]];
+            f32::from_ne_bytes(bytes)
+        }
+        PixelDataType::Float32 => value as f32,
+        _ => panic!("Invalid pixel data type"),
+    }
 }
 
 impl PixelBlock {
@@ -148,7 +213,6 @@ impl PixelBlock {
     }
 
     pub fn convert_into_f32_data(&mut self) {
-        debug!("into_f32_data: {:#?}", self.pixel_data_type);
         if self.pixel_data_type == PixelDataType::Float32 {
             return;
         } else {
@@ -167,25 +231,33 @@ impl PixelBlock {
             let pixel_slice = self.pixels.as_slice();
             let new_pixels: Vec<f32> = match old_pixel_data_type {
                 PixelDataType::UInt8 => {
-                    // SAFETY: It is safe to convert the pixel data structure
+                    // SAFETY: It is safe to convert the pixel data
+                    // from 'f32' to 'u8' because there can be no
+                    // alignment issues. f32 is 4-byte aligned. u8 is
+                    // 1-byte aligned which fits into 4-bytes evenly.
                     let pixels_u8 = unsafe { std::mem::transmute::<&[f32], &[u8]>(pixel_slice) };
-                    debug!("pixels_u8.len(): {}", pixels_u8.len());
                     pixels_u8
                         .into_iter()
                         .map(|x| (*x as f32) / (u8::max_value() as f32))
                         .collect()
                 }
                 PixelDataType::UInt16 => {
+                    // SAFETY: It is safe to convert the pixel data
+                    // from 'f32' to 'u16' because there can be no
+                    // alignment issues. f32 is 4-byte aligned. u16 is
+                    // 2-byte aligned, which fits into 4-bytes evenly.
                     let pixels_u16 = unsafe { std::mem::transmute::<&[f32], &[u16]>(pixel_slice) };
-                    debug!("pixels_u16.len(): {}", pixels_u16.len());
                     pixels_u16
                         .into_iter()
                         .map(|x| (*x as f32) / (u16::max_value() as f32))
                         .collect()
                 }
                 PixelDataType::Half16 => {
+                    // SAFETY: It is safe to convert the pixel data
+                    // from 'f32' to 'f16' because there can be no
+                    // alignment issues. f32 is 4-byte aligned. f16 is
+                    // 2-byte aligned, which fits into 4-bytes evenly.
                     let pixels_f16 = unsafe { std::mem::transmute::<&[f32], &[f16]>(pixel_slice) };
-                    debug!("pixels_f16.len(): {}", pixels_f16.len());
                     pixels_f16.into_iter().map(|x| (*x).to_f32()).collect()
                 }
                 _ => panic!("Unsupported pixel data type: {:#?}", old_pixel_data_type),
@@ -225,7 +297,12 @@ impl PixelBlock {
     }
 
     pub fn size(&self) -> usize {
-        pixel_block_size(self.width, self.height, self.num_channels)
+        pixel_block_size(
+            self.width,
+            self.height,
+            self.num_channels,
+            self.pixel_data_type,
+        )
     }
 
     pub fn size_bytes(&self) -> usize {
@@ -249,21 +326,12 @@ impl PixelBlock {
         self.num_channels = num_channels;
         self.pixel_data_type = pixel_data_type;
 
-        let new_capacity = pixel_block_size(width, height, num_channels);
+        let new_capacity = pixel_block_size(width, height, num_channels, pixel_data_type) as usize;
 
-        // Reserve ("exactly") enough memory to hold our pixels. We do
-        // not expect needing to append more pixels later in the
-        // future and we don't want to waste memory with unneeded
-        // pixels allocated that will never be used.
-        let additional_num_elements = cmp::max(0, new_capacity - self.pixels.capacity());
-        self.pixels.reserve_exact(additional_num_elements);
-
-        // SAFTEY: The memory is reserved at least enough memory to
-        // use, but may point to uninitialized data. It is expected
-        // the user either except "garbage" pixel values after calling
-        // this function, or the user is expecting to write over the
-        // pixel data immediately.
-        unsafe { self.pixels.set_len(new_capacity) };
+        // Resize with all values defaulting to "1.0" in the native
+        // pixel data type.
+        let fill_value = convert_value_to_f32_bytes(1.0, pixel_data_type);
+        self.pixels.resize(new_capacity, fill_value);
     }
 }
 

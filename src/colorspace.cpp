@@ -15,7 +15,6 @@ bool ocio_print_color_spaces() {
     try {
         OCIO::ConstConfigRcPtr config = OCIO::GetCurrentConfig();
         auto num_color_spaces = config->getNumColorSpaces();
-        std::cout << "num_color_spaces: " << num_color_spaces << '\n';
         for (auto i = 0; i < num_color_spaces; i++) {
             auto color_space_name = config->getColorSpaceNameByIndex(i);
             std::cout << i << ": " << color_space_name << '\n';
@@ -33,8 +32,6 @@ bool ocio_color_convert_inplace(
         int width, int height, int num_channels,
         const rust::String &src_color_space_name,
         const rust::String &dst_color_space_name) {
-    std::cout << "SRC COLOR SPACE: " << src_color_space_name << '\n';
-    std::cout << "DST COLOR SPACE: " << dst_color_space_name << '\n';
 
     bool ok = false;
     try {
