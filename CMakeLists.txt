@@ -30,19 +30,20 @@ set(OpenCompGraph_INSTALL_PREFIX ""
 set(OpenCompGraph_BUILD_TESTS OFF
   CACHE BOOL "builds Tests for OpenCompGraph?.")
 
-set(OPENIMAGEIO_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/install/openimageio"
-  CACHE STRING "Root path to installed OpenImageIO.")
 
 # Third-party packages.
+set(OPENIMAGEIO_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/install/openimageio"
+  CACHE STRING "Root path to installed OpenImageIO.")
 find_package(OpenImageIO REQUIRED
   HINTS ${OPENIMAGEIO_ROOT})
 message(STATUS "OpenImageIO Found: ${OpenImageIO_FOUND}")
 message(STATUS "OpenImageIO Version: ${OpenImageIO_VERSION}")
 
+set(OPENCOLORIO_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/install/opencolorio"
+  CACHE STRING "Root path to installed OpenColorIO.")
 find_package(OpenColorIO REQUIRED
   HINTS ${OPENCOLORIO_ROOT})
 message(STATUS "OpenColorIO Found: ${OpenColorIO_FOUND}")
-message(STATUS "OpenColorIO Library: ${OpenColorIO_LIBRARY}")
 message(STATUS "OpenColorIO Libraries: ${OpenColorIO_LIBRARIES}")
 message(STATUS "OpenColorIO Include: ${OpenColorIO_INCLUDE_DIRS}")
 
