@@ -13,6 +13,14 @@ impl BBox2Df {
             max_y,
         }
     }
+
+    pub fn width(&self) -> f32 {
+        self.max_x - self.min_x
+    }
+
+    pub fn height(&self) -> f32 {
+        self.max_y - self.min_y
+    }
 }
 
 impl Hash for BBox2Df {
