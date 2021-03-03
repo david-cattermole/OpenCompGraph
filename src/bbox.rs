@@ -32,6 +32,17 @@ impl Hash for BBox2Df {
     }
 }
 
+impl From<BBox2Di> for BBox2Df {
+    fn from(value: BBox2Di) -> Self {
+        BBox2Df::new(
+            value.min_x as f32,
+            value.min_y as f32,
+            value.max_x as f32,
+            value.max_y as f32,
+        )
+    }
+}
+
 impl BBox2Di {
     pub fn new(min_x: i32, min_y: i32, max_x: i32, max_y: i32) -> BBox2Di {
         BBox2Di {
