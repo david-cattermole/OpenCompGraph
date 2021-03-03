@@ -14,8 +14,9 @@ use crate::cxxbridge::ffi::NodeStatus;
 use crate::cxxbridge::ffi::NodeType;
 use crate::data::HashValue;
 use crate::data::Identifier;
+use crate::deformer::brownian::DeformerBrownian;
+use crate::deformer::tde4_classic::DeformerTde4Classic;
 use crate::deformer::Deformer;
-use crate::deformer::DeformerType;
 use crate::hashutils::HashableF32;
 use crate::node::traits::Operation;
 use crate::node::NodeImpl;
@@ -94,17 +95,15 @@ impl Operation for LensDistortOperation {
 
                 let enable = attr_block.get_attr_i32("enable");
                 if enable == 1 {
-                    // Calculate Deformation.
-                    let mut deformer = Deformer::new(DeformerType::Brownian);
-                    let k1 = attr_block.get_attr_f32("k1");
-                    let k2 = attr_block.get_attr_f32("k2");
-                    let center_x = attr_block.get_attr_f32("center_x");
-                    let center_y = attr_block.get_attr_f32("center_y");
-                    deformer.set_attr_f32("k1", k1);
-                    deformer.set_attr_f32("k2", k2);
-                    deformer.set_attr_f32("center_x", center_x);
-                    deformer.set_attr_f32("center_y", center_y);
-                    copy.push_deformer(deformer);
+                    let mut deformer = DeformerTde4Classic::default();
+                    deformer.set_attr_f32("distortion", attr_block.get_attr_f32("k1"));
+                    deformer.set_attr_f32("quartic_distortion", attr_block.get_attr_f32("k2"));
+                    deformer
+                        .set_attr_f32("lens_center_offset_x", attr_block.get_attr_f32("center_x"));
+                    deformer
+                        .set_attr_f32("lens_center_offset_y", attr_block.get_attr_f32("center_y"));
+                    deformer.commit_data().unwrap();
+                    copy.push_deformer(Box::new(deformer));
                 }
 
                 // Set Output data

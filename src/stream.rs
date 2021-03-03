@@ -2,7 +2,9 @@ use image;
 use log::{debug, error, info, warn};
 use std::rc::Rc;
 
+use crate::cxxbridge::ffi::BBox2Df;
 use crate::cxxbridge::ffi::BBox2Di;
+use crate::cxxbridge::ffi::DeformerDirection;
 use crate::cxxbridge::ffi::Matrix4;
 use crate::cxxbridge::ffi::PixelDataType;
 use crate::cxxbridge::ffi::StreamDataState;
@@ -20,7 +22,7 @@ pub struct StreamDataImpl {
     color_matrix: Matrix4,
     transform_matrix: Matrix4,
     pixel_block: Rc<PixelBlock>,
-    deformers: Vec<Deformer>,
+    deformers: Vec<Box<dyn Deformer>>,
 }
 
 impl StreamDataImpl {
@@ -105,52 +107,17 @@ impl StreamDataImpl {
         self.transform_matrix = value;
     }
 
-    // pub fn apply_deformers(&self, src: &[f32], dst: &mut [f32]) {
-    //     deformutils::apply_deformers(&self.deformers, &src, dst);
-    // }
-
-    // TODO: Rename this (and in the C++ wrapper code).
-    pub fn apply_deformers(&self, buffer: &mut [f32]) {
-        debug!("StreamData.apply_deformers...");
-        deformutils::apply_deformers_to_positions(&self.deformers, buffer);
-    }
-
-    pub fn apply_deformers_to_pixels(
+    pub fn apply_deformers(
         &self,
-        src: &[f32],
-        src_width: i32,
-        src_height: i32,
-        src_num_channels: i32,
-    ) -> Box<Vec<f32>> {
+        buffer: &mut [f32],
+        image_window: BBox2Df,
+        direction: DeformerDirection,
+    ) {
         debug!("StreamData.apply_deformers...");
-
-        // TODO: Calculate the needed image dimensions here using the
-        // bounding box, then allocate enough memory.
-        let dst_width = src_width;
-        let dst_height = src_height;
-        let dst_num_channels = src_num_channels;
-        let dst_size = (dst_width * dst_height * dst_num_channels) as usize;
-        let mut dst_box = Box::new(vec![0.0 as f32; dst_size]);
-        let mut dst = &mut dst_box[..];
-
-        deformutils::apply_deformers_to_pixels(
-            &self.deformers,
-            // display_window,
-            // data_window,
-            src_width,
-            src_height,
-            src_num_channels,
-            src,
-            dst_width,
-            dst_height,
-            dst_num_channels,
-            dst,
-        );
-
-        dst_box
+        deformutils::apply_deformers_to_positions(&self.deformers, direction, image_window, buffer);
     }
 
-    pub fn deformers(&self) -> &Vec<Deformer> {
+    pub fn deformers(&self) -> &Vec<Box<dyn Deformer>> {
         &self.deformers
     }
 
@@ -158,7 +125,7 @@ impl StreamDataImpl {
         self.deformers.len()
     }
 
-    pub fn push_deformer(&mut self, value: Deformer) {
+    pub fn push_deformer(&mut self, value: Box<dyn Deformer>) {
         self.deformers.push(value);
     }
 
@@ -270,11 +237,16 @@ impl StreamDataImplRc {
         self.inner.transform_matrix()
     }
 
-    pub fn apply_deformers(&self, buffer: &mut [f32]) {
-        self.inner.apply_deformers(buffer);
+    pub fn apply_deformers(
+        &self,
+        buffer: &mut [f32],
+        image_window: BBox2Df,
+        direction: DeformerDirection,
+    ) {
+        self.inner.apply_deformers(buffer, image_window, direction);
     }
 
-    pub fn deformers(&self) -> &Vec<Deformer> {
+    pub fn deformers(&self) -> &Vec<Box<dyn Deformer>> {
         self.inner.deformers()
     }
 

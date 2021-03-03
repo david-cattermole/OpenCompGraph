@@ -70,6 +70,7 @@ int test_b(const bool debug_print, std::shared_ptr<ocg::Cache> cache) {
     size_t tri_count = 0;
 
     // 2 x 2 divisions = 1 face (2 triangles).
+    auto direction = ocg::DeformerDirection::kForward;
     divisions_x = 2;
     divisions_y = 2;
     const char* file_path_2x2 = "./tests/data/out/test_b_2x2_out.obj";
@@ -78,6 +79,7 @@ int test_b(const bool debug_print, std::shared_ptr<ocg::Cache> cache) {
         divisions_x,
         divisions_y,
         stream_data,
+        direction,
         file_path_2x2,
         pos_count,
         uv_count,
@@ -93,6 +95,7 @@ int test_b(const bool debug_print, std::shared_ptr<ocg::Cache> cache) {
         divisions_x,
         divisions_y,
         stream_data,
+        direction,
         file_path_3x3,
         pos_count,
         uv_count,

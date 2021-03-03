@@ -10,6 +10,7 @@ void generate_mesh(
     uint32_t divisions_x,
     uint32_t divisions_y,
     ocg::StreamData &stream_data,
+    ocg::DeformerDirection direction,
     const char* file_path,
     size_t &pos_count,
     size_t &uv_count,

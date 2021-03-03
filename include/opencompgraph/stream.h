@@ -47,7 +47,9 @@ public:
     size_t deformers_len() const noexcept;
 
     OPENCOMPGRAPH_SYMBOL_EXPORT
-    void apply_deformers(rust::Slice<float> &buffer) noexcept;
+    void apply_deformers(rust::Slice<float> &buffer,
+                         BBox2Df image_window,
+                         DeformerDirection direction) noexcept;
 
     OPENCOMPGRAPH_SYMBOL_EXPORT
     rust::Slice<const float> pixel_buffer() const noexcept;

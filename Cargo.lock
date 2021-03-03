@@ -416,6 +416,7 @@ dependencies = [
  "linked-hash-map",
  "log",
  "nalgebra",
+ "num-traits",
  "petgraph",
  "rand",
  "rustc-hash",

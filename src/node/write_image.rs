@@ -12,6 +12,7 @@ use crate::colorspace;
 use crate::colorutils;
 use crate::colorxform;
 use crate::cxxbridge::ffi::AttrState;
+use crate::cxxbridge::ffi::DeformerDirection;
 use crate::cxxbridge::ffi::ImageShared;
 use crate::cxxbridge::ffi::NodeStatus;
 use crate::cxxbridge::ffi::NodeType;
@@ -90,8 +91,9 @@ impl Operation for WriteImageOperation {
                 let width = copy.pixel_width();
                 let height = copy.pixel_height();
                 let display_window = copy.display_window();
-                let data_window = copy.data_window();
                 let transform_matrix = copy.transform_matrix().to_na_matrix();
+                let src_data_window = copy.data_window();
+                let mut data_window = copy.data_window();
                 let mut pixel_block = copy.clone_pixel_block();
 
                 // Convert to f32 data and convert to linear color space.
@@ -118,23 +120,16 @@ impl Operation for WriteImageOperation {
                     //
                     // TODO: Apply 'transform_matrix' as part of the
                     // deformation, so we only resample the image once.
-                    //
-                    // TODO: Determine the destination size and
-                    // pre-allocate memory for it.
-                    let src_pixels = src_pixel_block.as_slice();
-                    let mut pixels = &mut pixel_block.as_slice_mut();
+                    let ref_pixel_block = pixel_block.clone();
+                    let direction = DeformerDirection::Forward;
                     deformutils::apply_deformers_to_pixels(
                         &copy.deformers(),
-                        // display_window,
-                        // data_window,
-                        width,
-                        height,
-                        num_channels,
-                        &src_pixels,
-                        width,
-                        height,
-                        num_channels,
-                        &mut pixels[..],
+                        direction,
+                        display_window,
+                        &ref_pixel_block,
+                        src_data_window,
+                        &mut pixel_block,
+                        &mut data_window,
                     );
                 }
 

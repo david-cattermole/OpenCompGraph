@@ -2,6 +2,7 @@
 #include "rust/cxx.h"
 #include "opencompgraph/symbol_export.h"
 #include "opencompgraph/colorspace.h"
+#include "opencompgraph/ldpk_utils.h"
 #include "opencompgraph/imageio.h"
 #include "opencompgraph/systemmemory.h"
 #include <algorithm>
@@ -10,6 +11,7 @@
 #include <cstdint>
 #include <initializer_list>
 #include <iterator>
+#include <memory>
 #include <new>
 #include <string>
 #include <type_traits>
@@ -909,12 +911,15 @@ namespace open_comp_graph {
   enum class NodeStatus : ::std::uint8_t;
   enum class AttrState : ::std::uint8_t;
   enum class StreamDataState : ::std::uint8_t;
+  enum class DeformerDirection : ::std::uint8_t;
   namespace internal {
     struct GraphImplShared;
     struct StreamDataImplShared;
     struct CacheImplShared;
     struct ConfigImplShared;
     struct ImageShared;
+    enum class ParameterType : ::std::int32_t;
+    using OcgLdPluginBase = ::open_comp_graph::internal::OcgLdPluginBase;
     struct PixelBlock;
     struct StreamDataImplRc;
     struct StreamDataImpl;
@@ -1110,7 +1115,29 @@ enum class StreamDataState : ::std::uint8_t {
 };
 #endif // CXXBRIDGE1_ENUM_open_comp_graph$StreamDataState
 
+#ifndef CXXBRIDGE1_ENUM_open_comp_graph$DeformerDirection
+#define CXXBRIDGE1_ENUM_open_comp_graph$DeformerDirection
+enum class DeformerDirection : ::std::uint8_t {
+  kForward = 0,
+  kBackward = 1,
+  kUninitialized = 255,
+};
+#endif // CXXBRIDGE1_ENUM_open_comp_graph$DeformerDirection
+
 namespace internal {
+#ifndef CXXBRIDGE1_ENUM_open_comp_graph$internal$ParameterType
+#define CXXBRIDGE1_ENUM_open_comp_graph$internal$ParameterType
+enum class ParameterType : ::std::int32_t {
+  kString = 0,
+  kDouble = 1,
+  kInt = 2,
+  kFile = 3,
+  kBoolean = 4,
+  kAdjustableDouble = 5,
+  kUninitialized = 255,
+};
+#endif // CXXBRIDGE1_ENUM_open_comp_graph$internal$ParameterType
+
 #ifndef CXXBRIDGE1_STRUCT_open_comp_graph$internal$PixelBlock
 #define CXXBRIDGE1_STRUCT_open_comp_graph$internal$PixelBlock
 struct PixelBlock final : public ::rust::Opaque {
@@ -1143,7 +1170,7 @@ struct StreamDataImplRc final : public ::rust::Opaque {
   OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::Matrix4 color_matrix() const noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::Matrix4 transform_matrix() const noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t deformers_len() const noexcept;
-  OPENCOMPGRAPH_SYMBOL_EXPORT void apply_deformers(::rust::Slice<float> buffer) const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT void apply_deformers(::rust::Slice<float> buffer, ::open_comp_graph::BBox2Df image_window, ::open_comp_graph::DeformerDirection direction) const noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT ::rust::Slice<const float> pixel_buffer() const noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT ::std::int32_t pixel_width() const noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT ::std::int32_t pixel_height() const noexcept;

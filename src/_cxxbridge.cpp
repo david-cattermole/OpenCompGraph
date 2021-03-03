@@ -1,6 +1,7 @@
 #include "rust/cxx.h"
 #include "opencompgraph/symbol_export.h"
 #include "opencompgraph/colorspace.h"
+#include "opencompgraph/ldpk_utils.h"
 #include "opencompgraph/imageio.h"
 #include "opencompgraph/systemmemory.h"
 #include <algorithm>
@@ -10,6 +11,7 @@
 #include <functional>
 #include <initializer_list>
 #include <iterator>
+#include <memory>
 #include <new>
 #include <string>
 #include <type_traits>
@@ -937,6 +939,9 @@ public:
     str.repr = repr;
     return str;
   }
+  static repr::Fat repr(Str str) noexcept {
+    return str.repr;
+  }
 };
 
 template <typename T>
@@ -947,6 +952,14 @@ public:
     slice.repr = repr;
     return slice;
   }
+};
+
+template <bool> struct deleter_if {
+  template <typename T> void operator()(T *) {}
+};
+
+template <> struct deleter_if<true> {
+  template <typename T> void operator()(T *ptr) { ptr->~T(); }
 };
 } // namespace
 } // namespace cxxbridge1
@@ -963,12 +976,15 @@ namespace open_comp_graph {
   enum class NodeStatus : ::std::uint8_t;
   enum class AttrState : ::std::uint8_t;
   enum class StreamDataState : ::std::uint8_t;
+  enum class DeformerDirection : ::std::uint8_t;
   namespace internal {
     struct GraphImplShared;
     struct StreamDataImplShared;
     struct CacheImplShared;
     struct ConfigImplShared;
     struct ImageShared;
+    enum class ParameterType : ::std::int32_t;
+    using OcgLdPluginBase = ::open_comp_graph::internal::OcgLdPluginBase;
     struct PixelBlock;
     struct StreamDataImplRc;
     struct StreamDataImpl;
@@ -1164,7 +1180,29 @@ enum class StreamDataState : ::std::uint8_t {
 };
 #endif // CXXBRIDGE1_ENUM_open_comp_graph$StreamDataState
 
+#ifndef CXXBRIDGE1_ENUM_open_comp_graph$DeformerDirection
+#define CXXBRIDGE1_ENUM_open_comp_graph$DeformerDirection
+enum class DeformerDirection : ::std::uint8_t {
+  kForward = 0,
+  kBackward = 1,
+  kUninitialized = 255,
+};
+#endif // CXXBRIDGE1_ENUM_open_comp_graph$DeformerDirection
+
 namespace internal {
+#ifndef CXXBRIDGE1_ENUM_open_comp_graph$internal$ParameterType
+#define CXXBRIDGE1_ENUM_open_comp_graph$internal$ParameterType
+enum class ParameterType : ::std::int32_t {
+  kString = 0,
+  kDouble = 1,
+  kInt = 2,
+  kFile = 3,
+  kBoolean = 4,
+  kAdjustableDouble = 5,
+  kUninitialized = 255,
+};
+#endif // CXXBRIDGE1_ENUM_open_comp_graph$internal$ParameterType
+
 #ifndef CXXBRIDGE1_STRUCT_open_comp_graph$internal$PixelBlock
 #define CXXBRIDGE1_STRUCT_open_comp_graph$internal$PixelBlock
 struct PixelBlock final : public ::rust::Opaque {
@@ -1197,7 +1235,7 @@ struct StreamDataImplRc final : public ::rust::Opaque {
   OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::Matrix4 color_matrix() const noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::Matrix4 transform_matrix() const noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t deformers_len() const noexcept;
-  OPENCOMPGRAPH_SYMBOL_EXPORT void apply_deformers(::rust::Slice<float> buffer) const noexcept;
+  OPENCOMPGRAPH_SYMBOL_EXPORT void apply_deformers(::rust::Slice<float> buffer, ::open_comp_graph::BBox2Df image_window, ::open_comp_graph::DeformerDirection direction) const noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT ::rust::Slice<const float> pixel_buffer() const noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT ::std::int32_t pixel_width() const noexcept;
   OPENCOMPGRAPH_SYMBOL_EXPORT ::std::int32_t pixel_height() const noexcept;
@@ -1376,6 +1414,86 @@ OPENCOMPGRAPH_SYMBOL_EXPORT bool open_comp_graph$internal$cxxbridge1$ocio_color_
   return ocio_color_convert_inplace$(pixel_data, width, height, num_channels, src_color_space, dst_color_space);
 }
 
+OPENCOMPGRAPH_SYMBOL_EXPORT ::rust::repr::Fat open_comp_graph$internal$cxxbridge1$OcgLdPluginBase$get_version_string(const ::open_comp_graph::internal::OcgLdPluginBase &self) noexcept {
+  ::rust::Str (::open_comp_graph::internal::OcgLdPluginBase::*get_version_string$)() const = &::open_comp_graph::internal::OcgLdPluginBase::get_version_string;
+  return ::rust::impl<::rust::Str>::repr((self.*get_version_string$)());
+}
+
+OPENCOMPGRAPH_SYMBOL_EXPORT bool open_comp_graph$internal$cxxbridge1$OcgLdPluginBase$get_model_name(::open_comp_graph::internal::OcgLdPluginBase &self, ::rust::Slice<::std::uint8_t> model_name) noexcept {
+  bool (::open_comp_graph::internal::OcgLdPluginBase::*get_model_name$)(::rust::Slice<::std::uint8_t>) = &::open_comp_graph::internal::OcgLdPluginBase::get_model_name;
+  return (self.*get_model_name$)(model_name);
+}
+
+OPENCOMPGRAPH_SYMBOL_EXPORT bool open_comp_graph$internal$cxxbridge1$OcgLdPluginBase$get_num_parameters(::open_comp_graph::internal::OcgLdPluginBase &self, ::std::int32_t &value) noexcept {
+  bool (::open_comp_graph::internal::OcgLdPluginBase::*get_num_parameters$)(::std::int32_t &) = &::open_comp_graph::internal::OcgLdPluginBase::get_num_parameters;
+  return (self.*get_num_parameters$)(value);
+}
+
+OPENCOMPGRAPH_SYMBOL_EXPORT bool open_comp_graph$internal$cxxbridge1$OcgLdPluginBase$get_parameter_name(::open_comp_graph::internal::OcgLdPluginBase &self, ::std::int32_t value, ::rust::Slice<::std::uint8_t> identifier) noexcept {
+  bool (::open_comp_graph::internal::OcgLdPluginBase::*get_parameter_name$)(::std::int32_t, ::rust::Slice<::std::uint8_t>) = &::open_comp_graph::internal::OcgLdPluginBase::get_parameter_name;
+  return (self.*get_parameter_name$)(value, identifier);
+}
+
+OPENCOMPGRAPH_SYMBOL_EXPORT bool open_comp_graph$internal$cxxbridge1$OcgLdPluginBase$get_parameter_type(::open_comp_graph::internal::OcgLdPluginBase &self, ::rust::Str identifier, ::std::int32_t &value) noexcept {
+  bool (::open_comp_graph::internal::OcgLdPluginBase::*get_parameter_type$)(::rust::Str, ::std::int32_t &) = &::open_comp_graph::internal::OcgLdPluginBase::get_parameter_type;
+  return (self.*get_parameter_type$)(identifier, value);
+}
+
+OPENCOMPGRAPH_SYMBOL_EXPORT bool open_comp_graph$internal$cxxbridge1$OcgLdPluginBase$get_parameter_default_value_f64(::open_comp_graph::internal::OcgLdPluginBase &self, ::rust::Str identifier, double &value) noexcept {
+  bool (::open_comp_graph::internal::OcgLdPluginBase::*get_parameter_default_value_f64$)(::rust::Str, double &) = &::open_comp_graph::internal::OcgLdPluginBase::get_parameter_default_value_f64;
+  return (self.*get_parameter_default_value_f64$)(identifier, value);
+}
+
+OPENCOMPGRAPH_SYMBOL_EXPORT bool open_comp_graph$internal$cxxbridge1$OcgLdPluginBase$get_parameter_range(::open_comp_graph::internal::OcgLdPluginBase &self, ::rust::Str identifier, double &min_value, double &max_value) noexcept {
+  bool (::open_comp_graph::internal::OcgLdPluginBase::*get_parameter_range$)(::rust::Str, double &, double &) = &::open_comp_graph::internal::OcgLdPluginBase::get_parameter_range;
+  return (self.*get_parameter_range$)(identifier, min_value, max_value);
+}
+
+OPENCOMPGRAPH_SYMBOL_EXPORT bool open_comp_graph$internal$cxxbridge1$OcgLdPluginBase$set_parameter_value_f64(::open_comp_graph::internal::OcgLdPluginBase &self, ::rust::Str identifier, double value) noexcept {
+  bool (::open_comp_graph::internal::OcgLdPluginBase::*set_parameter_value_f64$)(::rust::Str, double) = &::open_comp_graph::internal::OcgLdPluginBase::set_parameter_value_f64;
+  return (self.*set_parameter_value_f64$)(identifier, value);
+}
+
+OPENCOMPGRAPH_SYMBOL_EXPORT bool open_comp_graph$internal$cxxbridge1$OcgLdPluginBase$initialize_parameters(::open_comp_graph::internal::OcgLdPluginBase &self) noexcept {
+  bool (::open_comp_graph::internal::OcgLdPluginBase::*initialize_parameters$)() = &::open_comp_graph::internal::OcgLdPluginBase::initialize_parameters;
+  return (self.*initialize_parameters$)();
+}
+
+OPENCOMPGRAPH_SYMBOL_EXPORT bool open_comp_graph$internal$cxxbridge1$OcgLdPluginBase$undistort(::open_comp_graph::internal::OcgLdPluginBase &self, double x0, double y0, double &x1, double &y1) noexcept {
+  bool (::open_comp_graph::internal::OcgLdPluginBase::*undistort$)(double, double, double &, double &) = &::open_comp_graph::internal::OcgLdPluginBase::undistort;
+  return (self.*undistort$)(x0, y0, x1, y1);
+}
+
+OPENCOMPGRAPH_SYMBOL_EXPORT bool open_comp_graph$internal$cxxbridge1$OcgLdPluginBase$distort(::open_comp_graph::internal::OcgLdPluginBase &self, double x0, double y0, double &x1, double &y1) noexcept {
+  bool (::open_comp_graph::internal::OcgLdPluginBase::*distort$)(double, double, double &, double &) = &::open_comp_graph::internal::OcgLdPluginBase::distort;
+  return (self.*distort$)(x0, y0, x1, y1);
+}
+
+OPENCOMPGRAPH_SYMBOL_EXPORT bool open_comp_graph$internal$cxxbridge1$OcgLdPluginBase$distort_with_guess(::open_comp_graph::internal::OcgLdPluginBase &self, double x0, double y0, double x1_start, double y1_start, double &x1, double &y1) noexcept {
+  bool (::open_comp_graph::internal::OcgLdPluginBase::*distort_with_guess$)(double, double, double, double, double &, double &) = &::open_comp_graph::internal::OcgLdPluginBase::distort_with_guess;
+  return (self.*distort_with_guess$)(x0, y0, x1_start, y1_start, x1, y1);
+}
+
+OPENCOMPGRAPH_SYMBOL_EXPORT bool open_comp_graph$internal$cxxbridge1$OcgLdPluginBase$provides_parameter_derivatives(::open_comp_graph::internal::OcgLdPluginBase &self) noexcept {
+  bool (::open_comp_graph::internal::OcgLdPluginBase::*provides_parameter_derivatives$)() = &::open_comp_graph::internal::OcgLdPluginBase::provides_parameter_derivatives;
+  return (self.*provides_parameter_derivatives$)();
+}
+
+OPENCOMPGRAPH_SYMBOL_EXPORT void open_comp_graph$internal$cxxbridge1$OcgLdPluginBase$get_bounding_box_undistort(::open_comp_graph::internal::OcgLdPluginBase &self, double xa_in, double ya_in, double xb_in, double yb_in, double &xa_out, double &ya_out, double &xb_out, double &yb_out, ::std::int32_t nx, ::std::int32_t ny) noexcept {
+  void (::open_comp_graph::internal::OcgLdPluginBase::*get_bounding_box_undistort$)(double, double, double, double, double &, double &, double &, double &, ::std::int32_t, ::std::int32_t) = &::open_comp_graph::internal::OcgLdPluginBase::get_bounding_box_undistort;
+  (self.*get_bounding_box_undistort$)(xa_in, ya_in, xb_in, yb_in, xa_out, ya_out, xb_out, yb_out, nx, ny);
+}
+
+OPENCOMPGRAPH_SYMBOL_EXPORT void open_comp_graph$internal$cxxbridge1$OcgLdPluginBase$get_bounding_box_distort(::open_comp_graph::internal::OcgLdPluginBase &self, double xa_in, double ya_in, double xb_in, double yb_in, double &xa_out, double &ya_out, double &xb_out, double &yb_out, ::std::int32_t nx, ::std::int32_t ny) noexcept {
+  void (::open_comp_graph::internal::OcgLdPluginBase::*get_bounding_box_distort$)(double, double, double, double, double &, double &, double &, double &, ::std::int32_t, ::std::int32_t) = &::open_comp_graph::internal::OcgLdPluginBase::get_bounding_box_distort;
+  (self.*get_bounding_box_distort$)(xa_in, ya_in, xb_in, yb_in, xa_out, ya_out, xb_out, yb_out, nx, ny);
+}
+
+OPENCOMPGRAPH_SYMBOL_EXPORT ::open_comp_graph::internal::OcgLdPluginBase *open_comp_graph$internal$cxxbridge1$ldpk_new_plugin() noexcept {
+  ::std::unique_ptr<::open_comp_graph::internal::OcgLdPluginBase> (*ldpk_new_plugin$)() = ::open_comp_graph::internal::ldpk_new_plugin;
+  return ldpk_new_plugin$().release();
+}
+
 OPENCOMPGRAPH_SYMBOL_EXPORT bool open_comp_graph$internal$cxxbridge1$oiio_get_thread_count(::std::int32_t &num_threads) noexcept {
   bool (*oiio_get_thread_count$)(::std::int32_t &) = ::open_comp_graph::internal::oiio_get_thread_count;
   return oiio_get_thread_count$(num_threads);
@@ -1439,7 +1557,7 @@ void open_comp_graph$internal$cxxbridge1$PixelBlock$data_resize(::open_comp_grap
 
 ::std::size_t open_comp_graph$internal$cxxbridge1$StreamDataImplRc$deformers_len(const ::open_comp_graph::internal::StreamDataImplRc &self) noexcept;
 
-void open_comp_graph$internal$cxxbridge1$StreamDataImplRc$apply_deformers(const ::open_comp_graph::internal::StreamDataImplRc &self, ::rust::Slice<float> buffer) noexcept;
+void open_comp_graph$internal$cxxbridge1$StreamDataImplRc$apply_deformers(const ::open_comp_graph::internal::StreamDataImplRc &self, ::rust::Slice<float> buffer, ::open_comp_graph::BBox2Df image_window, ::open_comp_graph::DeformerDirection direction) noexcept;
 
 ::rust::repr::Fat open_comp_graph$internal$cxxbridge1$StreamDataImplRc$pixel_buffer(const ::open_comp_graph::internal::StreamDataImplRc &self) noexcept;
 
@@ -1761,8 +1879,8 @@ OPENCOMPGRAPH_SYMBOL_EXPORT ::std::size_t StreamDataImplRc::deformers_len() cons
   return open_comp_graph$internal$cxxbridge1$StreamDataImplRc$deformers_len(*this);
 }
 
-OPENCOMPGRAPH_SYMBOL_EXPORT void StreamDataImplRc::apply_deformers(::rust::Slice<float> buffer) const noexcept {
-  open_comp_graph$internal$cxxbridge1$StreamDataImplRc$apply_deformers(*this, buffer);
+OPENCOMPGRAPH_SYMBOL_EXPORT void StreamDataImplRc::apply_deformers(::rust::Slice<float> buffer, ::open_comp_graph::BBox2Df image_window, ::open_comp_graph::DeformerDirection direction) const noexcept {
+  open_comp_graph$internal$cxxbridge1$StreamDataImplRc$apply_deformers(*this, buffer, image_window, direction);
 }
 
 OPENCOMPGRAPH_SYMBOL_EXPORT ::rust::Slice<const float> StreamDataImplRc::pixel_buffer() const noexcept {
@@ -2115,6 +2233,25 @@ void cxxbridge1$box$open_comp_graph$internal$ConfigImpl$drop(::rust::Box<::open_
 ::open_comp_graph::internal::PixelBlock *cxxbridge1$box$open_comp_graph$internal$PixelBlock$alloc() noexcept;
 void cxxbridge1$box$open_comp_graph$internal$PixelBlock$dealloc(::open_comp_graph::internal::PixelBlock *) noexcept;
 void cxxbridge1$box$open_comp_graph$internal$PixelBlock$drop(::rust::Box<::open_comp_graph::internal::PixelBlock> *ptr) noexcept;
+
+static_assert(::rust::detail::is_complete<::open_comp_graph::internal::OcgLdPluginBase>::value, "definition of OcgLdPluginBase is required");
+static_assert(sizeof(::std::unique_ptr<::open_comp_graph::internal::OcgLdPluginBase>) == sizeof(void *), "");
+static_assert(alignof(::std::unique_ptr<::open_comp_graph::internal::OcgLdPluginBase>) == alignof(void *), "");
+void cxxbridge1$unique_ptr$open_comp_graph$internal$OcgLdPluginBase$null(::std::unique_ptr<::open_comp_graph::internal::OcgLdPluginBase> *ptr) noexcept {
+  ::new (ptr) ::std::unique_ptr<::open_comp_graph::internal::OcgLdPluginBase>();
+}
+void cxxbridge1$unique_ptr$open_comp_graph$internal$OcgLdPluginBase$raw(::std::unique_ptr<::open_comp_graph::internal::OcgLdPluginBase> *ptr, ::open_comp_graph::internal::OcgLdPluginBase *raw) noexcept {
+  ::new (ptr) ::std::unique_ptr<::open_comp_graph::internal::OcgLdPluginBase>(raw);
+}
+const ::open_comp_graph::internal::OcgLdPluginBase *cxxbridge1$unique_ptr$open_comp_graph$internal$OcgLdPluginBase$get(const ::std::unique_ptr<::open_comp_graph::internal::OcgLdPluginBase>& ptr) noexcept {
+  return ptr.get();
+}
+::open_comp_graph::internal::OcgLdPluginBase *cxxbridge1$unique_ptr$open_comp_graph$internal$OcgLdPluginBase$release(::std::unique_ptr<::open_comp_graph::internal::OcgLdPluginBase>& ptr) noexcept {
+  return ptr.release();
+}
+void cxxbridge1$unique_ptr$open_comp_graph$internal$OcgLdPluginBase$drop(::std::unique_ptr<::open_comp_graph::internal::OcgLdPluginBase> *ptr) noexcept {
+  ::rust::deleter_if<::rust::detail::is_complete<::open_comp_graph::internal::OcgLdPluginBase>::value>{}(ptr);
+}
 
 ::open_comp_graph::internal::StreamDataImpl *cxxbridge1$box$open_comp_graph$internal$StreamDataImpl$alloc() noexcept;
 void cxxbridge1$box$open_comp_graph$internal$StreamDataImpl$dealloc(::open_comp_graph::internal::StreamDataImpl *) noexcept;

@@ -56,8 +56,10 @@ size_t StreamData::deformers_len() const noexcept {
     return this->inner.inner->deformers_len();
 };
 
-void StreamData::apply_deformers(rust::Slice<float> &buffer) noexcept {
-    return this->inner.inner->apply_deformers(buffer);
+void StreamData::apply_deformers(rust::Slice<float> &buffer,
+                                 BBox2Df image_window,
+                                 DeformerDirection direction) noexcept {
+    return this->inner.inner->apply_deformers(buffer, image_window, direction);
 };
 
 rust::Slice<const float> StreamData::pixel_buffer() const noexcept {

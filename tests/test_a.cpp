@@ -17,11 +17,13 @@ int test_a(const bool debug_print, std::shared_ptr<ocg::Cache> cache) {
     auto read_node = graph.create_node(ocg::NodeType::kReadImage, "my_read_node");
     auto lens_node = graph.create_node(ocg::NodeType::kLensDistort, "lens_node");
     auto write_node = graph.create_node(ocg::NodeType::kWriteImage, "write_node");
+
     graph.set_node_attr_str(read_node, "file_path", "./tests/data/checker_8bit_rgba_3840x2160.png");
-    graph.set_node_attr_f32(lens_node, "k1", -0.2f);
-    graph.set_node_attr_f32(lens_node, "k2", -0.05f);
+    graph.set_node_attr_f32(lens_node, "k1", 0.2f);
+    graph.set_node_attr_f32(lens_node, "k2", 0.05f);
     graph.set_node_attr_f32(lens_node, "center_x", 0.0f);
-    graph.set_node_attr_str(write_node, "file_path", "./tests/data/out/test_a_out1.jpg");
+    graph.set_node_attr_f32(lens_node, "center_y", 0.0f);
+    graph.set_node_attr_str(write_node, "file_path", "./tests/data/out/test_a_out1.png");
 
     graph.connect(read_node, lens_node, 0);
     graph.connect(lens_node, write_node, 0);
@@ -49,6 +51,7 @@ int test_a(const bool debug_print, std::shared_ptr<ocg::Cache> cache) {
     size_t tri_count = 0;
 
     // 2 x 2 divisions = 1 face (2 triangles).
+    auto direction = ocg::DeformerDirection::kForward;
     divisions_x = 2;
     divisions_y = 2;
     const char* file_path_2x2 = "./tests/data/out/test_a_2x2_out.obj";
@@ -57,6 +60,7 @@ int test_a(const bool debug_print, std::shared_ptr<ocg::Cache> cache) {
         divisions_x,
         divisions_y,
         stream_data,
+        direction,
         file_path_2x2,
         pos_count,
         uv_count,
@@ -72,6 +76,7 @@ int test_a(const bool debug_print, std::shared_ptr<ocg::Cache> cache) {
         divisions_x,
         divisions_y,
         stream_data,
+        direction,
         file_path_3x3,
         pos_count,
         uv_count,
@@ -87,6 +92,7 @@ int test_a(const bool debug_print, std::shared_ptr<ocg::Cache> cache) {
         divisions_x,
         divisions_y,
         stream_data,
+        direction,
         file_path_4x4,
         pos_count,
         uv_count,
@@ -102,6 +108,7 @@ int test_a(const bool debug_print, std::shared_ptr<ocg::Cache> cache) {
         divisions_x,
         divisions_y,
         stream_data,
+        direction,
         file_path_2x4,
         pos_count,
         uv_count,
@@ -117,6 +124,7 @@ int test_a(const bool debug_print, std::shared_ptr<ocg::Cache> cache) {
         divisions_x,
         divisions_y,
         stream_data,
+        direction,
         file_path_16x32,
         pos_count,
         uv_count,
@@ -132,6 +140,7 @@ int test_a(const bool debug_print, std::shared_ptr<ocg::Cache> cache) {
         divisions_x,
         divisions_y,
         stream_data,
+        direction,
         file_path_32x16,
         pos_count,
         uv_count,
@@ -149,6 +158,7 @@ int test_a(const bool debug_print, std::shared_ptr<ocg::Cache> cache) {
         divisions_x,
         divisions_y,
         stream_data,
+        direction,
         file_path_192x108,
         pos_count,
         uv_count,

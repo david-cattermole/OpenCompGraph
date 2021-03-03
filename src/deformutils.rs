@@ -1,151 +1,252 @@
 use log::{debug, error, info, warn};
 
+use crate::cxxbridge::ffi::BBox2Df;
 use crate::cxxbridge::ffi::BBox2Di;
+use crate::cxxbridge::ffi::DeformerDirection;
 use crate::deformer::brownian;
 use crate::deformer::Deformer;
-use crate::deformer::DeformerType;
+use crate::mathutils;
+use crate::pixel::get_pixel_rgb;
+use crate::pixel::get_pixel_rgba;
+use crate::pixelblock::PixelBlock;
 
-pub fn apply_deformers_to_positions(deformers: &Vec<Deformer>, buffer: &mut [f32]) {
-    for deformer in deformers {
-        debug!("apply_deformer...");
-        let enable = deformer.get_attr_i32("enable");
-        if enable == 0 {
-            continue;
-        }
-
-        let deformer_type = deformer.deformer_type();
-        debug!("Deformer Type: {:?}", deformer_type);
-        match deformer_type {
-            DeformerType::Brownian => {
-                let k1 = deformer.get_attr_f32("k1");
-                let k2 = deformer.get_attr_f32("k2");
-                let xc = deformer.get_attr_f32("center_x");
-                let yc = deformer.get_attr_f32("center_y");
-                let parameters = brownian::Parameters::new(xc, yc, k1, k2);
-                deform_slice_by_3_in_place(buffer, parameters)
-            }
-            DeformerType::Null => (),
-            DeformerType::Unknown => warn!("Unknown deformer type."),
-        }
-    }
-}
-
-// TODO: Provide a function to calculate the new bounding box, and
-// hence the size of the new image. We need to allocate the new image
-// before using this function.
-pub fn apply_deformers_to_pixels(
-    deformers: &Vec<Deformer>,
-    // display_window: BBox2Di,
-    // data_window: BBox2Di,
-    src_width: i32,
-    src_height: i32,
-    src_num_channels: i32,
-    src: &[f32],
-    dst_width: i32,
-    dst_height: i32,
-    dst_num_channels: i32,
-    dst: &mut [f32],
+pub fn apply_deformers_to_positions(
+    deformers: &Vec<Box<dyn Deformer>>,
+    direction: DeformerDirection,
+    image_window: BBox2Df,
+    buffer: &mut [f32],
 ) {
-    if src.len() != dst.len() {
-        error!("The given source and destination buffer lengths are not equal.");
+    if deformers.len() == 0 {
+        // TODO: Copy src to dst.
+        return;
+    }
+    let enabled_deformers: Vec<_> = deformers
+        .iter()
+        .filter(|x| x.get_attr_i32("enable") == 1)
+        .collect();
+    if enabled_deformers.len() == 0 {
+        // TODO: Copy src to dst.
         return;
     }
 
-    for deformer in deformers {
-        let enable = deformer.get_attr_i32("enable");
-        if enable == 0 {
-            continue;
-        }
 
-        let deformer_type = deformer.deformer_type();
-        match deformer_type {
-            DeformerType::Brownian => {
-                let k1 = deformer.get_attr_f32("k1");
-                let k2 = deformer.get_attr_f32("k2");
-                let xc = deformer.get_attr_f32("center_x");
-                let yc = deformer.get_attr_f32("center_y");
-                let parameters = brownian::Parameters::new(k1, k2, xc, yc);
-                deform_image_slice_by_3(
-                    &src,
-                    dst,
-                    parameters,
-                    src_width,
-                    src_height,
-                    src_num_channels,
-                    dst_width,
-                    dst_height,
-                    dst_num_channels,
-                )
+    let stride = 3;
+    match direction {
+        DeformerDirection::Forward => {
+            for deformer in enabled_deformers {
+                deformer.apply_forward_slice_in_place(buffer, image_window, stride);
             }
-            DeformerType::Null => (),
-            DeformerType::Unknown => warn!("Unknown deformer type."),
         }
+        DeformerDirection::Backward => {
+            for deformer in enabled_deformers {
+                deformer.apply_backward_slice_in_place(buffer, image_window, stride);
+            }
+        }
+        _ => panic!("Invalid deformer direction: {:#?}", direction),
     }
 }
 
-// pub fn remove_deformers(deformers: Vec<Deformer>) {}
-
-pub fn deform_image_slice_by_3(
-    src: &[f32],
-    dst: &mut [f32],
-    parameters: brownian::Parameters,
-    src_width: i32,
-    src_height: i32,
-    src_num_channels: i32,
-    dst_width: i32,
-    dst_height: i32,
-    dst_num_channels: i32,
+pub fn apply_deformers_to_pixels(
+    deformers: &Vec<Box<dyn Deformer>>,
+    direction: DeformerDirection,
+    display_window: BBox2Di,
+    src_pixel_block: &PixelBlock,
+    src_data_window: BBox2Di,
+    dst_pixel_block: &mut PixelBlock,
+    dst_data_window: &mut BBox2Di,
 ) {
-    let xc = parameters.xc;
-    let yc = parameters.yc;
-    let k1 = parameters.k1;
-    let k2 = parameters.k2;
+    let display_window_f32 = BBox2Df::from(display_window);
 
-    let dst_y_stride = dst_width as usize * dst_num_channels as usize;
+    if deformers.len() == 0 {
+        // TODO: Copy src to dst.
+        return;
+    }
+    let enabled_deformers: Vec<_> = deformers
+        .iter()
+        .filter(|x| x.get_attr_i32("enable") == 1)
+        .collect();
+    if enabled_deformers.len() == 0 {
+        // TODO: Copy src to dst.
+        return;
+    }
+
+    // Get the bounding box of the pixel_coords.
+    let display_window_f32 = BBox2Df::from(display_window);
+    let mut tmp_data_window = BBox2Df::from(src_data_window);
+    match direction {
+        DeformerDirection::Forward => {
+            for deformer in &enabled_deformers {
+                tmp_data_window =
+                    deformer.apply_forward_bounding_box(tmp_data_window, display_window_f32);
+            }
+        }
+        DeformerDirection::Backward => {
+            for deformer in &enabled_deformers {
+                tmp_data_window =
+                    deformer.apply_backward_bounding_box(tmp_data_window, display_window_f32);
+            }
+        }
+        _ => panic!("Incorrect deformer direction; {:?}", direction),
+    }
+
+    let mut dst_data_window = BBox2Di::new(
+        tmp_data_window.min_x.floor() as i32,
+        tmp_data_window.min_y.floor() as i32,
+        tmp_data_window.max_x.ceil() as i32,
+        tmp_data_window.max_y.ceil() as i32,
+    );
+    dst_pixel_block.data_resize(
+        dst_data_window.width(),
+        dst_data_window.height(),
+        src_pixel_block.num_channels(),
+        src_pixel_block.pixel_data_type(),
+    );
+
+    let src_width = src_pixel_block.width();
+    let src_height = src_pixel_block.height();
+    let src_num_pixels = src_width as usize * src_height as usize;
+
+    let dst_width = dst_pixel_block.width();
+    let dst_height = dst_pixel_block.height();
+    let dst_num_pixels = dst_width as usize * dst_height as usize;
+
+    // Fill pixel coordinates with identity input values.
+    let stride = 2 as usize;
+    let mut pixel_coords = vec![0.0 as f32; dst_num_pixels * stride];
+    let mut index = 0;
+    for row in dst_data_window.min_y..dst_data_window.max_y {
+        for col in dst_data_window.min_x..dst_data_window.max_x {
+            // Position of pixel, with lower-left=(0.0, 0.0), and with
+            // upper-right=(width-1, height-1), then include a
+            // half-pixel offset, so we sample the lens center of the
+            // pixel, rather than the edge.
+            let pixel_x = (col as f32) + 0.5;
+            let pixel_y = (row as f32) + 0.5;
+            pixel_coords[index + 0] = pixel_x;
+            pixel_coords[index + 1] = pixel_y;
+            index += stride;
+        }
+    }
+
+    // Apply deformers to 2D position buffer.
+    let stride = 2;
+
+    match direction {
+        // Calculate the distortion in the opposite direction to what
+        // the user has requested, so that we can map the destination
+        // to source.
+        DeformerDirection::Forward => {
+            for deformer in &enabled_deformers {
+                let mut buffer = pixel_coords.as_mut_slice();
+                deformer.apply_backward_slice_in_place(buffer, display_window_f32, stride);
+            }
+        }
+        DeformerDirection::Backward => {
+            for deformer in &enabled_deformers {
+                let mut buffer = pixel_coords.as_mut_slice();
+                deformer.apply_forward_slice_in_place(buffer, display_window_f32, stride);
+            }
+        }
+        _ => panic!("Incorrect deformer direction; {:?}", direction),
+    }
+
+    // Sample the image pixels with the position values.
+    pixels_remap_coords(
+        display_window,
+        &pixel_coords, // pixel coordinates are relative to 'display window'.
+        &src_pixel_block,
+        src_data_window,
+        dst_pixel_block,
+        &mut dst_data_window,
+    )
+}
+
+pub fn pixels_remap_coords(
+    display_window: BBox2Di,
+    pixel_coords: &[f32],
+    src_pixel_block: &PixelBlock,
+    src_data_window: BBox2Di,
+    dst_pixel_block: &mut PixelBlock,
+    dst_data_window: &mut BBox2Di,
+) {
+    let display_window_f32 = BBox2Df::from(display_window);
+
+    let dst_width = dst_pixel_block.width();
+    let dst_height = dst_pixel_block.height();
+    let dst_num_channels = dst_pixel_block.num_channels();
+    let dst_num_pixels = (dst_width as usize) * (dst_height as usize);
+    if dst_num_pixels != (pixel_coords.len() / 2) {
+        error!("Destination pixel count and pixel coordinates do not match.");
+        return;
+    }
+    let mut dst_pixels = dst_pixel_block.as_slice_mut();
+
+    let src_width = src_pixel_block.width();
+    let src_height = src_pixel_block.height();
+    let src_num_channels = src_pixel_block.num_channels();
+    let src_pixels = src_pixel_block.as_slice();
+
+    let src_x_stride = src_num_channels as usize;
     let dst_x_stride = dst_num_channels as usize;
+    let src_y_stride = src_width as usize * src_x_stride;
+    let dst_y_stride = dst_width as usize * dst_x_stride;
 
-    let mut count = 0;
+    let mut pixel_coord_index = 0;
     for dy in 0..dst_height as usize {
         for dx in 0..dst_width as usize {
             let dst_index = (dy * dst_y_stride) + (dx * dst_x_stride);
 
-            let r = src[dst_index + 0];
-            let g = src[dst_index + 1];
-            let b = src[dst_index + 2];
+            // X and Y source pixel coordinate to fetch the pixel
+            // value. The pixel coordinates are relative to the
+            // 'display window'.
+            let x = pixel_coords[pixel_coord_index + 0];
+            let y = pixel_coords[pixel_coord_index + 1];
 
-            dst[dst_index + 0] = r;
-            dst[dst_index + 1] = g;
-            dst[dst_index + 2] = b;
-            count += 1;
+            let x = mathutils::remap(
+                display_window_f32.min_x,
+                display_window_f32.max_x,
+                src_data_window.min_x as f32,
+                (src_data_window.max_x - 1) as f32,
+                x,
+            );
+            let y = mathutils::remap(
+                display_window_f32.min_y,
+                display_window_f32.max_y,
+                src_data_window.min_y as f32,
+                (src_data_window.max_y - 1) as f32,
+                y,
+            );
+
+            if src_num_channels == 4 {
+                let (r, g, b, a) = get_pixel_rgba(
+                    src_pixels,
+                    src_width,
+                    src_height,
+                    src_x_stride,
+                    src_y_stride,
+                    x,
+                    y,
+                );
+                dst_pixels[dst_index + 0] = r;
+                dst_pixels[dst_index + 1] = g;
+                dst_pixels[dst_index + 2] = b;
+                dst_pixels[dst_index + 3] = a;
+            } else if src_num_channels == 3 {
+                let (r, g, b) = get_pixel_rgb(
+                    src_pixels,
+                    src_width,
+                    src_height,
+                    src_x_stride,
+                    src_y_stride,
+                    x,
+                    y,
+                );
+                dst_pixels[dst_index + 0] = r;
+                dst_pixels[dst_index + 1] = g;
+                dst_pixels[dst_index + 2] = b;
+            }
+            pixel_coord_index += 2;
         }
     }
 }
 
-/// Given a slice of values, each 3 elements are expected to be a XYZ,
-/// where only X and Y are deformed.
-pub fn deform_slice_by_3_in_place(buffer: &mut [f32], parameters: brownian::Parameters) {
-    debug!(
-        "deform_slice_by_3_in_place: {} {:#?}",
-        buffer.len(),
-        parameters
-    );
-    let xc = parameters.xc;
-    let yc = parameters.yc;
-    let k1 = parameters.k1;
-    let k2 = parameters.k2;
-
-    let step_num = 3;
-    let count = buffer.len() / step_num;
-    for i in 0..count {
-        let index = i * step_num;
-
-        let x = buffer[index + 0];
-        let y = buffer[index + 1];
-        // Z is never changed, only X and Y are modified.
-
-        let (xu, yu) = brownian::apply_distortion_model_brownian_degree4(x, y, xc, yc, k1, k2);
-
-        buffer[index + 0] = xu;
-        buffer[index + 1] = yu;
-    }
-}

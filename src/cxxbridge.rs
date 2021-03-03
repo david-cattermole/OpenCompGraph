@@ -1,4 +1,5 @@
 use log::{debug, error, info, warn};
+use std::os::raw::c_char;
 use std::rc::Rc;
 
 use crate::cache::create_cache_box_with_capacity;
@@ -229,6 +230,38 @@ pub mod ffi {
         Valid = 1,
     }
 
+    #[repr(u8)]
+    #[derive(Debug, Copy, Clone, Hash)]
+    #[namespace = "open_comp_graph"]
+    pub(crate) enum DeformerDirection {
+        #[cxx_name = "kForward"]
+        Forward = 0,
+        #[cxx_name = "kBackward"]
+        Backward = 1,
+        #[cxx_name = "kUninitialized"]
+        Uninitialized = 255,
+    }
+
+    // This matches the LDPK's 'tde4_ldp_ptype' enum values.
+    #[repr(i32)]
+    #[derive(Debug, Copy, Clone, Hash)]
+    #[namespace = "open_comp_graph::internal"]
+    pub(crate) enum ParameterType {
+        #[cxx_name = "kString"]
+        String = 0,
+        #[cxx_name = "kDouble"]
+        Double = 1,
+        #[cxx_name = "kInt"]
+        Int = 2,
+        #[cxx_name = "kFile"]
+        File = 3,
+        #[cxx_name = "kBoolean"]
+        Boolean = 4,
+        #[cxx_name = "kAdjustableDouble"]
+        AdjustableDouble = 5,
+        #[cxx_name = "kUninitialized"]
+        Uninitialized = 255,
+    }
 
     // Color Spaces
     #[namespace = "open_comp_graph::internal"]
@@ -244,6 +277,99 @@ pub mod ffi {
             num_channels: i32,
             src_color_space: &String,
             dst_color_space: &String) -> bool;
+    }
+
+    // LDPK and the tde4_ld_plugin class.
+    #[namespace = "open_comp_graph::internal"]
+    unsafe extern "C++" {
+        include!("opencompgraph/ldpk_utils.h");
+
+        type OcgLdPluginBase;
+
+        fn get_version_string(self: Pin<&OcgLdPluginBase>) -> &str;
+
+        fn get_model_name(
+            self: Pin<&mut OcgLdPluginBase>,
+            model_name: &mut [u8]
+        ) -> bool;
+
+        fn get_num_parameters(
+            self: Pin<&mut OcgLdPluginBase>,
+            value: &mut i32,
+        ) -> bool;
+
+        fn get_parameter_name(
+            self: Pin<&mut OcgLdPluginBase>,
+            value: i32,
+            identifier: &mut [u8]
+        ) -> bool;
+
+        fn get_parameter_type(
+            self: Pin<&mut OcgLdPluginBase>,
+            identifier: &str,
+            value: &mut i32,
+        ) -> bool;
+
+        fn get_parameter_default_value_f64(
+            self: Pin<&mut OcgLdPluginBase>,
+            identifier: &str,
+            value: &mut f64,
+        ) -> bool;
+
+        fn get_parameter_range(
+            self: Pin<&mut OcgLdPluginBase>,
+            identifier: &str,
+            min_value: &mut f64,
+            max_value: &mut f64,
+        ) -> bool;
+
+        fn set_parameter_value_f64(
+            self: Pin<&mut OcgLdPluginBase>,
+            identifier: &str,
+            value: f64
+        ) -> bool;
+
+        fn initialize_parameters(self: Pin<&mut OcgLdPluginBase>) -> bool;
+
+        fn undistort(
+            self: Pin<&mut OcgLdPluginBase>,
+            x0: f64, y0: f64,
+            x1: &mut f64, y1: &mut f64
+        ) -> bool;
+
+        fn distort(
+            self: Pin<&mut OcgLdPluginBase>,
+            x0: f64, y0: f64,
+            x1: &mut f64, y1: &mut f64
+        ) -> bool;
+
+        fn distort_with_guess(
+            self: Pin<&mut OcgLdPluginBase>,
+            x0: f64, y0: f64,
+            x1_start: f64, y1_start: f64,
+            x1: &mut f64, y1: &mut f64
+        ) -> bool;
+
+        fn provides_parameter_derivatives(
+            self: Pin<&mut OcgLdPluginBase>) -> bool;
+
+	    fn get_bounding_box_undistort(
+            self: Pin<&mut OcgLdPluginBase>,
+            xa_in: f64, ya_in: f64,
+            xb_in: f64, yb_in: f64,
+            xa_out: &mut f64, ya_out: &mut f64,
+            xb_out: &mut f64, yb_out: &mut f64,
+            nx: i32, ny: i32);
+
+	    fn get_bounding_box_distort(
+            self: Pin<&mut OcgLdPluginBase>,
+            xa_in: f64, ya_in: f64,
+            xb_in: f64, yb_in: f64,
+            xa_out: &mut f64, ya_out: &mut f64,
+            xb_out: &mut f64, yb_out: &mut f64,
+            nx: i32, ny: i32);
+
+        fn ldpk_new_plugin() -> UniquePtr<OcgLdPluginBase>;
     }
 
     // Image IO
@@ -302,7 +428,12 @@ pub mod ffi {
         fn color_matrix(&self) -> Matrix4;
         fn transform_matrix(&self) -> Matrix4;
         fn deformers_len(&self) -> usize;
-        fn apply_deformers(&self, buffer: &mut [f32]);
+        fn apply_deformers(
+            &self,
+            buffer: &mut [f32],
+            image_window: BBox2Df,
+            direction: DeformerDirection
+        );
         fn pixel_buffer(&self) -> &[f32];
         fn pixel_width(&self) -> i32;
         fn pixel_height(&self) -> i32;
