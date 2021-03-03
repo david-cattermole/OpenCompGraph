@@ -229,16 +229,6 @@ pub mod ffi {
         Valid = 1,
     }
 
-    // ThingC
-    #[namespace = "open_comp_graph::cpp"]
-    unsafe extern "C++" {
-        include!("opencompgraph/cpp.h");
-
-        // type ThingC;
-        // fn make_thingc(appname: &str) -> UniquePtr<ThingC>;
-        // fn get_name(thing: &ThingC) -> &CxxString;
-        // fn run_sharedthing(state: SharedThing);
-    }
 
     // Color Spaces
     #[namespace = "open_comp_graph::internal"]

@@ -1,7 +1,6 @@
 #pragma once
 #include "rust/cxx.h"
 #include "opencompgraph/symbol_export.h"
-#include "opencompgraph/cpp.h"
 #include "opencompgraph/colorspace.h"
 #include "opencompgraph/imageio.h"
 #include "opencompgraph/systemmemory.h"
