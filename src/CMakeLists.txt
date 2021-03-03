@@ -56,6 +56,8 @@ target_include_directories(${target_lib}
         ${CMAKE_CURRENT_SOURCE_DIR}
         ${OPENIMAGEIO_INCLUDES}
         ${OpenColorIO_INCLUDE_DIR}
+        ${ldpk_INCLUDE_DIRS}
+        ${dlfcn-win32_INCLUDE_DIRS}
 )
 
 if (MSVC)

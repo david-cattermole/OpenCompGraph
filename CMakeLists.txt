@@ -56,6 +56,22 @@ message(STATUS "OpenColorIO Include: ${OpenColorIO_INCLUDE_DIRS}")
 set_target_properties(OpenColorIO PROPERTIES
   IMPORTED_LINK_INTERFACE_LIBRARIES_RELEASE "")
 
+set(LDPK_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/install/ldpk"
+  CACHE STRING "Root path to installed LDPK.")
+find_package(ldpk REQUIRED
+  HINTS ${LDPK_ROOT})
+message(STATUS "LDPK Found: ${ldpk_FOUND}")
+message(STATUS "LDPK Libraries: ${ldpk_LIBRARIES}")
+message(STATUS "LDPK Include: ${ldpk_INCLUDE_DIRS}")
+
+set(DLFCN_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/install/dlfcn"
+  CACHE STRING "Root path to installed dlfcn.")
+find_package(dlfcn-win32 REQUIRED
+  HINTS ${DLFCN_ROOT})
+message(STATUS "DLFCN Found: ${dlfcn-win32_FOUND}")
+message(STATUS "DLFCN Libraries: ${dlfcn-win32_LIBRARIES}")
+message(STATUS "DLFCN Include: ${dlfcn-win32_INCLUDE_DIRS}")
+
 add_subdirectory(src)
 add_subdirectory(include)
 if(OpenCompGraph_BUILD_TESTS)

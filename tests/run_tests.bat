@@ -19,6 +19,8 @@ SET CONFIG_DIR=%OCG_ROOT%\config
 
 :: Install root paths for various third-party components.
 SET ZLIB_ROOT=%THIRDPARTY_INSTALL_DIR%\zlib
+SET DLFCN_ROOT=%THIRDPARTY_INSTALL_DIR%\dlfcn
+SET LDPK_ROOT=%THIRDPARTY_INSTALL_DIR%\ldpk
 SET JPEG_TURBO_ROOT=%THIRDPARTY_INSTALL_DIR%\libjpeg_turbo
 SET PNG_ROOT=%THIRDPARTY_INSTALL_DIR%\libpng
 SET TIFF_ROOT=%THIRDPARTY_INSTALL_DIR%\libtiff
@@ -31,7 +33,7 @@ SET BOOST_ROOT=C:\Program Files\boost_1_61_0
 :: Set PATH to find runtime libraries.
 ::
 :: NOTE: These paths override any others in the PATH.
-SET PATH=%ZLIB_ROOT%\bin;%TIFF_ROOT%\bin;%JPEG_TURBO_ROOT%\bin;%PNG_ROOT%\bin;%ILMBASE_ROOT%\lib;%OPENEXR_ROOT%\lib;%OPENCOLORIO_ROOT%\bin;%OPENIMAGEIO_ROOT%\bin;%BOOST_ROOT%\lib64-msvc-14.0;%PATH%
+SET PATH=%ZLIB_ROOT%\bin;%DLFCN_ROOT%\bin;%LDPK_ROOT%\bin;%TIFF_ROOT%\bin;%JPEG_TURBO_ROOT%\bin;%PNG_ROOT%\bin;%ILMBASE_ROOT%\lib;%OPENEXR_ROOT%\lib;%OPENCOLORIO_ROOT%\bin;%OPENIMAGEIO_ROOT%\bin;%BOOST_ROOT%\lib64-msvc-14.0;%PATH%
 
 :: Run test!
 SET OCIO=%CONFIG_DIR%\aces_1.2\config.ocio
