@@ -56,6 +56,17 @@ bool oiio_read_image(const rust::String &file_path, ImageShared &image) {
     image.display_window.max_x = spec.full_x + spec.full_width;
     image.display_window.max_y = spec.full_y + spec.full_height;
 
+    // Ensure the display window corner starts at 0,0 by removing any
+    // non-zero values and pushing the values into the data window.
+    image.data_window.min_x += image.display_window.min_x;
+    image.data_window.min_y += image.display_window.min_y;
+    image.data_window.max_x += image.display_window.min_x;
+    image.data_window.max_y += image.display_window.min_y;
+    image.display_window.max_x -= image.display_window.min_x;
+    image.display_window.max_y -= image.display_window.min_y;
+    image.display_window.min_x = 0;
+    image.display_window.min_y = 0;
+
     // Allocate pixel memory with Rust data structure.
     //
     // Make sure the data read is compatible with OpenGL without
