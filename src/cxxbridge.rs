@@ -540,6 +540,10 @@ pub mod ffi {
 
         // Creation
         fn create_geometry_plane_box(
+            center_x: f32,
+            center_y: f32,
+            size_x: f32,
+            size_y: f32,
             divisions_x: u32,
             divisions_y: u32
         ) -> Box<GeometryPlaneImpl>;

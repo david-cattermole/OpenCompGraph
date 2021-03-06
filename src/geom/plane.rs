@@ -1,17 +1,49 @@
+use crate::mathutils;
 use log::{debug, error, info, warn};
 
 #[derive(Debug)]
 pub struct GeometryPlaneImpl {
+    center_x: f32,
+    center_y: f32,
+    size_x: f32,
+    size_y: f32,
     divisions_x: u32,
     divisions_y: u32,
 }
 
 impl GeometryPlaneImpl {
-    pub fn new(divisions_x: u32, divisions_y: u32) -> GeometryPlaneImpl {
+    pub fn new(
+        center_x: f32,
+        center_y: f32,
+        size_x: f32,
+        size_y: f32,
+        divisions_x: u32,
+        divisions_y: u32,
+    ) -> GeometryPlaneImpl {
         GeometryPlaneImpl {
+            center_x,
+            center_y,
+            size_x,
+            size_y,
             divisions_x,
             divisions_y,
         }
+    }
+
+    pub fn center_x(&self) -> f32 {
+        self.center_x
+    }
+
+    pub fn center_y(&self) -> f32 {
+        self.center_y
+    }
+
+    pub fn size_x(&self) -> f32 {
+        self.size_x
+    }
+
+    pub fn size_y(&self) -> f32 {
+        self.size_y
     }
 
     pub fn divisions_x(&self) -> u32 {
@@ -20,6 +52,22 @@ impl GeometryPlaneImpl {
 
     pub fn divisions_y(&self) -> u32 {
         self.divisions_y
+    }
+
+    pub fn set_center_x(&mut self, value: f32) {
+        self.center_x = value
+    }
+
+    pub fn set_center_y(&mut self, value: f32) {
+        self.center_y = value
+    }
+
+    pub fn set_size_x(&mut self, value: f32) {
+        self.size_x = value
+    }
+
+    pub fn set_size_y(&mut self, value: f32) {
+        self.size_y = value
     }
 
     pub fn set_divisions_x(&mut self, value: u32) {
@@ -82,12 +130,20 @@ impl GeometryPlaneImpl {
     /// Vertex Buffer Positions
     pub fn fill_buffer_vertex_positions(&self, buffer: &mut [f32]) -> bool {
         let mut index = 0;
+        let mut max_x = self.size_x / 2.0;
+        let mut min_x = -max_x;
+        let mut max_y = self.size_y / 2.0;
+        let mut min_y = -max_y;
         let square_size_x: f32 = 1.0 / ((self.divisions_x - 1) as f32);
         let square_size_y: f32 = 1.0 / ((self.divisions_y - 1) as f32);
         for row in 0..self.divisions_y {
             for col in 0..self.divisions_x {
-                buffer[index + 0] = -0.5 + ((col as f32) * square_size_x);
-                buffer[index + 1] = -0.5 + ((row as f32) * square_size_y);
+                let x = (col as f32) * square_size_x;
+                let y = (row as f32) * square_size_y;
+                let pos_x = mathutils::lerp(min_x, max_x, x) - self.center_x;
+                let pos_y = mathutils::lerp(min_y, max_y, y) - self.center_y;
+                buffer[index + 0] = pos_x;
+                buffer[index + 1] = pos_y;
                 buffer[index + 2] = 0.0;
                 index += 3;
             }
@@ -212,7 +268,21 @@ impl GeometryPlaneImpl {
     }
 }
 
-pub fn create_geometry_plane_box(divisions_x: u32, divisions_y: u32) -> Box<GeometryPlaneImpl> {
+pub fn create_geometry_plane_box(
+    center_x: f32,
+    center_y: f32,
+    size_x: f32,
+    size_y: f32,
+    divisions_x: u32,
+    divisions_y: u32,
+) -> Box<GeometryPlaneImpl> {
     debug!("create_geometry_plane_box()");
-    Box::new(GeometryPlaneImpl::new(divisions_x, divisions_y))
+    Box::new(GeometryPlaneImpl::new(
+        center_x,
+        center_y,
+        size_x,
+        size_y,
+        divisions_x,
+        divisions_y,
+    ))
 }

@@ -1675,7 +1675,7 @@ bool open_comp_graph$internal$cxxbridge1$GeometryPlaneImpl$fill_buffer_index_bor
 
 bool open_comp_graph$internal$cxxbridge1$GeometryPlaneImpl$fill_buffer_index_wire_lines(const ::open_comp_graph::internal::GeometryPlaneImpl &self, ::rust::Slice<::std::uint32_t> buffer_index_wire_lines) noexcept;
 
-::open_comp_graph::internal::GeometryPlaneImpl *open_comp_graph$internal$cxxbridge1$create_geometry_plane_box(::std::uint32_t divisions_x, ::std::uint32_t divisions_y) noexcept;
+::open_comp_graph::internal::GeometryPlaneImpl *open_comp_graph$internal$cxxbridge1$create_geometry_plane_box(float center_x, float center_y, float size_x, float size_y, ::std::uint32_t divisions_x, ::std::uint32_t divisions_y) noexcept;
 
 void open_comp_graph$internal$cxxbridge1$export_mesh(::rust::Slice<const float> buffer_vertex_positions, ::rust::Slice<const float> buffer_vertex_uvs, ::rust::Slice<const ::std::uint32_t> buffer_index_tris, ::rust::Str file_path) noexcept;
 } // extern "C"
@@ -2151,8 +2151,8 @@ OPENCOMPGRAPH_SYMBOL_EXPORT bool GeometryPlaneImpl::fill_buffer_index_wire_lines
   return open_comp_graph$internal$cxxbridge1$GeometryPlaneImpl$fill_buffer_index_wire_lines(*this, buffer_index_wire_lines);
 }
 
-OPENCOMPGRAPH_SYMBOL_EXPORT ::rust::Box<::open_comp_graph::internal::GeometryPlaneImpl> create_geometry_plane_box(::std::uint32_t divisions_x, ::std::uint32_t divisions_y) noexcept {
-  return ::rust::Box<::open_comp_graph::internal::GeometryPlaneImpl>::from_raw(open_comp_graph$internal$cxxbridge1$create_geometry_plane_box(divisions_x, divisions_y));
+OPENCOMPGRAPH_SYMBOL_EXPORT ::rust::Box<::open_comp_graph::internal::GeometryPlaneImpl> create_geometry_plane_box(float center_x, float center_y, float size_x, float size_y, ::std::uint32_t divisions_x, ::std::uint32_t divisions_y) noexcept {
+  return ::rust::Box<::open_comp_graph::internal::GeometryPlaneImpl>::from_raw(open_comp_graph$internal$cxxbridge1$create_geometry_plane_box(center_x, center_y, size_x, size_y, divisions_x, divisions_y));
 }
 
 OPENCOMPGRAPH_SYMBOL_EXPORT void export_mesh(::rust::Slice<const float> buffer_vertex_positions, ::rust::Slice<const float> buffer_vertex_uvs, ::rust::Slice<const ::std::uint32_t> buffer_index_tris, ::rust::Str file_path) noexcept {
