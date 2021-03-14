@@ -19,7 +19,14 @@ void generate_mesh(const bool debug_print,
         std::cout << "divisions: " << divisions_x << "x" << divisions_y << '\n';
     }
 
-    auto geom = ocg::internal::create_geometry_plane_box(divisions_x, divisions_y);
+    auto center_x = -0.5f;
+    auto center_y = -0.5f;
+    auto size_x = 1.0f;
+    auto size_y = 1.0f;
+    auto geom = ocg::internal::create_geometry_plane_box(
+        center_x, center_y,
+        size_x, size_y,
+        divisions_x, divisions_y);
 
     pos_count = geom->calc_buffer_size_vertex_positions();
     uv_count = geom->calc_buffer_size_vertex_uvs();
