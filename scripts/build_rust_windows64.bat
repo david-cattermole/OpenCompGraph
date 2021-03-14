@@ -10,7 +10,7 @@ CHDIR %ROOT%
 
 :: Install the needed cxxbridge.exe command to be installed with the
 :: exact version we need.
-cargo install cxxbridge-cmd --version 1.0.26
+cargo install cxxbridge-cmd --version 1.0.32
 
 :: Build Rust
 ::
