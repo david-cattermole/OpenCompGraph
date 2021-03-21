@@ -104,10 +104,11 @@ pub fn merge(
 
             let (r, g, b, a) = match mode {
                 MergeImageMode::Add => {
-                    let r = r_a + r_b;
-                    let g = g_a + g_b;
-                    let b = b_a + b_b;
-                    let a = a_a + a_b;
+                    let mask = mix;
+                    let r = r_a + (r_b * mask);
+                    let g = g_a + (g_b * mask);
+                    let b = b_a + (b_b * mask);
+                    let a = a_a + (a_b * mask);
                     (r, g, b, a)
                 }
                 MergeImageMode::Over => {
@@ -120,11 +121,11 @@ pub fn merge(
                     (r, g, b, a)
                 }
                 MergeImageMode::Multiply => {
-                    let mix = 1.0;
-                    let r = r_a * (r_b * mix);
-                    let g = g_a * (g_b * mix);
-                    let b = b_a * (b_b * mix);
-                    let a = a_a * (a_b * mix);
+                    let mask = mix;
+                    let r = r_a * (r_b * mask);
+                    let g = g_a * (g_b * mask);
+                    let b = b_a * (b_b * mask);
+                    let a = a_a * (a_b * mask);
                     (r, g, b, a)
                 }
                 _ => panic!("unsupported merge mode"),
