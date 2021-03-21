@@ -346,6 +346,30 @@ impl GraphImpl {
     ) -> Result<(), ErrorCode> {
         let node = &mut self.nodes[node_index];
 
+        // TODO: Store the amount of time the node took to compute,
+        // and how much (new) memory it requires. Then use the
+        // meta-information to weight the importance of the item in
+        // the cache.
+
+        // TODO: The node compute should be split into multiple
+        // methods.
+        //
+        // - A) a method to initalised and validate the node's input.
+        // - B) a method to calculate the pixel values.
+        // - C) a method to calculate the bounding box only.
+        //
+        // 'A' is single threaded and is used to initalise data
+        // structures and cache data for the future computations.
+        //
+        // 'B' is run on each row of the image and may be distributed
+        // across many threads.
+        //
+        // 'C' is used to provide bounding-box information so we can
+        // test if our render region intersects with the bounding box.
+        //
+        // Both 'B' and 'C' expect 'A' to have already been called so
+        // that any data structures are valid and up-to-date.
+
         match node.compute(frame, &inputs, &mut self.output, cache) {
             NodeStatus::Valid | NodeStatus::Warning => {
                 stream_data_cache.insert(node_index, self.output.clone());

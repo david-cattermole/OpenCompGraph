@@ -89,6 +89,8 @@ impl Operation for ReadImageOperation {
         let path = match Path::new(&path_expanded).canonicalize() {
             Ok(full_path) => full_path,
             Err(_) => {
+                // The path could not be canonicalised, probably
+                // meaning the path does not exist.
                 let hash_value = self.cache_hash(frame, node_type_id, &attr_block, inputs);
 
                 let mut stream_data = StreamDataImpl::new();
