@@ -13,7 +13,7 @@ path = "./src/lib.rs"
 crate_type = ["staticlib"]
 
 [dependencies]
-cxx = "=1.0.32"
+cxx = "=1.0.33"
 rustc-hash = "1.1.0"
 fastapprox = "0.3.0"
 log = "0.4.0"
