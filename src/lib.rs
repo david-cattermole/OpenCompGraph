@@ -18,6 +18,7 @@ pub mod graph;
 pub mod graphiter;
 pub mod hashutils;
 pub mod imageio;
+pub mod imagemerge;
 pub mod ldpk_utils;
 pub mod logger;
 pub mod mathutils;

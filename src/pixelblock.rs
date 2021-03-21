@@ -28,20 +28,6 @@ use crate::data::COLOR_BARS_WIDTH;
 use crate::node::traits::Operation;
 use crate::node::NodeImpl;
 
-#[derive(Clone)]
-pub struct PixelBlock {
-    width: i32,
-    height: i32,
-    num_channels: i32,
-    pixel_data_type: PixelDataType,
-
-    /// The pixel data may *not* be f32 values, but rather the values
-    /// may be u8 or u16 or 'half'. We use 'f32' here as the maximum
-    /// number of bytes that could be needed. Rust's Vec will ensure
-    /// that the f32 values are a byte aligned for us.
-    pixels: Vec<f32>,
-}
-
 #[inline]
 fn size_bytes_aligned_to<T>(size_bytes: usize) -> usize {
     let align_type = std::mem::align_of::<T>();
@@ -147,6 +133,46 @@ fn convert_value_to_f32_bytes(value: f32, pixel_data_type: PixelDataType) -> f32
         PixelDataType::Float32 => value as f32,
         _ => panic!("Invalid pixel data type"),
     }
+}
+
+/// Get the pixel index into a packed data structure of RGB(A) pixel
+/// data.
+///
+/// Returns the index if the x,y coordinates are with-in bounds,
+/// otherwise -1 is returned.
+#[inline]
+pub fn get_pixel_index(
+    width: i32,
+    height: i32,
+    x_stride: i32,
+    y_stride: i32,
+    x: i32,
+    y: i32,
+) -> isize {
+    let index_x = x * x_stride;
+    let index_y = y * y_stride;
+    let mut index = index_x + index_y;
+    let max_x = (width - 1) * x_stride;
+    let max_y = (height - 1) * y_stride;
+    let max_index = max_x + max_y;
+    if (index < 0) || (index > max_index) {
+        index = -1;
+    }
+    return index as isize;
+}
+
+#[derive(Clone)]
+pub struct PixelBlock {
+    width: i32,
+    height: i32,
+    num_channels: i32,
+    pixel_data_type: PixelDataType,
+
+    /// The pixel data may *not* be f32 values, but rather the values
+    /// may be u8 or u16 or 'half'. We use 'f32' here as the maximum
+    /// number of bytes that could be needed. Rust's Vec will ensure
+    /// that the f32 values are a byte aligned for us.
+    pixels: Vec<f32>,
 }
 
 impl PixelBlock {
@@ -312,6 +338,12 @@ impl PixelBlock {
             self.num_channels,
             self.pixel_data_type,
         )
+    }
+
+    pub fn get_pixel_index(&self, x: i32, y: i32) -> isize {
+        let x_stride = self.num_channels;
+        let y_stride = self.width * self.num_channels;
+        get_pixel_index(self.width, self.height, x_stride, y_stride, x, y)
     }
 
     pub fn data_resize(

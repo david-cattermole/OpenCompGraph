@@ -53,6 +53,15 @@ impl BBox2Di {
         }
     }
 
+    pub fn combine(a: BBox2Di, b: BBox2Di) -> BBox2Di {
+        BBox2Di {
+            min_x: i32::min(a.min_x, b.min_x),
+            min_y: i32::min(a.min_y, b.min_y),
+            max_x: i32::max(a.max_x, b.max_x),
+            max_y: i32::max(a.max_y, b.max_y),
+        }
+    }
+
     pub fn width(&self) -> i32 {
         self.max_x - self.min_x
     }

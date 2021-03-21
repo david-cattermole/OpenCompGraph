@@ -19,6 +19,7 @@ use crate::stream::StreamDataImpl;
 
 pub mod grade;
 pub mod lens_distort;
+pub mod merge_image;
 pub mod null;
 pub mod read_image;
 pub mod traits;
@@ -159,6 +160,7 @@ pub fn create_node(node_type: NodeType, id: Identifier) -> NodeImpl {
         NodeType::LensDistort => lens_distort::new(id),
         NodeType::Null => null::new(id),
         NodeType::Grade => grade::new(id),
+        NodeType::MergeImage => merge_image::new(id),
         NodeType::Transform => transform::new(id),
         _ => panic!("Invalid NodeType: {:?}", node_type),
     }

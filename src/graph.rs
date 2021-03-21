@@ -30,7 +30,6 @@ use crate::node::NodeImpl;
 use crate::stream::StreamDataImpl;
 use crate::stream::StreamDataImplRc;
 
-type HashValue = u64;
 type NodeGraph =
     petgraph::stable_graph::StableGraph<NodeWeight, EdgeWeight, petgraph::Directed, GraphIdx>;
 
@@ -234,7 +233,6 @@ impl GraphImpl {
         match maybe_node_idx {
             Some(value) => debug!("Node found: id={} index={}", node_id, value),
             None => warn!("Node NOT found: id={}", node_id),
-            // _ => (),
         }
         maybe_node_idx
     }
@@ -283,45 +281,58 @@ impl GraphImpl {
 
     // Get the stack of indices to be computed, going upstream
     // from the starting index.
-    fn find_upstream_indexes(&self, start_node_idx: usize) -> Vec<NodeIdx> {
-        let mut sorted_node_indexes = Vec::<NodeIdx>::new();
+    fn find_all_upstream_nodes(&self, start_node_idx: GraphIdx) -> Vec<NodeIdx> {
+        let mut node_indexes = Vec::<NodeIdx>::new();
         let start_index = NodeIdx::new(start_node_idx);
         let mut walker = UpstreamEvalSearch::new(&self.graph, start_index);
-        while let Some(nx) = walker.next(&self.graph) {
-            let index = nx.index();
-            let node = &self.nodes[index];
-            sorted_node_indexes.push(nx);
-            debug!("walk index: {}", index);
+
+        while let Some((node, depth)) = walker.next(&self.graph) {
+            node_indexes.push(node);
         }
-        sorted_node_indexes
+        node_indexes
+    }
+
+    // Get the stack of indices to be computed, going upstream
+    // from the starting index.
+    fn find_direct_upstream_nodes(&self, start_node_idx: GraphIdx) -> Vec<NodeIdx> {
+        let mut node_indexes = Vec::<NodeIdx>::new();
+        let start_index = NodeIdx::new(start_node_idx);
+        let mut walker = UpstreamEvalSearch::new(&self.graph, start_index);
+        while let Some((node, depth)) = walker.next(&self.graph) {
+            if depth == 0 {
+                // Skip the current level.
+                continue;
+            }
+            if depth > 1 {
+                break;
+            }
+            node_indexes.push(node);
+        }
+        node_indexes
     }
 
     /// Get upstream parent inputs (so we can calculate the node hash)
     fn compute_node_metadata(
         &mut self,
-        nx: NodeIdx,
+        node_idx: NodeIdx,
         frame: i32,
-        parent_inputs: &mut Vec<Rc<StreamDataImpl>>,
-        stream_data_cache: &FxHashMap<HashValue, Rc<StreamDataImpl>>,
-    ) -> Result<(GraphIdx, Vec<Rc<StreamDataImpl>>), ErrorCode> {
+        stream_data_cache: &FxHashMap<GraphIdx, Rc<StreamDataImpl>>,
+    ) -> Result<Vec<Rc<StreamDataImpl>>, ErrorCode> {
         let mut inputs = Vec::<Rc<StreamDataImpl>>::new();
-        let parents = self.graph.neighbors_directed(nx, Direction::Incoming);
-        for parent_node_index in parents {
+
+        let parent_node_indexes = self.find_direct_upstream_nodes(node_idx.index());
+        debug!("Parent input count: {}", parent_node_indexes.len());
+        for parent_node_index in parent_node_indexes {
             let parent_index = parent_node_index.index();
             debug!("parent index: {}", parent_index);
 
-            let parent_node = &self.nodes[parent_index];
-            let parent_hash = parent_node.hash(frame, parent_inputs);
-            debug!("Parent node hash: {}", parent_hash);
-
-            if let Some(stream_data) = stream_data_cache.get(&parent_hash) {
+            if let Some(stream_data) = stream_data_cache.get(&parent_index) {
                 inputs.push(stream_data.clone());
             } else {
-                panic!("Parent node hash is missing: {}", parent_hash);
+                panic!("Parent node index is missing: {}", parent_index);
             }
         }
-        let node_index = nx.index();
-        Ok((node_index, inputs))
+        Ok(inputs)
     }
 
     /// Compute the node.
@@ -331,16 +342,13 @@ impl GraphImpl {
         node_index: GraphIdx,
         frame: i32,
         cache: &mut Box<CacheImpl>,
-        stream_data_cache: &mut FxHashMap<HashValue, Rc<StreamDataImpl>>,
+        stream_data_cache: &mut FxHashMap<GraphIdx, Rc<StreamDataImpl>>,
     ) -> Result<(), ErrorCode> {
         let node = &mut self.nodes[node_index];
 
         match node.compute(frame, &inputs, &mut self.output, cache) {
             NodeStatus::Valid | NodeStatus::Warning => {
-                let node_hash = node.hash(frame, &inputs);
-                // debug!("Node hash: {}", node_hash);
-
-                stream_data_cache.insert(node_hash, self.output.clone());
+                stream_data_cache.insert(node_index, self.output.clone());
                 Ok(())
             }
             NodeStatus::Uninitialized => {
@@ -360,27 +368,24 @@ impl GraphImpl {
 
     fn execute_frame(
         &mut self,
-        sorted_node_indexes: &Vec<NodeIdx>,
+        node_indexes: &Vec<NodeIdx>,
         frame: i32,
         cache: &mut Box<CacheImpl>,
     ) -> Result<(), ErrorCode> {
         info!("Execute Frame Context: {}", frame);
         let start = Instant::now();
 
-        let mut stream_data_cache = FxHashMap::<HashValue, Rc<StreamDataImpl>>::default();
-        let mut parent_inputs = Vec::<Rc<StreamDataImpl>>::new();
-        for nx in sorted_node_indexes.iter().rev() {
-            debug!("Compute Node Index: {:?}", nx);
-            let (node_index, node_inputs) =
-                self.compute_node_metadata(*nx, frame, &mut parent_inputs, &stream_data_cache)?;
+        let mut stream_data_cache = FxHashMap::<GraphIdx, Rc<StreamDataImpl>>::default();
+        for node_index in node_indexes.iter().rev() {
+            debug!("Compute Node: {:?}", node_index);
+            let node_inputs = self.compute_node_metadata(*node_index, frame, &stream_data_cache)?;
             self.compute_node_output(
                 &node_inputs,
-                node_index,
+                node_index.index(),
                 frame,
                 cache,
                 &mut stream_data_cache,
             )?;
-            parent_inputs = node_inputs.to_vec();
         }
         let duration = start.elapsed();
         debug!("Frame Execute {} total time: {:?}", frame, duration);
@@ -416,10 +421,10 @@ impl GraphImpl {
                 return self.status;
             }
         };
-        let sorted_node_indexes = self.find_upstream_indexes(start_node_idx);
+        let node_indexes = self.find_all_upstream_nodes(start_node_idx);
 
         for frame in frames {
-            match self.execute_frame(&sorted_node_indexes, *frame, cache) {
+            match self.execute_frame(&node_indexes, *frame, cache) {
                 Err(e) => {
                     match e {
                         ErrorCode::Failure => {

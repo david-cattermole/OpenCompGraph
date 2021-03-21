@@ -186,15 +186,15 @@ pub fn pixels_remap_coords(
     let src_num_channels = src_pixel_block.num_channels();
     let src_pixels = src_pixel_block.as_slice();
 
-    let src_x_stride = src_num_channels as usize;
-    let dst_x_stride = dst_num_channels as usize;
-    let src_y_stride = src_width as usize * src_x_stride;
-    let dst_y_stride = dst_width as usize * dst_x_stride;
+    let src_x_stride = src_num_channels;
+    let dst_x_stride = dst_num_channels;
+    let src_y_stride = src_width * src_x_stride;
+    let dst_y_stride = dst_width * dst_x_stride;
 
     let mut pixel_coord_index = 0;
     for dy in 0..dst_height as usize {
         for dx in 0..dst_width as usize {
-            let dst_index = (dy * dst_y_stride) + (dx * dst_x_stride);
+            let dst_index: usize = (dy * dst_y_stride as usize) + (dx * dst_x_stride as usize);
 
             // X and Y source pixel coordinate to fetch the pixel
             // value. The pixel coordinates are relative to the

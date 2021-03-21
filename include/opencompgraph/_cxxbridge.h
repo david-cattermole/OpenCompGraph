@@ -911,6 +911,7 @@ namespace open_comp_graph {
   enum class AttrState : ::std::uint8_t;
   enum class StreamDataState : ::std::uint8_t;
   enum class DeformerDirection : ::std::uint8_t;
+  enum class MergeImageMode : ::std::uint8_t;
   namespace internal {
     struct GraphImplShared;
     struct StreamDataImplShared;
@@ -1071,6 +1072,7 @@ enum class NodeType : ::std::uint8_t {
   kReadImage = 1,
   kWriteImage = 2,
   kTransform = 5,
+  kMergeImage = 6,
   kGrade = 3,
   kLensDistort = 4,
 };
@@ -1136,7 +1138,19 @@ enum class ParameterType : ::std::int32_t {
   kUninitialized = 255,
 };
 #endif // CXXBRIDGE1_ENUM_open_comp_graph$internal$ParameterType
+} // namespace internal
 
+#ifndef CXXBRIDGE1_ENUM_open_comp_graph$MergeImageMode
+#define CXXBRIDGE1_ENUM_open_comp_graph$MergeImageMode
+enum class MergeImageMode : ::std::uint8_t {
+  kAdd = 0,
+  kOver = 1,
+  kMultiply = 2,
+  kUninitialized = 255,
+};
+#endif // CXXBRIDGE1_ENUM_open_comp_graph$MergeImageMode
+
+namespace internal {
 #ifndef CXXBRIDGE1_STRUCT_open_comp_graph$internal$PixelBlock
 #define CXXBRIDGE1_STRUCT_open_comp_graph$internal$PixelBlock
 struct PixelBlock final : public ::rust::Opaque {
