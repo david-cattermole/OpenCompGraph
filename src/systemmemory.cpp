@@ -17,7 +17,7 @@
 #error Unknown Operating System; Windows, MacOS and Linux are supported.
 #endif
 
-#include <opencompgraph/systemmemory.h>
+#include <opencompgraph/internal/systemmemory.h>
 
 namespace open_comp_graph {
 namespace internal {

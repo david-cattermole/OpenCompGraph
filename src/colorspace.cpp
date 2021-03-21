@@ -1,8 +1,14 @@
+// STL
 #include <iostream>
 #include <memory>
+
+// OpenCompGraph
 #include <rust/cxx.h>
 #include <opencompgraph.h>
-#include <opencompgraph/oiio_utils.h>
+#include <opencompgraph/internal/oiio_utils.h>
+#include <opencompgraph/internal/colorspace.h>
+
+// OCIO
 #include <OpenColorIO/OpenColorIO.h>
 
 namespace OCIO = OCIO_NAMESPACE;

@@ -9,7 +9,7 @@
 #include <map>
 #include <functional>
 #include <algorithm>
-#include "symbol_export.h"
+#include "opencompgraph/symbol_export.h"
 
 namespace open_comp_graph {
 

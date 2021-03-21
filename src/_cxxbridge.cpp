@@ -1,9 +1,9 @@
 #include "rust/cxx.h"
 #include "opencompgraph/symbol_export.h"
-#include "opencompgraph/colorspace.h"
-#include "opencompgraph/ldpk_utils.h"
-#include "opencompgraph/imageio.h"
-#include "opencompgraph/systemmemory.h"
+#include "opencompgraph/internal/colorspace.h"
+#include "opencompgraph/internal/ldpk_utils.h"
+#include "opencompgraph/internal/imageio.h"
+#include "opencompgraph/internal/systemmemory.h"
 #include <algorithm>
 #include <array>
 #include <cassert>

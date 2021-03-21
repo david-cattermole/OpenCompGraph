@@ -1,4 +1,4 @@
-#include <opencompgraph/oiio_utils.h>
+#include <opencompgraph/internal/oiio_utils.h>
 #include <OpenImageIO/typedesc.h>
 
 namespace open_comp_graph {

@@ -7,6 +7,7 @@ use crate::attrblock::AttrBlock;
 use crate::cxxbridge::ffi::BBox2Df;
 use crate::mathutils;
 
+pub mod ldpk_utils;
 pub mod brownian;
 pub mod tde4_classic;
 

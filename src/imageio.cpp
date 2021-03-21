@@ -2,7 +2,7 @@
 #include <memory>
 #include <rust/cxx.h>
 #include <opencompgraph.h>
-#include <opencompgraph/oiio_utils.h>
+#include <opencompgraph/internal/oiio_utils.h>
 #include <OpenImageIO/imageio.h>
 
 namespace open_comp_graph {

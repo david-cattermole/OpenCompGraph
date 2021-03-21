@@ -10,7 +10,7 @@ use crate::cxxbridge::ffi::BBox2Df;
 use crate::cxxbridge::ffi::ParameterType;
 use crate::deformer::Deformer;
 use crate::hashutils::HashableF32;
-use crate::ldpk_utils::LensDistortionPlugin;
+use crate::deformer::ldpk_utils::LensDistortionPlugin;
 use crate::mathutils;
 
 // Note: All names end with a null terminator character because the
