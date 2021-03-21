@@ -6,7 +6,6 @@
 #include <rust/cxx.h>
 #include <opencompgraph/_cxxbridge.h>
 #include "symbol_export.h"
-#include "_cxxbridge.h"
 
 
 // Forward declare.
