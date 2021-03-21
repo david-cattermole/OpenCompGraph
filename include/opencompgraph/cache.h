@@ -10,28 +10,28 @@ namespace open_comp_graph {
 
 class Cache {
 public:
-    OPENCOMPGRAPH_SYMBOL_EXPORT
+    OCG_API_EXPORT
     Cache() noexcept;
 
-    OPENCOMPGRAPH_SYMBOL_EXPORT
+    OCG_API_EXPORT
     rust::Box<internal::CacheImpl> get_box() noexcept;
 
-    OPENCOMPGRAPH_SYMBOL_EXPORT
+    OCG_API_EXPORT
     void set_box(rust::Box<internal::CacheImpl> box) noexcept;
 
-    OPENCOMPGRAPH_SYMBOL_EXPORT
+    OCG_API_EXPORT
     std::uint64_t count() const noexcept;
 
-    OPENCOMPGRAPH_SYMBOL_EXPORT
+    OCG_API_EXPORT
     std::size_t used_bytes() const noexcept;
 
-    OPENCOMPGRAPH_SYMBOL_EXPORT
+    OCG_API_EXPORT
     std::size_t capacity_bytes() const noexcept;
 
-    OPENCOMPGRAPH_SYMBOL_EXPORT
+    OCG_API_EXPORT
     void set_capacity_bytes(std::size_t value) noexcept;
 
-    OPENCOMPGRAPH_SYMBOL_EXPORT
+    OCG_API_EXPORT
     std::string data_debug_string() const noexcept;
 
 private:

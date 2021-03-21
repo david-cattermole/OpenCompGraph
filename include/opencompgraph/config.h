@@ -10,25 +10,25 @@ namespace open_comp_graph {
 
 class Config {
 public:
-    OPENCOMPGRAPH_SYMBOL_EXPORT
+    OCG_API_EXPORT
     Config() noexcept;
 
-    OPENCOMPGRAPH_SYMBOL_EXPORT
+    OCG_API_EXPORT
     Config(const char* file_name) noexcept;
 
-    OPENCOMPGRAPH_SYMBOL_EXPORT
+    OCG_API_EXPORT
     rust::Box<internal::ConfigImpl> get_box() noexcept;
 
-    OPENCOMPGRAPH_SYMBOL_EXPORT
+    OCG_API_EXPORT
     void set_box(rust::Box<internal::ConfigImpl> box) noexcept;
 
-    OPENCOMPGRAPH_SYMBOL_EXPORT
+    OCG_API_EXPORT
     float cache_ram_capacity_percent() const noexcept;
 
-    OPENCOMPGRAPH_SYMBOL_EXPORT
+    OCG_API_EXPORT
     std::size_t cache_ram_capacity_bytes() const noexcept;
 
-    OPENCOMPGRAPH_SYMBOL_EXPORT
+    OCG_API_EXPORT
     std::string data_debug_string() const noexcept;
 
 private:

@@ -17,7 +17,7 @@ message(STATUS "Using cxxbridge: ${CXXBRIDGE}")
 set(cxxbridge_in ${CMAKE_CURRENT_SOURCE_DIR}/cxxbridge.rs)
 set(cxxbridge_source_out ${CMAKE_CURRENT_SOURCE_DIR}/_cxxbridge.cpp)
 set(cxxbridge_header_out ${CMAKE_CURRENT_SOURCE_DIR}/../include/opencompgraph/_cxxbridge.h)
-set(cxxbridge_args "--cxx-impl-annotations" "OPENCOMPGRAPH_SYMBOL_EXPORT")
+set(cxxbridge_args "--cxx-impl-annotations" "OCG_API_EXPORT")
 add_custom_command(
   OUTPUT ${cxxbridge_source_out} ${cxxbridge_header_out}
   COMMAND ${CXXBRIDGE} ${cxxbridge_in} ${cxxbridge_args} --header --output ${cxxbridge_header_out}

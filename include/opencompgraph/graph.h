@@ -14,69 +14,69 @@ namespace open_comp_graph {
 
 class Graph {
 public:
-    OPENCOMPGRAPH_SYMBOL_EXPORT Graph() noexcept;
+    OCG_API_EXPORT Graph() noexcept;
 
-    OPENCOMPGRAPH_SYMBOL_EXPORT
+    OCG_API_EXPORT
     GraphState state() const noexcept;
 
-    OPENCOMPGRAPH_SYMBOL_EXPORT
+    OCG_API_EXPORT
     ExecuteStatus execute_status() const noexcept;
 
-    OPENCOMPGRAPH_SYMBOL_EXPORT
+    OCG_API_EXPORT
     Node create_node(NodeType node_type) noexcept;
 
-    OPENCOMPGRAPH_SYMBOL_EXPORT
+    OCG_API_EXPORT
     Node create_node(NodeType node_type, const char* name) noexcept;
 
-    OPENCOMPGRAPH_SYMBOL_EXPORT
+    OCG_API_EXPORT
     Node create_node(NodeType node_type, uint64_t id) noexcept;
 
-    OPENCOMPGRAPH_SYMBOL_EXPORT
+    OCG_API_EXPORT
     bool delete_node(const Node &node) noexcept;
 
-    OPENCOMPGRAPH_SYMBOL_EXPORT
+    OCG_API_EXPORT
     bool delete_node(uint64_t node_id) noexcept;
 
-    OPENCOMPGRAPH_SYMBOL_EXPORT
+    OCG_API_EXPORT
     AttrState node_attr_exists(const Node &node, rust::Str name) const noexcept;
 
-    OPENCOMPGRAPH_SYMBOL_EXPORT
+    OCG_API_EXPORT
     float get_node_attr_f32(const Node &node, rust::Str name) const noexcept;
 
-    OPENCOMPGRAPH_SYMBOL_EXPORT
+    OCG_API_EXPORT
     int32_t get_node_attr_i32(const Node &node, rust::Str name) const noexcept;
 
-    OPENCOMPGRAPH_SYMBOL_EXPORT
+    OCG_API_EXPORT
     rust::Str get_node_attr_str(const Node &node, rust::Str name) const noexcept;
 
-    OPENCOMPGRAPH_SYMBOL_EXPORT
+    OCG_API_EXPORT
     void set_node_attr_f32(const Node &node, rust::Str name, float value) noexcept;
 
-    OPENCOMPGRAPH_SYMBOL_EXPORT
+    OCG_API_EXPORT
     void set_node_attr_i32(const Node &node, rust::Str name, int32_t value) noexcept;
 
-    OPENCOMPGRAPH_SYMBOL_EXPORT
+    OCG_API_EXPORT
     void set_node_attr_str(const Node &node, rust::Str name, rust::Str value) noexcept;
 
-    OPENCOMPGRAPH_SYMBOL_EXPORT
+    OCG_API_EXPORT
     bool node_exists(const Node& node) noexcept;
 
-    OPENCOMPGRAPH_SYMBOL_EXPORT
+    OCG_API_EXPORT
     void connect(const Node& src_node, const Node& dst_node, uint8_t input_num) noexcept;
 
-    OPENCOMPGRAPH_SYMBOL_EXPORT
+    OCG_API_EXPORT
     ExecuteStatus execute(
         const Node& node,
         std::vector<int32_t> &frames,
         std::shared_ptr<Cache> &cache) noexcept;
 
-    OPENCOMPGRAPH_SYMBOL_EXPORT
+    OCG_API_EXPORT
     NodeStatus node_status(const Node &node) const noexcept;
 
-    OPENCOMPGRAPH_SYMBOL_EXPORT
+    OCG_API_EXPORT
     std::string data_debug_string() const noexcept;
 
-    OPENCOMPGRAPH_SYMBOL_EXPORT
+    OCG_API_EXPORT
     StreamData output_stream() noexcept;
 
 private:

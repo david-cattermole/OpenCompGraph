@@ -8,7 +8,7 @@ namespace internal {
 
 // Returns the number of bytes of system memory available on the
 // current machine. If an error occured, 0 (zero) is returned.
-OPENCOMPGRAPH_SYMBOL_EXPORT
+OCG_API_EXPORT
 size_t get_total_system_memory_as_bytes();
 
 } // namespace internal

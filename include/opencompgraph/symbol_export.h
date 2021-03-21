@@ -3,11 +3,11 @@
 
 // Cross-platform symbol visibility macro.
 #if defined(_MSC_VER)
-    #define OPENCOMPGRAPH_SYMBOL_EXPORT __declspec(dllexport)
+    #define OCG_API_EXPORT __declspec(dllexport)
 #elif defined(__GNUC__)
-    #define OPENCOMPGRAPH_SYMBOL_EXPORT __attribute__((visibility("default")))
+    #define OCG_API_EXPORT __attribute__((visibility("default")))
 #else
-    #define OPENCOMPGRAPH_SYMBOL_EXPORT
+    #define OCG_API_EXPORT
 #endif
 
 #endif // OPENCOMPGRAPH_SYMBOL_EXPORT_H

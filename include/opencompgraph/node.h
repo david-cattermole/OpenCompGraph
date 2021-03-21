@@ -9,16 +9,16 @@ namespace open_comp_graph {
 
 class Node {
 public:
-    OPENCOMPGRAPH_SYMBOL_EXPORT
+    OCG_API_EXPORT
     Node(NodeType node_type, size_t id) noexcept;
 
-    OPENCOMPGRAPH_SYMBOL_EXPORT
+    OCG_API_EXPORT
     ~Node();
 
-    OPENCOMPGRAPH_SYMBOL_EXPORT
+    OCG_API_EXPORT
     uint64_t get_id() const noexcept;
 
-    OPENCOMPGRAPH_SYMBOL_EXPORT
+    OCG_API_EXPORT
     NodeType get_node_type() const noexcept;
 
 private:

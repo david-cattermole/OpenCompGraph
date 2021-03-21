@@ -21,22 +21,22 @@ namespace cpp {
 
 // class ThingC {
 // public:
-//     OPENCOMPGRAPH_SYMBOL_EXPORT
+//     OCG_API_EXPORT
 //     ThingC(std::string appname);
 
-//     OPENCOMPGRAPH_SYMBOL_EXPORT
+//     OCG_API_EXPORT
 //     ~ThingC();
 
 //     std::string appname;
 // };
 
-// OPENCOMPGRAPH_SYMBOL_EXPORT
+// OCG_API_EXPORT
 // std::unique_ptr <ThingC> make_thingc(rust::Str appname);
 
-// OPENCOMPGRAPH_SYMBOL_EXPORT
+// OCG_API_EXPORT
 // const std::string &get_name(const ThingC &thing);
 
-// OPENCOMPGRAPH_SYMBOL_EXPORT
+// OCG_API_EXPORT
 // void run_sharedthing(shared::SharedThing state);
 
 } // namespace cpp

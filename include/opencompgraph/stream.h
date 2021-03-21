@@ -10,60 +10,60 @@ namespace open_comp_graph {
 
 class StreamData {
 public:
-    OPENCOMPGRAPH_SYMBOL_EXPORT
+    OCG_API_EXPORT
     StreamData() noexcept;
 
-    OPENCOMPGRAPH_SYMBOL_EXPORT
+    OCG_API_EXPORT
     explicit StreamData(rust::Box<internal::StreamDataImplRc> box) noexcept;
 
-    OPENCOMPGRAPH_SYMBOL_EXPORT
+    OCG_API_EXPORT
     rust::Box<internal::StreamDataImplRc> get_box() noexcept;
 
-    OPENCOMPGRAPH_SYMBOL_EXPORT
+    OCG_API_EXPORT
     void set_box(rust::Box<internal::StreamDataImplRc> box) noexcept;
 
-    OPENCOMPGRAPH_SYMBOL_EXPORT
+    OCG_API_EXPORT
     StreamDataState state() const noexcept;
 
-    OPENCOMPGRAPH_SYMBOL_EXPORT
+    OCG_API_EXPORT
     uint8_t state_id() const noexcept;
 
-    OPENCOMPGRAPH_SYMBOL_EXPORT
+    OCG_API_EXPORT
     uint64_t hash() const noexcept;
 
-    OPENCOMPGRAPH_SYMBOL_EXPORT
+    OCG_API_EXPORT
     BBox2Di display_window() const noexcept;
 
-    OPENCOMPGRAPH_SYMBOL_EXPORT
+    OCG_API_EXPORT
     BBox2Di data_window() const noexcept;
 
-    OPENCOMPGRAPH_SYMBOL_EXPORT
+    OCG_API_EXPORT
     Matrix4 color_matrix() const noexcept;
 
-    OPENCOMPGRAPH_SYMBOL_EXPORT
+    OCG_API_EXPORT
     Matrix4 transform_matrix() const noexcept;
 
-    OPENCOMPGRAPH_SYMBOL_EXPORT
+    OCG_API_EXPORT
     size_t deformers_len() const noexcept;
 
-    OPENCOMPGRAPH_SYMBOL_EXPORT
+    OCG_API_EXPORT
     void apply_deformers(rust::Slice<float> &buffer,
                          BBox2Df image_window,
                          DeformerDirection direction) noexcept;
 
-    OPENCOMPGRAPH_SYMBOL_EXPORT
+    OCG_API_EXPORT
     rust::Slice<const float> pixel_buffer() const noexcept;
 
-    OPENCOMPGRAPH_SYMBOL_EXPORT
+    OCG_API_EXPORT
     int32_t pixel_width() const noexcept;
 
-    OPENCOMPGRAPH_SYMBOL_EXPORT
+    OCG_API_EXPORT
     int32_t pixel_height() const noexcept;
 
-    OPENCOMPGRAPH_SYMBOL_EXPORT
+    OCG_API_EXPORT
     int32_t pixel_num_channels() const noexcept;
 
-    OPENCOMPGRAPH_SYMBOL_EXPORT
+    OCG_API_EXPORT
     PixelDataType pixel_data_type() const noexcept;
 
 private:
