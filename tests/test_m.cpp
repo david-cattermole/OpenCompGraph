@@ -55,7 +55,7 @@ int test_m(const bool debug_print, std::shared_ptr<ocg::Cache> cache) {
     // A Add B
     graph.set_node_attr_i32(merge_add_node, "mode", merge_mode_add);
     graph.set_node_attr_str(write_add_node, "file_path",
-                            "./tests/data/out/test_m_merge_add_out.####.png");
+                            "./tests/data/out/test_m_merge_add_out.####.exr");
     graph.connect(read_fg1_node, merge_add_node, 0); // A
     graph.connect(read_bg1_node, merge_add_node, 1); // B
     graph.connect(merge_add_node, write_add_node, 0);
@@ -63,7 +63,7 @@ int test_m(const bool debug_print, std::shared_ptr<ocg::Cache> cache) {
     // A Over B
     graph.set_node_attr_i32(merge_over_node, "mode", merge_mode_over);
     graph.set_node_attr_str(write_over_node, "file_path",
-                            "./tests/data/out/test_m_merge_over_out.####.png");
+                            "./tests/data/out/test_m_merge_over_out.####.exr");
     graph.connect(read_fg2_node, merge_over_node, 0); // A
     graph.connect(read_bg1_node, merge_over_node, 1); // B
     graph.connect(merge_over_node, write_over_node, 0);
@@ -71,7 +71,7 @@ int test_m(const bool debug_print, std::shared_ptr<ocg::Cache> cache) {
     // A Multiply B
     graph.set_node_attr_i32(merge_mult_node, "mode", merge_mode_multiply);
     graph.set_node_attr_str(write_mult_node, "file_path",
-                            "./tests/data/out/test_m_merge_multiply_out.####.png");
+                            "./tests/data/out/test_m_merge_multiply_out.####.exr");
     graph.connect(read_fg2_node, merge_mult_node, 0); // A
     graph.connect(read_bg1_node, merge_mult_node, 1); // B
     graph.connect(merge_mult_node, write_mult_node, 0);
@@ -79,14 +79,14 @@ int test_m(const bool debug_print, std::shared_ptr<ocg::Cache> cache) {
     // Multiple merge operations; A Add B, then A over B.
     graph.set_node_attr_i32(merge_over2_node, "mode", merge_mode_over);
     graph.set_node_attr_str(write_concat_node, "file_path",
-                            "./tests/data/out/test_m_merge_add_over_out.####.png");
+                            "./tests/data/out/test_m_merge_add_over_out.####.exr");
     graph.connect(read_fg2_node, merge_over2_node, 0);  // A
     graph.connect(merge_add_node, merge_over2_node, 1); // B
     graph.connect(merge_over2_node, write_concat_node, 0);
 
     // Merge empty read node over background.
     graph.set_node_attr_str(write_empty_node, "file_path",
-                            "./tests/data/out/test_m_merge_empty_out.####.png");
+                            "./tests/data/out/test_m_merge_empty_out.####.exr");
     graph.connect(read_empty_node, merge_over3_node, 0); // A
     graph.connect(read_bg1_node, merge_over3_node, 1);   // B
     graph.connect(merge_over3_node, write_empty_node, 0);
@@ -94,7 +94,7 @@ int test_m(const bool debug_print, std::shared_ptr<ocg::Cache> cache) {
     // Beachball - A Over B
     graph.set_node_attr_i32(merge_over4_node, "mode", merge_mode_over);
     graph.set_node_attr_str(write_beachball_node, "file_path",
-                            "./tests/data/out/test_m_merge_beachball_out.####.png");
+                            "./tests/data/out/test_m_merge_beachball_out.####.exr");
     graph.connect(read_bg1_node, merge_over4_node, 0); // A
     graph.connect(read_fg3_node, merge_over4_node, 1); // B
     graph.connect(merge_over4_node, write_beachball_node, 0);
