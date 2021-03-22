@@ -98,22 +98,29 @@ bool oiio_read_image(const rust::String &file_path, ImageShared &image) {
 }
 
 bool oiio_write_image(const rust::String &file_path, const ImageShared &image) {
-
-    auto filename = std::string(file_path);
     const int32_t xres = image.pixel_block->width();
     const int32_t yres = image.pixel_block->height();
     const int32_t channels = image.pixel_block->num_channels();
     rust::Slice<const float> pixels = image.pixel_block->as_slice();
     const float *pixel_data = pixels.data();
 
+    auto filename = std::string(file_path);
     auto out = OIIO::ImageOutput::create(filename);
     if (!out) {
         return false;
     }
 
-    OIIO::ImageSpec spec(xres, yres, channels, OIIO::TypeDesc::UINT8);
+    auto type_desc = ocg_format_to_oiio_format(image.pixel_block->pixel_data_type());
+    OIIO::ImageSpec spec(xres, yres, channels, type_desc);
+    spec.full_x = image.display_window.min_x;
+    spec.full_y = image.display_window.min_y;
+    spec.full_width = image.display_window.max_x - image.display_window.min_x;
+    spec.full_height = image.display_window.max_y - image.display_window.min_y;
+    spec.x = image.data_window.min_x;
+    spec.y = image.data_window.min_y;
+
     out->open(filename, spec);
-    out->write_image(OIIO::TypeDesc::UINT8, pixel_data);
+    out->write_image(type_desc, pixel_data);
     out->close();
     return true;
 }
