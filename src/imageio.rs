@@ -63,7 +63,7 @@ pub fn write_image(image: &ImageShared, path: &String) -> bool {
     debug!("Writing... {:?}", path);
     let start = Instant::now();
 
-    let use_oiio = false;
+    let use_oiio = true;
     let ok = match use_oiio {
         true => {
             // Use OpenImageIO C++ library to write the image path.
