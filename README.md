@@ -30,7 +30,7 @@ worked on.
 | Node connection frame work.                                                  |          Done |
 | Node attribute getting/setting.                                              |          Done |
 | Node image data streams.                                                     |          Done |
-| Multi-frame Execution context.                                               |   In progress |
+| Multi-frame Execution context.                                               |          Done |
 | Logging infrastructure for simple debug.                                     |          Done |
 | JPEG image reading support.                                                  |          Done |
 | JPEG image writing support.                                                  |          Done |
@@ -40,44 +40,45 @@ worked on.
 | TARGA image writing support.                                                 |          Done |
 | TIFF image reading support. (8-bit only)                                     |          Done |
 | TIFF image writing support. (8-bit only)                                     |          Done |
-| EXR image reading support.                                                   | To be started |
-| EXR image writing support.                                                   | To be started |
+| EXR image reading support.                                                   |          Done |
+| EXR image writing support.                                                   |          Done |
 | Generating polygon geometry (for 3D texture playback).                       |          Done |
 | Applying deformers to polygon vertices.                                      |          Done |
 | Convert Lens distortion (deformers) to ST-Maps                               | To be started |
-| Transform Matrix node data concatenation                                     |   In progress |
+| Transform Matrix node data concatenation                                     |          Done |
 | Pixel Deformer node data concatenation (lens distortion)                     |          Done |
 | Color Matrix node data concatenation (lens distortion)                       |          Done |
-| Image Sequence caching and real-time playback.                               |   In progress |
+| Image Sequence caching and real-time playback.                               |          Done |
 | Multi-threaded/asyncronous graph execution.                                  | To be started |
 | Configuration with files and environment variables.                          |   In progress |
-| Internal Unsigned Integer 8-bit Pixel Format.                                | To be started |
-| Internal Unsigned Integer 16-bit Pixel Format.                               | To be started |
-| Internal "Half" Floating point 16-bit Pixel Format.                          | To be started |
+| Internal Unsigned Integer 8-bit Pixel Format.                                |          Done |
+| Internal Unsigned Integer 16-bit Pixel Format.                               |          Done |
+| Internal "Half" Floating point 16-bit Pixel Format.                          |          Done |
 | Internal Floating Point 32-bit Pixel Format.                                 |          Done |
-| Image metadata display window and data window support.                       | To be started |
+| Image metadata display window and data window support.                       |          Done |
 | Standalone executable to read and executre node graphs.                      | To be started |
-| OpenImageIO integration for image reading and image processing.              | To be started |
-| OpenColorIO integration for accurate and configurable color workflow.        | To be started |
+| LDPK integration for lens distortion and image deformation.                  |   In progress |
+| OpenImageIO integration for image reading and image processing.              |   In progress |
+| OpenColorIO integration for accurate and configurable color workflow.        |   In progress |
 | Create a Python API to wrap the library.                                     | To be started |
-| R&D - Decrease RAM usage while still working in floating-point linear color. | To be started |
+| R&D - Decrease RAM usage while still working in floating-point linear color. | To be startad |
 | Write out cached data as loadable files for improved read-performance.       | To be started |
 
 These are the nodes that are planed or currently implemented.
 
 | Node Name     | Description                                                        |        Status |
 |:--------------|--------------------------------------------------------------------|--------------:|
-| ReadImage     | Read an image file (JPEG, PNG, TIFF, TGA) as a stream.             |   In progress |
-| WriteImage    | Write an image data stream to disk (JPEG, PNG, TIFF, TGA).         |   In progress |
-| LensDistort   | Deforms the image pixels with a brownian lens distortion function. |   In progress |
-| (Color) Grade | Applies a color matrix (4x4) to the input image stream             |   In progress |
-| Transform     | Applies a 2D transform to the input image stream                   |   In progress |
+| ReadImage     | Read an image file (JPEG, PNG, TIFF, TGA) as a stream.             |          Done |
+| WriteImage    | Write an image data stream to disk (JPEG, PNG, TIFF, TGA).         |          Done |
+| LensDistort   | Deforms the image pixels with a brownian lens distortion function. |          Done |
+| (Color) Grade | Applies a color matrix (4x4) to the input image stream             |          Done |
+| Transform     | Applies a 2D transform to the input image stream                   |          Done |
 | Null          | A "no op" node, that does nothing.                                 |          Done |
-| ConvertSTMap  | Apply a deformer as pixel colours                                  | To be started |
+| MergeImage    | Blend/Combine 1 or more images together into a single image.       |   In progress |
+| CropImage     | Remove pixel data outside a square region.                         | To be started |
 | ReformatImage | Change the resolution of the image data.                           | To be started |
 | Exposure      | Change the colors of an image using exposure values (EV)           | To be started |
-| MergeImage    | Blend/Combine 1 or more images together into a single image.       | To be started |
-| CropImage     | Remove pixel data outside a square region.                         | To be started |
+| ConvertSTMap  | Apply a deformer as pixel colours                                  | To be started |
 | Keyer         | Calculate an alpha channel for a green/blue-screen image           | To be started |
 
 
