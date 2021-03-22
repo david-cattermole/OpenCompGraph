@@ -2,12 +2,14 @@ use image;
 use image::GenericImageView;
 use image::ImageBuffer;
 use image::RgbaImage;
-use log::{debug, error, info, warn};
+use log::{debug, error, info, log_enabled, warn, Level};
 use std::path::Path;
 use std::path::PathBuf;
 use std::pin::Pin;
 use std::time::{Duration, Instant};
 
+use crate::colorutils::convert_linear_to_srgb;
+use crate::colorutils::convert_srgb_to_linear;
 use crate::cxxbridge::ffi::oiio_read_image;
 use crate::cxxbridge::ffi::oiio_write_image;
 use crate::cxxbridge::ffi::BBox2Di;
@@ -18,6 +20,8 @@ use crate::cxxbridge::ffi::StreamDataState;
 use crate::data::HashValue;
 use crate::deformer::Deformer;
 use crate::deformutils;
+use crate::imagebuffer::create_image_buffer_rgb_u8;
+use crate::imagebuffer::create_image_buffer_rgba_u8;
 use crate::pixelblock;
 
 pub fn read_image(path: &String) -> ImageShared {
@@ -56,7 +60,6 @@ pub fn read_image(path: &String) -> ImageShared {
 }
 
 pub fn write_image(image: &ImageShared, path: &String) -> bool {
-    // TODO: use the display and data windows.
     debug!("Writing... {:?}", path);
     let start = Instant::now();
 
@@ -71,14 +74,14 @@ pub fn write_image(image: &ImageShared, path: &String) -> bool {
             let mut ok = false;
             let num_channels = image.pixel_block.num_channels();
             if num_channels == 3 {
-                let img = pixelblock::create_image_buffer_rgb_u8(&image.pixel_block);
+                let img = create_image_buffer_rgb_u8(&image);
                 ok = match img.save(path) {
                     Ok(value) => true,
                     Err(_) => false,
                 };
             }
             if num_channels == 4 {
-                let img = pixelblock::create_image_buffer_rgba_u8(&image.pixel_block);
+                let img = create_image_buffer_rgba_u8(&image);
                 ok = match img.save(path) {
                     Ok(value) => true,
                     Err(_) => false,

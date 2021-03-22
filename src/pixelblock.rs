@@ -1,7 +1,6 @@
 use half::f16;
 use image;
 use image::GenericImageView;
-use image::RgbaImage;
 use log::{debug, error, info, log_enabled, warn, Level};
 use std::cmp;
 use std::collections::hash_map::DefaultHasher;
@@ -368,6 +367,9 @@ impl PixelBlock {
 }
 
 /// Consumes a image::DynamicImage and produces a PixelBlock.
+//
+// TODO: This function should return a newly created 'ImageShared'.
+//
 pub fn from_dynamic_image(img: image::DynamicImage) -> PixelBlock {
     let (_width, _height) = img.dimensions();
     let width = _width as i32;
@@ -422,71 +424,6 @@ pub fn from_dynamic_image(img: image::DynamicImage) -> PixelBlock {
         num_channels,
         pixel_data_type,
         pixels,
-    }
-}
-
-pub fn create_image_buffer_rgb_u8(
-    pixel_block: &PixelBlock,
-) -> image::ImageBuffer<image::Rgb<u8>, Vec<u8>> {
-    let width = pixel_block.width();
-    let height = pixel_block.height();
-    let pixels = &pixel_block.pixels;
-
-    // Get pixel statistics
-    if log_enabled!(Level::Debug) {
-        let min = pixels.iter().fold(f32::INFINITY, |a, &b| a.min(b));
-        let max = pixels.iter().fold(f32::NEG_INFINITY, |a, &b| a.max(b));
-        let avg = pixels.iter().sum::<f32>() / (pixels.len() as f32);
-        debug!("Min value: {}", min);
-        debug!("Max value: {}", max);
-        debug!("Avg value: {}", avg);
-    }
-
-    // Convert f32 pixel image to u8 ImageBuffer.
-    let pixels_u8: Vec<u8> = pixels
-        .iter()
-        .map(|x| (convert_linear_to_srgb(*x as f32) * (u8::max_value() as f32)) as u8)
-        .collect();
-
-    match image::ImageBuffer::from_raw(width as u32, height as u32, pixels_u8) {
-        Some(data) => data,
-        _ => panic!("invalid image."),
-    }
-}
-
-pub fn create_image_buffer_rgba_u8(
-    pixel_block: &PixelBlock,
-) -> image::ImageBuffer<image::Rgba<u8>, Vec<u8>> {
-    let width = pixel_block.width();
-    let height = pixel_block.height();
-    let pixels = &pixel_block.pixels;
-
-    // Get pixel statistics
-    if log_enabled!(Level::Debug) {
-        let min = pixels.iter().fold(f32::INFINITY, |a, &b| a.min(b));
-        let max = pixels.iter().fold(f32::NEG_INFINITY, |a, &b| a.max(b));
-        let avg = pixels.iter().sum::<f32>() / (pixels.len() as f32);
-        debug!("Min value: {}", min);
-        debug!("Max value: {}", max);
-        debug!("Avg value: {}", avg);
-    }
-
-    // Convert f32 pixel image to u8 ImageBuffer.
-    let pixels_u8: Vec<u8> = pixels
-        .iter()
-        .map(|x| (convert_linear_to_srgb(*x as f32) * (u8::max_value() as f32)) as u8)
-        .collect();
-
-    debug!(
-        "RGBA u8 width={} height={} num_channels={} pixels.size()={}",
-        width,
-        height,
-        pixel_block.num_channels,
-        pixels_u8.len()
-    );
-    match image::ImageBuffer::from_raw(width as u32, height as u32, pixels_u8) {
-        Some(data) => data,
-        _ => panic!("invalid image."),
     }
 }
 

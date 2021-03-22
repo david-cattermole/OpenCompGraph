@@ -17,6 +17,7 @@ pub mod geom;
 pub mod graph;
 pub mod graphiter;
 pub mod hashutils;
+pub mod imagebuffer;
 pub mod imageio;
 pub mod imagemerge;
 pub mod logger;
