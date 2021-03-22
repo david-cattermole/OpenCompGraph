@@ -28,12 +28,14 @@ int test_m(const bool debug_print, std::shared_ptr<ocg::Cache> cache) {
     auto merge_over2_node = graph.create_node(merge_image_type, "merge_over2");
     auto merge_over3_node = graph.create_node(merge_image_type, "merge_over3");
     auto merge_over4_node = graph.create_node(merge_image_type, "merge_over4");
+    auto merge_over5_node = graph.create_node(merge_image_type, "merge_over5");
     auto write_add_node = graph.create_node(write_image_type, "write_add");
     auto write_over_node = graph.create_node(write_image_type, "write_over");
     auto write_mult_node = graph.create_node(write_image_type, "write_mult");
     auto write_concat_node = graph.create_node(write_image_type, "write_concat");
     auto write_empty_node = graph.create_node(write_image_type, "write_empty");
     auto write_beachball_node = graph.create_node(write_image_type, "write_beachball");
+    auto write_beachball2_node = graph.create_node(write_image_type, "write_beachball2");
 
     // Precompute index for enum.
     auto merge_mode_add = static_cast<int32_t>(ocg::MergeImageMode::kAdd);
@@ -97,6 +99,14 @@ int test_m(const bool debug_print, std::shared_ptr<ocg::Cache> cache) {
     graph.connect(read_fg3_node, merge_over4_node, 1); // B
     graph.connect(merge_over4_node, write_beachball_node, 0);
 
+    // Beachball - A Over B
+    graph.set_node_attr_i32(merge_over4_node, "mode", merge_mode_over);
+    graph.set_node_attr_str(write_beachball2_node, "file_path",
+                            "./tests/data/out/test_m_merge_beachball2_out.####.exr");
+    graph.connect(read_fg3_node, merge_over5_node, 0); // A
+    graph.connect(read_bg1_node, merge_over5_node, 1); // B
+    graph.connect(merge_over5_node, write_beachball2_node, 0);
+
     // Execute
     if (debug_print) {
         std::cout << "Graph as string (before):\n"
@@ -108,6 +118,7 @@ int test_m(const bool debug_print, std::shared_ptr<ocg::Cache> cache) {
     graph.execute(write_concat_node, frames, cache);
     graph.execute(write_empty_node, frames, cache);
     graph.execute(write_beachball_node, frames, cache);
+    graph.execute(write_beachball2_node, frames, cache);
 
     if (debug_print) {
         std::cout << "Graph as string (after):\n"
