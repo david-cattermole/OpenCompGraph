@@ -369,7 +369,7 @@ pub mod ffi {
         fn provides_parameter_derivatives(
             self: Pin<&mut OcgLdPluginBase>) -> bool;
 
-	    fn get_bounding_box_undistort(
+        fn get_bounding_box_undistort(
             self: Pin<&mut OcgLdPluginBase>,
             xa_in: f64, ya_in: f64,
             xb_in: f64, yb_in: f64,
@@ -377,7 +377,7 @@ pub mod ffi {
             xb_out: &mut f64, yb_out: &mut f64,
             nx: i32, ny: i32);
 
-	    fn get_bounding_box_distort(
+        fn get_bounding_box_distort(
             self: Pin<&mut OcgLdPluginBase>,
             xa_in: f64, ya_in: f64,
             xb_in: f64, yb_in: f64,
