@@ -2,11 +2,11 @@ use fastapprox::faster;
 use log::{debug, error, info, warn};
 use nalgebra as na;
 
-use crate::colorxform;
 use crate::cxxbridge::ffi::ocio_color_convert_inplace;
 use crate::cxxbridge::ffi::BBox2Di;
 use crate::cxxbridge::ffi::ImageShared;
 use crate::cxxbridge::ffi::Matrix4;
+use crate::math::colorxform;
 use crate::pixelblock::PixelBlock;
 
 pub fn color_convert_inplace(

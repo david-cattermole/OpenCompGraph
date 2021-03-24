@@ -6,8 +6,6 @@ use std::rc::Rc;
 
 use crate::attrblock::AttrBlock;
 use crate::cache::CacheImpl;
-use crate::colorutils;
-use crate::colorxform;
 use crate::cxxbridge::ffi::AttrState;
 use crate::cxxbridge::ffi::Matrix4;
 use crate::cxxbridge::ffi::NodeStatus;

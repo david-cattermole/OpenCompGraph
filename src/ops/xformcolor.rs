@@ -1,8 +1,8 @@
 use log::{debug, error, info, warn};
 use nalgebra as na;
 
-use crate::colorxform;
 use crate::cxxbridge::ffi::Matrix4;
+use crate::math::colorxform;
 use crate::pixelblock::PixelBlock;
 
 pub fn apply_color_matrix_inplace(pixels: &mut [f32], num_channels: i32, matrix: na::Matrix4<f32>) {
