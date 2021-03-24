@@ -1,4 +1,4 @@
-use crate::mathutils;
+use crate::math;
 use log::{debug, error, info, warn};
 
 #[derive(Debug)]
@@ -140,8 +140,8 @@ impl GeometryPlaneImpl {
             for col in 0..self.divisions_x {
                 let x = (col as f32) * square_size_x;
                 let y = (row as f32) * square_size_y;
-                let pos_x = mathutils::lerp(min_x, max_x, x) - self.center_x;
-                let pos_y = mathutils::lerp(min_y, max_y, y) - self.center_y;
+                let pos_x = math::interp::lerp(min_x, max_x, x) - self.center_x;
+                let pos_y = math::interp::lerp(min_y, max_y, y) - self.center_y;
                 buffer[index + 0] = pos_x;
                 buffer[index + 1] = pos_y;
                 buffer[index + 2] = 0.0;

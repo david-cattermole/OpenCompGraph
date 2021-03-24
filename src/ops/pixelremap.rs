@@ -2,7 +2,7 @@ use log::{debug, error, info, warn};
 
 use crate::cxxbridge::ffi::BBox2Df;
 use crate::cxxbridge::ffi::BBox2Di;
-use crate::mathutils;
+use crate::math;
 use crate::pixel::get_pixel_rgb;
 use crate::pixel::get_pixel_rgba;
 use crate::pixelblock::PixelBlock;
@@ -60,14 +60,14 @@ pub fn pixels_remap_coords(
             let x = pixel_coords[pixel_coord_index + 0];
             let y = pixel_coords[pixel_coord_index + 1];
 
-            let x = mathutils::remap(
+            let x = math::interp::remap(
                 display_window_f32.min_x,
                 display_window_f32.max_x,
                 src_data_window.min_x as f32,
                 (src_data_window.max_x - 1) as f32,
                 x,
             );
-            let y = mathutils::remap(
+            let y = math::interp::remap(
                 display_window_f32.min_y,
                 display_window_f32.max_y,
                 src_data_window.min_y as f32,

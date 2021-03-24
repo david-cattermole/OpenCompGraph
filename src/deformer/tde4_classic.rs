@@ -8,10 +8,10 @@ use crate::attrblock::AttrBlock;
 use crate::cxxbridge::ffi::AttrState;
 use crate::cxxbridge::ffi::BBox2Df;
 use crate::cxxbridge::ffi::ParameterType;
+use crate::deformer::ldpk_utils::LensDistortionPlugin;
 use crate::deformer::Deformer;
 use crate::hashutils::HashableF32;
-use crate::deformer::ldpk_utils::LensDistortionPlugin;
-use crate::mathutils;
+use crate::math::interp;
 
 // Note: All names end with a null terminator character because the
 // C++ plug-ins expect it.
@@ -179,10 +179,10 @@ impl Deformer for DeformerTde4Classic {
     // Forward == undistort
     fn apply_forward_bounding_box(&self, bbox: BBox2Df, image_window: BBox2Df) -> BBox2Df {
         let bbox_remap = BBox2Df::new(
-            mathutils::remap(image_window.min_x, image_window.max_x, 0.0, 1.0, bbox.min_x),
-            mathutils::remap(image_window.min_y, image_window.max_y, 0.0, 1.0, bbox.min_y),
-            mathutils::remap(image_window.min_x, image_window.max_x, 0.0, 1.0, bbox.max_x),
-            mathutils::remap(image_window.min_y, image_window.max_y, 0.0, 1.0, bbox.max_y),
+            interp::remap(image_window.min_x, image_window.max_x, 0.0, 1.0, bbox.min_x),
+            interp::remap(image_window.min_y, image_window.max_y, 0.0, 1.0, bbox.min_y),
+            interp::remap(image_window.min_x, image_window.max_x, 0.0, 1.0, bbox.max_x),
+            interp::remap(image_window.min_y, image_window.max_y, 0.0, 1.0, bbox.max_y),
         );
         let (min_x, min_y, max_x, max_y) = self.plugin.get_bounding_box_undistort(
             bbox_remap.min_x as f64,
@@ -194,28 +194,28 @@ impl Deformer for DeformerTde4Classic {
         // Slight extra margin, just in case our
         // getBoundingBox-Methods miss something.
         BBox2Df::new(
-            mathutils::remap(
+            interp::remap(
                 0.0,
                 1.0,
                 image_window.min_x,
                 image_window.max_x,
                 min_x as f32,
             ) - 2.0,
-            mathutils::remap(
+            interp::remap(
                 0.0,
                 1.0,
                 image_window.min_y,
                 image_window.max_y,
                 min_y as f32,
             ) - 2.0,
-            mathutils::remap(
+            interp::remap(
                 0.0,
                 1.0,
                 image_window.min_x,
                 image_window.max_x,
                 max_x as f32,
             ) + 2.0,
-            mathutils::remap(
+            interp::remap(
                 0.0,
                 1.0,
                 image_window.min_y,
@@ -228,10 +228,10 @@ impl Deformer for DeformerTde4Classic {
     /// Backward == (re)distort
     fn apply_backward_bounding_box(&self, bbox: BBox2Df, image_window: BBox2Df) -> BBox2Df {
         let bbox_remap = BBox2Df::new(
-            mathutils::remap(image_window.min_x, image_window.max_x, 0.0, 1.0, bbox.min_x),
-            mathutils::remap(image_window.min_y, image_window.max_y, 0.0, 1.0, bbox.min_y),
-            mathutils::remap(image_window.min_x, image_window.max_x, 0.0, 1.0, bbox.max_x),
-            mathutils::remap(image_window.min_y, image_window.max_y, 0.0, 1.0, bbox.max_y),
+            interp::remap(image_window.min_x, image_window.max_x, 0.0, 1.0, bbox.min_x),
+            interp::remap(image_window.min_y, image_window.max_y, 0.0, 1.0, bbox.min_y),
+            interp::remap(image_window.min_x, image_window.max_x, 0.0, 1.0, bbox.max_x),
+            interp::remap(image_window.min_y, image_window.max_y, 0.0, 1.0, bbox.max_y),
         );
         let (min_x, min_y, max_x, max_y) = self.plugin.get_bounding_box_distort(
             bbox_remap.min_x as f64,
@@ -244,28 +244,28 @@ impl Deformer for DeformerTde4Classic {
         // Slight extra margin, just in case our
         // getBoundingBox-Methods miss something.
         BBox2Df::new(
-            mathutils::remap(
+            interp::remap(
                 0.0,
                 1.0,
                 image_window.min_x,
                 image_window.max_x,
                 min_x as f32,
             ) - 2.0,
-            mathutils::remap(
+            interp::remap(
                 0.0,
                 1.0,
                 image_window.min_y,
                 image_window.max_y,
                 min_y as f32,
             ) - 2.0,
-            mathutils::remap(
+            interp::remap(
                 0.0,
                 1.0,
                 image_window.min_x,
                 image_window.max_x,
                 max_x as f32,
             ) + 2.0,
-            mathutils::remap(
+            interp::remap(
                 0.0,
                 1.0,
                 image_window.min_y,

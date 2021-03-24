@@ -5,7 +5,6 @@ use crate::cxxbridge::ffi::BBox2Di;
 use crate::cxxbridge::ffi::DeformerDirection;
 use crate::deformer::brownian;
 use crate::deformer::Deformer;
-use crate::mathutils;
 use crate::ops;
 use crate::pixel::get_pixel_rgb;
 use crate::pixel::get_pixel_rgba;

@@ -5,10 +5,10 @@ use std::hash::Hash;
 
 use crate::attrblock::AttrBlock;
 use crate::cxxbridge::ffi::BBox2Df;
-use crate::mathutils;
+use crate::math;
 
-pub mod ldpk_utils;
 pub mod brownian;
+pub mod ldpk_utils;
 pub mod tde4_classic;
 
 /// Helper trait to clone a deformer.
@@ -84,13 +84,13 @@ pub trait Deformer: AttrBlock + DeformerClone {
 
             let x = buffer[index + 0];
             let y = buffer[index + 1];
-            let x_remap = mathutils::remap(min_x, max_x, 0.0, 1.0, x);
-            let y_remap = mathutils::remap(min_y, max_y, 0.0, 1.0, y);
+            let x_remap = math::interp::remap(min_x, max_x, 0.0, 1.0, x);
+            let y_remap = math::interp::remap(min_y, max_y, 0.0, 1.0, y);
 
             let (xu, yu) = self.apply_forward(x_remap, y_remap);
 
-            let xu_remap = mathutils::remap(0.0, 1.0, min_x, max_x, xu);
-            let yu_remap = mathutils::remap(0.0, 1.0, min_y, max_y, yu);
+            let xu_remap = math::interp::remap(0.0, 1.0, min_x, max_x, xu);
+            let yu_remap = math::interp::remap(0.0, 1.0, min_y, max_y, yu);
             buffer[index + 0] = xu_remap;
             buffer[index + 1] = yu_remap;
         }
@@ -122,13 +122,13 @@ pub trait Deformer: AttrBlock + DeformerClone {
 
             let x = buffer[index + 0];
             let y = buffer[index + 1];
-            let x_remap = mathutils::remap(min_x, max_x, 0.0, 1.0, x);
-            let y_remap = mathutils::remap(min_y, max_y, 0.0, 1.0, y);
+            let x_remap = math::interp::remap(min_x, max_x, 0.0, 1.0, x);
+            let y_remap = math::interp::remap(min_y, max_y, 0.0, 1.0, y);
 
             let (xu, yu) = self.apply_backward(x_remap, y_remap);
 
-            let xu_remap = mathutils::remap(0.0, 1.0, min_x, max_x, xu);
-            let yu_remap = mathutils::remap(0.0, 1.0, min_y, max_y, yu);
+            let xu_remap = math::interp::remap(0.0, 1.0, min_x, max_x, xu);
+            let yu_remap = math::interp::remap(0.0, 1.0, min_y, max_y, yu);
             buffer[index + 0] = xu_remap;
             buffer[index + 1] = yu_remap;
         }
