@@ -282,7 +282,7 @@ pub mod ffi {
     // Color Spaces
     #[namespace = "open_comp_graph::internal"]
     unsafe extern "C++" {
-        include!("opencompgraph/colorspace.h");
+        include!("opencompgraph/internal/colorspace.h");
 
         fn ocio_print_color_spaces() -> bool;
 
@@ -298,7 +298,7 @@ pub mod ffi {
     // LDPK and the tde4_ld_plugin class.
     #[namespace = "open_comp_graph::internal"]
     unsafe extern "C++" {
-        include!("opencompgraph/ldpk_utils.h");
+        include!("opencompgraph/internal/ldpk_utils.h");
 
         type OcgLdPluginBase;
 
@@ -391,7 +391,7 @@ pub mod ffi {
     // Image IO
     #[namespace = "open_comp_graph::internal"]
     unsafe extern "C++" {
-        include!("opencompgraph/imageio.h");
+        include!("opencompgraph/internal/imageio.h");
 
         fn oiio_get_thread_count(num_threads: &mut i32) -> bool;
         fn oiio_set_thread_count(num_threads: i32) -> bool;
@@ -402,7 +402,7 @@ pub mod ffi {
     // System Memory Utilities
     #[namespace = "open_comp_graph::internal"]
     unsafe extern "C++" {
-        include!("opencompgraph/systemmemory.h");
+        include!("opencompgraph/internal/systemmemory.h");
         fn get_total_system_memory_as_bytes() -> usize;
     }
 
