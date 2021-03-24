@@ -16,6 +16,9 @@ use crate::pixelblock;
 fn get_pixel_rgba(image: &ImageShared, x: i32, y: i32) -> (f32, f32, f32, f32) {
     // TODO: Somehow this function seems to incorrectly wrap the X
     // (and Y?) pixel location.
+    //
+    // TODO: This function should support 'clamp' and 'black outside'
+    // features.
     let pixels = image.pixel_block.as_slice();
     let num_channels = image.pixel_block.num_channels();
     let image_x = x - image.data_window.min_x;
