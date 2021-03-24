@@ -9,8 +9,6 @@ use std::string::String;
 use crate::attrblock::AttrBlock;
 use crate::cache::CacheImpl;
 use crate::colorspace;
-use crate::colorutils;
-use crate::colorxform;
 use crate::cxxbridge::ffi::AttrState;
 use crate::cxxbridge::ffi::DeformerDirection;
 use crate::cxxbridge::ffi::ImageShared;
@@ -22,6 +20,7 @@ use crate::deformutils;
 use crate::imageio;
 use crate::node::traits::Operation;
 use crate::node::NodeImpl;
+use crate::ops;
 use crate::pathutils;
 use crate::pixelblock::PixelBlock;
 use crate::stream::StreamDataImpl;
@@ -137,7 +136,7 @@ impl Operation for WriteImageOperation {
                 {
                     let color_matrix = copy.color_matrix().to_na_matrix();
                     let mut pixels = &mut pixel_block.as_slice_mut();
-                    colorutils::apply_color_matrix_inplace(pixels, num_channels, color_matrix);
+                    ops::xformcolor::apply_color_matrix_inplace(pixels, num_channels, color_matrix);
                 }
 
                 let file_path = attr_block.get_attr_str("file_path");
