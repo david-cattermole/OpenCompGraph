@@ -151,10 +151,10 @@ impl GeometryPlaneImpl {
     /// Vertex Buffer Positions
     pub fn fill_buffer_vertex_positions(&self, buffer: &mut [f32]) -> bool {
         let mut index = 0;
-        let mut max_x = self.size_x / 2.0;
-        let mut min_x = -max_x;
-        let mut max_y = self.size_y / 2.0;
-        let mut min_y = -max_y;
+        let max_x = self.size_x / 2.0;
+        let min_x = -max_x;
+        let max_y = self.size_y / 2.0;
+        let min_y = -max_y;
         let square_size_x: f32 = 1.0 / ((self.divisions_x - 1) as f32);
         let square_size_y: f32 = 1.0 / ((self.divisions_y - 1) as f32);
         for row in 0..self.divisions_y {

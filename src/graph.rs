@@ -145,7 +145,7 @@ impl GraphImpl {
     }
 
     pub fn set_node_attr_str(&mut self, node_id: Identifier, name: &str, value: &str) {
-        let mut node_box = match self.find_node_index_from_id(node_id) {
+        let node_box = match self.find_node_index_from_id(node_id) {
             Some(value) => &mut self.nodes[value],
             None => {
                 warn!("Node id not found: id={}", node_id);
@@ -170,7 +170,7 @@ impl GraphImpl {
     }
 
     pub fn set_node_attr_i32(&mut self, node_id: Identifier, name: &str, value: i32) {
-        let mut node_box = match self.find_node_index_from_id(node_id) {
+        let node_box = match self.find_node_index_from_id(node_id) {
             Some(value) => &mut self.nodes[value],
             None => {
                 warn!("Node id not found: id={}", node_id);
@@ -195,7 +195,7 @@ impl GraphImpl {
     }
 
     pub fn set_node_attr_f32(&mut self, node_id: Identifier, name: &str, value: f32) {
-        let mut node_box = match self.find_node_index_from_id(node_id) {
+        let node_box = match self.find_node_index_from_id(node_id) {
             Some(value) => &mut self.nodes[value],
             None => {
                 warn!("Node id not found: id={}", node_id);

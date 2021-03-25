@@ -102,14 +102,14 @@ fn do_image_process(
     );
 
     // Copy input data
-    let mut copy_b = &mut (**input_b).clone();
+    let copy_b = &mut (**input_b).clone();
     let num_channels = copy_b.pixel_num_channels();
     let width = copy_b.pixel_width();
     let height = copy_b.pixel_height();
     let display_window = copy_b.display_window();
     let transform_matrix = copy_b.transform_matrix().to_na_matrix();
     let src_data_window = copy_b.data_window();
-    let mut data_window = copy_b.data_window();
+    let data_window = copy_b.data_window();
     let mut pixel_block_a = input_a.clone_pixel_block();
     let mut pixel_block_b = copy_b.clone_pixel_block();
 

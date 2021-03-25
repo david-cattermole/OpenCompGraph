@@ -103,7 +103,7 @@ impl Operation for WriteImageOperation {
                 let src_pixel_block = input.pixel_block();
 
                 // Copy input data
-                let mut copy = &mut (**input).clone();
+                let copy = &mut (**input).clone();
                 let num_channels = copy.pixel_num_channels();
                 let width = copy.pixel_width();
                 let height = copy.pixel_height();
@@ -153,7 +153,7 @@ impl Operation for WriteImageOperation {
                 // Apply Color Matrix
                 {
                     let color_matrix = copy.color_matrix().to_na_matrix();
-                    let mut pixels = &mut pixel_block.as_slice_mut();
+                    let pixels = &mut pixel_block.as_slice_mut();
                     ops::xformcolor::apply_color_matrix_inplace(pixels, num_channels, color_matrix);
                 }
 

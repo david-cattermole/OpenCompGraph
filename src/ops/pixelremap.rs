@@ -52,7 +52,7 @@ pub fn pixels_remap_coords(
         error!("Destination pixel count and pixel coordinates do not match.");
         return;
     }
-    let mut dst_pixels = dst_pixel_block.as_slice_mut();
+    let dst_pixels = dst_pixel_block.as_slice_mut();
     warn!("dst_width = {}", dst_width);
     warn!("dst_height = {}", dst_height);
     warn!("dst_num_channels = {}", dst_num_channels);

@@ -112,7 +112,7 @@ pub fn merge(
     debug!("Image OUT: Display Window {:?}", image_out.display_window);
 
     let stride = image_out.pixel_block.num_channels() as usize;
-    let mut out_pixels = image_out.pixel_block.as_slice_mut();
+    let out_pixels = image_out.pixel_block.as_slice_mut();
     let mut index = 0;
     for row in out_data_window.min_y..out_data_window.max_y {
         for col in out_data_window.min_x..out_data_window.max_x {

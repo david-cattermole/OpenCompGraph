@@ -133,7 +133,7 @@ impl CacheImpl {
             return;
         }
 
-        let mut value_bytes = value.size_bytes();
+        let value_bytes = value.size_bytes();
 
         // Make space if necessary
         let expected_bytes = self.used_bytes + value_bytes;

@@ -155,13 +155,13 @@ pub fn apply_deformers_to_pixels(
         // to source.
         DeformerDirection::Forward => {
             for deformer in &enabled_deformers {
-                let mut buffer = pixel_coords.as_mut_slice();
+                let buffer = pixel_coords.as_mut_slice();
                 deformer.apply_backward_slice_in_place(buffer, display_window_f32, stride);
             }
         }
         DeformerDirection::Backward => {
             for deformer in &enabled_deformers {
-                let mut buffer = pixel_coords.as_mut_slice();
+                let buffer = pixel_coords.as_mut_slice();
                 deformer.apply_forward_slice_in_place(buffer, display_window_f32, stride);
             }
         }
