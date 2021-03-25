@@ -19,7 +19,6 @@
  *
  */
 
-#![allow(dead_code)]
 pub mod attrblock;
 pub mod bbox;
 pub mod cache;

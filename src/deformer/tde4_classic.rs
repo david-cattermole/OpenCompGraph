@@ -42,7 +42,7 @@ static PARM_NAME_FILM_BACK_HEIGHT: &str = "tde4_filmback_height_cm\0";
 static PARM_NAME_PIXEL_ASPECT: &str = "tde4_pixel_aspect\0";
 static PARM_NAME_LENS_CENTER_OFFSET_X: &str = "tde4_lens_center_offset_x_cm\0";
 static PARM_NAME_LENS_CENTER_OFFSET_Y: &str = "tde4_lens_center_offset_y_cm\0";
-static PARM_NAME_FOCUS_DISTANCE: &str = "tde4_custom_focus_distance_cm\0";
+// static PARM_NAME_FOCUS_DISTANCE: &str = "tde4_custom_focus_distance_cm\0";
 // Actual distortion parameter names.
 static PARM_NAME_DISTORTION: &str = "Distortion\0";
 static PARM_NAME_ANAMORPHIC_SQUEEZE: &str = "Anamorphic Squeeze\0";

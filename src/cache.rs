@@ -21,8 +21,6 @@
 
 use linked_hash_map::LinkedHashMap;
 use log::{debug, error};
-use rustc_hash::FxHasher;
-use std::hash::BuildHasherDefault;
 use std::rc::Rc;
 
 use crate::cxxbridge::ffi::BBox2Di;
@@ -42,7 +40,6 @@ impl CachedImage {
     }
 }
 
-type LruHashMap<K, V> = LinkedHashMap<K, V, BuildHasherDefault<FxHasher>>;
 type CacheKey = u64;
 type CacheValue = CachedImage;
 
