@@ -73,7 +73,6 @@ impl CacheImpl {
         let lru_hash_map = LinkedHashMap::new();
 
         let used_bytes = 0;
-        let capacity_bytes = 0;
         let hits = 0;
         let misses = 0;
         let inserts = 0;
