@@ -71,9 +71,8 @@ pub fn apply_deformers_to_pixels(
     src_pixel_block: &PixelBlock,
     src_data_window: BBox2Di,
     dst_pixel_block: &mut PixelBlock,
-    dst_data_window: &mut BBox2Di,
+    _dst_data_window: &mut BBox2Di,
 ) {
-    let display_window_f32 = BBox2Df::from(display_window);
 
     if deformers.len() == 0 {
         // TODO: Copy src to dst.

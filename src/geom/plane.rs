@@ -220,7 +220,7 @@ impl GeometryPlaneImpl {
         // Left line.
         let left_column = 0;
         for row in 0..(self.divisions_y - 1) {
-            let (top_left, bottom_left, top_right, bottom_right) =
+            let (top_left, bottom_left, _top_right, _bottom_right) =
                 self.get_indexes(row, left_column);
             buffer[index + 0] = top_left;
             buffer[index + 1] = bottom_left;
@@ -230,7 +230,7 @@ impl GeometryPlaneImpl {
         // Right line.
         let right_column = self.divisions_x - 1;
         for row in 0..(self.divisions_y - 1) {
-            let (top_left, bottom_left, top_right, bottom_right) =
+            let (top_left, bottom_left, _top_right, _bottom_right) =
                 self.get_indexes(row, right_column);
             buffer[index + 0] = top_left;
             buffer[index + 1] = bottom_left;
@@ -240,7 +240,7 @@ impl GeometryPlaneImpl {
         // Top line.
         let top_row = self.divisions_y - 1;
         for col in 0..(self.divisions_x - 1) {
-            let (top_left, bottom_left, top_right, bottom_right) = self.get_indexes(top_row, col);
+            let (top_left, _bottom_left, top_right, _bottom_right) = self.get_indexes(top_row, col);
             buffer[index + 0] = top_left;
             buffer[index + 1] = top_right;
             index += 2;
@@ -249,7 +249,7 @@ impl GeometryPlaneImpl {
         // Bottom line.
         let bottom_row = 0;
         for col in 0..(self.divisions_x - 1) {
-            let (top_left, bottom_left, top_right, bottom_right) =
+            let (top_left, _bottom_left, top_right, _bottom_right) =
                 self.get_indexes(bottom_row, col);
             buffer[index + 0] = top_left;
             buffer[index + 1] = top_right;

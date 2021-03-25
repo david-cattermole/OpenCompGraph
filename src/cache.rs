@@ -214,7 +214,7 @@ impl CacheImpl {
         // always decrease after each call.
         //
         // Identify least recently used key, and remove the key.
-        if let Some((key, value)) = self.lru_hash_map.pop_front() {
+        if let Some((_key, value)) = self.lru_hash_map.pop_front() {
             let value_bytes = value.size_bytes();
             // There should not be any overflow problems with this
             // subtraction since we add and subtract exactly goes

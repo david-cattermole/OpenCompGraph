@@ -52,7 +52,7 @@ pub fn export_mesh(positions: &[f32], uvs: &[f32], indices: &[u32], file_path: &
     let tri_count = indices.len() / 3;
     debug!("tri_count: {}", tri_count);
     let mut tri_index = 0;
-    for i in 0..tri_count {
+    for _i in 0..tri_count {
         // Note: Wavefront OBJ is a one-based format, so we must add 1
         // to the face index number.
         let x = 1 + indices[tri_index + 0];

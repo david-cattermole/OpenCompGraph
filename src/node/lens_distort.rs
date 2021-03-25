@@ -96,7 +96,7 @@ impl Operation for LensDistortOperation {
         attr_block: &Box<dyn AttrBlock>,
         inputs: &Vec<Rc<StreamDataImpl>>,
         output: &mut Rc<StreamDataImpl>,
-        cache: &mut Box<CacheImpl>,
+        _cache: &mut Box<CacheImpl>,
     ) -> NodeStatus {
         debug!("LensDistortOperation.compute()");
         // debug!("AttrBlock: {:?}", attr_block);
@@ -134,6 +134,7 @@ impl Operation for LensDistortOperation {
 
 impl AttrBlock for LensDistortAttrs {
     fn attr_hash(&self, frame: i32, state: &mut DefaultHasher) {
+        // TODO: Should we use "frame" to hash the value?
         self.hash(state)
     }
 
@@ -148,11 +149,11 @@ impl AttrBlock for LensDistortAttrs {
         }
     }
 
-    fn get_attr_str(&self, name: &str) -> &str {
+    fn get_attr_str(&self, _name: &str) -> &str {
         ""
     }
 
-    fn set_attr_str(&mut self, name: &str, value: &str) {
+    fn set_attr_str(&mut self, _name: &str, _value: &str) {
         ()
     }
 

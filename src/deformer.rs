@@ -76,11 +76,13 @@ pub trait Deformer: AttrBlock + DeformerClone {
 
     fn apply_backward(&self, x: f32, y: f32) -> (f32, f32);
 
-    fn apply_forward_bounding_box(&self, bbox: BBox2Df, image_window: BBox2Df) -> BBox2Df {
+    /// Default implementation does not change the input bbox.
+    fn apply_forward_bounding_box(&self, bbox: BBox2Df, _image_window: BBox2Df) -> BBox2Df {
         bbox
     }
 
-    fn apply_backward_bounding_box(&self, bbox: BBox2Df, image_window: BBox2Df) -> BBox2Df {
+    /// Default implementation does not change the input bbox.
+    fn apply_backward_bounding_box(&self, bbox: BBox2Df, _image_window: BBox2Df) -> BBox2Df {
         bbox
     }
 

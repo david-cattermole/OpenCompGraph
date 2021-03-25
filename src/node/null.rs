@@ -65,15 +65,15 @@ impl NullAttrs {
 impl Operation for NullOperation {
     fn compute(
         &mut self,
-        frame: i32,
-        node_type_id: u8,
-        attr_block: &Box<dyn AttrBlock>,
+        _frame: i32,
+        _node_type_id: u8,
+        _attr_block: &Box<dyn AttrBlock>,
         inputs: &Vec<Rc<StreamDataImpl>>,
         output: &mut Rc<StreamDataImpl>,
-        cache: &mut Box<CacheImpl>,
+        _cache: &mut Box<CacheImpl>,
     ) -> NodeStatus {
         debug!("NullOperation.compute()");
-        // debug!("AttrBlock: {:?}", attr_block);
+        // debug!("AttrBlock: {:?}", _attr_block);
         // debug!("Inputs: {:?}", inputs);
         // debug!("Output: {:?}", output);
         match inputs.len() {
@@ -88,34 +88,35 @@ impl Operation for NullOperation {
 
 impl AttrBlock for NullAttrs {
     fn attr_hash(&self, frame: i32, state: &mut DefaultHasher) {
+        // TODO: Should we use "frame" to hash the value?
         self.hash(state)
     }
 
-    fn attr_exists(&self, name: &str) -> AttrState {
+    fn attr_exists(&self, _name: &str) -> AttrState {
         AttrState::Missing
     }
 
-    fn get_attr_str(&self, name: &str) -> &str {
+    fn get_attr_str(&self, _name: &str) -> &str {
         ""
     }
 
-    fn set_attr_str(&mut self, name: &str, value: &str) {
+    fn set_attr_str(&mut self, _name: &str, _value: &str) {
         ()
     }
 
-    fn get_attr_i32(&self, name: &str) -> i32 {
+    fn get_attr_i32(&self, _name: &str) -> i32 {
         0
     }
 
-    fn set_attr_i32(&mut self, name: &str, value: i32) {
+    fn set_attr_i32(&mut self, _name: &str, _value: i32) {
         ()
     }
 
-    fn get_attr_f32(&self, name: &str) -> f32 {
+    fn get_attr_f32(&self, _name: &str) -> f32 {
         0.0
     }
 
-    fn set_attr_f32(&mut self, name: &str, value: f32) {
+    fn set_attr_f32(&mut self, _name: &str, _value: f32) {
         ()
     }
 }

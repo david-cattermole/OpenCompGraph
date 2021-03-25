@@ -184,6 +184,7 @@ impl Operation for ReadImageOperation {
 
 impl AttrBlock for ReadImageAttrs {
     fn attr_hash(&self, frame: i32, state: &mut DefaultHasher) {
+        // TODO: Should we use "frame" to hash the value?
         if self.enable == 1 {
             self.enable.hash(state);
             let path_expanded = pathutils::expand_string(self.file_path.to_string(), frame);
@@ -227,11 +228,11 @@ impl AttrBlock for ReadImageAttrs {
         };
     }
 
-    fn get_attr_f32(&self, name: &str) -> f32 {
+    fn get_attr_f32(&self, _name: &str) -> f32 {
         0.0
     }
 
-    fn set_attr_f32(&mut self, name: &str, value: f32) {
+    fn set_attr_f32(&mut self, _name: &str, _value: f32) {
         ()
     }
 }

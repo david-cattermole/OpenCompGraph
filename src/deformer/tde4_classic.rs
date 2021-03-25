@@ -328,6 +328,7 @@ impl Deformer for DeformerTde4Classic {
 
 impl AttrBlock for DeformerTde4Classic {
     fn attr_hash(&self, frame: i32, state: &mut DefaultHasher) {
+        // TODO: Should we use "frame" to hash the value?
         self.hash(state)
     }
 
@@ -351,11 +352,11 @@ impl AttrBlock for DeformerTde4Classic {
         }
     }
 
-    fn get_attr_str(&self, name: &str) -> &str {
+    fn get_attr_str(&self, _name: &str) -> &str {
         ""
     }
 
-    fn set_attr_str(&mut self, name: &str, value: &str) {
+    fn set_attr_str(&mut self, _name: &str, _value: &str) {
         ()
     }
 

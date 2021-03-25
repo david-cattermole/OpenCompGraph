@@ -45,7 +45,7 @@ pub fn read_image(path: &String) -> ImageShared {
                 display_window: BBox2Di::new(0, 0, 0, 0),
                 data_window: BBox2Di::new(0, 0, 0, 0),
             };
-            let ok = oiio_read_image(&path, &mut image);
+            oiio_read_image(&path, &mut image);
             image
         }
         false => {
@@ -84,14 +84,14 @@ pub fn write_image(image: &ImageShared, path: &String) -> bool {
             if num_channels == 3 {
                 let img = create_image_buffer_rgb_u8(&image);
                 ok = match img.save(path) {
-                    Ok(value) => true,
+                    Ok(_value) => true,
                     Err(_) => false,
                 };
             }
             if num_channels == 4 {
                 let img = create_image_buffer_rgba_u8(&image);
                 ok = match img.save(path) {
-                    Ok(value) => true,
+                    Ok(_value) => true,
                     Err(_) => false,
                 };
             }

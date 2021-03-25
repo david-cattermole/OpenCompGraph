@@ -81,11 +81,11 @@ impl Operation for WriteImageOperation {
     fn compute(
         &mut self,
         frame: i32,
-        node_type_id: u8,
+        _node_type_id: u8,
         attr_block: &Box<dyn AttrBlock>,
         inputs: &Vec<Rc<StreamDataImpl>>,
         output: &mut Rc<StreamDataImpl>,
-        cache: &mut Box<CacheImpl>,
+        _cache: &mut Box<CacheImpl>,
     ) -> NodeStatus {
         debug!("WriteImageOperation.compute()");
         // debug!("AttrBlock: {:?}", attr_block);
@@ -100,13 +100,9 @@ impl Operation for WriteImageOperation {
             0 => NodeStatus::Error,
             _ => {
                 let input = &inputs[0].clone();
-                let src_pixel_block = input.pixel_block();
 
                 // Copy input data
                 let copy = &mut (**input).clone();
-                let num_channels = copy.pixel_num_channels();
-                let width = copy.pixel_width();
-                let height = copy.pixel_height();
                 let display_window = copy.display_window();
                 let transform_matrix = copy.transform_matrix().to_na_matrix();
                 let src_data_window = copy.data_window();
@@ -123,7 +119,7 @@ impl Operation for WriteImageOperation {
                 let width = pixel_block.width();
                 let height = pixel_block.height();
                 let num_channels = pixel_block.num_channels();
-                let ok = colorspace::color_convert_inplace(
+                colorspace::color_convert_inplace(
                     &mut pixel_block.as_slice_mut(),
                     width,
                     height,
@@ -180,6 +176,7 @@ impl Operation for WriteImageOperation {
 
 impl AttrBlock for WriteImageAttrs {
     fn attr_hash(&self, frame: i32, state: &mut DefaultHasher) {
+        // TODO: Should we use "frame" to hash the value?
         self.hash(state)
     }
 
@@ -219,11 +216,11 @@ impl AttrBlock for WriteImageAttrs {
         };
     }
 
-    fn get_attr_f32(&self, name: &str) -> f32 {
+    fn get_attr_f32(&self, _name: &str) -> f32 {
         0.0
     }
 
-    fn set_attr_f32(&mut self, name: &str, value: f32) {
+    fn set_attr_f32(&mut self, _name: &str, _value: f32) {
         ()
     }
 }

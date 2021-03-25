@@ -114,7 +114,7 @@ impl GraphImpl {
         // TODO: Zero out the now empty fields.
         let node_index = petgraph::graph::NodeIndex::new(node_idx);
         match self.graph.remove_node(node_index) {
-            Some(value) => {
+            Some(_value) => {
                 self.state = GraphState::Dirty;
                 true
             }
@@ -234,7 +234,7 @@ impl GraphImpl {
     pub fn node_exists(&self, node_id: u64) -> bool {
         let node_idx = self.find_node_index_from_id(node_id);
         let found = match node_idx {
-            Some(value) => true,
+            Some(_value) => true,
             None => false,
         };
         debug!("Node with hash {} exists={}", node_id, found);
@@ -301,7 +301,7 @@ impl GraphImpl {
         let start_index = NodeIdx::new(start_node_idx);
         let mut walker = UpstreamEvalSearch::new(&self.graph, start_index);
 
-        while let Some((node, depth)) = walker.next(&self.graph) {
+        while let Some((node, _depth)) = walker.next(&self.graph) {
             node_indexes.push(node);
         }
         node_indexes

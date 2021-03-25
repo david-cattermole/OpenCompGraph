@@ -27,7 +27,6 @@ use std::fmt;
 use std::hash::{Hash, Hasher};
 
 use crate::colorutils::convert_srgb_to_linear;
-use crate::cxxbridge::ffi::BBox2Di;
 use crate::cxxbridge::ffi::PixelDataType;
 use crate::data::COLOR_BARS;
 use crate::data::COLOR_BARS_HEIGHT;
@@ -51,7 +50,6 @@ fn size_aligned_to<T>(size_bytes: usize) -> usize {
 
 #[inline]
 pub fn stride_num_channels(num_channels: i32, pixel_data_type: PixelDataType) -> usize {
-    // num_channels as usize
     match pixel_data_type {
         // Force all 8-bit image pixels to be 4-byte aligned. Add
         // an extra channel for RGB images.
@@ -249,16 +247,7 @@ impl PixelBlock {
             return;
         } else {
             let old_pixel_data_type = self.pixel_data_type;
-            let old_size_bytes = self.size_bytes();
-            let size = self.size();
-
             let new_pixel_data_type = PixelDataType::Float32;
-            let new_size_bytes = pixel_block_size_bytes(
-                self.width,
-                self.height,
-                self.num_channels,
-                new_pixel_data_type,
-            );
 
             let pixel_slice = self.pixels.as_slice();
             let new_pixels: Vec<f32> = match old_pixel_data_type {
@@ -423,8 +412,6 @@ pub fn from_dynamic_image(img: image::DynamicImage) -> PixelBlock {
     }
 
     let pixel_data_type = PixelDataType::Float32;
-    let data_window = BBox2Di::new(0, 0, width, height);
-    let display_window = BBox2Di::new(0, 0, width, height);
     PixelBlock {
         width,
         height,

@@ -36,7 +36,7 @@ pub fn pixels_remap_coords(
     src_pixel_block: &PixelBlock,
     src_data_window: BBox2Di,
     dst_pixel_block: &mut PixelBlock,
-    dst_data_window: &mut BBox2Di,
+    _dst_data_window: &mut BBox2Di,
 ) {
     let display_window_f32 = BBox2Df::from(display_window);
     warn!("display_window = {:?}", display_window);

@@ -103,13 +103,7 @@ fn do_image_process(
 
     // Copy input data
     let copy_b = &mut (**input_b).clone();
-    let num_channels = copy_b.pixel_num_channels();
-    let width = copy_b.pixel_width();
-    let height = copy_b.pixel_height();
-    let display_window = copy_b.display_window();
     let transform_matrix = copy_b.transform_matrix().to_na_matrix();
-    let src_data_window = copy_b.data_window();
-    let data_window = copy_b.data_window();
     let mut pixel_block_a = input_a.clone_pixel_block();
     let mut pixel_block_b = copy_b.clone_pixel_block();
 
@@ -243,6 +237,7 @@ impl Operation for MergeImageOperation {
 
 impl AttrBlock for MergeImageAttrs {
     fn attr_hash(&self, frame: i32, state: &mut DefaultHasher) {
+        // TODO: Should we use "frame" to hash the value?
         if self.enable == 1 {
             self.enable.hash(state);
             self.mode.hash(state);
@@ -259,11 +254,11 @@ impl AttrBlock for MergeImageAttrs {
         }
     }
 
-    fn get_attr_str(&self, name: &str) -> &str {
+    fn get_attr_str(&self, _name: &str) -> &str {
         ""
     }
 
-    fn set_attr_str(&mut self, name: &str, value: &str) {
+    fn set_attr_str(&mut self, _name: &str, _value: &str) {
         ()
     }
 

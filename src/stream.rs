@@ -165,7 +165,7 @@ impl StreamDataImpl {
         // when the "old" Rc goes out of scope it will be cleaned up
         // if there are no more references to the underlying
         // allocation.
-        let old_data = Rc::clone(&self.pixel_block);
+        let _old_data = Rc::clone(&self.pixel_block);
         self.pixel_block = pixel_block.clone();
     }
 
