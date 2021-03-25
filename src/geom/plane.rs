@@ -20,7 +20,7 @@
  */
 
 use crate::math;
-use log::{debug, error, info, warn};
+use log::debug;
 
 #[derive(Debug)]
 pub struct GeometryPlaneImpl {

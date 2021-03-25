@@ -21,9 +21,6 @@
 
 use nalgebra as na;
 
-use crate::cxxbridge::ffi::Matrix4;
-use crate::matrix;
-
 fn create_translate_2d(translate_x: f32, translate_y: f32) -> na::Matrix4<f32> {
     na::Matrix4::<f32>::new(
         1.0,

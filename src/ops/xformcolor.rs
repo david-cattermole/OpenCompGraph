@@ -19,12 +19,7 @@
  *
  */
 
-use log::{debug, error, info, warn};
 use nalgebra as na;
-
-use crate::cxxbridge::ffi::Matrix4;
-use crate::math::colorxform;
-use crate::pixelblock::PixelBlock;
 
 pub fn apply_color_matrix_inplace(pixels: &mut [f32], num_channels: i32, matrix: na::Matrix4<f32>) {
     let pixel_count = pixels.len() / (num_channels as usize);

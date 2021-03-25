@@ -20,13 +20,12 @@
  */
 
 use cxx::UniquePtr;
-use log::{debug, error, info, warn};
+use log::{debug, warn};
 use std::cell::RefCell;
 use std::fmt;
 use std::os::raw::c_char;
 
 use crate::cxxbridge::ffi::ldpk_new_plugin;
-use crate::cxxbridge::ffi::AttrState;
 use crate::cxxbridge::ffi::OcgLdPluginBase;
 use crate::cxxbridge::ffi::ParameterType;
 

@@ -19,7 +19,6 @@
  *
  */
 
-use log::{debug, error, info, warn};
 use num_traits::Float;
 use num_traits::NumCast;
 

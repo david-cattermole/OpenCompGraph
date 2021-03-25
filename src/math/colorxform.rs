@@ -21,9 +21,6 @@
 
 use nalgebra as na;
 
-use crate::cxxbridge::ffi::Matrix4;
-use crate::matrix;
-
 /// Multiply RGB colors, as matrix.
 pub fn apply_scale_rgba(
     input_matrix: na::Matrix4<f32>,

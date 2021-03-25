@@ -20,7 +20,6 @@
  */
 
 use fastapprox::faster;
-use log::{debug, error, info, warn};
 
 /// https://www.excamera.com/sphinx/article-srgb.html
 pub fn convert_srgb_to_linear(x: f32) -> f32 {

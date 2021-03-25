@@ -19,8 +19,7 @@
  *
  */
 
-use image;
-use log::{debug, error, info, warn};
+use log::debug;
 use std::rc::Rc;
 
 use crate::cxxbridge::ffi::BBox2Df;

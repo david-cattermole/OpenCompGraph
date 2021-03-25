@@ -19,7 +19,7 @@
  *
  */
 
-use log::{debug, error, info, warn};
+use log::debug;
 use std::collections::hash_map::DefaultHasher;
 use std::hash;
 use std::hash::Hash;

@@ -19,7 +19,7 @@
  *
  */
 
-use log::{debug, error, info, warn};
+use log::debug;
 use std::collections::hash_map::DefaultHasher;
 use std::hash;
 use std::hash::Hash;
@@ -31,7 +31,6 @@ use crate::cxxbridge::ffi::AttrState;
 use crate::cxxbridge::ffi::Matrix4;
 use crate::cxxbridge::ffi::NodeStatus;
 use crate::cxxbridge::ffi::NodeType;
-use crate::data::HashValue;
 use crate::data::Identifier;
 use crate::hashutils::HashableF32;
 use crate::math::xform;

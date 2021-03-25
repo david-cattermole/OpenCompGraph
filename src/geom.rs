@@ -19,7 +19,7 @@
  *
  */
 
-use log::{debug, error, info, warn};
+use log::debug;
 pub mod plane;
 
 /// Export arrays of data as an .obj file - for debug.

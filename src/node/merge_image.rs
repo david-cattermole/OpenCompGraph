@@ -19,36 +19,27 @@
  *
  */
 
-use log::{debug, error, info, warn};
-use rustc_hash::FxHasher;
+use log::debug;
 use std::collections::hash_map::DefaultHasher;
-use std::hash;
 use std::hash::Hash;
-use std::path::Path;
 use std::rc::Rc;
-use std::string::String;
 
 use crate::attrblock::AttrBlock;
 use crate::cache::CacheImpl;
 use crate::cache::CachedImage;
 use crate::cxxbridge::ffi::AttrState;
-use crate::cxxbridge::ffi::BBox2Df;
 use crate::cxxbridge::ffi::BBox2Di;
 use crate::cxxbridge::ffi::ImageShared;
 use crate::cxxbridge::ffi::MergeImageMode;
 use crate::cxxbridge::ffi::NodeStatus;
 use crate::cxxbridge::ffi::NodeType;
-use crate::cxxbridge::ffi::PixelDataType;
-use crate::data::HashValue;
 use crate::data::Identifier;
 use crate::hashutils::HashableF32;
 use crate::node::traits::Operation;
 use crate::node::NodeImpl;
 use crate::ops::imagemerge;
-use crate::pathutils;
 use crate::pixelblock::PixelBlock;
 use crate::stream::StreamDataImpl;
-use crate::stream::StreamDataImplRc;
 
 pub fn new(id: Identifier) -> NodeImpl {
     NodeImpl {

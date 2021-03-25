@@ -19,7 +19,7 @@
  *
  */
 
-use log::{debug, error, info, warn};
+use log::{debug, warn};
 use std::rc::Rc;
 
 use crate::attrblock::AttrBlock;
@@ -27,15 +27,8 @@ use crate::cache::CacheImpl;
 use crate::cxxbridge::ffi::AttrState;
 use crate::cxxbridge::ffi::NodeStatus;
 use crate::cxxbridge::ffi::NodeType;
-use crate::cxxbridge::ffi::StreamDataState;
-use crate::data::EdgeIdx;
-use crate::data::EdgeWeight;
-use crate::data::GraphIdx;
 use crate::data::HashValue;
 use crate::data::Identifier;
-use crate::data::NodeIdx;
-use crate::data::NodeWeight;
-use crate::pixelblock::PixelBlock;
 use crate::stream::StreamDataImpl;
 
 pub mod grade;

@@ -24,7 +24,7 @@
 /// OCG configuration has multiple levels with flexibility for a
 /// pipeline in mind.
 ///
-use log::{debug, error, info, warn};
+use log::debug;
 use serde::Deserialize;
 use std::default::Default;
 use std::env;

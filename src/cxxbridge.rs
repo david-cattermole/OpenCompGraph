@@ -19,26 +19,20 @@
  *
  */
 
-use log::{debug, error, info, warn};
-use std::os::raw::c_char;
-use std::rc::Rc;
+use log::debug;
 
 use crate::cache::create_cache_box_with_capacity;
 use crate::cache::CacheImpl;
 use crate::config::get_config;
 use crate::config::ConfigImpl;
-use crate::data::HashValue;
-use crate::data::Identifier;
 use crate::geom::export_mesh;
 use crate::geom::plane::create_geometry_plane_box;
 use crate::geom::plane::GeometryPlaneImpl;
 use crate::graph::create_graph_box;
 use crate::graph::GraphImpl;
-use crate::hashutils::calculate_hash;
 use crate::hashutils::generate_id_from_name;
 use crate::hashutils::generate_random_id;
 use crate::logger::initialize;
-use crate::node::create_node;
 use crate::node::create_node_box_with_id;
 use crate::node::NodeImpl;
 use crate::pixelblock::channel_size_bytes;

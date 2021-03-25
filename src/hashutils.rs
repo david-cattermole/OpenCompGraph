@@ -19,16 +19,11 @@
  *
  */
 
-use image;
-use petgraph;
-use std::fmt;
-use std::hash::{Hash, Hasher};
-use std::mem;
-
 use rand::rngs::SmallRng;
 use rand::{Rng, SeedableRng};
 use rustc_hash::FxHasher;
-use std::collections::hash_map::DefaultHasher;
+use std::hash::{Hash, Hasher};
+use std::mem;
 
 use crate::data::HashValue;
 

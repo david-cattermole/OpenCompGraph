@@ -19,16 +19,13 @@
  *
  */
 
-use log::{debug, error, info, warn};
+use log::warn;
 
 use crate::cxxbridge::ffi::BBox2Df;
 use crate::cxxbridge::ffi::BBox2Di;
 use crate::cxxbridge::ffi::DeformerDirection;
-use crate::deformer::brownian;
 use crate::deformer::Deformer;
 use crate::ops;
-use crate::pixel::get_pixel_rgb;
-use crate::pixel::get_pixel_rgba;
 use crate::pixelblock::PixelBlock;
 
 pub fn apply_deformers_to_positions(

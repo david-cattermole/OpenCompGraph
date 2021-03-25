@@ -19,10 +19,8 @@
  *
  */
 
-use log::{debug, error, info, warn};
-use rustc_hash::FxHasher;
+use log::debug;
 use std::collections::hash_map::DefaultHasher;
-use std::hash;
 use std::hash::Hash;
 use std::path::Path;
 use std::rc::Rc;
@@ -32,19 +30,14 @@ use crate::attrblock::AttrBlock;
 use crate::cache::CacheImpl;
 use crate::cache::CachedImage;
 use crate::cxxbridge::ffi::AttrState;
-use crate::cxxbridge::ffi::BBox2Df;
-use crate::cxxbridge::ffi::BBox2Di;
 use crate::cxxbridge::ffi::NodeStatus;
 use crate::cxxbridge::ffi::NodeType;
-use crate::data::HashValue;
 use crate::data::Identifier;
 use crate::imageio;
 use crate::node::traits::Operation;
 use crate::node::NodeImpl;
 use crate::pathutils;
-use crate::pixelblock::PixelBlock;
 use crate::stream::StreamDataImpl;
-use crate::stream::StreamDataImplRc;
 
 pub fn new(id: Identifier) -> NodeImpl {
     NodeImpl {

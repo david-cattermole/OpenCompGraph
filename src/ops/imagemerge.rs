@@ -19,19 +19,12 @@
  *
  */
 
-use log::{debug, error, info, warn};
-use std::time::{Duration, Instant};
+use log::debug;
 
 use crate::cxxbridge::ffi::BBox2Di;
 use crate::cxxbridge::ffi::ImageShared;
-use crate::cxxbridge::ffi::Matrix4;
 use crate::cxxbridge::ffi::MergeImageMode;
 use crate::cxxbridge::ffi::PixelDataType;
-use crate::cxxbridge::ffi::StreamDataState;
-use crate::data::HashValue;
-use crate::deformer::Deformer;
-use crate::deformutils;
-use crate::pixelblock;
 
 #[inline]
 fn get_pixel_rgba(image: &ImageShared, x: i32, y: i32) -> (f32, f32, f32, f32) {

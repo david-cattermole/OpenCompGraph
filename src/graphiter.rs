@@ -21,14 +21,9 @@
 
 use petgraph;
 use petgraph::data::DataMap;
-use petgraph::stable_graph::EdgeReference;
-use petgraph::visit::{
-    EdgeRef, GraphRef, IntoEdgeReferences, IntoEdgesDirected, IntoNeighborsDirected, VisitMap,
-    Visitable,
-};
-use petgraph::{Direction, Incoming};
+use petgraph::visit::{EdgeRef, GraphRef, IntoEdgesDirected, VisitMap, Visitable};
+use petgraph::Direction;
 use std::collections::VecDeque;
-use std::marker::PhantomData;
 
 #[derive(Clone)]
 pub struct UpstreamEvalSearch<N, VM> {

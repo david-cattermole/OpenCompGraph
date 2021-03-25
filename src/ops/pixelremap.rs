@@ -19,7 +19,7 @@
  *
  */
 
-use log::{debug, error, info, warn};
+use log::{error, warn};
 
 use crate::cxxbridge::ffi::BBox2Df;
 use crate::cxxbridge::ffi::BBox2Di;

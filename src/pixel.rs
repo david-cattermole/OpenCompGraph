@@ -19,8 +19,6 @@
  *
  */
 
-use log::{debug, error, info, warn};
-
 use crate::pixelblock::get_pixel_index;
 
 // This assumes the 'pixels' have RGBA channels.

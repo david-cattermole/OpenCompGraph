@@ -19,7 +19,7 @@
  *
  */
 
-use log::{debug, error, info, warn};
+use log::debug;
 use std::collections::hash_map::DefaultHasher;
 use std::hash;
 use std::hash::Hash;
@@ -28,12 +28,9 @@ use std::rc::Rc;
 use crate::attrblock::AttrBlock;
 use crate::cache::CacheImpl;
 use crate::cxxbridge::ffi::AttrState;
-use crate::cxxbridge::ffi::Matrix4;
 use crate::cxxbridge::ffi::NodeStatus;
 use crate::cxxbridge::ffi::NodeType;
-use crate::data::HashValue;
 use crate::data::Identifier;
-use crate::deformer::brownian::DeformerBrownian;
 use crate::deformer::tde4_classic::DeformerTde4Classic;
 use crate::deformer::Deformer;
 use crate::hashutils::HashableF32;

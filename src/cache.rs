@@ -20,17 +20,12 @@
  */
 
 use linked_hash_map::LinkedHashMap;
-use log::{debug, error, info, warn};
-use rustc_hash::FxHashMap;
+use log::{debug, error};
 use rustc_hash::FxHasher;
-use std::cmp::Ordering;
-use std::cmp::Reverse;
-use std::collections::BinaryHeap;
 use std::hash::BuildHasherDefault;
 use std::rc::Rc;
 
 use crate::cxxbridge::ffi::BBox2Di;
-use crate::cxxbridge::ffi::ImageShared;
 use crate::data::BYTES_TO_GIGABYTES;
 use crate::pixelblock::PixelBlock;
 

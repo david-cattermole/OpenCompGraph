@@ -19,7 +19,6 @@
  *
  */
 
-use log::{debug, error, info, warn};
 use std::collections::hash_map::DefaultHasher;
 use std::hash::Hash;
 use std::hash::Hasher;
@@ -29,8 +28,6 @@ use crate::attrblock::AttrBlock;
 use crate::cache::CacheImpl;
 use crate::cxxbridge::ffi::NodeStatus;
 use crate::data::HashValue;
-use crate::data::Identifier;
-use crate::node::NodeImpl;
 use crate::stream::StreamDataImpl;
 
 
