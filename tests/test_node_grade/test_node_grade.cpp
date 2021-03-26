@@ -17,17 +17,19 @@
  * along with OpenCompGraph.  If not, see <https://www.gnu.org/licenses/>.
  * ====================================================================
  *
+ * Read and grade an image. Never writes out the image.
  */
 
 #include <iostream>
 #include <opencompgraph.h>
-#include "generate_frame_range.h"
+#include "../generate_frame_range.h"
 
 namespace ocg = open_comp_graph;
 
-int test_h(const bool debug_print, std::shared_ptr<ocg::Cache> cache) {
+int test_node_grade(const bool debug_print,
+                    std::shared_ptr<ocg::Cache> cache) {
     if (debug_print) {
-        std::cout << "=========================================== test_h()" << '\n';
+        std::cout << "============================== test_node_grade()" << '\n';
     }
     auto bench = ocg::internal::BenchmarkTime();
 
@@ -87,7 +89,7 @@ int test_h(const bool debug_print, std::shared_ptr<ocg::Cache> cache) {
 
     if (debug_print) {
         bench.stop();
-        bench.print("Test H:");
+        bench.print("Test Node Grade:");
     }
 
     return 0;

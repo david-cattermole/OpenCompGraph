@@ -21,4 +21,5 @@
 
 #include <opencompgraph.h>
 
-int test_h(const bool debug_print, std::shared_ptr<open_comp_graph::Cache> cache);
+int test_node_grade(const bool debug_print,
+                    std::shared_ptr<open_comp_graph::Cache> cache);

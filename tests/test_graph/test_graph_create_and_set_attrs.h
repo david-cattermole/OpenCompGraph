@@ -19,4 +19,4 @@
  *
  */
 
-int test_c(const bool debug_print);
+int test_graph_create_and_set_attrs(const bool debug_print);

@@ -21,4 +21,5 @@
 
 #include <opencompgraph.h>
 
-int test_j(const bool debug_print);
+int test_node_imageio(const bool debug_print,
+                      std::shared_ptr<open_comp_graph::Cache> cache);

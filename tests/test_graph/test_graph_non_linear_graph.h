@@ -21,4 +21,5 @@
 
 #include <opencompgraph.h>
 
-int test_d(const bool debug_print, std::shared_ptr<open_comp_graph::Cache> cache);
+int test_graph_non_linear_graph(const bool debug_print,
+                                std::shared_ptr<open_comp_graph::Cache> cache);

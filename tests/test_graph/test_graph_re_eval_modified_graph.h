@@ -21,4 +21,5 @@
 
 #include <opencompgraph.h>
 
-int test_m(const bool debug_print, std::shared_ptr<open_comp_graph::Cache> cache);
+int test_graph_re_eval_modified_graph(const bool debug_print,
+                                      std::shared_ptr<open_comp_graph::Cache> cache);

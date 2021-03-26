@@ -17,17 +17,19 @@
  * along with OpenCompGraph.  If not, see <https://www.gnu.org/licenses/>.
  * ====================================================================
  *
+ * Read and write images, with Null between them.
  */
 
 #include <iostream>
 #include <opencompgraph.h>
-#include "generate_frame_range.h"
+#include "../generate_frame_range.h"
 
 namespace ocg = open_comp_graph;
 
-int test_g(const bool debug_print, std::shared_ptr<ocg::Cache> cache) {
+int test_graph_no_ops(const bool debug_print,
+                      std::shared_ptr<ocg::Cache> cache) {
     if (debug_print) {
-        std::cout << "=========================================== test_g()" << '\n';
+        std::cout << "============================ test_graph_no_ops()" << '\n';
     }
     auto bench = ocg::internal::BenchmarkTime();
 
@@ -43,8 +45,10 @@ int test_g(const bool debug_print, std::shared_ptr<ocg::Cache> cache) {
         std::cout << "write_node=" << &write_node << '\n';
     }
 
-    graph.set_node_attr_str(read_node, "file_path", "tests/data/checker_8bit_rgba_3840x2160.png");
-    graph.set_node_attr_str(write_node, "file_path", "./tests/data/out/test_g_out.png");
+    graph.set_node_attr_str(
+        read_node, "file_path", "tests/data/checker_8bit_rgba_3840x2160.png");
+    graph.set_node_attr_str(
+        write_node, "file_path", "./tests/data/out/test_g_out.png");
 
     // Ensure the node exists in the graph, check by finding based on
     // the id queried before.
@@ -62,20 +66,19 @@ int test_g(const bool debug_print, std::shared_ptr<ocg::Cache> cache) {
     assert(null_node1_exists);
     assert(null_node2_exists);
     assert(write_node_exists);
-    
+
     // Connect nodes together.
     graph.connect(read_node, null_node1, 0);
     graph.connect(null_node1, null_node2, 0);
-    graph.connect(null_node2, write_node, 0);    
+    graph.connect(null_node2, write_node, 0);
 
     graph.execute(write_node, frames, cache);
     if (debug_print) {
         std::cout << "Graph as string:\n"
                   << graph.data_debug_string();
 
-
         bench.stop();
-        bench.print("Test G:");
+        bench.print("Test Graph No-Ops;");
     }
     return 0;
 }

@@ -17,18 +17,21 @@
  * along with OpenCompGraph.  If not, see <https://www.gnu.org/licenses/>.
  * ====================================================================
  *
+ * Graph with non-linear set of connections, reading, color correcting
+ * and writing images.
  */
 
 #include <iostream>
 #include <cassert>
 #include <opencompgraph.h>
-#include "generate_frame_range.h"
+#include "../generate_frame_range.h"
 
 namespace ocg = open_comp_graph;
 
-int test_f(const bool debug_print, std::shared_ptr<ocg::Cache> cache) {
+int test_graph_non_linear_graph(const bool debug_print,
+                                std::shared_ptr<ocg::Cache> cache) {
     if (debug_print) {
-        std::cout << "====================================== test_f()" << '\n';
+        std::cout << "================== test_graph_non_linear_graph()" << '\n';
     }
     auto bench = ocg::internal::BenchmarkTime();
 
@@ -224,7 +227,7 @@ int test_f(const bool debug_print, std::shared_ptr<ocg::Cache> cache) {
                   << '\n';
 
         bench.stop();
-        bench.print("Test F:");
+        bench.print("Test Graph Non-Linear Graph:");
     }
 
     return 0;

@@ -21,19 +21,19 @@
 
 #include <iostream>
 #include <opencompgraph.h>
-#include "test_a.h"
-#include "test_b.h"
-#include "test_c.h"
-#include "test_d.h"
-#include "test_e.h"
-#include "test_f.h"
-#include "test_g.h"
-#include "test_h.h"
-#include "test_i.h"
-#include "test_j.h"
-#include "test_k.h"
-#include "test_l.h"
-#include "test_m.h"
+#include "test_graph/test_graph_create_and_set_attrs.h"
+#include "test_graph/test_graph_non_linear_graph.h"
+#include "test_graph/test_graph_no_ops.h"
+#include "test_graph/test_graph_re_eval_modified_graph.h"
+#include "test_stream/test_stream_empty_write_geom.h"
+#include "test_cache/test_cache_read_image_seq.h"
+#include "test_cache/test_cache_init.h"
+#include "test_node_null/test_node_null.h"
+#include "test_node_imageio/test_node_imageio.h"
+#include "test_node_lens/test_node_lens.h"
+#include "test_node_transform/test_node_transform.h"
+#include "test_node_grade/test_node_grade.h"
+#include "test_node_merge/test_node_merge.h"
 
 namespace ocg = open_comp_graph;
 
@@ -42,7 +42,7 @@ int main() {
     ocg::log::initialize();
     const bool debug_print = true;
 
-    test_k(debug_print);
+    test_cache_init(debug_print);
 
     // Run single frame tests.
     {
@@ -55,19 +55,21 @@ int main() {
         auto capacity = 1 * kBytesToGigabytes;
         cache->set_capacity_bytes(capacity);
 
-        auto count = 1;
+        auto count = 1;  // Increase the 'count' to test cache read performance.
         for (auto i = 0; i < count; ++i) {
-            test_a(debug_print, cache);
-            test_b(debug_print, cache);
-            test_c(debug_print);
-            test_d(debug_print, cache);
-            test_e(debug_print, cache);
-            test_f(debug_print, cache);
-            test_g(debug_print, cache);
-            test_h(debug_print, cache);
-            test_i(debug_print);
-            test_l(debug_print, cache);
-            test_m(debug_print, cache);
+            test_stream_empty_write_geom(debug_print);
+
+            test_graph_create_and_set_attrs(debug_print);
+            test_graph_non_linear_graph(debug_print, cache);
+            test_graph_no_ops(debug_print, cache);
+            test_graph_re_eval_modified_graph(debug_print, cache);
+
+            test_node_lens(debug_print, cache);
+            test_node_transform(debug_print, cache);
+            test_node_imageio(debug_print, cache);
+            test_node_null(debug_print, cache);
+            test_node_grade(debug_print, cache);
+            test_node_merge(debug_print, cache);
         }
 
         bench.stop();
@@ -83,7 +85,7 @@ int main() {
         auto bench = ocg::internal::BenchmarkTime();
         bench.start();
 
-        test_j(debug_print);
+        test_cache_read_image_seq(debug_print);
 
         bench.stop();
         bench.print("Mult-Frame Tests:");

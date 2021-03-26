@@ -17,6 +17,7 @@
  * along with OpenCompGraph.  If not, see <https://www.gnu.org/licenses/>.
  * ====================================================================
  *
+ * Read an image sequence, in different orders to stress the caching system.
  */
 
 #include <iostream>
@@ -27,23 +28,26 @@
 #include <iterator>
 
 #include <opencompgraph.h>
-#include "generate_frame_range.h"
+#include "../generate_frame_range.h"
 
 namespace ocg = open_comp_graph;
 
 
-// Test the sequence execution and caching mechanisms.
-int test_j(const bool debug_print) {
+int test_cache_read_image_seq(const bool debug_print) {
     if (debug_print) {
-        std::cout << "=========================================== test_j()" << '\n';
+        std::cout << "==================== test_cache_read_image_seq()" << '\n';
     }
     auto bench = ocg::internal::BenchmarkTime();
     auto graph = ocg::Graph();
 
     auto read_node = graph.create_node(ocg::NodeType::kReadImage, "read");
     auto write_node = graph.create_node(ocg::NodeType::kWriteImage, "write");
-    graph.set_node_attr_str(read_node, "file_path", "tests/data/color_bars_3840x2160_png/color_bars.####.png");
-    graph.set_node_attr_str(write_node, "file_path", "./tests/data/out/test_j_out_color_bars_3840x2160.####.png");
+    graph.set_node_attr_str(
+        read_node, "file_path",
+        "tests/data/color_bars_3840x2160_png/color_bars.####.png");
+    graph.set_node_attr_str(
+        write_node, "file_path",
+        "./tests/data/out/test_j_out_color_bars_3840x2160.####.png");
 
     graph.connect(read_node, write_node, 0);
 
@@ -63,7 +67,8 @@ int test_j(const bool debug_print) {
     auto frames = generate_frame_range(start_frame, end_frame);
 
     // frame range with frames that do not have valid inputs.
-    auto frames_out_of_range = generate_frame_range(start_frame - 10, start_frame + 10);
+    auto frames_out_of_range =
+        generate_frame_range(start_frame - 10, start_frame + 10);
 
     // Frame numbers, looped N times, to simulate a user playing back.
     const auto playback_n_times = 4;
@@ -146,7 +151,7 @@ int test_j(const bool debug_print) {
 
     if (debug_print) {
         bench.stop();
-        bench.print("Test J:");
+        bench.print("Test Cache Read Image Sequence:");
     }
     return 0;
 }

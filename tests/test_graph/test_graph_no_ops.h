@@ -21,4 +21,5 @@
 
 #include <opencompgraph.h>
 
-int test_i(const bool debug_print);
+int test_graph_no_ops(const bool debug_print,
+                      std::shared_ptr<open_comp_graph::Cache> cache);

@@ -17,6 +17,8 @@
  * along with OpenCompGraph.  If not, see <https://www.gnu.org/licenses/>.
  * ====================================================================
  *
+ * Re-execute the same graph with different values. Ensure the graph
+ * can re-evaluate correctly.
  */
 
 #include <iostream>
@@ -24,7 +26,7 @@
 #include <sstream>  // stringstream
 #include <cmath>    // fabs
 #include <opencompgraph.h>
-#include "generate_frame_range.h"
+#include "../generate_frame_range.h"
 
 namespace ocg = open_comp_graph;
 
@@ -36,9 +38,10 @@ std::string number_to_string(NUM_TYPE num) {
     return ss.str();
 }
 
-int test_l(const bool debug_print, std::shared_ptr<ocg::Cache> cache) {
+int test_graph_re_eval_modified_graph(const bool debug_print,
+                                      std::shared_ptr<ocg::Cache> cache) {
     if (debug_print) {
-        std::cout << "=========================================== test_l()" << '\n';
+        std::cout << "============ test_graph_re_eval_modified_graph()" << '\n';
     }
     auto bench = ocg::internal::BenchmarkTime();
 
@@ -133,7 +136,7 @@ int test_l(const bool debug_print, std::shared_ptr<ocg::Cache> cache) {
 
     if (debug_print) {
         bench.stop();
-        bench.print("Test l:");
+        bench.print("Test Graph Re-Eval Modified Graph:");
     }
 
     return 0;

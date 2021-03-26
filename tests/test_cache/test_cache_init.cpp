@@ -17,6 +17,7 @@
  * along with OpenCompGraph.  If not, see <https://www.gnu.org/licenses/>.
  * ====================================================================
  *
+ * Test the cache creation, and getter/setters.
  */
 
 #include <iostream>
@@ -27,15 +28,14 @@
 #include <iterator>
 
 #include <opencompgraph.h>
-#include "generate_frame_range.h"
+#include "../generate_frame_range.h"
 
 namespace ocg = open_comp_graph;
 
 
-// Test the sequence execution and caching mechanisms.
-int test_k(const bool debug_print) {
+int test_cache_init(const bool debug_print) {
     if (debug_print) {
-        std::cout << "=========================================== test_k()" << '\n';
+        std::cout << "============================== test_cache_init()" << '\n';
     }
     auto bench = ocg::internal::BenchmarkTime();
 
@@ -68,7 +68,7 @@ int test_k(const bool debug_print) {
 
     if (debug_print) {
         bench.stop();
-        bench.print("Test K:");
+        bench.print("Test Cache Init:");
     }
     return 0;
 }

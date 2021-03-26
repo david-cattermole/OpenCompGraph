@@ -19,6 +19,10 @@
  *
  */
 
+#include <memory>
 #include <opencompgraph.h>
 
-int test_k(const bool debug_print);
+namespace ocg = open_comp_graph;
+
+int test_node_lens(const bool debug_print,
+                   std::shared_ptr<ocg::Cache> cache);

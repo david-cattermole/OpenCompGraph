@@ -17,22 +17,20 @@
  * along with OpenCompGraph.  If not, see <https://www.gnu.org/licenses/>.
  * ====================================================================
  *
- * Example usage of open_comp_graph.h
+ * Create some nodes and set attributes. No connections are made.
  */
 
 #include <cstdint>
 #include <iostream>
-#include <sstream>
 #include <string>
 #include <opencompgraph.h>
-#include "generate_frame_range.h"
 
 namespace ocg = open_comp_graph;
 
 
-int test_c(const bool debug_print) {
+int test_graph_create_and_set_attrs(const bool debug_print) {
     if (debug_print) {
-        std::cout << "=========================================== test_c()" << '\n';
+        std::cout << "============== test_graph_create_and_set_attrs()" << '\n';
     }
     auto bench = ocg::internal::BenchmarkTime();
 
@@ -144,8 +142,8 @@ int test_c(const bool debug_print) {
         std::cout << "Graph as string:\n"
                   << graph.data_debug_string();
 
-        bench.stop();    
-        bench.print("Test C:");
+        bench.stop();
+        bench.print("Test Graph Create and Set Attrs:");
     }
 
     return 0;

@@ -17,20 +17,23 @@
  * along with OpenCompGraph.  If not, see <https://www.gnu.org/licenses/>.
  * ====================================================================
  *
+ * Basic "Read image -> transform" connection and execution, with
+ * geometry output. Write node is connected by not executed.
  */
 
 #include <iostream>
 #include <string>
 #include <opencompgraph.h>
-#include "generate_mesh.h"
-#include "generate_frame_range.h"
+#include "../generate_mesh.h"
+#include "../generate_frame_range.h"
 
 namespace ocg = open_comp_graph;
 
 
-int test_b(const bool debug_print, std::shared_ptr<ocg::Cache> cache) {
+int test_node_transform(const bool debug_print,
+                        std::shared_ptr<ocg::Cache> cache) {
     if (debug_print) {
-        std::cout << "=========================================== test_b()" << '\n';
+        std::cout << "========================== test_node_transform()" << '\n';
     }
     auto bench = ocg::internal::BenchmarkTime();
 
@@ -49,9 +52,12 @@ int test_b(const bool debug_print, std::shared_ptr<ocg::Cache> cache) {
     auto read_node = graph.create_node(ocg::NodeType::kReadImage, "my_read_node");
     auto tfm_node = graph.create_node(ocg::NodeType::kTransform, "transform");
     auto write_node = graph.create_node(ocg::NodeType::kWriteImage, "write_node");
-    graph.set_node_attr_str(read_node, "file_path", "./tests/data/checker_8bit_rgba_3840x2160.png");
+    graph.set_node_attr_str(
+        read_node, "file_path", "./tests/data/checker_8bit_rgba_3840x2160.png");
     graph.set_node_attr_f32(tfm_node, "translate_x", 2.0f);
-    graph.set_node_attr_str(write_node, "file_path", "./tests/data/out/test_b_out1.jpg");
+    graph.set_node_attr_str(
+        write_node, "file_path",
+        "./tests/data/out/test_node_transform_out1.jpg");
 
     graph.connect(read_node, tfm_node, 0);
     graph.connect(tfm_node, write_node, 0);
@@ -94,7 +100,7 @@ int test_b(const bool debug_print, std::shared_ptr<ocg::Cache> cache) {
     auto direction = ocg::DeformerDirection::kForward;
     divisions_x = 2;
     divisions_y = 2;
-    const char* file_path_2x2 = "./tests/data/out/test_b_2x2_out.obj";
+    const char* file_path_2x2 = "./tests/data/out/test_node_transform_2x2_out.obj";
     generate_mesh(
         debug_print,
         divisions_x,
@@ -110,7 +116,7 @@ int test_b(const bool debug_print, std::shared_ptr<ocg::Cache> cache) {
     stream_data = graph.output_stream();
     divisions_x = 3;
     divisions_y = 3;
-    const char* file_path_3x3 = "./tests/data/out/test_b_3x3_out.obj";
+    const char* file_path_3x3 = "./tests/data/out/test_node_transform_3x3_out.obj";
     generate_mesh(
         debug_print,
         divisions_x,
@@ -132,7 +138,7 @@ int test_b(const bool debug_print, std::shared_ptr<ocg::Cache> cache) {
                   << graph.data_debug_string();
 
         bench.stop();
-        bench.print("Test B:");
+        bench.print("Test Node Transform:");
     }
 
     return 0;
