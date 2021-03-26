@@ -104,7 +104,6 @@ impl Operation for WriteImageOperation {
                 // Copy input data
                 let copy = &mut (**input).clone();
                 let display_window = copy.display_window();
-                let transform_matrix = copy.transform_matrix().to_na_matrix();
                 let src_data_window = copy.data_window();
                 let mut data_window = copy.data_window();
                 let mut pixel_block = copy.clone_pixel_block();
@@ -133,6 +132,7 @@ impl Operation for WriteImageOperation {
                     //
                     // TODO: Apply 'transform_matrix' as part of the
                     // deformation, so we only resample the image once.
+                    let _transform_matrix = copy.transform_matrix().to_na_matrix();
                     let ref_pixel_block = pixel_block.clone();
                     let direction = DeformerDirection::Forward;
                     deformutils::apply_deformers_to_pixels(

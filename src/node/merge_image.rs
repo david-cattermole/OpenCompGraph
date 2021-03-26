@@ -103,13 +103,17 @@ fn do_image_process(
 
     // Copy input data
     let copy_b = &mut (**input_b).clone();
-    let transform_matrix = copy_b.transform_matrix().to_na_matrix();
     let mut pixel_block_a = input_a.clone_pixel_block();
     let mut pixel_block_b = copy_b.clone_pixel_block();
 
     debug!("Merge Convert");
     pixel_block_a.convert_into_f32_data();
     pixel_block_b.convert_into_f32_data();
+
+    let _transform_matrix = copy_b.transform_matrix().to_na_matrix();
+    // TODO: Apply transform matrix, deformations and color
+    // corrections before attemping to merge. These operations are the
+    // same as those from the 'write_image.rs' file.
 
     let pixel_block_a_box = Box::new(pixel_block_a);
     let image_a = ImageShared {
