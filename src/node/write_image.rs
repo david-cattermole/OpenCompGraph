@@ -176,8 +176,11 @@ impl Operation for WriteImageOperation {
 
 impl AttrBlock for WriteImageAttrs {
     fn attr_hash(&self, frame: i32, state: &mut DefaultHasher) {
-        // TODO: Should we use "frame" to hash the value?
-        self.hash(state)
+        self.enable.hash(state);
+        if self.enable == 1 {
+            let path_expanded = pathutils::expand_string(self.file_path.to_string(), frame);
+            path_expanded.hash(state);
+        }
     }
 
     fn attr_exists(&self, name: &str) -> AttrState {

@@ -236,8 +236,7 @@ impl Operation for MergeImageOperation {
 }
 
 impl AttrBlock for MergeImageAttrs {
-    fn attr_hash(&self, frame: i32, state: &mut DefaultHasher) {
-        // TODO: Should we use "frame" to hash the value?
+    fn attr_hash(&self, _frame: i32, state: &mut DefaultHasher) {
         if self.enable == 1 {
             self.enable.hash(state);
             self.mode.hash(state);

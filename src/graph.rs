@@ -330,7 +330,6 @@ impl GraphImpl {
     fn compute_node_metadata(
         &mut self,
         node_idx: NodeIdx,
-        frame: i32,
         stream_data_cache: &FxHashMap<GraphIdx, Rc<StreamDataImpl>>,
     ) -> Result<Vec<Rc<StreamDataImpl>>, ErrorCode> {
         let mut inputs = Vec::<Rc<StreamDataImpl>>::new();
@@ -414,10 +413,13 @@ impl GraphImpl {
         info!("Execute Frame Context: {}", frame);
         let start = Instant::now();
 
+        // TODO: Metadata is independant of frame number, so maybe we
+        // can re-factor it and only calculate it once?
         let mut stream_data_cache = FxHashMap::<GraphIdx, Rc<StreamDataImpl>>::default();
         for node_index in node_indexes.iter().rev() {
             debug!("Compute Node: {:?}", node_index);
-            let node_inputs = self.compute_node_metadata(*node_index, frame, &stream_data_cache)?;
+
+            let node_inputs = self.compute_node_metadata(*node_index, &stream_data_cache)?;
             self.compute_node_output(
                 &node_inputs,
                 node_index.index(),

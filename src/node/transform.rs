@@ -145,8 +145,7 @@ impl Operation for TransformOperation {
 }
 
 impl AttrBlock for TransformAttrs {
-    fn attr_hash(&self, frame: i32, state: &mut DefaultHasher) {
-        // TODO: Should we use "frame" to hash the value?
+    fn attr_hash(&self, _frame: i32, state: &mut DefaultHasher) {
         self.hash(state)
     }
 
