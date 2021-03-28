@@ -30,7 +30,6 @@ use crate::attrblock::AttrBlock;
 use crate::cache::CacheImpl;
 use crate::colorspace;
 use crate::cxxbridge::ffi::AttrState;
-use crate::cxxbridge::ffi::DeformerDirection;
 use crate::cxxbridge::ffi::ImageShared;
 use crate::cxxbridge::ffi::NodeStatus;
 use crate::cxxbridge::ffi::NodeType;
@@ -129,15 +128,9 @@ impl Operation for WriteImageOperation {
 
                 {
                     // Apply Deformations.
-                    //
-                    // TODO: Apply 'transform_matrix' as part of the
-                    // deformation, so we only resample the image once.
-                    let _transform_matrix = copy.transform_matrix().to_na_matrix();
                     let ref_pixel_block = pixel_block.clone();
-                    let direction = DeformerDirection::Forward;
                     deformutils::apply_deformers_to_pixels(
                         &copy.deformers(),
-                        direction,
                         display_window,
                         &ref_pixel_block,
                         src_data_window,

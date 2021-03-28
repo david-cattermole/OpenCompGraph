@@ -24,7 +24,6 @@ use std::rc::Rc;
 
 use crate::cxxbridge::ffi::BBox2Df;
 use crate::cxxbridge::ffi::BBox2Di;
-use crate::cxxbridge::ffi::DeformerDirection;
 use crate::cxxbridge::ffi::Matrix4;
 use crate::cxxbridge::ffi::PixelDataType;
 use crate::cxxbridge::ffi::StreamDataState;
@@ -40,7 +39,6 @@ pub struct StreamDataImpl {
     display_window: BBox2Di,
     data_window: BBox2Di,
     color_matrix: Matrix4,
-    transform_matrix: Matrix4,
     pixel_block: Rc<PixelBlock>,
     deformers: Vec<Box<dyn Deformer>>,
 }
@@ -56,7 +54,6 @@ impl StreamDataImpl {
         let display_window = BBox2Di::new(0, 0, bbox_max_width, bbox_max_height);
         let data_window = BBox2Di::new(0, 0, bbox_max_width, bbox_max_height);
         let color_matrix = Matrix4::identity();
-        let transform_matrix = Matrix4::identity();
         let deformers = Vec::new();
 
         StreamDataImpl {
@@ -65,7 +62,6 @@ impl StreamDataImpl {
             display_window,
             data_window,
             color_matrix,
-            transform_matrix,
             pixel_block,
             deformers,
         }
@@ -119,22 +115,9 @@ impl StreamDataImpl {
         self.color_matrix = value;
     }
 
-    pub fn transform_matrix(&self) -> Matrix4 {
-        self.transform_matrix
-    }
-
-    pub fn set_transform_matrix(&mut self, value: Matrix4) {
-        self.transform_matrix = value;
-    }
-
-    pub fn apply_deformers(
-        &self,
-        buffer: &mut [f32],
-        image_window: BBox2Df,
-        direction: DeformerDirection,
-    ) {
+    pub fn apply_deformers(&self, buffer: &mut [f32], image_window: BBox2Df) {
         debug!("StreamData.apply_deformers...");
-        deformutils::apply_deformers_to_positions(&self.deformers, direction, image_window, buffer);
+        deformutils::apply_deformers_to_positions(&self.deformers, image_window, buffer);
     }
 
     pub fn deformers(&self) -> &Vec<Box<dyn Deformer>> {
@@ -253,17 +236,8 @@ impl StreamDataImplRc {
         self.inner.color_matrix()
     }
 
-    pub fn transform_matrix(&self) -> Matrix4 {
-        self.inner.transform_matrix()
-    }
-
-    pub fn apply_deformers(
-        &self,
-        buffer: &mut [f32],
-        image_window: BBox2Df,
-        direction: DeformerDirection,
-    ) {
-        self.inner.apply_deformers(buffer, image_window, direction);
+    pub fn apply_deformers(&self, buffer: &mut [f32], image_window: BBox2Df) {
+        self.inner.apply_deformers(buffer, image_window);
     }
 
     pub fn deformers(&self) -> &Vec<Box<dyn Deformer>> {

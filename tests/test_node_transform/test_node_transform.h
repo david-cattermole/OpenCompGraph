@@ -19,5 +19,7 @@
  *
  */
 
+#include <opencompgraph.h>
+
 int test_node_transform(const bool debug_print,
-                        std::shared_ptr<ocg::Cache> cache);
+                        std::shared_ptr<open_comp_graph::Cache> cache);

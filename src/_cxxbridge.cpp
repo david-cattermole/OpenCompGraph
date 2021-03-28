@@ -975,7 +975,7 @@ namespace open_comp_graph {
   enum class NodeStatus : ::std::uint8_t;
   enum class AttrState : ::std::uint8_t;
   enum class StreamDataState : ::std::uint8_t;
-  enum class DeformerDirection : ::std::uint8_t;
+  enum class LensDistortDirection : ::std::uint8_t;
   enum class MergeImageMode : ::std::uint8_t;
   namespace internal {
     struct GraphImplShared;
@@ -1181,14 +1181,14 @@ enum class StreamDataState : ::std::uint8_t {
 };
 #endif // CXXBRIDGE1_ENUM_open_comp_graph$StreamDataState
 
-#ifndef CXXBRIDGE1_ENUM_open_comp_graph$DeformerDirection
-#define CXXBRIDGE1_ENUM_open_comp_graph$DeformerDirection
-enum class DeformerDirection : ::std::uint8_t {
-  kForward = 0,
-  kBackward = 1,
+#ifndef CXXBRIDGE1_ENUM_open_comp_graph$LensDistortDirection
+#define CXXBRIDGE1_ENUM_open_comp_graph$LensDistortDirection
+enum class LensDistortDirection : ::std::uint8_t {
+  kUndistort = 0,
+  kDistort = 1,
   kUninitialized = 255,
 };
-#endif // CXXBRIDGE1_ENUM_open_comp_graph$DeformerDirection
+#endif // CXXBRIDGE1_ENUM_open_comp_graph$LensDistortDirection
 
 namespace internal {
 #ifndef CXXBRIDGE1_ENUM_open_comp_graph$internal$ParameterType
@@ -1246,9 +1246,8 @@ struct StreamDataImplRc final : public ::rust::Opaque {
   OCG_API_EXPORT ::open_comp_graph::BBox2Di display_window() const noexcept;
   OCG_API_EXPORT ::open_comp_graph::BBox2Di data_window() const noexcept;
   OCG_API_EXPORT ::open_comp_graph::Matrix4 color_matrix() const noexcept;
-  OCG_API_EXPORT ::open_comp_graph::Matrix4 transform_matrix() const noexcept;
   OCG_API_EXPORT ::std::size_t deformers_len() const noexcept;
-  OCG_API_EXPORT void apply_deformers(::rust::Slice<float> buffer, ::open_comp_graph::BBox2Df image_window, ::open_comp_graph::DeformerDirection direction) const noexcept;
+  OCG_API_EXPORT void apply_deformers(::rust::Slice<float> buffer, ::open_comp_graph::BBox2Df image_window) const noexcept;
   OCG_API_EXPORT ::rust::Slice<const float> pixel_buffer() const noexcept;
   OCG_API_EXPORT ::std::int32_t pixel_width() const noexcept;
   OCG_API_EXPORT ::std::int32_t pixel_height() const noexcept;
@@ -1566,11 +1565,9 @@ void open_comp_graph$internal$cxxbridge1$PixelBlock$data_resize(::open_comp_grap
 
 ::open_comp_graph::Matrix4 open_comp_graph$internal$cxxbridge1$StreamDataImplRc$color_matrix(const ::open_comp_graph::internal::StreamDataImplRc &self) noexcept;
 
-::open_comp_graph::Matrix4 open_comp_graph$internal$cxxbridge1$StreamDataImplRc$transform_matrix(const ::open_comp_graph::internal::StreamDataImplRc &self) noexcept;
-
 ::std::size_t open_comp_graph$internal$cxxbridge1$StreamDataImplRc$deformers_len(const ::open_comp_graph::internal::StreamDataImplRc &self) noexcept;
 
-void open_comp_graph$internal$cxxbridge1$StreamDataImplRc$apply_deformers(const ::open_comp_graph::internal::StreamDataImplRc &self, ::rust::Slice<float> buffer, ::open_comp_graph::BBox2Df image_window, ::open_comp_graph::DeformerDirection direction) noexcept;
+void open_comp_graph$internal$cxxbridge1$StreamDataImplRc$apply_deformers(const ::open_comp_graph::internal::StreamDataImplRc &self, ::rust::Slice<float> buffer, ::open_comp_graph::BBox2Df image_window) noexcept;
 
 ::rust::repr::Fat open_comp_graph$internal$cxxbridge1$StreamDataImplRc$pixel_buffer(const ::open_comp_graph::internal::StreamDataImplRc &self) noexcept;
 
@@ -1884,16 +1881,12 @@ OCG_API_EXPORT ::open_comp_graph::Matrix4 StreamDataImplRc::color_matrix() const
   return open_comp_graph$internal$cxxbridge1$StreamDataImplRc$color_matrix(*this);
 }
 
-OCG_API_EXPORT ::open_comp_graph::Matrix4 StreamDataImplRc::transform_matrix() const noexcept {
-  return open_comp_graph$internal$cxxbridge1$StreamDataImplRc$transform_matrix(*this);
-}
-
 OCG_API_EXPORT ::std::size_t StreamDataImplRc::deformers_len() const noexcept {
   return open_comp_graph$internal$cxxbridge1$StreamDataImplRc$deformers_len(*this);
 }
 
-OCG_API_EXPORT void StreamDataImplRc::apply_deformers(::rust::Slice<float> buffer, ::open_comp_graph::BBox2Df image_window, ::open_comp_graph::DeformerDirection direction) const noexcept {
-  open_comp_graph$internal$cxxbridge1$StreamDataImplRc$apply_deformers(*this, buffer, image_window, direction);
+OCG_API_EXPORT void StreamDataImplRc::apply_deformers(::rust::Slice<float> buffer, ::open_comp_graph::BBox2Df image_window) const noexcept {
+  open_comp_graph$internal$cxxbridge1$StreamDataImplRc$apply_deformers(*this, buffer, image_window);
 }
 
 OCG_API_EXPORT ::rust::Slice<const float> StreamDataImplRc::pixel_buffer() const noexcept {

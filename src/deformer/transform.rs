@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020, 2021 David Cattermole.
+ * Copyright (C) 2021 David Cattermole.
  *
  * This file is part of OpenCompGraph.
  *
@@ -19,41 +19,23 @@
  *
  */
 
-use log::debug;
+// use log::warn;
+use nalgebra as na;
 use std::collections::hash_map::DefaultHasher;
 use std::hash;
 use std::hash::Hash;
-use std::rc::Rc;
+use std::hash::Hasher;
 
 use crate::attrblock::AttrBlock;
-use crate::cache::CacheImpl;
 use crate::cxxbridge::ffi::AttrState;
-use crate::cxxbridge::ffi::NodeStatus;
-use crate::cxxbridge::ffi::NodeType;
-use crate::data::Identifier;
-use crate::deformer::transform::DeformerTransform;
+use crate::cxxbridge::ffi::BBox2Df;
 use crate::deformer::Deformer;
 use crate::hashutils::HashableF32;
+use crate::math::interp;
+use crate::math::xform;
 
-use crate::node::traits::Operation;
-use crate::node::NodeImpl;
-use crate::stream::StreamDataImpl;
-
-pub fn new(id: Identifier) -> NodeImpl {
-    NodeImpl {
-        node_type: NodeType::Transform,
-        id,
-        status: NodeStatus::Uninitialized,
-        compute: Box::new(TransformOperation::new()),
-        attr_block: Box::new(TransformAttrs::new()),
-    }
-}
-
-#[derive(Debug, Clone, Default)]
-pub struct TransformOperation {}
-
-#[derive(Debug, Clone, Default)]
-pub struct TransformAttrs {
+#[derive(Debug, Clone)]
+pub struct DeformerTransform {
     pub enable: i32,
     pub invert: i32,
     pub translate_x: f32,
@@ -63,9 +45,10 @@ pub struct TransformAttrs {
     pub rotate_center_y: f32,
     pub scale_x: f32,
     pub scale_y: f32,
+    // TODO: Add pivot point
 }
 
-impl hash::Hash for TransformAttrs {
+impl hash::Hash for DeformerTransform {
     fn hash<H: hash::Hasher>(&self, state: &mut H) {
         self.enable.hash(state);
         self.invert.hash(state);
@@ -79,15 +62,9 @@ impl hash::Hash for TransformAttrs {
     }
 }
 
-impl TransformOperation {
-    pub fn new() -> TransformOperation {
-        TransformOperation {}
-    }
-}
-
-impl TransformAttrs {
-    pub fn new() -> TransformAttrs {
-        TransformAttrs {
+impl Default for DeformerTransform {
+    fn default() -> Self {
+        Self {
             enable: 1,
             invert: 0,
             translate_x: 0.0,
@@ -101,61 +78,85 @@ impl TransformAttrs {
     }
 }
 
-impl Operation for TransformOperation {
-    fn compute(
-        &mut self,
-        frame: i32,
-        node_type_id: u8,
-        attr_block: &Box<dyn AttrBlock>,
-        inputs: &Vec<Rc<StreamDataImpl>>,
-        output: &mut Rc<StreamDataImpl>,
-        _cache: &mut Box<CacheImpl>,
-    ) -> NodeStatus {
-        debug!("TransformOperation.compute()");
-        // debug!("AttrBlock: {:?}", attr_block);
-        // debug!("Inputs: {:?}", inputs);
-        // debug!("Output: {:?}", output);
+/// 2D Transform deformer.
+fn _apply(
+    obj: &DeformerTransform,
+    xd: f32,
+    yd: f32,
+    image_window: BBox2Df,
+    inverse: bool,
+) -> (f32, f32) {
+    // Normalise the translate values between the image window.
+    let tx = interp::inverse_lerp(image_window.min_x, image_window.max_x, obj.translate_x);
+    let ty = interp::inverse_lerp(image_window.min_x, image_window.max_x, obj.translate_y);
+    let mut out_matrix = xform::create_transform_trs_2d(
+        tx,
+        ty,
+        obj.rotate_center_x,
+        obj.rotate_center_y,
+        obj.rotate,
+        obj.scale_x,
+        obj.scale_y,
+    );
 
-        match inputs.len() {
-            0 => NodeStatus::Error,
-            _ => {
-                let input = &inputs[0].clone();
-                let mut copy = (**input).clone();
+    // Apply matrix invert.
+    let mut do_invert = false;
+    if inverse == false {
+        if obj.invert > 0 {
+            do_invert = true;
+        }
+    } else {
+        if obj.invert == 0 {
+            do_invert = true;
+        }
+    }
+    if do_invert == true {
+        let inverse_matrix = out_matrix.try_inverse();
+        match inverse_matrix {
+            Some(value) => out_matrix = value,
+            None => (),
+        }
+    }
 
-                let enable = attr_block.get_attr_i32("enable");
-                if enable == 1 {
-                    let mut deformer = DeformerTransform::default();
+    let v = na::Point4::new(xd, yd, 0.0, 1.0);
+    let r = out_matrix * v;
+    (r.x, r.y)
+}
 
-                    deformer.set_attr_i32("invert", attr_block.get_attr_i32("invert"));
-                    deformer.set_attr_f32("translate_x", attr_block.get_attr_f32("translate_x"));
-                    deformer.set_attr_f32("translate_y", attr_block.get_attr_f32("translate_y"));
-                    deformer.set_attr_f32("rotate", attr_block.get_attr_f32("rotate"));
-                    deformer.set_attr_f32(
-                        "rotate_center_x",
-                        attr_block.get_attr_f32("rotate_center_x"),
-                    );
-                    deformer.set_attr_f32(
-                        "rotate_center_y",
-                        attr_block.get_attr_f32("rotate_center_y"),
-                    );
-                    deformer.set_attr_f32("scale_x", attr_block.get_attr_f32("scale_x"));
-                    deformer.set_attr_f32("scale_y", attr_block.get_attr_f32("scale_y"));
+impl Deformer for DeformerTransform {
+    fn hash_deformer(&self) -> u64 {
+        let mut state = DefaultHasher::default();
+        self.hash(&mut state);
+        state.finish()
+    }
 
-                    deformer.commit_data().unwrap();
-                    copy.push_deformer(Box::new(deformer));
-                }
+    fn commit_data(&mut self) -> Result<(), String> {
+        Ok(())
+    }
 
-                // Set Output data
-                let hash_value = self.cache_hash(frame, node_type_id, &attr_block, inputs);
-                copy.set_hash(hash_value);
-                *output = Rc::new(copy);
-                NodeStatus::Valid
-            }
+    fn apply_slice_in_place(
+        &self,
+        buffer: &mut [f32],
+        image_window: BBox2Df,
+        inverse: bool,
+        stride: usize,
+    ) {
+        let count = buffer.len() / stride;
+        for i in 0..count {
+            let index = i * stride;
+
+            let x = buffer[index + 0];
+            let y = buffer[index + 1];
+
+            let (xu, yu) = _apply(self, x, y, image_window, inverse);
+
+            buffer[index + 0] = xu;
+            buffer[index + 1] = yu;
         }
     }
 }
 
-impl AttrBlock for TransformAttrs {
+impl AttrBlock for DeformerTransform {
     fn attr_hash(&self, _frame: i32, state: &mut DefaultHasher) {
         self.hash(state)
     }

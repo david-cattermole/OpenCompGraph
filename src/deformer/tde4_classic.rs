@@ -54,6 +54,7 @@ static PARM_NAME_QUARTIC_DISTORTION: &str = "Quartic Distortion\0";
 pub struct DeformerTde4Classic {
     /// Enable/disable the deformer.
     enable: i32,
+    direction: i32, // index for a LensDistortDirection.
 
     // Built-in LDPK parameters
     focal_length: f32,
@@ -110,6 +111,7 @@ impl Default for DeformerTde4Classic {
 
         Self {
             enable: 1,
+            direction: 0, // 0 = 'Undistort'
 
             focal_length,
             film_back_width,
@@ -127,6 +129,25 @@ impl Default for DeformerTde4Classic {
             plugin,
         }
     }
+}
+
+/// Tde4 Classic lens distortion model.
+///
+/// xd and yd are expected to be in FOV units.
+fn _apply(obj: &DeformerTde4Classic, xd: f32, yd: f32, inverse: bool) -> (f32, f32) {
+    let (xu, yu) = match obj.direction {
+        0 => match inverse {
+            false => obj.plugin.undistort(xd as f64, yd as f64),
+            true => obj.plugin.distort(xd as f64, yd as f64),
+        },
+        1 => match inverse {
+            false => obj.plugin.distort(xd as f64, yd as f64),
+            true => obj.plugin.undistort(xd as f64, yd as f64),
+        },
+        _ => panic!("unsupported direction: {:?}", obj.direction),
+    };
+
+    (xu as f32, yu as f32)
 }
 
 impl Deformer for DeformerTde4Classic {
@@ -179,39 +200,34 @@ impl Deformer for DeformerTde4Classic {
         self.plugin.initialize_parameters()
     }
 
-    /// Tde4Classic lens distortion model.
-    ///
-    /// xd and yd are expected to be in FOV units.
-    ///
-    /// Forward == undistort
-    fn apply_forward(&self, xd: f32, yd: f32) -> (f32, f32) {
-        let (xu, yu) = self.plugin.undistort(xd as f64, yd as f64);
-        // warn!("apply_forward: xd={} yd={} -> xu={} yu={}", xd, yd, xu, yu);
-        (xu as f32, yu as f32)
-    }
-
-    /// Backward == (re)distort
-    fn apply_backward(&self, xd: f32, yd: f32) -> (f32, f32) {
-        let (xu, yu) = self.plugin.distort(xd as f64, yd as f64);
-        // warn!("apply_backward: xd={} yd={} -> xu={} yu={}", xd, yd, xu, yu);
-        (xu as f32, yu as f32)
-    }
-
-    // Forward == undistort
-    fn apply_forward_bounding_box(&self, bbox: BBox2Df, image_window: BBox2Df) -> BBox2Df {
+    fn apply_bounding_box(&self, bbox: BBox2Df, image_window: BBox2Df) -> BBox2Df {
         let bbox_remap = BBox2Df::new(
             interp::remap(image_window.min_x, image_window.max_x, 0.0, 1.0, bbox.min_x),
             interp::remap(image_window.min_y, image_window.max_y, 0.0, 1.0, bbox.min_y),
             interp::remap(image_window.min_x, image_window.max_x, 0.0, 1.0, bbox.max_x),
             interp::remap(image_window.min_y, image_window.max_y, 0.0, 1.0, bbox.max_y),
         );
-        let (min_x, min_y, max_x, max_y) = self.plugin.get_bounding_box_undistort(
-            bbox_remap.min_x as f64,
-            bbox_remap.min_y as f64,
-            bbox_remap.max_x as f64,
-            bbox_remap.max_y as f64,
-        );
-        // warn!("apply_forward_bounding_box: xd={} yd={} -> xu={} yu={}", xd, yd, xu, yu);
+
+        let (min_x, min_y, max_x, max_y) = match self.direction {
+            0 => self.plugin.get_bounding_box_undistort(
+                bbox_remap.min_x as f64,
+                bbox_remap.min_y as f64,
+                bbox_remap.max_x as f64,
+                bbox_remap.max_y as f64,
+            ),
+            1 => self.plugin.get_bounding_box_distort(
+                bbox_remap.min_x as f64,
+                bbox_remap.min_y as f64,
+                bbox_remap.max_x as f64,
+                bbox_remap.max_y as f64,
+            ),
+            _ => panic!("unsupported direction: {:?}", self.direction),
+        };
+        // warn!(
+        //     "apply_bounding_box: xd={} yd={} -> xu={} yu={}",
+        //     xd, yd, xu, yu
+        // );
+
         // Slight extra margin, just in case our
         // getBoundingBox-Methods miss something.
         BBox2Df::new(
@@ -246,54 +262,36 @@ impl Deformer for DeformerTde4Classic {
         )
     }
 
-    /// Backward == (re)distort
-    fn apply_backward_bounding_box(&self, bbox: BBox2Df, image_window: BBox2Df) -> BBox2Df {
-        let bbox_remap = BBox2Df::new(
-            interp::remap(image_window.min_x, image_window.max_x, 0.0, 1.0, bbox.min_x),
-            interp::remap(image_window.min_y, image_window.max_y, 0.0, 1.0, bbox.min_y),
-            interp::remap(image_window.min_x, image_window.max_x, 0.0, 1.0, bbox.max_x),
-            interp::remap(image_window.min_y, image_window.max_y, 0.0, 1.0, bbox.max_y),
-        );
-        let (min_x, min_y, max_x, max_y) = self.plugin.get_bounding_box_distort(
-            bbox_remap.min_x as f64,
-            bbox_remap.min_y as f64,
-            bbox_remap.max_x as f64,
-            bbox_remap.max_y as f64,
-        );
-        // warn!("apply_forward_bounding_box: xd={} yd={} -> xu={} yu={}", xd, yd, xu, yu);
+    /// Given a slice of values, every 'stride' number of buffer values,
+    /// the X and Y are deformed.
+    fn apply_slice_in_place(
+        &self,
+        buffer: &mut [f32],
+        image_window: BBox2Df,
+        inverse: bool,
+        stride: usize,
+    ) {
+        let min_x = image_window.min_x;
+        let min_y = image_window.min_y;
+        let max_x = image_window.max_x;
+        let max_y = image_window.max_y;
 
-        // Slight extra margin, just in case our
-        // getBoundingBox-Methods miss something.
-        BBox2Df::new(
-            interp::remap(
-                0.0,
-                1.0,
-                image_window.min_x,
-                image_window.max_x,
-                min_x as f32,
-            ) - 2.0,
-            interp::remap(
-                0.0,
-                1.0,
-                image_window.min_y,
-                image_window.max_y,
-                min_y as f32,
-            ) - 2.0,
-            interp::remap(
-                0.0,
-                1.0,
-                image_window.min_x,
-                image_window.max_x,
-                max_x as f32,
-            ) + 2.0,
-            interp::remap(
-                0.0,
-                1.0,
-                image_window.min_y,
-                image_window.max_y,
-                max_y as f32,
-            ) + 2.0,
-        )
+        let count = buffer.len() / stride;
+        for i in 0..count {
+            let index = i * stride;
+
+            let x = buffer[index + 0];
+            let y = buffer[index + 1];
+            let x_remap = interp::remap(min_x, max_x, 0.0, 1.0, x);
+            let y_remap = interp::remap(min_y, max_y, 0.0, 1.0, y);
+
+            let (xu, yu) = _apply(self, x_remap, y_remap, inverse);
+
+            let xu_remap = interp::remap(0.0, 1.0, min_x, max_x, xu);
+            let yu_remap = interp::remap(0.0, 1.0, min_y, max_y, yu);
+            buffer[index + 0] = xu_remap;
+            buffer[index + 1] = yu_remap;
+        }
     }
 
     fn data_debug_string(&self) -> String {
@@ -334,6 +332,7 @@ impl AttrBlock for DeformerTde4Classic {
     fn attr_exists(&self, name: &str) -> AttrState {
         match name {
             "enable" => AttrState::Exists,
+            "direction" => AttrState::Exists,
             // Built in LDPK parameters
             "focal_length" => AttrState::Exists,
             "film_back_width" => AttrState::Exists,
@@ -362,6 +361,7 @@ impl AttrBlock for DeformerTde4Classic {
     fn get_attr_i32(&self, name: &str) -> i32 {
         match name {
             "enable" => self.enable,
+            "direction" => self.direction,
             _ => 0,
         }
     }
@@ -369,6 +369,7 @@ impl AttrBlock for DeformerTde4Classic {
     fn set_attr_i32(&mut self, name: &str, value: i32) {
         match name {
             "enable" => self.enable = value,
+            "direction" => self.direction = value,
             _ => (),
         };
     }
@@ -409,7 +410,6 @@ impl AttrBlock for DeformerTde4Classic {
             "curvature_x" => self.curvature_x = value,
             "curvature_y" => self.curvature_y = value,
             "quartic_distortion" => self.quartic_distortion = value,
-
             _ => (),
         }
     }

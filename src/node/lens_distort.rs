@@ -54,6 +54,7 @@ pub struct LensDistortOperation {}
 #[derive(Debug, Clone, Default)]
 pub struct LensDistortAttrs {
     pub enable: i32,
+    pub direction: i32,
     pub k1: f32,
     pub k2: f32,
     pub center_x: f32,
@@ -80,6 +81,7 @@ impl LensDistortAttrs {
     pub fn new() -> LensDistortAttrs {
         LensDistortAttrs {
             enable: 1,
+            direction: 1, // 0 = 'undistort'
             k1: 0.0,
             k2: 0.0,
             center_x: 0.0,
@@ -112,6 +114,8 @@ impl Operation for LensDistortOperation {
                 let enable = attr_block.get_attr_i32("enable");
                 if enable == 1 {
                     let mut deformer = DeformerTde4Classic::default();
+
+                    deformer.set_attr_i32("direction", attr_block.get_attr_i32("direction"));
                     deformer.set_attr_f32("distortion", attr_block.get_attr_f32("k1"));
                     deformer.set_attr_f32("quartic_distortion", attr_block.get_attr_f32("k2"));
                     deformer
@@ -140,6 +144,7 @@ impl AttrBlock for LensDistortAttrs {
     fn attr_exists(&self, name: &str) -> AttrState {
         match name {
             "enable" => AttrState::Exists,
+            "direction" => AttrState::Exists,
             "k1" => AttrState::Exists,
             "k2" => AttrState::Exists,
             "center_x" => AttrState::Exists,
@@ -159,6 +164,7 @@ impl AttrBlock for LensDistortAttrs {
     fn get_attr_i32(&self, name: &str) -> i32 {
         match name {
             "enable" => self.enable,
+            "direction" => self.direction,
             _ => 0,
         }
     }
@@ -166,6 +172,7 @@ impl AttrBlock for LensDistortAttrs {
     fn set_attr_i32(&mut self, name: &str, value: i32) {
         match name {
             "enable" => self.enable = value,
+            "direction" => self.direction = value,
             _ => (),
         };
     }

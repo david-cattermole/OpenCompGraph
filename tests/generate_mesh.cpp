@@ -29,7 +29,6 @@ void generate_mesh(const bool debug_print,
                    const uint32_t divisions_x,
                    const uint32_t divisions_y,
                    ocg::StreamData &stream_data,
-                   ocg::DeformerDirection direction,
                    const char* file_path,
                    size_t &pos_count,
                    size_t &uv_count,
@@ -81,7 +80,7 @@ void generate_mesh(const bool debug_print,
         image_window.min_y = -0.5;
         image_window.max_x = +0.5;
         image_window.max_y = +0.5;
-        stream_data.apply_deformers(slice_vertex_pos, image_window, direction);
+        stream_data.apply_deformers(slice_vertex_pos, image_window);
     }
 
     // TODO: Apply the image 2D transforms (from the StreamData).

@@ -19,18 +19,14 @@
  *
  */
 
-use log::warn;
-
 use crate::cxxbridge::ffi::BBox2Df;
 use crate::cxxbridge::ffi::BBox2Di;
-use crate::cxxbridge::ffi::DeformerDirection;
 use crate::deformer::Deformer;
 use crate::ops;
 use crate::pixelblock::PixelBlock;
 
 pub fn apply_deformers_to_positions(
     deformers: &Vec<Box<dyn Deformer>>,
-    direction: DeformerDirection,
     image_window: BBox2Df,
     buffer: &mut [f32],
 ) {
@@ -47,32 +43,24 @@ pub fn apply_deformers_to_positions(
         return;
     }
 
-
     let stride = 3;
-    match direction {
-        DeformerDirection::Forward => {
-            for deformer in enabled_deformers {
-                deformer.apply_forward_slice_in_place(buffer, image_window, stride);
-            }
-        }
-        DeformerDirection::Backward => {
-            for deformer in enabled_deformers {
-                deformer.apply_backward_slice_in_place(buffer, image_window, stride);
-            }
-        }
-        _ => panic!("Invalid deformer direction: {:#?}", direction),
+    let inverse = false;
+    for deformer in enabled_deformers {
+        deformer.apply_slice_in_place(buffer, image_window, inverse, stride);
     }
 }
 
 pub fn apply_deformers_to_pixels(
     deformers: &Vec<Box<dyn Deformer>>,
-    direction: DeformerDirection,
     display_window: BBox2Di,
     src_pixel_block: &PixelBlock,
     src_data_window: BBox2Di,
     dst_pixel_block: &mut PixelBlock,
     _dst_data_window: &mut BBox2Di,
 ) {
+    // TODO: Check if all deformers are 'uniform' (same deformation
+    // for all points - can be simplified to a matrix), then compute
+    // the matrix and perform the computation once.
 
     if deformers.len() == 0 {
         // TODO: Copy src to dst.
@@ -90,20 +78,8 @@ pub fn apply_deformers_to_pixels(
     // Get the bounding box of the pixel_coords.
     let display_window_f32 = BBox2Df::from(display_window);
     let mut tmp_data_window = BBox2Df::from(src_data_window);
-    match direction {
-        DeformerDirection::Forward => {
-            for deformer in &enabled_deformers {
-                tmp_data_window =
-                    deformer.apply_forward_bounding_box(tmp_data_window, display_window_f32);
-            }
-        }
-        DeformerDirection::Backward => {
-            for deformer in &enabled_deformers {
-                tmp_data_window =
-                    deformer.apply_backward_bounding_box(tmp_data_window, display_window_f32);
-            }
-        }
-        _ => panic!("Incorrect deformer direction; {:?}", direction),
+    for deformer in &enabled_deformers {
+        tmp_data_window = deformer.apply_bounding_box(tmp_data_window, display_window_f32);
     }
 
     let mut dst_data_window = BBox2Di::new(
@@ -118,10 +94,6 @@ pub fn apply_deformers_to_pixels(
         src_pixel_block.num_channels(),
         src_pixel_block.pixel_data_type(),
     );
-
-    let src_width = src_pixel_block.width();
-    let src_height = src_pixel_block.height();
-    let src_num_pixels = src_width as usize * src_height as usize;
 
     let dst_width = dst_pixel_block.width();
     let dst_height = dst_pixel_block.height();
@@ -147,24 +119,13 @@ pub fn apply_deformers_to_pixels(
 
     // Apply deformers to 2D position buffer.
     let stride = 2;
-
-    match direction {
-        // Calculate the distortion in the opposite direction to what
-        // the user has requested, so that we can map the destination
-        // to source.
-        DeformerDirection::Forward => {
-            for deformer in &enabled_deformers {
-                let buffer = pixel_coords.as_mut_slice();
-                deformer.apply_backward_slice_in_place(buffer, display_window_f32, stride);
-            }
-        }
-        DeformerDirection::Backward => {
-            for deformer in &enabled_deformers {
-                let buffer = pixel_coords.as_mut_slice();
-                deformer.apply_forward_slice_in_place(buffer, display_window_f32, stride);
-            }
-        }
-        _ => panic!("Incorrect deformer direction; {:?}", direction),
+    // Calculate the distortion in the opposite direction to what the
+    // user has requested, so that we can map the destination to
+    // source.
+    let inverse = true;
+    for deformer in &enabled_deformers {
+        let buffer = pixel_coords.as_mut_slice();
+        deformer.apply_slice_in_place(buffer, display_window_f32, inverse, stride);
     }
 
     // Sample the image pixels with the position values.
@@ -177,4 +138,3 @@ pub fn apply_deformers_to_pixels(
         &mut dst_data_window,
     )
 }
-

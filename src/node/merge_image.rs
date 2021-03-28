@@ -110,7 +110,6 @@ fn do_image_process(
     pixel_block_a.convert_into_f32_data();
     pixel_block_b.convert_into_f32_data();
 
-    let _transform_matrix = copy_b.transform_matrix().to_na_matrix();
     // TODO: Apply transform matrix, deformations and color
     // corrections before attemping to merge. These operations are the
     // same as those from the 'write_image.rs' file.

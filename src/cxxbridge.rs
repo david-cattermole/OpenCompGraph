@@ -249,11 +249,11 @@ pub mod ffi {
     #[repr(u8)]
     #[derive(Debug, Copy, Clone, Hash)]
     #[namespace = "open_comp_graph"]
-    pub(crate) enum DeformerDirection {
-        #[cxx_name = "kForward"]
-        Forward = 0,
-        #[cxx_name = "kBackward"]
-        Backward = 1,
+    pub(crate) enum LensDistortDirection {
+        #[cxx_name = "kUndistort"]
+        Undistort = 0,
+        #[cxx_name = "kDistort"]
+        Distort = 1,
         #[cxx_name = "kUninitialized"]
         Uninitialized = 255,
     }
@@ -457,13 +457,11 @@ pub mod ffi {
         fn display_window(&self) -> BBox2Di;
         fn data_window(&self) -> BBox2Di;
         fn color_matrix(&self) -> Matrix4;
-        fn transform_matrix(&self) -> Matrix4;
         fn deformers_len(&self) -> usize;
         fn apply_deformers(
             &self,
             buffer: &mut [f32],
             image_window: BBox2Df,
-            direction: DeformerDirection
         );
         fn pixel_buffer(&self) -> &[f32];
         fn pixel_width(&self) -> i32;
@@ -625,6 +623,16 @@ impl From<i32> for ffi::MergeImageMode {
             1 => ffi::MergeImageMode::Over,
             2 => ffi::MergeImageMode::Multiply,
             _ => ffi::MergeImageMode::Uninitialized,
+        }
+    }
+}
+
+impl From<i32> for ffi::LensDistortDirection {
+    fn from(value: i32) -> Self {
+        match value {
+            0 => ffi::LensDistortDirection::Undistort,
+            1 => ffi::LensDistortDirection::Distort,
+            _ => ffi::LensDistortDirection::Uninitialized,
         }
     }
 }

@@ -26,8 +26,10 @@ use std::hash::Hasher;
 
 use crate::attrblock::AttrBlock;
 use crate::cxxbridge::ffi::AttrState;
+use crate::cxxbridge::ffi::BBox2Df;
 use crate::deformer::Deformer;
 use crate::hashutils::HashableF32;
+use crate::math::interp;
 
 #[derive(Debug, Clone)]
 pub struct DeformerBrownian {
@@ -69,6 +71,60 @@ impl Default for DeformerBrownian {
     }
 }
 
+/// Brownian lens distortion model.
+///
+/// xu = xd + ((xd - xc) * ((k1 * r2) + (k2 * r4)));
+/// yu = yd + ((yd - yc) * ((k1 * r2) + (k2 * r4)));
+///
+/// where:
+///   xu = undistorted image point
+///   xd = distorted image point
+///   xc = distortion center
+///   k1, k2, etc = Nth radial distortion coefficent
+///   p1, p2, etc = Nth tangential distortion coefficent
+///   r = sqrt(pow(xd - xc, 2) + pow(yd - yc, 2))
+///
+fn _apply(
+    obj: &DeformerBrownian,
+    xd: f32,
+    yd: f32,
+    image_window: BBox2Df,
+    inverse: bool,
+) -> (f32, f32) {
+    let min_x = image_window.min_x;
+    let min_y = image_window.min_y;
+    let max_x = image_window.max_x;
+    let max_y = image_window.max_y;
+
+    let xd_remap = interp::remap(min_x, max_x, 0.0, 1.0, xd);
+    let yd_remap = interp::remap(min_y, max_y, 0.0, 1.0, yd);
+
+    let xc = obj.xc;
+    let yc = obj.yc;
+    let k1 = obj.k1;
+    let k2 = obj.k2;
+
+    let r: f32 = ((xd - xc).powi(2) + (yd - yc).powi(2)).sqrt();
+    let r2: f32 = r.powi(2);
+    let r4: f32 = r.powi(4) * 2.0;
+
+    let (xu, yu) = match inverse {
+        false => (
+            xd_remap + ((xd_remap - xc) * ((k1 * r2) + (k2 * r4))),
+            yd_remap + ((yd_remap - yc) * ((k1 * r2) + (k2 * r4))),
+        ),
+        true => (
+            xd_remap - ((xd_remap - xc) * ((k1 * r2) + (k2 * r4))),
+            yd_remap - ((yd_remap - yc) * ((k1 * r2) + (k2 * r4))),
+        ),
+    };
+
+    let xu_remap = interp::remap(0.0, 1.0, min_x, max_x, xu);
+    let yu_remap = interp::remap(0.0, 1.0, min_y, max_y, yu);
+
+    (xu_remap, yu_remap)
+}
+
 impl Deformer for DeformerBrownian {
     fn hash_deformer(&self) -> u64 {
         let mut state = DefaultHasher::default();
@@ -80,49 +136,25 @@ impl Deformer for DeformerBrownian {
         Ok(())
     }
 
-    /// Brownian lens distortion model.
-    ///
-    /// xu = xd + ((xd - xc) * ((k1 * r2) + (k2 * r4)));
-    /// yu = yd + ((yd - yc) * ((k1 * r2) + (k2 * r4)));
-    ///
-    /// where:
-    ///   xu = undistorted image point
-    ///   xd = distorted image point
-    ///   xc = distortion center
-    ///   k1, k2, etc = Nth radial distortion coefficent
-    ///   p1, p2, etc = Nth tangential distortion coefficent
-    ///   r = sqrt(pow(xd - xc, 2) + pow(yd - yc, 2))
-    ///
-    fn apply_forward(&self, xd: f32, yd: f32) -> (f32, f32) {
-        let xc = self.xc;
-        let yc = self.yc;
-        let k1 = self.k1;
-        let k2 = self.k2;
+    fn apply_slice_in_place(
+        &self,
+        buffer: &mut [f32],
+        image_window: BBox2Df,
+        inverse: bool,
+        stride: usize,
+    ) {
+        let count = buffer.len() / stride;
+        for i in 0..count {
+            let index = i * stride;
 
-        let r: f32 = ((xd - xc).powi(2) + (yd - yc).powi(2)).sqrt();
-        let r2: f32 = r.powi(2);
-        let r4: f32 = r.powi(4) * 2.0;
+            let x = buffer[index + 0];
+            let y = buffer[index + 1];
 
-        let xu = xd + ((xd - xc) * ((k1 * r2) + (k2 * r4)));
-        let yu = yd + ((yd - yc) * ((k1 * r2) + (k2 * r4)));
+            let (xu, yu) = _apply(self, x, y, image_window, inverse);
 
-        (xu, yu)
-    }
-
-    fn apply_backward(&self, xd: f32, yd: f32) -> (f32, f32) {
-        let xc = self.xc;
-        let yc = self.yc;
-        let k1 = self.k1;
-        let k2 = self.k2;
-
-        let r: f32 = ((xd - xc).powi(2) + (yd - yc).powi(2)).sqrt();
-        let r2: f32 = r.powi(2);
-        let r4: f32 = r.powi(4) * 2.0;
-
-        let xu = xd - ((xd - xc) * ((k1 * r2) + (k2 * r4)));
-        let yu = yd - ((yd - yc) * ((k1 * r2) + (k2 * r4)));
-
-        (xu, yu)
+            buffer[index + 0] = xu;
+            buffer[index + 1] = yu;
+        }
     }
 }
 

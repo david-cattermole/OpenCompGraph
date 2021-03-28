@@ -39,21 +39,82 @@ int test_node_lens(const bool debug_print,
 
     auto frames = generate_frame_range(1, 1);
     auto graph = ocg::Graph();
-    auto read_node = graph.create_node(ocg::NodeType::kReadImage, "my_read_node");
-    auto lens_node = graph.create_node(ocg::NodeType::kLensDistort, "lens_node");
-    auto write_node = graph.create_node(ocg::NodeType::kWriteImage, "write_node");
 
-    graph.set_node_attr_str(read_node, "file_path", "./tests/data/checker_8bit_rgba_3840x2160.png");
-    graph.set_node_attr_f32(lens_node, "k1", 0.2f);
-    graph.set_node_attr_f32(lens_node, "k2", 0.05f);
-    graph.set_node_attr_f32(lens_node, "center_x", 0.0f);
-    graph.set_node_attr_f32(lens_node, "center_y", 0.0f);
-    graph.set_node_attr_str(write_node, "file_path", "./tests/data/out/test_node_lens_out1.png");
+    auto read_type = ocg::NodeType::kReadImage;
+    auto lens_type = ocg::NodeType::kLensDistort;
+    auto write_type = ocg::NodeType::kWriteImage;
 
-    graph.connect(read_node, lens_node, 0);
-    graph.connect(lens_node, write_node, 0);
+    auto read_node = graph.create_node(read_type, "read_node");
+    auto lens_distort_node = graph.create_node(lens_type, "distort");
+    auto lens_undistort_node = graph.create_node(lens_type, "undistort");
+    auto lens_redistort_node = graph.create_node(lens_type, "redistort");
+    auto write_distort_png_node = graph.create_node(write_type, "write_distort_png");
+    auto write_undistort_png_node = graph.create_node(write_type, "write_undistort_png");
+    auto write_redistort_png_node = graph.create_node(write_type, "write_redistort_png");
+    auto write_distort_exr_node = graph.create_node(write_type, "write_distort_exr");
+    auto write_undistort_exr_node = graph.create_node(write_type, "write_undistort_exr");
+    auto write_redistort_exr_node = graph.create_node(write_type, "write_redistort_exr");
 
-    auto status = graph.execute(lens_node, frames, cache);
+    // Distortion test values.
+    auto undistort_dir = static_cast<int32_t>(ocg::LensDistortDirection::kUndistort);
+    auto distort_dir = static_cast<int32_t>(ocg::LensDistortDirection::kDistort);
+    auto k1 = 0.2f;
+    auto k2 = 0.05f;
+    auto cx = 0.0f;
+    auto cy = 0.0f;
+
+    graph.set_node_attr_str(
+        read_node, "file_path",
+        "./tests/data/checker_8bit_rgba_3840x2160.png");
+
+    graph.set_node_attr_i32(lens_distort_node, "direction", distort_dir);
+    graph.set_node_attr_f32(lens_distort_node, "k1", k1);
+    graph.set_node_attr_f32(lens_distort_node, "k2", k2);
+    graph.set_node_attr_f32(lens_distort_node, "center_x", cx);
+    graph.set_node_attr_f32(lens_distort_node, "center_y", cy);
+
+    graph.set_node_attr_i32(lens_undistort_node, "direction", undistort_dir);
+    graph.set_node_attr_f32(lens_undistort_node, "k1", k1);
+    graph.set_node_attr_f32(lens_undistort_node, "k2", k2);
+    graph.set_node_attr_f32(lens_undistort_node, "center_x", cx);
+    graph.set_node_attr_f32(lens_undistort_node, "center_y", cy);
+
+    graph.set_node_attr_i32(lens_redistort_node, "direction", distort_dir);
+    graph.set_node_attr_f32(lens_redistort_node, "k1", k1);
+    graph.set_node_attr_f32(lens_redistort_node, "k2", k2);
+    graph.set_node_attr_f32(lens_redistort_node, "center_x", cx);
+    graph.set_node_attr_f32(lens_redistort_node, "center_y", cy);
+
+    graph.set_node_attr_str(
+        write_distort_png_node, "file_path",
+        "./tests/data/out/test_node_lens_out_distort.png");
+    graph.set_node_attr_str(
+        write_undistort_png_node, "file_path",
+        "./tests/data/out/test_node_lens_out_undistort.png");
+    graph.set_node_attr_str(
+        write_redistort_png_node, "file_path",
+        "./tests/data/out/test_node_lens_out_redistort.png");
+    graph.set_node_attr_str(
+        write_distort_exr_node, "file_path",
+        "./tests/data/out/test_node_lens_out_distort.exr");
+    graph.set_node_attr_str(
+        write_undistort_exr_node, "file_path",
+        "./tests/data/out/test_node_lens_out_undistort.exr");
+    graph.set_node_attr_str(
+        write_redistort_exr_node, "file_path",
+        "./tests/data/out/test_node_lens_out_redistort.exr");
+
+    graph.connect(read_node, lens_distort_node, 0);
+    graph.connect(read_node, lens_undistort_node, 0);
+    graph.connect(lens_distort_node, write_distort_png_node, 0);
+    graph.connect(lens_distort_node, write_distort_exr_node, 0);
+    graph.connect(lens_undistort_node, write_undistort_png_node, 0);
+    graph.connect(lens_undistort_node, write_undistort_exr_node, 0);
+    graph.connect(lens_undistort_node, lens_redistort_node, 0);
+    graph.connect(lens_redistort_node, write_redistort_png_node, 0);
+    graph.connect(lens_redistort_node, write_redistort_exr_node, 0);
+
+    auto status = graph.execute(lens_undistort_node, frames, cache);
     if (debug_print) {
         std::cout << "Graph as string:\n"
                   << graph.data_debug_string();
@@ -76,7 +137,6 @@ int test_node_lens(const bool debug_print,
     size_t tri_count = 0;
 
     // 2 x 2 divisions = 1 face (2 triangles).
-    auto direction = ocg::DeformerDirection::kForward;
     divisions_x = 2;
     divisions_y = 2;
     const char* file_path_2x2 = "./tests/data/out/test_node_lens_2x2_out.obj";
@@ -85,7 +145,6 @@ int test_node_lens(const bool debug_print,
         divisions_x,
         divisions_y,
         stream_data,
-        direction,
         file_path_2x2,
         pos_count,
         uv_count,
@@ -101,7 +160,6 @@ int test_node_lens(const bool debug_print,
         divisions_x,
         divisions_y,
         stream_data,
-        direction,
         file_path_3x3,
         pos_count,
         uv_count,
@@ -117,7 +175,6 @@ int test_node_lens(const bool debug_print,
         divisions_x,
         divisions_y,
         stream_data,
-        direction,
         file_path_4x4,
         pos_count,
         uv_count,
@@ -133,7 +190,6 @@ int test_node_lens(const bool debug_print,
         divisions_x,
         divisions_y,
         stream_data,
-        direction,
         file_path_2x4,
         pos_count,
         uv_count,
@@ -149,7 +205,6 @@ int test_node_lens(const bool debug_print,
         divisions_x,
         divisions_y,
         stream_data,
-        direction,
         file_path_16x32,
         pos_count,
         uv_count,
@@ -165,7 +220,6 @@ int test_node_lens(const bool debug_print,
         divisions_x,
         divisions_y,
         stream_data,
-        direction,
         file_path_32x16,
         pos_count,
         uv_count,
@@ -183,17 +237,47 @@ int test_node_lens(const bool debug_print,
         divisions_x,
         divisions_y,
         stream_data,
-        direction,
         file_path_192x108,
         pos_count,
         uv_count,
         tri_count);
 
-    status = graph.execute(write_node, frames, cache);
+    status = graph.execute(write_distort_png_node, frames, cache);
     if (status != ocg::ExecuteStatus::kSuccess) {
         std::cout << "ERROR=" << static_cast<uint32_t>(status) << '\n';
         return 1;
     }
+
+    status = graph.execute(write_undistort_png_node, frames, cache);
+    if (status != ocg::ExecuteStatus::kSuccess) {
+        std::cout << "ERROR=" << static_cast<uint32_t>(status) << '\n';
+        return 1;
+    }
+
+    status = graph.execute(write_redistort_png_node, frames, cache);
+    if (status != ocg::ExecuteStatus::kSuccess) {
+        std::cout << "ERROR=" << static_cast<uint32_t>(status) << '\n';
+        return 1;
+    }
+
+    status = graph.execute(write_distort_exr_node, frames, cache);
+    if (status != ocg::ExecuteStatus::kSuccess) {
+        std::cout << "ERROR=" << static_cast<uint32_t>(status) << '\n';
+        return 1;
+    }
+
+    status = graph.execute(write_undistort_exr_node, frames, cache);
+    if (status != ocg::ExecuteStatus::kSuccess) {
+        std::cout << "ERROR=" << static_cast<uint32_t>(status) << '\n';
+        return 1;
+    }
+
+    status = graph.execute(write_redistort_exr_node, frames, cache);
+    if (status != ocg::ExecuteStatus::kSuccess) {
+        std::cout << "ERROR=" << static_cast<uint32_t>(status) << '\n';
+        return 1;
+    }
+
     if (debug_print) {
         std::cout << "Graph as string:\n"
                   << graph.data_debug_string();

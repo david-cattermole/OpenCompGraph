@@ -69,18 +69,13 @@ Matrix4 StreamData::color_matrix() const noexcept {
     return this->inner.inner->color_matrix();
 };
 
-Matrix4 StreamData::transform_matrix() const noexcept {
-    return this->inner.inner->transform_matrix();
-};
-
 size_t StreamData::deformers_len() const noexcept {
     return this->inner.inner->deformers_len();
 };
 
 void StreamData::apply_deformers(rust::Slice<float> &buffer,
-                                 BBox2Df image_window,
-                                 DeformerDirection direction) noexcept {
-    return this->inner.inner->apply_deformers(buffer, image_window, direction);
+                                 BBox2Df image_window) noexcept {
+    return this->inner.inner->apply_deformers(buffer, image_window);
 };
 
 rust::Slice<const float> StreamData::pixel_buffer() const noexcept {

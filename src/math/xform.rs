@@ -26,19 +26,19 @@ fn create_translate_2d(translate_x: f32, translate_y: f32) -> na::Matrix4<f32> {
         1.0,
         0.0,
         0.0,
-        0.0,
-        //
-        0.0,
-        1.0,
-        0.0,
-        0.0,
-        //
-        0.0,
-        0.0,
-        1.0,
-        0.0,
         translate_x,
+        //
+        0.0,
+        1.0,
+        0.0,
         translate_y,
+        //
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
         0.0,
         1.0,
     )
@@ -81,9 +81,8 @@ fn create_scale_2d(scale_x: f32, scale_y: f32) -> na::Matrix4<f32> {
     )
 }
 
-// The transformation order is "TRS".
-pub fn apply_transform_2d(
-    input_matrix: na::Matrix4<f32>,
+/// The transformation order is "TRS".
+pub fn create_transform_trs_2d(
     translate_x: f32,
     translate_y: f32,
     rotate_center_x: f32,
@@ -95,5 +94,5 @@ pub fn apply_transform_2d(
     let translate = create_translate_2d(translate_x, translate_y);
     let rotate = create_rotate_2d(rotate_center_x, rotate_center_y, rotate_degree);
     let scale = create_scale_2d(scale_x, scale_y);
-    scale * rotate * translate * input_matrix
+    scale * rotate * translate
 }
