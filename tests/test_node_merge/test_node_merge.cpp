@@ -32,7 +32,7 @@ int test_node_merge(const bool debug_print,
     }
     auto bench = ocg::internal::BenchmarkTime();
 
-    auto frames = generate_frame_range(1, 10);
+    auto frames = generate_frame_range(1, 2);
     auto graph = ocg::Graph();
 
     auto read_image_type = ocg::NodeType::kReadImage;
