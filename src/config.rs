@@ -63,12 +63,28 @@ impl ConfigCache {
     }
 }
 
+#[derive(Debug, PartialEq, Deserialize)]
+struct ConfigThreading {
+    /// How many threads to use when reading or writing images?
+    num_threads: i32,
+}
+
+impl Default for ConfigThreading {
+    fn default() -> Self {
+        ConfigThreading { num_threads: 0 }
+    }
+}
+
+impl ConfigThreading {
+    pub fn num_threads(&self) -> i32 {
+        self.num_threads
     }
 }
 
 #[derive(Debug, Default, PartialEq, Deserialize)]
 pub struct ConfigImpl {
     cache: ConfigCache,
+    threading: ConfigThreading,
 }
 
 fn load_config(file_path: &str) -> Result<ConfigImpl, serde_yaml::Error> {

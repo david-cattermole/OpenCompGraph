@@ -2,3 +2,9 @@ cache:
   # How much RAM should be used for the cache, as a percentage (%).
   # Valid values are between 0.0 and 100.0. Default to 20%.
   ram_capacity_percent: 20.0
+
+threading:
+  # How many threads should be used for Image reading and writing?
+  # '0' means to use all available CPUs. Values above '0' will use
+  # only N number of threads for the task.
+  num_threads: 0
