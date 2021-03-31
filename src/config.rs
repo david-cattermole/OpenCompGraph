@@ -37,6 +37,8 @@ use crate::cxxbridge::ffi::ConfigImplShared;
 struct ConfigCache {
     /// How much System RAM to use for the cache? (This does not
     /// account for or use Swap/Page memory.)
+    ///
+    /// This value is expected to be between 0.0 and 100.0.
     ram_capacity_percent: f32,
 }
 
@@ -57,7 +59,10 @@ impl ConfigCache {
     }
 
     pub fn ram_capacity_percent(&self) -> f32 {
-        self.ram_capacity_percent
+        (self.ram_capacity_percent / 100.0).min(0.0).max(1.0)
+    }
+}
+
     }
 }
 

@@ -1,2 +1,4 @@
 cache:
-  ram_capacity_percent: 0.2
+  # How much RAM should be used for the cache, as a percentage (%).
+  # Valid values are between 0.0 and 100.0. Default to 20%.
+  ram_capacity_percent: 20.0
