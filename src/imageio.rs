@@ -23,7 +23,9 @@ use image;
 use log::debug;
 use std::time::Instant;
 
+use crate::cxxbridge::ffi::oiio_get_thread_count;
 use crate::cxxbridge::ffi::oiio_read_image;
+use crate::cxxbridge::ffi::oiio_set_thread_count;
 use crate::cxxbridge::ffi::oiio_write_image;
 use crate::cxxbridge::ffi::BBox2Di;
 use crate::cxxbridge::ffi::ImageShared;
@@ -32,7 +34,7 @@ use crate::imagebuffer::create_image_buffer_rgb_u8;
 use crate::imagebuffer::create_image_buffer_rgba_u8;
 use crate::pixelblock;
 
-pub fn read_image(path: &String) -> ImageShared {
+pub fn read_image(path: &String, num_threads: i32) -> ImageShared {
     debug!("Reading... {:?}", path);
     let start = Instant::now();
 
@@ -45,7 +47,14 @@ pub fn read_image(path: &String) -> ImageShared {
                 display_window: BBox2Di::new(0, 0, 0, 0),
                 data_window: BBox2Di::new(0, 0, 0, 0),
             };
+
+            // Overrides the number of threads used for reading.
+            let mut num_threads_backup = 0;
+            oiio_get_thread_count(&mut num_threads_backup);
+            oiio_set_thread_count(num_threads);
             oiio_read_image(&path, &mut image);
+            oiio_set_thread_count(num_threads_backup);
+
             image
         }
         false => {
@@ -67,7 +76,7 @@ pub fn read_image(path: &String) -> ImageShared {
     image
 }
 
-pub fn write_image(image: &ImageShared, path: &String) -> bool {
+pub fn write_image(image: &ImageShared, path: &String, num_threads: i32) -> bool {
     debug!("Writing... {:?}", path);
     let start = Instant::now();
 
@@ -75,7 +84,14 @@ pub fn write_image(image: &ImageShared, path: &String) -> bool {
     let ok = match use_oiio {
         true => {
             // Use OpenImageIO C++ library to write the image path.
-            oiio_write_image(&path, &image)
+            //
+            // Overrides the number of threads used for writing.
+            let mut num_threads_backup = 0;
+            oiio_get_thread_count(&mut num_threads_backup);
+            oiio_set_thread_count(num_threads);
+            let ok = oiio_write_image(&path, &image);
+            oiio_set_thread_count(num_threads_backup);
+            ok
         }
         false => {
             // Use Rust "image" Crate.

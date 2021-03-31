@@ -159,7 +159,8 @@ impl Operation for WriteImageOperation {
                     display_window,
                     data_window,
                 };
-                let ok = imageio::write_image(&image, &path_expanded);
+                let num_threads = 0;
+                let ok = imageio::write_image(&image, &path_expanded, num_threads);
                 debug!("Succcess: {}", ok);
                 NodeStatus::Valid
             }

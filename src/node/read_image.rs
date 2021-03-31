@@ -132,7 +132,8 @@ impl Operation for ReadImageOperation {
                 }
                 _ => {
                     debug!("Cache Miss");
-                    let img = imageio::read_image(&path_expanded);
+                    let num_threads = 0;
+                    let img = imageio::read_image(&path_expanded, num_threads);
                     let pixel_block_rc = Rc::new(*img.pixel_block);
                     let cached_img = CachedImage {
                         pixel_block: pixel_block_rc.clone(),
