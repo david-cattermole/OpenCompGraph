@@ -131,7 +131,9 @@ int test_graph_create_and_set_attrs(const bool debug_print) {
         std::cout << "write_path1=" << write_path1 << '\n';
         }
 
-        graph.set_node_attr_str(write_node, write_attr, "./tests/data/out/test_c_out.png");
+        graph.set_node_attr_str(
+            write_node, write_attr,
+            "./tests/data/out/test_graph_create_and_set_attrs_out.png");
         auto write_path2 = graph.get_node_attr_str(write_node, write_attr);
             if (debug_print) {
         std::cout << "write_path2=" << write_path2 << '\n';

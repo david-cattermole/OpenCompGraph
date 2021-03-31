@@ -54,9 +54,15 @@ int test_graph_non_linear_graph(const bool debug_print,
     graph.set_node_attr_f32(grade_underexpose_node, "multiply_r", 0.5f);
     graph.set_node_attr_f32(grade_dark_node, "multiply_r", 0.25f);
     graph.set_node_attr_f32(grade_light_node, "multiply_r", 1.2f);
-    graph.set_node_attr_str(write1_node, "file_path", "./tests/data/out/test_f_out1.png");
-    graph.set_node_attr_str(write2_node, "file_path", "./tests/data/out/test_f_out2.png");
-    graph.set_node_attr_str(write3_node, "file_path", "./tests/data/out/test_f_out3.png");
+    graph.set_node_attr_str(
+        write1_node, "file_path",
+        "./tests/data/out/test_graph_non_linear_graph_out1.png");
+    graph.set_node_attr_str(
+        write2_node, "file_path",
+        "./tests/data/out/test_graph_non_linear_graph_out2.png");
+    graph.set_node_attr_str(
+        write3_node, "file_path",
+        "./tests/data/out/test_graph_non_linear_graph_out3.png");
 
     graph.connect(read_node, grade_overexpose_node, 0);
     graph.connect(grade_overexpose_node, grade_underexpose_node, 0);

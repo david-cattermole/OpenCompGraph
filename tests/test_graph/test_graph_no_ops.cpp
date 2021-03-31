@@ -48,7 +48,7 @@ int test_graph_no_ops(const bool debug_print,
     graph.set_node_attr_str(
         read_node, "file_path", "tests/data/checker_8bit_rgba_3840x2160.png");
     graph.set_node_attr_str(
-        write_node, "file_path", "./tests/data/out/test_g_out.png");
+        write_node, "file_path", "./tests/data/out/test_graph_no_ops_out.png");
 
     // Ensure the node exists in the graph, check by finding based on
     // the id queried before.

@@ -79,7 +79,7 @@ int test_graph_re_eval_modified_graph(const bool debug_print,
         graph.set_node_attr_f32(grade_node, "multiply_g", mult_g);
         graph.set_node_attr_f32(grade_node, "multiply_b", mult_b);
 
-        auto out_file = "./tests/data/out/test_l_out" + number_to_string(i) + ".png";
+        auto out_file = "./tests/data/out/test_graph_re_eval_modified_graph_out" + number_to_string(i) + ".png";
         graph.set_node_attr_str(write_node, "file_path", out_file);
 
         auto exec_status = graph.execute(write_node, frames, cache);

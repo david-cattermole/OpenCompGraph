@@ -47,7 +47,7 @@ int test_cache_read_image_seq(const bool debug_print) {
         "tests/data/color_bars_3840x2160_png/color_bars.####.png");
     graph.set_node_attr_str(
         write_node, "file_path",
-        "./tests/data/out/test_j_out_color_bars_3840x2160.####.png");
+        "./tests/data/out/test_cache_read_image_seq_out_color_bars_3840x2160.####.png");
 
     graph.connect(read_node, write_node, 0);
 
