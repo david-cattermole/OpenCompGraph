@@ -1072,6 +1072,7 @@ enum class NodeType : ::std::uint8_t {
   kReadImage = 1,
   kWriteImage = 2,
   kTransform = 5,
+  kCropImage = 7,
   kMergeImage = 6,
   kGrade = 3,
   kLensDistort = 4,

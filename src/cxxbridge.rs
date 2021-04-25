@@ -176,7 +176,7 @@ pub mod ffi {
         // Transform
         #[cxx_name = "kTransform"]
         Transform = 5,
-        // CropImage,
+        CropImage = 7,
         // ReformatImage,
 
         // Merges

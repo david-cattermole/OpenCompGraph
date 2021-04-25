@@ -59,6 +59,16 @@ pub struct WriteImageOperation {}
 pub struct WriteImageAttrs {
     pub enable: i32,
     pub file_path: String,
+    // Crop the input image the display window before writing?
+    //
+    // '-1' = Auto.
+    // '0' = disabled.
+    // '1' = enabled.
+    //
+    // When 'auto' is enabled, if the image format to be writen does
+    // not support a data windows, the image is cropped, otherwise it
+    // is not.
+    pub crop_on_write: i32,
 }
 
 impl WriteImageOperation {
@@ -72,6 +82,7 @@ impl WriteImageAttrs {
         WriteImageAttrs {
             enable: 1,
             file_path: "".to_string(),
+            crop_on_write: 1,
         }
     }
 }
@@ -160,7 +171,11 @@ impl Operation for WriteImageOperation {
                     data_window,
                 };
                 let num_threads = 0;
-                let ok = imageio::write_image(&image, &path_expanded, num_threads);
+                let crop_on_write = attr_block.get_attr_i32("crop_on_write");
+                // TODO: Set 'do_crop' based on the crop_on_write
+                // attribute, and checking the file path extension.
+                let do_crop = true;
+                let ok = imageio::write_image(&image, &path_expanded, num_threads, do_crop);
                 debug!("Succcess: {}", ok);
                 NodeStatus::Valid
             }
@@ -181,6 +196,7 @@ impl AttrBlock for WriteImageAttrs {
         match name {
             "enable" => AttrState::Exists,
             "file_path" => AttrState::Exists,
+            "crop_on_write" => AttrState::Exists,
             _ => AttrState::Missing,
         }
     }
@@ -202,6 +218,7 @@ impl AttrBlock for WriteImageAttrs {
     fn get_attr_i32(&self, name: &str) -> i32 {
         match name {
             "enable" => self.enable,
+            "crop_on_write" => self.crop_on_write,
             _ => 0,
         }
     }
@@ -209,6 +226,7 @@ impl AttrBlock for WriteImageAttrs {
     fn set_attr_i32(&mut self, name: &str, value: i32) {
         match name {
             "enable" => self.enable = value,
+            "crop_on_write" => self.crop_on_write = value,
             _ => (),
         };
     }

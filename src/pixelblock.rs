@@ -27,6 +27,7 @@ use std::fmt;
 use std::hash::{Hash, Hasher};
 
 use crate::colorutils::convert_srgb_to_linear;
+use crate::cxxbridge::ffi::BBox2Di;
 use crate::cxxbridge::ffi::PixelDataType;
 use crate::data::COLOR_BARS;
 use crate::data::COLOR_BARS_HEIGHT;
@@ -240,6 +241,66 @@ impl PixelBlock {
             pixel_data_type,
             pixels,
         }
+    }
+
+    /// Construct a pixel block from an existing PixelBlock, with a
+    /// new data window.
+    ///
+    /// The pixels inside the data window are copied.
+    pub fn from_pixel_block(
+        pixel_block: &PixelBlock,
+        data_window: BBox2Di,
+        crop_window: BBox2Di,
+    ) -> PixelBlock {
+        assert!(pixel_block.width() == data_window.width());
+        assert!(pixel_block.height() == data_window.height());
+
+        let diff_window = BBox2Di::intersection(data_window, crop_window);
+
+        let width = crop_window.width();
+        let height = crop_window.height();
+        let num_channels = pixel_block.num_channels();
+
+        // TODO: Support other pixel data types.
+        let pixel_data_type = PixelDataType::Float32;
+
+        let mut new_pixel_block = PixelBlock::new(width, height, num_channels, pixel_data_type);
+
+        // Detect if there are any pixels to copy over. If not, simply
+        // return the transparent black pixels for the crop window.
+        if diff_window.area() == 0 {
+            return new_pixel_block;
+        }
+
+        // Copy over pixels, scanline by scanline.
+        //
+        // Each scanline may live inside or outside the original data
+        // window.
+        let stride_y = diff_window.width() * num_channels;
+
+        let dst_offset_y = diff_window.min_y;
+        let src_offset_y = data_window.min_y;
+        let src_offset_start_x = (diff_window.min_x - data_window.min_x) * num_channels;
+        let src_offset_end_x = src_offset_start_x + (diff_window.width()) * num_channels;
+
+        for y in diff_window.min_y..diff_window.max_y {
+            // Destination indexes into the cropped output image.
+            let dst_row = y - dst_offset_y;
+            let dst_start_index = (dst_row * crop_window.width() * num_channels) as usize;
+            let dst_end_index = dst_start_index + (diff_window.width() * num_channels) as usize;
+            let mut dst = &mut new_pixel_block.pixels[dst_start_index..dst_end_index];
+
+            // Source indexes into the input image.
+            let src_row = (y - src_offset_y);
+            let src_row_index = (src_row * data_window.width() * num_channels) as usize;
+            let src_start_index = (src_row_index + src_offset_start_x as usize);
+            let src_end_index = (src_row_index + src_offset_end_x as usize);
+            let src = &pixel_block.pixels[src_start_index..src_end_index];
+
+            dst.copy_from_slice(src);
+        }
+
+        new_pixel_block
     }
 
     pub fn convert_into_f32_data(&mut self) {

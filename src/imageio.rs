@@ -49,11 +49,12 @@ pub fn read_image(path: &String, num_threads: i32) -> ImageShared {
             };
 
             // Overrides the number of threads used for reading.
-            let mut num_threads_backup = 0;
-            oiio_get_thread_count(&mut num_threads_backup);
+            let mut old_num_threads = 0;
+            oiio_get_thread_count(&mut old_num_threads);
             oiio_set_thread_count(num_threads);
             oiio_read_image(&path, &mut image);
-            oiio_set_thread_count(num_threads_backup);
+            oiio_set_thread_count(old_num_threads);
+
 
             image
         }
@@ -76,7 +77,12 @@ pub fn read_image(path: &String, num_threads: i32) -> ImageShared {
     image
 }
 
-pub fn write_image(image: &ImageShared, path: &String, num_threads: i32) -> bool {
+pub fn write_image(
+    image: &ImageShared,
+    path: &String,
+    num_threads: i32,
+    crop_to_display_window: bool,
+) -> bool {
     debug!("Writing... {:?}", path);
     let start = Instant::now();
 
@@ -84,13 +90,16 @@ pub fn write_image(image: &ImageShared, path: &String, num_threads: i32) -> bool
     let ok = match use_oiio {
         true => {
             // Use OpenImageIO C++ library to write the image path.
-            //
+
             // Overrides the number of threads used for writing.
-            let mut num_threads_backup = 0;
-            oiio_get_thread_count(&mut num_threads_backup);
+            let mut old_num_threads = 0;
+            oiio_get_thread_count(&mut old_num_threads);
             oiio_set_thread_count(num_threads);
+
             let ok = oiio_write_image(&path, &image);
-            oiio_set_thread_count(num_threads_backup);
+
+            oiio_set_thread_count(old_num_threads);
+
             ok
         }
         false => {

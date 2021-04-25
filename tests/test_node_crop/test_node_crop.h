@@ -19,7 +19,7 @@
  *
  */
 
-pub mod imagecrop;
-pub mod imagemerge;
-pub mod pixelremap;
-pub mod xformcolor;
+#include <opencompgraph.h>
+
+int test_node_crop(const bool debug_print,
+                   std::shared_ptr<open_comp_graph::Cache> cache);
