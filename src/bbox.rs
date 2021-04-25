@@ -96,6 +96,12 @@ impl BBox2Di {
         }
     }
 
+    pub fn center(&self) -> (i32, i32) {
+        let x = (self.min_x + self.max_x) / 2;
+        let y = (self.min_y + self.max_y) / 2;
+        (x, y)
+    }
+
     pub fn area(&self) -> u32 {
         (self.width() * self.height()) as u32
     }
