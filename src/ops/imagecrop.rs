@@ -35,7 +35,7 @@ pub fn do_image_process(
 ) -> ImageShared {
     debug_assert!(inputs.len() == 1);
 
-    let mut new_data_window = match black_outside {
+    let new_data_window = match black_outside {
         true => BBox2Di::new(
             // Add extra edge of pixels around the edge of the image.
             crop_window.min_x - 1,

@@ -276,8 +276,6 @@ impl PixelBlock {
         //
         // Each scanline may live inside or outside the original data
         // window.
-        let stride_y = diff_window.width() * num_channels;
-
         let dst_offset_y = diff_window.min_y;
         let src_offset_y = data_window.min_y;
         let src_offset_start_x = (diff_window.min_x - data_window.min_x) * num_channels;
@@ -288,13 +286,13 @@ impl PixelBlock {
             let dst_row = y - dst_offset_y;
             let dst_start_index = (dst_row * crop_window.width() * num_channels) as usize;
             let dst_end_index = dst_start_index + (diff_window.width() * num_channels) as usize;
-            let mut dst = &mut new_pixel_block.pixels[dst_start_index..dst_end_index];
+            let dst = &mut new_pixel_block.pixels[dst_start_index..dst_end_index];
 
             // Source indexes into the input image.
-            let src_row = (y - src_offset_y);
+            let src_row = y - src_offset_y;
             let src_row_index = (src_row * data_window.width() * num_channels) as usize;
-            let src_start_index = (src_row_index + src_offset_start_x as usize);
-            let src_end_index = (src_row_index + src_offset_end_x as usize);
+            let src_start_index = src_row_index + src_offset_start_x as usize;
+            let src_end_index = src_row_index + src_offset_end_x as usize;
             let src = &pixel_block.pixels[src_start_index..src_end_index];
 
             dst.copy_from_slice(src);

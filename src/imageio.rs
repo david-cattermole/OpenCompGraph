@@ -55,7 +55,6 @@ pub fn read_image(path: &String, num_threads: i32) -> ImageShared {
             oiio_read_image(&path, &mut image);
             oiio_set_thread_count(old_num_threads);
 
-
             image
         }
         false => {
@@ -81,7 +80,7 @@ pub fn write_image(
     image: &ImageShared,
     path: &String,
     num_threads: i32,
-    crop_to_display_window: bool,
+    _crop_to_display_window: bool,
 ) -> bool {
     debug!("Writing... {:?}", path);
     let start = Instant::now();
