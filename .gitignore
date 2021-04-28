@@ -4,5 +4,6 @@
 /build_windows
 /install
 /cmake-build-*
+venv/*
 **/*.rs.bk
 *~
