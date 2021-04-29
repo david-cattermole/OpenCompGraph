@@ -16,7 +16,8 @@
 # along with OpenCompGraph.  If not, see <https://www.gnu.org/licenses/>.
 # ---------------------------------------------------------------------
 #
-# Maya MatchMoveSolver build script.
+# CMake Build script for Science-D-Vision's Lens Distortion Plugin
+# Kit.
 #
 cmake_minimum_required(VERSION 3.0)
 
@@ -37,9 +38,9 @@ set(PROJECT_COPYRIGHT "Science-D-Visions, (c) 2011,2012,2013,2014,2015,2016,2017
 #   set(PYTHON_LIB_DIR "/usr/lib/python2.7")  # TODO: Test on Linux.
 # endif ()
 
-# # Ensure we can find the installed dlfcn CMake module, so we can load
-# # the package.
-# set(CMAKE_PREFIX_PATH ${CMAKE_MODULE_PATH} ${DLFCN_LOCATION}/share)
+# Ensure we can find the installed dlfcn CMake module, so we can load
+# the package.
+set(CMAKE_PREFIX_PATH ${CMAKE_MODULE_PATH} ${DLFCN_LOCATION}/share)
 
 # Base LDPK Plug-in Loader
 set(LDPK_BASE_SOURCE_FILES
