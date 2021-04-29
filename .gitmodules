@@ -4,3 +4,6 @@
 [submodule "tests/data/openexr-images"]
 	path = tests/data/openexr-images
 	url = https://github.com/AcademySoftwareFoundation/openexr-images
+[submodule "tests/data/ocio-configs"]
+	path = tests/data/ocio-configs
+	url = https://github.com/colour-science/OpenColorIO-Configs.git
