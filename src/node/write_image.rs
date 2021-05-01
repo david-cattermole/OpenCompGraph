@@ -126,6 +126,9 @@ impl Operation for WriteImageOperation {
                 // color space.
                 pixel_block.convert_into_f32_data();
 
+                // TODO: Allow the user to give OCIO color spaces.
+                let from_color_space = "Utility - sRGB - Texture".to_string();
+                let to_color_space = "ACES - ACEScg".to_string();
                 let width = pixel_block.width();
                 let height = pixel_block.height();
                 let num_channels = pixel_block.num_channels();
@@ -134,8 +137,8 @@ impl Operation for WriteImageOperation {
                     width,
                     height,
                     num_channels,
-                    &"Utility - sRGB - Texture".to_string(),
-                    &"ACES - ACEScg".to_string(),
+                    &from_color_space,
+                    &to_color_space,
                 );
 
                 {

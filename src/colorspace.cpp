@@ -59,14 +59,15 @@ bool ocio_color_convert_inplace(
         int width, int height, int num_channels,
         const rust::String &src_color_space_name,
         const rust::String &dst_color_space_name) {
+    std::cout << "SRC COLOR SPACE: " << src_color_space_name << '\n';
+    std::cout << "DST COLOR SPACE: " << dst_color_space_name << '\n';
 
     bool ok = false;
     try {
         OCIO::ConstConfigRcPtr config = OCIO::GetCurrentConfig();
 
-        // FIXME: These are hard-coded for now, this should be fixed.
-        auto src_color_space_name_c = "Utility - sRGB - Texture";
-        auto dst_color_space_name_c = "ACES - ACEScg";
+        auto src_color_space_name_c = std::string(src_color_space_name).c_str();
+        auto dst_color_space_name_c = std::string(dst_color_space_name).c_str();
         auto src_color_space = config->getColorSpace(src_color_space_name_c);
         auto dst_color_space = config->getColorSpace(dst_color_space_name_c);
 
