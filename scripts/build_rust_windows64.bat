@@ -5,7 +5,7 @@ SETLOCAL
 :: The root of this project.
 SET THIS_DIR=%~dp0
 SET ROOT=%THIS_DIR%..\
-ECHO OpenCompGroup Root: %ROOT%
+ECHO OpenCompGraph Root: %ROOT%
 CHDIR %ROOT%
 
 :: Install the needed cxxbridge.exe command to be installed with the
