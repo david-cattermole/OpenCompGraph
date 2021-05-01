@@ -44,8 +44,8 @@ public:
   String(const char *);
   String(const char *, std::size_t);
 
-  String &operator=(const String &) & noexcept;
-  String &operator=(String &&) & noexcept;
+  String &operator=(const String &) &noexcept;
+  String &operator=(String &&) &noexcept;
 
   explicit operator std::string() const;
 
@@ -53,6 +53,7 @@ public:
   const char *data() const noexcept;
   std::size_t size() const noexcept;
   std::size_t length() const noexcept;
+  bool empty() const noexcept;
 
   const char *c_str() noexcept;
 
@@ -97,7 +98,7 @@ public:
   Str(const char *);
   Str(const char *, std::size_t);
 
-  Str &operator=(const Str &) & noexcept = default;
+  Str &operator=(const Str &) &noexcept = default;
 
   explicit operator std::string() const;
 
@@ -105,6 +106,7 @@ public:
   const char *data() const noexcept;
   std::size_t size() const noexcept;
   std::size_t length() const noexcept;
+  bool empty() const noexcept;
 
   // Important in order for System V ABI to pass in registers.
   Str(const Str &) noexcept = default;
@@ -144,8 +146,8 @@ template <>
 struct copy_assignable_if<false> {
   copy_assignable_if() noexcept = default;
   copy_assignable_if(const copy_assignable_if &) noexcept = default;
-  copy_assignable_if &operator=(const copy_assignable_if &) & noexcept = delete;
-  copy_assignable_if &operator=(copy_assignable_if &&) & noexcept = default;
+  copy_assignable_if &operator=(const copy_assignable_if &) &noexcept = delete;
+  copy_assignable_if &operator=(copy_assignable_if &&) &noexcept = default;
 };
 } // namespace detail
 
@@ -159,8 +161,8 @@ public:
   Slice() noexcept;
   Slice(T *, std::size_t count) noexcept;
 
-  Slice &operator=(const Slice<T> &) & noexcept = default;
-  Slice &operator=(Slice<T> &&) & noexcept = default;
+  Slice &operator=(const Slice<T> &) &noexcept = default;
+  Slice &operator=(Slice<T> &&) &noexcept = default;
 
   T *data() const noexcept;
   std::size_t size() const noexcept;
@@ -248,7 +250,7 @@ public:
   explicit Box(const T &);
   explicit Box(T &&);
 
-  Box &operator=(Box &&) & noexcept;
+  Box &operator=(Box &&) &noexcept;
 
   const T *operator->() const noexcept;
   const T &operator*() const noexcept;
@@ -293,7 +295,7 @@ public:
   Vec(Vec &&) noexcept;
   ~Vec() noexcept;
 
-  Vec &operator=(Vec &&) & noexcept;
+  Vec &operator=(Vec &&) &noexcept;
   Vec &operator=(const Vec &) &;
 
   std::size_t size() const noexcept;
@@ -316,7 +318,7 @@ public:
   void push_back(const T &value);
   void push_back(T &&value);
   template <typename... Args>
-  void emplace_back(Args &&... args);
+  void emplace_back(Args &&...args);
 
   using iterator = typename Slice<T>::iterator;
   iterator begin() noexcept;
@@ -372,7 +374,7 @@ public:
   ~Error() noexcept override;
 
   Error &operator=(const Error &) &;
-  Error &operator=(Error &&) & noexcept;
+  Error &operator=(Error &&) &noexcept;
 
   const char *what() const noexcept override;
 
@@ -475,7 +477,7 @@ void panic [[noreturn]] (const char *msg);
 #define CXXBRIDGE1_RUST_FN
 template <typename Ret, typename... Args>
 Ret Fn<Ret(Args...)>::operator()(Args... args) const noexcept {
-  return (*this->trampoline)(std::move(args)..., this->fn);
+  return (*this->trampoline)(std::forward<Args>(args)..., this->fn);
 }
 
 template <typename Ret, typename... Args>
@@ -484,12 +486,15 @@ Fn<Ret(Args...)> Fn<Ret(Args...)>::operator*() const noexcept {
 }
 #endif // CXXBRIDGE1_RUST_FN
 
-#ifndef CXXBRIDGE1_RUST_BITCOPY
-#define CXXBRIDGE1_RUST_BITCOPY
+#ifndef CXXBRIDGE1_RUST_BITCOPY_T
+#define CXXBRIDGE1_RUST_BITCOPY_T
 struct unsafe_bitcopy_t final {
   explicit unsafe_bitcopy_t() = default;
 };
+#endif // CXXBRIDGE1_RUST_BITCOPY_T
 
+#ifndef CXXBRIDGE1_RUST_BITCOPY
+#define CXXBRIDGE1_RUST_BITCOPY
 constexpr unsafe_bitcopy_t unsafe_bitcopy{};
 #endif // CXXBRIDGE1_RUST_BITCOPY
 
@@ -502,7 +507,12 @@ Slice<T>::Slice() noexcept {
 
 template <typename T>
 Slice<T>::Slice(T *s, std::size_t count) noexcept {
-  sliceInit(this, const_cast<typename std::remove_const<T>::type *>(s), count);
+  assert(s != nullptr || count == 0);
+  sliceInit(this,
+            s == nullptr && count == 0
+                ? reinterpret_cast<void *>(align_of<T>())
+                : const_cast<typename std::remove_const<T>::type *>(s),
+            count);
 }
 
 template <typename T>
@@ -735,7 +745,7 @@ Box<T>::~Box() noexcept {
 }
 
 template <typename T>
-Box<T> &Box<T>::operator=(Box &&other) & noexcept {
+Box<T> &Box<T>::operator=(Box &&other) &noexcept {
   if (this->ptr) {
     this->drop();
   }
@@ -766,7 +776,7 @@ T &Box<T>::operator*() noexcept {
 
 template <typename T>
 template <typename... Fields>
-Box<T> Box<T>::in_place(Fields &&... fields) {
+Box<T> Box<T>::in_place(Fields &&...fields) {
   allocation alloc;
   auto ptr = alloc.ptr;
   ::new (ptr) T{std::forward<Fields>(fields)...};
@@ -823,7 +833,7 @@ Vec<T>::~Vec() noexcept {
 }
 
 template <typename T>
-Vec<T> &Vec<T>::operator=(Vec &&other) & noexcept {
+Vec<T> &Vec<T>::operator=(Vec &&other) &noexcept {
   this->drop();
   this->repr = other.repr;
   new (&other) Vec();
@@ -920,7 +930,7 @@ void Vec<T>::push_back(T &&value) {
 
 template <typename T>
 template <typename... Args>
-void Vec<T>::emplace_back(Args &&... args) {
+void Vec<T>::emplace_back(Args &&...args) {
   auto size = this->size();
   this->reserve_total(size + 1);
   ::new (reinterpret_cast<T *>(reinterpret_cast<char *>(this->data()) +
