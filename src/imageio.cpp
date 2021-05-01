@@ -102,6 +102,26 @@ bool oiio_read_image(const rust::String &file_path, ImageShared &image) {
     auto pixels = image.pixel_block->as_slice_mut();
     auto pixel_data = pixels.data();
 
+    // Read image metadata.
+    //
+    // https://openimageio.readthedocs.io/en/release-2.2.8.0/stdmetadata.html#cmdoption-arg-oiio-ColorSpace
+    int orientation = spec.get_int_attribute("Orientation", 0);
+    float pixel_aspect = spec.get_float_attribute("PixelAspectRatio", 1.0f);
+    std::string colorspace_text = spec.get_string_attribute("oiio:ColorSpace", "");
+    std::string desc_text = spec.get_string_attribute("ImageDescription", "");
+    int unassociated_alpha = spec.get_int_attribute("oiio:UnassociatedAlpha", 0);
+    std::cout << "Orientation: " << orientation << '\n';
+    std::cout << "Pixel Aspect: " << pixel_aspect << '\n';
+    std::cout << "Color Space: " << colorspace_text << '\n';
+    std::cout << "Unassociated Alpha: " << unassociated_alpha << '\n';
+    std::cout << "Description: " << desc_text << '\n';
+    auto color_space = rust::String(colorspace_text);
+    image.metadata->set_color_space(color_space);
+    image.metadata->set_pixel_aspect(pixel_aspect);
+    image.metadata->set_orientation(
+        static_cast<ImageOrientation>(orientation));
+    image.metadata->set_unassociated_alpha(unassociated_alpha != 0);
+
     int chbegin = 0;
     int chend = num_channels;
     auto pixel_size_bytes = padded_num_channels * channel_num_bytes;

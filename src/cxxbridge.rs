@@ -32,6 +32,7 @@ use crate::graph::create_graph_box;
 use crate::graph::GraphImpl;
 use crate::hashutils::generate_id_from_name;
 use crate::hashutils::generate_random_id;
+use crate::imagemetadata::ImageMetadata;
 use crate::logger::initialize;
 use crate::node::create_node_box_with_id;
 use crate::node::NodeImpl;
@@ -124,6 +125,7 @@ pub mod ffi {
     #[namespace = "open_comp_graph::internal"]
     pub(crate) struct ImageShared {
         pixel_block: Box<PixelBlock>,
+        metadata: Box<ImageMetadata>,
         display_window: BBox2Di,
         data_window: BBox2Di,
     }
@@ -295,7 +297,54 @@ pub mod ffi {
         #[cxx_name = "kUninitialized"]
         Uninitialized = 255,
     }
+
     // Color Spaces
+    // The orientation of an image.
+    //
+    // https://openimageio.readthedocs.io/en/release-2.2.8.0/stdmetadata.html#cmdoption-arg-Orientation
+    //
+    #[repr(u8)]
+    #[derive(Debug, Copy, Clone, Hash)]
+    #[namespace = "open_comp_graph"]
+    pub(crate) enum ImageOrientation {
+        // NOTE: Keep these indexes in-line with the "From" trait
+        // below.
+        //
+        // 0 = normal (top to bottom, left to right)
+        #[cxx_name = "kNormal"]
+        Normal = 0,
+        //
+        // 1 = flipped horizontally (top to botom, right to left)
+        #[cxx_name = "kFlippedHorizontally"]
+        FlippedHorizontally = 1,
+        //
+        // 2 = rotated 180 (bottom to top, right to left)
+        #[cxx_name = "kRotated180"]
+        Rotated180 = 2,
+        //
+        // 3 = flipped vertically (bottom to top, left to right)
+        #[cxx_name = "kFlippedVertically"]
+        FlippedVertically = 3,
+        //
+        // 4 = transposed (left to right, top to bottom)
+        #[cxx_name = "kTransposed"]
+        Transposed = 4,
+        //
+        // 5 = rotated 90 clockwise (right to left, top to bottom)
+        #[cxx_name = "kRotated90Clockwise"]
+        Rotated90Clockwise = 5,
+        //
+        // 6 = transverse (right to left, bottom to top)
+        #[cxx_name = "kTransverse"]
+        Transverse = 6,
+        //
+        // 7 = rotated 90 counter-clockwise (left to right, bottom to top)
+        #[cxx_name = "kRotated90CounterClockwise"]
+        Rotated90CounterClockwise = 7,
+        //
+        #[cxx_name = "kUninitialized"]
+        Uninitialized = 255,
+    }
     #[namespace = "open_comp_graph::internal"]
     unsafe extern "C++" {
         include!("opencompgraph/internal/colorspace.h");
@@ -422,7 +471,6 @@ pub mod ffi {
         fn get_total_system_memory_as_bytes() -> usize;
     }
 
-
     // PixelBlock
     #[namespace = "open_comp_graph::internal"]
     extern "Rust" {
@@ -445,6 +493,24 @@ pub mod ffi {
             height: i32,
             num_channels: i32,
             pixel_data_type: PixelDataType);
+    }
+
+    // ImageMetadata
+    #[namespace = "open_comp_graph::internal"]
+    extern "Rust" {
+        type ImageMetadata;
+
+        fn color_space(&self) -> String;
+        fn set_color_space(&mut self, value: String);
+
+        fn pixel_aspect(&self) -> f32;
+        fn set_pixel_aspect(&mut self, value: f32);
+
+        fn orientation(&self) -> ImageOrientation;
+        fn set_orientation(&mut self, value: ImageOrientation);
+
+        fn unassociated_alpha(&self) -> bool;
+        fn set_unassociated_alpha(&mut self, value: bool);
     }
 
     // StreamData (Rc)
@@ -634,6 +700,22 @@ impl From<i32> for ffi::LensDistortDirection {
             0 => ffi::LensDistortDirection::Undistort,
             1 => ffi::LensDistortDirection::Distort,
             _ => ffi::LensDistortDirection::Uninitialized,
+        }
+    }
+}
+
+impl From<i32> for ffi::ImageOrientation {
+    fn from(value: i32) -> Self {
+        match value {
+            0 => ffi::ImageOrientation::Normal,
+            1 => ffi::ImageOrientation::FlippedHorizontally,
+            2 => ffi::ImageOrientation::Rotated180,
+            3 => ffi::ImageOrientation::FlippedVertically,
+            4 => ffi::ImageOrientation::Transposed,
+            5 => ffi::ImageOrientation::Rotated90Clockwise,
+            6 => ffi::ImageOrientation::Transverse,
+            7 => ffi::ImageOrientation::Rotated90CounterClockwise,
+            _ => ffi::ImageOrientation::Uninitialized,
         }
     }
 }

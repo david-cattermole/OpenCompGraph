@@ -23,6 +23,7 @@ use std::rc::Rc;
 
 use crate::cxxbridge::ffi::BBox2Di;
 use crate::cxxbridge::ffi::ImageShared;
+use crate::imagemetadata::ImageMetadata;
 use crate::pixelblock::PixelBlock;
 use crate::stream::StreamDataImpl;
 
@@ -71,6 +72,7 @@ pub fn do_image_process(
         pixel_block: pixel_block_box,
         display_window: new_display_window,
         data_window: new_data_window,
+        metadata: Box::new(ImageMetadata::new()),
     };
 
     image_out

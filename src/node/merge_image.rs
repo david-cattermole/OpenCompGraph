@@ -35,6 +35,7 @@ use crate::cxxbridge::ffi::NodeStatus;
 use crate::cxxbridge::ffi::NodeType;
 use crate::data::Identifier;
 use crate::hashutils::HashableF32;
+use crate::imagemetadata::ImageMetadata;
 use crate::node::traits::Operation;
 use crate::node::NodeImpl;
 use crate::ops::imagemerge;
@@ -119,6 +120,7 @@ fn do_image_process(
         pixel_block: pixel_block_a_box,
         display_window: input_a.display_window(),
         data_window: input_a.data_window(),
+        metadata: Box::new(ImageMetadata::new()),
     };
 
     let pixel_block_b_box = Box::new(pixel_block_b);
@@ -126,6 +128,7 @@ fn do_image_process(
         pixel_block: pixel_block_b_box,
         display_window: input_b.display_window(),
         data_window: input_b.data_window(),
+        metadata: Box::new(ImageMetadata::new()),
     };
 
     let pixel_block_out_box = Box::new(PixelBlock::new_constant_pixel_rgba_f32(0.0, 0.0, 0.0, 1.0));
@@ -133,6 +136,7 @@ fn do_image_process(
         pixel_block: pixel_block_out_box,
         display_window: BBox2Di::new(0, 0, 1, 1),
         data_window: BBox2Di::new(0, 0, 1, 1),
+        metadata: Box::new(ImageMetadata::new()),
     };
 
     let ok = imagemerge::merge(merge_mode, &image_a, &image_b, mix, &mut image_out);

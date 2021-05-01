@@ -35,6 +35,7 @@ pub mod graphiter;
 pub mod hashutils;
 pub mod imagebuffer;
 pub mod imageio;
+pub mod imagemetadata;
 pub mod logger;
 pub mod math;
 pub mod matrix;

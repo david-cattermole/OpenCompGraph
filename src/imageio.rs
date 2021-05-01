@@ -32,6 +32,7 @@ use crate::cxxbridge::ffi::ImageShared;
 use crate::cxxbridge::ffi::PixelDataType;
 use crate::imagebuffer::create_image_buffer_rgb_u8;
 use crate::imagebuffer::create_image_buffer_rgba_u8;
+use crate::imagemetadata::ImageMetadata;
 use crate::pixelblock;
 
 pub fn read_image(path: &String, num_threads: i32) -> ImageShared {
@@ -46,6 +47,7 @@ pub fn read_image(path: &String, num_threads: i32) -> ImageShared {
                 pixel_block: Box::new(pixelblock::PixelBlock::empty(PixelDataType::Float32)),
                 display_window: BBox2Di::new(0, 0, 0, 0),
                 data_window: BBox2Di::new(0, 0, 0, 0),
+                metadata: Box::new(ImageMetadata::new()),
             };
 
             // Overrides the number of threads used for reading.
@@ -67,6 +69,7 @@ pub fn read_image(path: &String, num_threads: i32) -> ImageShared {
                 pixel_block,
                 display_window,
                 data_window,
+                metadata: Box::new(ImageMetadata::new()),
             }
         }
     };

@@ -20,6 +20,7 @@ namespace open_comp_graph {
   enum class StreamDataState : ::std::uint8_t;
   enum class LensDistortDirection : ::std::uint8_t;
   enum class MergeImageMode : ::std::uint8_t;
+  enum class ImageOrientation : ::std::uint8_t;
   namespace internal {
     struct GraphImplShared;
     struct StreamDataImplShared;
@@ -29,6 +30,7 @@ namespace open_comp_graph {
     enum class ParameterType : ::std::int32_t;
     using OcgLdPluginBase = ::open_comp_graph::internal::OcgLdPluginBase;
     struct PixelBlock;
+    struct ImageMetadata;
     struct StreamDataImplRc;
     struct StreamDataImpl;
     struct NodeImpl;
@@ -147,6 +149,7 @@ struct ConfigImplShared final {
 #define CXXBRIDGE1_STRUCT_open_comp_graph$internal$ImageShared
 struct ImageShared final {
   ::rust::Box<::open_comp_graph::internal::PixelBlock> pixel_block;
+  ::rust::Box<::open_comp_graph::internal::ImageMetadata> metadata;
   ::open_comp_graph::BBox2Di display_window;
   ::open_comp_graph::BBox2Di data_window;
 
@@ -259,6 +262,21 @@ enum class MergeImageMode : ::std::uint8_t {
 };
 #endif // CXXBRIDGE1_ENUM_open_comp_graph$MergeImageMode
 
+#ifndef CXXBRIDGE1_ENUM_open_comp_graph$ImageOrientation
+#define CXXBRIDGE1_ENUM_open_comp_graph$ImageOrientation
+enum class ImageOrientation : ::std::uint8_t {
+  kNormal = 0,
+  kFlippedHorizontally = 1,
+  kRotated180 = 2,
+  kFlippedVertically = 3,
+  kTransposed = 4,
+  kRotated90Clockwise = 5,
+  kTransverse = 6,
+  kRotated90CounterClockwise = 7,
+  kUninitialized = 255,
+};
+#endif // CXXBRIDGE1_ENUM_open_comp_graph$ImageOrientation
+
 namespace internal {
 #ifndef CXXBRIDGE1_STRUCT_open_comp_graph$internal$PixelBlock
 #define CXXBRIDGE1_STRUCT_open_comp_graph$internal$PixelBlock
@@ -280,6 +298,28 @@ private:
   };
 };
 #endif // CXXBRIDGE1_STRUCT_open_comp_graph$internal$PixelBlock
+
+#ifndef CXXBRIDGE1_STRUCT_open_comp_graph$internal$ImageMetadata
+#define CXXBRIDGE1_STRUCT_open_comp_graph$internal$ImageMetadata
+struct ImageMetadata final : public ::rust::Opaque {
+  OCG_API_EXPORT ::rust::String color_space() const noexcept;
+  OCG_API_EXPORT void set_color_space(::rust::String value) noexcept;
+  OCG_API_EXPORT float pixel_aspect() const noexcept;
+  OCG_API_EXPORT void set_pixel_aspect(float value) noexcept;
+  OCG_API_EXPORT ::open_comp_graph::ImageOrientation orientation() const noexcept;
+  OCG_API_EXPORT void set_orientation(::open_comp_graph::ImageOrientation value) noexcept;
+  OCG_API_EXPORT bool unassociated_alpha() const noexcept;
+  OCG_API_EXPORT void set_unassociated_alpha(bool value) noexcept;
+  ~ImageMetadata() = delete;
+
+private:
+  friend ::rust::layout;
+  struct layout {
+    static ::std::size_t size() noexcept;
+    static ::std::size_t align() noexcept;
+  };
+};
+#endif // CXXBRIDGE1_STRUCT_open_comp_graph$internal$ImageMetadata
 
 #ifndef CXXBRIDGE1_STRUCT_open_comp_graph$internal$StreamDataImplRc
 #define CXXBRIDGE1_STRUCT_open_comp_graph$internal$StreamDataImplRc

@@ -36,6 +36,7 @@ use crate::cxxbridge::ffi::NodeType;
 use crate::data::Identifier;
 use crate::deformutils;
 use crate::imageio;
+use crate::imagemetadata::ImageMetadata;
 use crate::node::traits::Operation;
 use crate::node::NodeImpl;
 use crate::ops;
@@ -169,6 +170,7 @@ impl Operation for WriteImageOperation {
                     pixel_block: pixel_block_box,
                     display_window,
                     data_window,
+                    metadata: Box::new(ImageMetadata::new()),
                 };
                 let num_threads = 0;
                 let crop_on_write = attr_block.get_attr_i32("crop_on_write");
