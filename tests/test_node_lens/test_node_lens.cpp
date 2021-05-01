@@ -65,7 +65,7 @@ int test_node_lens(const bool debug_print,
 
     graph.set_node_attr_str(
         read_node, "file_path",
-        "./tests/data/checker_8bit_rgba_3840x2160.png");
+        "./tests/data/ocg-testdata/images/checker/checker_8bit_rgba_3840x2160.png");
 
     graph.set_node_attr_i32(lens_distort_node, "direction", distort_dir);
     graph.set_node_attr_f32(lens_distort_node, "k1", k1);
