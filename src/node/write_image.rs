@@ -83,7 +83,7 @@ impl WriteImageAttrs {
         WriteImageAttrs {
             enable: 1,
             file_path: "".to_string(),
-            crop_on_write: 1,
+            crop_on_write: -1,
         }
     }
 }
@@ -174,9 +174,24 @@ impl Operation for WriteImageOperation {
                 };
                 let num_threads = 0;
                 let crop_on_write = attr_block.get_attr_i32("crop_on_write");
-                // TODO: Set 'do_crop' based on the crop_on_write
-                // attribute, and checking the file path extension.
-                let do_crop = true;
+
+                // Should the image be cropped to the display window
+                // before writing?
+                let do_crop = match crop_on_write {
+                    0 => false, // Disabled
+                    1 => true,  // Enabled
+                    -1 => {
+                        // Auto.
+                        //
+                        // When If the image format does not support data
+                        // windows, then crop off the extra information outside
+                        // the display window.
+                        let format_supports_data_window = path_expanded.ends_with(".exr");
+                        !format_supports_data_window
+                    }
+                    _ => panic!("Invalid crop_on_write value: {}", crop_on_write),
+                };
+
                 let ok = imageio::write_image(&image, &path_expanded, num_threads, do_crop);
                 debug!("Succcess: {}", ok);
                 NodeStatus::Valid
