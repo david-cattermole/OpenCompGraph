@@ -40,7 +40,7 @@ int test_node_grade(const bool debug_print,
     auto grade_node = graph.create_node(ocg::NodeType::kGrade, "grade");
 
     graph.set_node_attr_str(
-        read_node, "file_path", "tests/data/checker_8bit_rgba_8x8.png");
+        read_node, "file_path", "tests/data/ocg-testdata/images/checker/checker_8bit_rgba_8x8.png");
     graph.set_node_attr_f32(grade_node, "multiply_g", 2.0);
 
     // Connect nodes together and execute

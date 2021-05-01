@@ -47,7 +47,7 @@ int test_node_transform(const bool debug_print,
     auto write2_node = graph.create_node(ocg::NodeType::kWriteImage, "write_node2");
     auto write3_node = graph.create_node(ocg::NodeType::kWriteImage, "write_node3");
     graph.set_node_attr_str(
-        read_node, "file_path", "./tests/data/checker_8bit_rgba_3840x2160.png");
+        read_node, "file_path", "./tests/data/ocg-testdata/images/checker/checker_8bit_rgba_3840x2160.png");
 
     // Test 1
     graph.set_node_attr_f32(tfm1_node, "translate_x", 0.5f);

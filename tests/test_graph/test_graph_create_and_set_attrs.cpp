@@ -65,7 +65,7 @@ int test_graph_create_and_set_attrs(const bool debug_print) {
         }
 
         graph.set_node_attr_str(
-            read_node, read_attr, "tests/data/checker_8bit_rgba_8x8.png");
+            read_node, read_attr, "tests/data/ocg-testdata/images/checker/checker_8bit_rgba_8x8.png");
         auto read_path2 = graph.get_node_attr_str(read_node, read_attr);
         if (debug_print) {
             std::cout << "read_path2=" << read_path2 << '\n';
