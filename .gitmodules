@@ -7,3 +7,6 @@
 [submodule "tests/data/ocio-configs"]
 	path = tests/data/ocio-configs
 	url = https://github.com/colour-science/OpenColorIO-Configs.git
+[submodule "tests/data/ocg-testdata"]
+	path = tests/data/ocg-testdata
+	url = https://github.com/david-cattermole/OpenCompGraph-testdata.git
