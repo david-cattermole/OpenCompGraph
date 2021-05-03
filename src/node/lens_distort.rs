@@ -55,19 +55,25 @@ pub struct LensDistortOperation {}
 pub struct LensDistortAttrs {
     pub enable: i32,
     pub direction: i32,
-    pub k1: f32,
-    pub k2: f32,
-    pub center_x: f32,
-    pub center_y: f32,
+    pub lens_center_offset_x: f32,
+    pub lens_center_offset_y: f32,
+    pub distortion: f32,
+    pub anamorphic_squeeze: f32,
+    pub curvature_x: f32,
+    pub curvature_y: f32,
+    pub quartic_distortion: f32,
 }
 
 impl hash::Hash for LensDistortAttrs {
     fn hash<H: hash::Hasher>(&self, state: &mut H) {
         self.enable.hash(state);
-        HashableF32::new(self.k1).hash(state);
-        HashableF32::new(self.k2).hash(state);
-        HashableF32::new(self.center_x).hash(state);
-        HashableF32::new(self.center_y).hash(state);
+        HashableF32::new(self.lens_center_offset_x).hash(state);
+        HashableF32::new(self.lens_center_offset_y).hash(state);
+        HashableF32::new(self.distortion).hash(state);
+        HashableF32::new(self.anamorphic_squeeze).hash(state);
+        HashableF32::new(self.curvature_x).hash(state);
+        HashableF32::new(self.curvature_y).hash(state);
+        HashableF32::new(self.quartic_distortion).hash(state);
     }
 }
 
@@ -82,10 +88,13 @@ impl LensDistortAttrs {
         LensDistortAttrs {
             enable: 1,
             direction: 1, // 0 = 'undistort'
-            k1: 0.0,
-            k2: 0.0,
-            center_x: 0.0,
-            center_y: 0.0,
+            lens_center_offset_x: 0.0,
+            lens_center_offset_y: 0.0,
+            distortion: 0.0,
+            anamorphic_squeeze: 1.0,
+            curvature_x: 0.0,
+            curvature_y: 0.0,
+            quartic_distortion: 0.0,
         }
     }
 }
@@ -115,13 +124,22 @@ impl Operation for LensDistortOperation {
                 if enable == 1 {
                     let mut deformer = DeformerTde4Classic::default();
 
-                    deformer.set_attr_i32("direction", attr_block.get_attr_i32("direction"));
-                    deformer.set_attr_f32("distortion", attr_block.get_attr_f32("k1"));
-                    deformer.set_attr_f32("quartic_distortion", attr_block.get_attr_f32("k2"));
-                    deformer
-                        .set_attr_f32("lens_center_offset_x", attr_block.get_attr_f32("center_x"));
-                    deformer
-                        .set_attr_f32("lens_center_offset_y", attr_block.get_attr_f32("center_y"));
+                    let direction = attr_block.get_attr_i32("direction");
+                    let lco_x = attr_block.get_attr_f32("lens_center_offset_x");
+                    let lco_y = attr_block.get_attr_f32("lens_center_offset_y");
+                    let distortion = attr_block.get_attr_f32("distortion");
+                    let anamorphic_squeeze = attr_block.get_attr_f32("anamorphic_squeeze");
+                    let curvature_x = attr_block.get_attr_f32("curvature_x");
+                    let curvature_y = attr_block.get_attr_f32("curvature_y");
+                    let quartic_distortion = attr_block.get_attr_f32("quartic_distortion");
+                    deformer.set_attr_i32("direction", direction);
+                    deformer.set_attr_f32("lens_center_offset_x", lco_x);
+                    deformer.set_attr_f32("lens_center_offset_y", lco_y);
+                    deformer.set_attr_f32("distortion", distortion);
+                    deformer.set_attr_f32("anamorphic_squeeze", anamorphic_squeeze);
+                    deformer.set_attr_f32("curvature_x", curvature_x);
+                    deformer.set_attr_f32("curvature_y", curvature_y);
+                    deformer.set_attr_f32("quartic_distortion", quartic_distortion);
                     deformer.commit_data().unwrap();
                     copy.push_deformer(Box::new(deformer));
                 }
@@ -145,10 +163,13 @@ impl AttrBlock for LensDistortAttrs {
         match name {
             "enable" => AttrState::Exists,
             "direction" => AttrState::Exists,
-            "k1" => AttrState::Exists,
-            "k2" => AttrState::Exists,
-            "center_x" => AttrState::Exists,
-            "center_y" => AttrState::Exists,
+            "lens_center_offset_x" => AttrState::Exists,
+            "lens_center_offset_y" => AttrState::Exists,
+            "distortion" => AttrState::Exists,
+            "anamorphic_squeeze" => AttrState::Exists,
+            "curvature_x" => AttrState::Exists,
+            "curvature_y" => AttrState::Exists,
+            "quartic_distortion" => AttrState::Exists,
             _ => AttrState::Missing,
         }
     }
@@ -179,20 +200,26 @@ impl AttrBlock for LensDistortAttrs {
 
     fn get_attr_f32(&self, name: &str) -> f32 {
         match name {
-            "k1" => self.k1,
-            "k2" => self.k2,
-            "center_x" => self.center_x,
-            "center_y" => self.center_y,
+            "lens_center_offset_x" => self.lens_center_offset_x,
+            "lens_center_offset_y" => self.lens_center_offset_y,
+            "distortion" => self.distortion,
+            "anamorphic_squeeze" => self.anamorphic_squeeze,
+            "curvature_x" => self.curvature_x,
+            "curvature_y" => self.curvature_y,
+            "quartic_distortion" => self.quartic_distortion,
             _ => 0.0,
         }
     }
 
     fn set_attr_f32(&mut self, name: &str, value: f32) {
         match name {
-            "k1" => self.k1 = value,
-            "k2" => self.k2 = value,
-            "center_x" => self.center_x = value,
-            "center_y" => self.center_y = value,
+            "lens_center_offset_x" => self.lens_center_offset_x = value,
+            "lens_center_offset_y" => self.lens_center_offset_y = value,
+            "distortion" => self.distortion = value,
+            "anamorphic_squeeze" => self.anamorphic_squeeze = value,
+            "curvature_x" => self.curvature_x = value,
+            "curvature_y" => self.curvature_y = value,
+            "quartic_distortion" => self.quartic_distortion = value,
             _ => (),
         }
     }
