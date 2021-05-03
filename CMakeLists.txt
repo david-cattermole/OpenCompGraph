@@ -120,9 +120,6 @@ install(FILES
   "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/install/ilmbase_openexr/lib/IlmThread-${OPENEXR_SO_VERSION}.dll"
   "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/install/ilmbase_openexr/lib/Imath-${OPENEXR_SO_VERSION}.dll"
 
-  # LDPK
-  "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/install/ldpk/bin/ldpk.dll"
-
   # libjpeg-turbo
   "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/install/libjpeg_turbo/bin/jpeg62.dll"
   "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/install/libjpeg_turbo/bin/turbojpeg.dll"
