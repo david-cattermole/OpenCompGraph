@@ -26,7 +26,7 @@ worked on.
 | MS Windows support (MSVC)                                                    |          Done |
 | Linux support (GCC)                                                          | To be started |
 | MacOS support (Clang)                                                        | To be started |
-| Rust to C++ API                                                              |   In progress |
+| Rust to C++ API                                                              |           WIP |
 | Node connection frame work.                                                  |          Done |
 | Node attribute getting/setting.                                              |          Done |
 | Node image data streams.                                                     |          Done |
@@ -57,9 +57,9 @@ worked on.
 | Internal Floating Point 32-bit Pixel Format.                                 |          Done |
 | Image metadata display window and data window support.                       |          Done |
 | Standalone executable to read and executre node graphs.                      | To be started |
-| LDPK integration for lens distortion and image deformation.                  |   In progress |
-| OpenImageIO integration for image reading and image processing.              |   In progress |
-| OpenColorIO integration for accurate and configurable color workflow.        |   In progress |
+| LDPK integration for lens distortion and image deformation.                  |           WIP |
+| OpenImageIO integration for image reading and image processing.              |           WIP |
+| OpenColorIO integration for accurate and configurable color workflow.        |           WIP |
 | Create a Python API to wrap the library.                                     | To be started |
 | R&D - Decrease RAM usage while still working in floating-point linear color. | To be startad |
 | Write out cached data as loadable files for improved read-performance.       | To be started |
@@ -74,13 +74,12 @@ These are the nodes that are planed or currently implemented.
 | (Color) Grade | Applies a color matrix (4x4) to the input image stream             |          Done |
 | Transform     | Applies a 2D transform to the input image stream                   |          Done |
 | Null          | A "no op" node, that does nothing.                                 |          Done |
-| MergeImage    | Blend/Combine 1 or more images together into a single image.       |   In progress |
-| CropImage     | Remove pixel data outside a square region.                         | To be started |
+| MergeImage    | Blend/Combine 1 or more images together into a single image.       |           WIP |
+| CropImage     | Remove pixel data outside a square region.                         |           WIP |
 | ReformatImage | Change the resolution of the image data.                           | To be started |
 | Exposure      | Change the colors of an image using exposure values (EV)           | To be started |
 | ConvertSTMap  | Apply a deformer as pixel colours                                  | To be started |
 | Keyer         | Calculate an alpha channel for a green/blue-screen image           | To be started |
-
 
 ## Building
 
