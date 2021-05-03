@@ -110,11 +110,11 @@ bool oiio_read_image(const rust::String &file_path, ImageShared &image) {
     std::string colorspace_text = spec.get_string_attribute("oiio:ColorSpace", "");
     std::string desc_text = spec.get_string_attribute("ImageDescription", "");
     int unassociated_alpha = spec.get_int_attribute("oiio:UnassociatedAlpha", 0);
-    std::cout << "Orientation: " << orientation << '\n';
-    std::cout << "Pixel Aspect: " << pixel_aspect << '\n';
-    std::cout << "Color Space: " << colorspace_text << '\n';
-    std::cout << "Unassociated Alpha: " << unassociated_alpha << '\n';
-    std::cout << "Description: " << desc_text << '\n';
+    // std::cout << "Orientation: " << orientation << '\n';
+    // std::cout << "Pixel Aspect: " << pixel_aspect << '\n';
+    // std::cout << "Color Space: " << colorspace_text << '\n';
+    // std::cout << "Unassociated Alpha: " << unassociated_alpha << '\n';
+    // std::cout << "Description: " << desc_text << '\n';
     auto color_space = rust::String(colorspace_text);
     image.metadata->set_color_space(color_space);
     image.metadata->set_pixel_aspect(pixel_aspect);
