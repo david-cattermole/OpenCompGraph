@@ -78,3 +78,6 @@ Make sure the following commands are run in the Visual Studio 2015 enabled Comma
 > install\bin\opencompgraph_tests.exe
 ```
 
+Note: You must install [Boost](https://www.boost.org/users/download/)
+manually and ensure a version is used that does not confict with any
+software you link with.
