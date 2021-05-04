@@ -41,7 +41,7 @@ fn get_pixel_rgba(image: &ImageShared, x: i32, y: i32) -> (f32, f32, f32, f32) {
     let mut r = 0.0;
     let mut g = 0.0;
     let mut b = 0.0;
-    let mut a = 1.0; // Default to full opaque.
+    let mut a = 0.0;
     if index >= 0 {
         let i = index as usize;
         r = pixels[i + 0];
