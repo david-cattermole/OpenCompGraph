@@ -156,11 +156,10 @@ pub fn get_pixel_index(
 ) -> isize {
     let index_x = x * x_stride;
     let index_y = y * y_stride;
-    let mut index = index_x + index_y;
     let max_x = (width - 1) * x_stride;
     let max_y = (height - 1) * y_stride;
-    let max_index = max_x + max_y;
-    if (index < 0) || (index > max_index) {
+    let mut index = index_x + index_y;
+    if (index_x < 0) || (index_x > max_x) || (index_y < 0) || (index_y > max_y) {
         index = -1;
     }
     return index as isize;
