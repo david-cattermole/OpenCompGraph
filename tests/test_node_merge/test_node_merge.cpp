@@ -123,8 +123,8 @@ int test_node_merge(const bool debug_print,
     graph.set_node_attr_str(
         write_beachball_node, "file_path",
         "./tests/data/out/test_node_merge_merge_beachball_out.####.exr");
-    graph.connect(read_bg1_node, merge_over4_node, 0); // A
-    graph.connect(read_fg3_node, merge_over4_node, 1); // B
+    graph.connect(read_bg1_node, merge_over4_node, 0); // A - tahoe-gps.jpg
+    graph.connect(read_fg3_node, merge_over4_node, 1); // B - beachball
     graph.connect(merge_over4_node, write_beachball_node, 0);
 
     // Beachball - A Over B
@@ -132,8 +132,8 @@ int test_node_merge(const bool debug_print,
     graph.set_node_attr_str(
         write_beachball2_node, "file_path",
         "./tests/data/out/test_node_merge_merge_beachball2_out.####.exr");
-    graph.connect(read_fg3_node, merge_over5_node, 0); // A
-    graph.connect(read_bg1_node, merge_over5_node, 1); // B
+    graph.connect(read_fg3_node, merge_over5_node, 0); // A - beachball
+    graph.connect(read_bg1_node, merge_over5_node, 1); // B - tahoe-gps.jpg
     graph.connect(merge_over5_node, write_beachball2_node, 0);
 
     // Execute
