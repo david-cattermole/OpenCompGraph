@@ -165,6 +165,36 @@ pub fn get_pixel_index(
     return index as isize;
 }
 
+#[inline]
+pub fn transmute_slice_f32_to_u8(pixel_slice: &[f32]) -> &[u8] {
+    // SAFETY: It is safe to convert the pixel data
+    // from 'f32' to 'u8' because there can be no
+    // alignment issues. f32 is 4-byte aligned. u8 is
+    // 1-byte aligned which fits into 4-bytes evenly.
+    let pixels_u8 = unsafe { std::mem::transmute::<&[f32], &[u8]>(pixel_slice) };
+    pixels_u8
+}
+
+#[inline]
+pub fn transmute_slice_f32_to_u16(pixel_slice: &[f32]) -> &[u16] {
+    // SAFETY: It is safe to convert the pixel data
+    // from 'f32' to 'u16' because there can be no
+    // alignment issues. f32 is 4-byte aligned. u16 is
+    // 2-byte aligned, which fits into 4-bytes evenly.
+    let pixels_u16 = unsafe { std::mem::transmute::<&[f32], &[u16]>(pixel_slice) };
+    pixels_u16
+}
+
+#[inline]
+pub fn transmute_slice_f32_to_f16(pixel_slice: &[f32]) -> &[f16] {
+    // SAFETY: It is safe to convert the pixel data
+    // from 'f32' to 'f16' because there can be no
+    // alignment issues. f32 is 4-byte aligned. f16 is
+    // 2-byte aligned, which fits into 4-bytes evenly.
+    let pixels_f16 = unsafe { std::mem::transmute::<&[f32], &[f16]>(pixel_slice) };
+    pixels_f16
+}
+
 #[derive(Clone)]
 pub struct PixelBlock {
     width: i32,
@@ -310,33 +340,21 @@ impl PixelBlock {
             let pixel_slice = self.pixels.as_slice();
             let new_pixels: Vec<f32> = match old_pixel_data_type {
                 PixelDataType::UInt8 => {
-                    // SAFETY: It is safe to convert the pixel data
-                    // from 'f32' to 'u8' because there can be no
-                    // alignment issues. f32 is 4-byte aligned. u8 is
-                    // 1-byte aligned which fits into 4-bytes evenly.
-                    let pixels_u8 = unsafe { std::mem::transmute::<&[f32], &[u8]>(pixel_slice) };
+                    let pixels_u8 = transmute_slice_f32_to_u8(pixel_slice);
                     pixels_u8
                         .into_iter()
                         .map(|x| (*x as f32) / (u8::max_value() as f32))
                         .collect()
                 }
                 PixelDataType::UInt16 => {
-                    // SAFETY: It is safe to convert the pixel data
-                    // from 'f32' to 'u16' because there can be no
-                    // alignment issues. f32 is 4-byte aligned. u16 is
-                    // 2-byte aligned, which fits into 4-bytes evenly.
-                    let pixels_u16 = unsafe { std::mem::transmute::<&[f32], &[u16]>(pixel_slice) };
+                    let pixels_u16 = transmute_slice_f32_to_u16(pixel_slice);
                     pixels_u16
                         .into_iter()
                         .map(|x| (*x as f32) / (u16::max_value() as f32))
                         .collect()
                 }
                 PixelDataType::Half16 => {
-                    // SAFETY: It is safe to convert the pixel data
-                    // from 'f32' to 'f16' because there can be no
-                    // alignment issues. f32 is 4-byte aligned. f16 is
-                    // 2-byte aligned, which fits into 4-bytes evenly.
-                    let pixels_f16 = unsafe { std::mem::transmute::<&[f32], &[f16]>(pixel_slice) };
+                    let pixels_f16 = transmute_slice_f32_to_f16(pixel_slice);
                     pixels_f16.into_iter().map(|x| (*x).to_f32()).collect()
                 }
                 _ => panic!("Unsupported pixel data type: {:#?}", old_pixel_data_type),
