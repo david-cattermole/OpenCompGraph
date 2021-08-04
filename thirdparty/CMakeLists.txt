@@ -166,6 +166,47 @@ ExternalProject_Add(libpng
 
 
 ##################
+# GIF
+##################
+#
+# Reference:
+#     https://github.com/OpenImageIO/oiio/blob/master/src/build-scripts/build_gif.bash
+#
+# TODO: Add GIF support (on *NIX only (because Windows doesn't have
+#    make and it will be hard to build it for Windows.)
+
+
+##################
+# OpenJPEG
+##################
+#
+# Reference:
+#     ???
+#
+# TODO: Add OpenJPEG support.
+
+
+##################
+# WebP
+##################
+#
+# Reference:
+#     https://github.com/OpenImageIO/oiio/blob/master/src/build-scripts/build_webp.bash
+#
+# TODO: Add WebP support.
+
+
+##################
+# LibRaw
+##################
+#
+# Reference:
+#     https://github.com/OpenImageIO/oiio/blob/master/src/build-scripts/build_libraw.bash
+#
+# TODO: Add LibRaw support.
+
+
+##################
 # ILM Base (OpenEXR)
 ##################
 #
