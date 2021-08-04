@@ -123,6 +123,16 @@ bool oiio_read_image(const rust::String &file_path, ImageShared &image) {
     image.spec.orientation = static_cast<ImageOrientation>(orientation);
     image.spec.unassociated_alpha = unassociated_alpha != 0;
 
+    // // TODO: Find which channels are z-depth and which channels are
+    // // alpha.
+    //
+    // // Read channel names.
+    // auto in = ImageInput::open (filename);
+    // const ImageSpec &spec = in->spec();
+    // for (int i = 0;  i < spec.nchannels;  ++i)
+    //     std::cout << "Channel " << i << " is "
+    //               << spec.channelnames[i] << "\n";
+
     int chbegin = 0;
     int chend = num_channels;
     auto pixel_size_bytes = padded_num_channels * channel_num_bytes;

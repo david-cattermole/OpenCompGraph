@@ -202,6 +202,11 @@ pub struct PixelBlock {
     num_channels: i32,
     pixel_data_type: PixelDataType,
 
+    // TODO: Add a 'single_pixel' flag to indicate the entire image
+    // has a single colour. This allows large images that are constant
+    // to allocate 1 pixel, but represent many pixels.
+    _single_pixel: bool,
+
     /// The pixel data may *not* be f32 values, but rather the values
     /// may be u8 or u16 or 'half'. We use 'f32' here as the maximum
     /// number of bytes that could be needed. Rust's Vec will ensure
@@ -292,6 +297,7 @@ impl PixelBlock {
 
         // TODO: Support other pixel data types.
         let pixel_data_type = PixelDataType::Float32;
+        // let pixel_data_type = pixel_block.pixel_data_type();
 
         let mut new_pixel_block = PixelBlock::new(width, height, num_channels, pixel_data_type);
 

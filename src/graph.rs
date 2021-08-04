@@ -354,6 +354,8 @@ impl GraphImpl {
         &mut self,
         inputs: &Vec<Rc<StreamDataImpl>>,
         node_index: GraphIdx,
+        // TODO: Convert 'frame' to f64, so we can evaluate sub-frames
+        // and frame blending.
         frame: i32,
         cache: &mut Box<CacheImpl>,
         stream_data_cache: &mut FxHashMap<GraphIdx, Rc<StreamDataImpl>>,

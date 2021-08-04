@@ -63,6 +63,7 @@ pub struct TransformAttrs {
     pub rotate_center_y: f32,
     pub scale_x: f32,
     pub scale_y: f32,
+    // TODO: Add pivot point.
 }
 
 impl hash::Hash for TransformAttrs {

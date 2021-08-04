@@ -68,6 +68,11 @@ pub struct WriteImageAttrs {
     // not support a data windows, the image is cropped, otherwise it
     // is not.
     pub crop_on_write: i32,
+    // TODO: Add attributes:
+    //
+    // - Pre-multiply (?)
+    // - Output Channels
+    // - Output colour space.
 }
 
 impl WriteImageOperation {

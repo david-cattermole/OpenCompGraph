@@ -56,6 +56,16 @@ pub struct ReadImageOperation {}
 pub struct ReadImageAttrs {
     pub enable: i32,
     pub file_path: String,
+    // TODO: Add more attributes:
+    //
+    // - Start frame - The first frame number to use.
+    // - End frame - the last frame number to use.
+    // - Missing frame behavior - What to do when an image is not found.
+    //
+    // - Pre-multiply
+    // - Un-premultiply
+    // - Input Color Space
+    // - Output channels.
 }
 
 impl ReadImageOperation {

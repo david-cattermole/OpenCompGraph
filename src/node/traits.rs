@@ -63,6 +63,13 @@ pub trait Operation: std::fmt::Debug {
         state.finish()
     }
 
+    // TODO: Operations should have a method to initialise and check
+    // the operation has all required data before doing the main
+    // "compute" function.
+
+    // TOOD: Create a method that must be overridden by implementations.
+    // that are responsible for returning the bounding box.
+
     fn compute(
         &mut self,
         frame: i32,
