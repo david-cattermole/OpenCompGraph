@@ -95,6 +95,7 @@ int test_node_crop(const bool debug_print,
                             "./tests/data/out/test_node_crop_out3.####.png");
     graph.set_node_attr_str(write4_node, "file_path",
                             "./tests/data/out/test_node_crop_out4.####.png");
+    graph.set_node_attr_i32(write4_node, "crop_on_write", 1);
 
     graph.connect(read1_node, crop1_node, 0);
     graph.connect(read2_node, crop2_node, 0);
