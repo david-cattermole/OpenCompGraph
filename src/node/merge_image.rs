@@ -30,14 +30,15 @@ use crate::cache::CachedImage;
 use crate::cxxbridge::ffi::AttrState;
 use crate::cxxbridge::ffi::BBox2Di;
 use crate::cxxbridge::ffi::ImageShared;
+use crate::cxxbridge::ffi::ImageSpec;
 use crate::cxxbridge::ffi::MergeImageMode;
 use crate::cxxbridge::ffi::NodeStatus;
 use crate::cxxbridge::ffi::NodeType;
 use crate::data::Identifier;
 use crate::hashutils::HashableF32;
-use crate::imagemetadata::ImageMetadata;
 use crate::node::traits::Operation;
 use crate::node::NodeImpl;
+use crate::ops::bake;
 use crate::ops::imagemerge;
 use crate::pixelblock::PixelBlock;
 use crate::stream::StreamDataImpl;
@@ -103,44 +104,74 @@ fn do_image_process(
     );
 
     // Copy input data
+    let copy_a = &mut (**input_a).clone();
     let copy_b = &mut (**input_b).clone();
     let mut pixel_block_a = input_a.clone_pixel_block();
     let mut pixel_block_b = copy_b.clone_pixel_block();
 
     debug!("Merge Convert");
-    pixel_block_a.convert_into_f32_data();
-    pixel_block_b.convert_into_f32_data();
 
     // TODO: Apply transform matrix, deformations and color
     // corrections before attemping to merge. These operations are the
     // same as those from the 'write_image.rs' file.
 
+    // TODO: Allow the user to give OCIO color spaces.
+    let from_color_space_a = "Utility - sRGB - Texture".to_string();
+    let to_color_space_a = "ACES - ACEScg".to_string();
+    let from_color_space_b = "Utility - sRGB - Texture".to_string();
+    let to_color_space_b = "ACES - ACEScg".to_string();
+
+    // Stream A
+    let display_window_a = copy_a.display_window();
+    let mut data_window_a = copy_a.data_window();
+    bake::do_process(
+        &mut pixel_block_a,
+        display_window_a,
+        &mut data_window_a,
+        &copy_a.deformers(),
+        copy_a.color_matrix(),
+        from_color_space_a,
+        to_color_space_a,
+    );
     let pixel_block_a_box = Box::new(pixel_block_a);
+    // let metadata_a_box = create_metadata_shared();
     let image_a = ImageShared {
         pixel_block: pixel_block_a_box,
-        display_window: input_a.display_window(),
-        data_window: input_a.data_window(),
-        metadata: Box::new(ImageMetadata::new()),
+        display_window: display_window_a,
+        data_window: data_window_a,
+        spec: ImageSpec::new(),
     };
 
+    // Stream B
+    let display_window_b = copy_b.display_window();
+    let mut data_window_b = copy_b.data_window();
+    bake::do_process(
+        &mut pixel_block_b,
+        display_window_b,
+        &mut data_window_b,
+        &copy_b.deformers(),
+        copy_b.color_matrix(),
+        from_color_space_b,
+        to_color_space_b,
+    );
     let pixel_block_b_box = Box::new(pixel_block_b);
     let image_b = ImageShared {
         pixel_block: pixel_block_b_box,
         display_window: input_b.display_window(),
         data_window: input_b.data_window(),
-        metadata: Box::new(ImageMetadata::new()),
+        spec: ImageSpec::new(),
     };
 
-    let pixel_block_out_box = Box::new(PixelBlock::new_constant_pixel_rgba_f32(0.0, 0.0, 0.0, 1.0));
+    // Merge images
+    let pixel_block_out = PixelBlock::new_constant_pixel_rgba_f32(0.0, 0.0, 0.0, 1.0);
     let mut image_out = ImageShared {
-        pixel_block: pixel_block_out_box,
+        pixel_block: Box::new(pixel_block_out),
         display_window: BBox2Di::new(0, 0, 1, 1),
         data_window: BBox2Di::new(0, 0, 1, 1),
-        metadata: Box::new(ImageMetadata::new()),
+        spec: ImageSpec::new(),
     };
-
     let ok = imagemerge::merge(merge_mode, &image_a, &image_b, mix, &mut image_out);
-    debug!("Succcess: {}", ok);
+    debug!("merge_image Succcess: {}", ok);
 
     image_out
 }

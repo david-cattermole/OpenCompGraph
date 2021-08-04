@@ -95,11 +95,11 @@ namespace open_comp_graph {
     struct StreamDataImplShared;
     struct CacheImplShared;
     struct ConfigImplShared;
+    struct ImageSpec;
     struct ImageShared;
     enum class ParameterType : ::std::int32_t;
     using OcgLdPluginBase = ::open_comp_graph::internal::OcgLdPluginBase;
     struct PixelBlock;
-    struct ImageMetadata;
     struct StreamDataImplRc;
     struct StreamDataImpl;
     struct NodeImpl;
@@ -214,11 +214,23 @@ struct ConfigImplShared final {
 };
 #endif // CXXBRIDGE1_STRUCT_open_comp_graph$internal$ConfigImplShared
 
+#ifndef CXXBRIDGE1_STRUCT_open_comp_graph$internal$ImageSpec
+#define CXXBRIDGE1_STRUCT_open_comp_graph$internal$ImageSpec
+struct ImageSpec final {
+  ::rust::String color_space;
+  float pixel_aspect;
+  ::open_comp_graph::ImageOrientation orientation;
+  bool unassociated_alpha;
+
+  using IsRelocatable = ::std::true_type;
+};
+#endif // CXXBRIDGE1_STRUCT_open_comp_graph$internal$ImageSpec
+
 #ifndef CXXBRIDGE1_STRUCT_open_comp_graph$internal$ImageShared
 #define CXXBRIDGE1_STRUCT_open_comp_graph$internal$ImageShared
 struct ImageShared final {
   ::rust::Box<::open_comp_graph::internal::PixelBlock> pixel_block;
-  ::rust::Box<::open_comp_graph::internal::ImageMetadata> metadata;
+  ::open_comp_graph::internal::ImageSpec spec;
   ::open_comp_graph::BBox2Di display_window;
   ::open_comp_graph::BBox2Di data_window;
 
@@ -367,28 +379,6 @@ private:
   };
 };
 #endif // CXXBRIDGE1_STRUCT_open_comp_graph$internal$PixelBlock
-
-#ifndef CXXBRIDGE1_STRUCT_open_comp_graph$internal$ImageMetadata
-#define CXXBRIDGE1_STRUCT_open_comp_graph$internal$ImageMetadata
-struct ImageMetadata final : public ::rust::Opaque {
-  OCG_API_EXPORT ::rust::String color_space() const noexcept;
-  OCG_API_EXPORT void set_color_space(::rust::String value) noexcept;
-  OCG_API_EXPORT float pixel_aspect() const noexcept;
-  OCG_API_EXPORT void set_pixel_aspect(float value) noexcept;
-  OCG_API_EXPORT ::open_comp_graph::ImageOrientation orientation() const noexcept;
-  OCG_API_EXPORT void set_orientation(::open_comp_graph::ImageOrientation value) noexcept;
-  OCG_API_EXPORT bool unassociated_alpha() const noexcept;
-  OCG_API_EXPORT void set_unassociated_alpha(bool value) noexcept;
-  ~ImageMetadata() = delete;
-
-private:
-  friend ::rust::layout;
-  struct layout {
-    static ::std::size_t size() noexcept;
-    static ::std::size_t align() noexcept;
-  };
-};
-#endif // CXXBRIDGE1_STRUCT_open_comp_graph$internal$ImageMetadata
 
 #ifndef CXXBRIDGE1_STRUCT_open_comp_graph$internal$StreamDataImplRc
 #define CXXBRIDGE1_STRUCT_open_comp_graph$internal$StreamDataImplRc
@@ -703,24 +693,6 @@ OCG_API_EXPORT ::std::size_t open_comp_graph$internal$cxxbridge1$get_total_syste
 ::std::size_t open_comp_graph$internal$cxxbridge1$channel_size_bytes(::open_comp_graph::PixelDataType pixel_data_type) noexcept;
 
 void open_comp_graph$internal$cxxbridge1$PixelBlock$data_resize(::open_comp_graph::internal::PixelBlock &self, ::std::int32_t width, ::std::int32_t height, ::std::int32_t num_channels, ::open_comp_graph::PixelDataType pixel_data_type) noexcept;
-::std::size_t open_comp_graph$internal$cxxbridge1$ImageMetadata$operator$sizeof() noexcept;
-::std::size_t open_comp_graph$internal$cxxbridge1$ImageMetadata$operator$alignof() noexcept;
-
-void open_comp_graph$internal$cxxbridge1$ImageMetadata$color_space(const ::open_comp_graph::internal::ImageMetadata &self, ::rust::String *return$) noexcept;
-
-void open_comp_graph$internal$cxxbridge1$ImageMetadata$set_color_space(::open_comp_graph::internal::ImageMetadata &self, ::rust::String *value) noexcept;
-
-float open_comp_graph$internal$cxxbridge1$ImageMetadata$pixel_aspect(const ::open_comp_graph::internal::ImageMetadata &self) noexcept;
-
-void open_comp_graph$internal$cxxbridge1$ImageMetadata$set_pixel_aspect(::open_comp_graph::internal::ImageMetadata &self, float value) noexcept;
-
-::open_comp_graph::ImageOrientation open_comp_graph$internal$cxxbridge1$ImageMetadata$orientation(const ::open_comp_graph::internal::ImageMetadata &self) noexcept;
-
-void open_comp_graph$internal$cxxbridge1$ImageMetadata$set_orientation(::open_comp_graph::internal::ImageMetadata &self, ::open_comp_graph::ImageOrientation value) noexcept;
-
-bool open_comp_graph$internal$cxxbridge1$ImageMetadata$unassociated_alpha(const ::open_comp_graph::internal::ImageMetadata &self) noexcept;
-
-void open_comp_graph$internal$cxxbridge1$ImageMetadata$set_unassociated_alpha(::open_comp_graph::internal::ImageMetadata &self, bool value) noexcept;
 ::std::size_t open_comp_graph$internal$cxxbridge1$StreamDataImplRc$operator$sizeof() noexcept;
 ::std::size_t open_comp_graph$internal$cxxbridge1$StreamDataImplRc$operator$alignof() noexcept;
 
@@ -1018,48 +990,6 @@ OCG_API_EXPORT ::std::size_t channel_size_bytes(::open_comp_graph::PixelDataType
 
 OCG_API_EXPORT void PixelBlock::data_resize(::std::int32_t width, ::std::int32_t height, ::std::int32_t num_channels, ::open_comp_graph::PixelDataType pixel_data_type) noexcept {
   open_comp_graph$internal$cxxbridge1$PixelBlock$data_resize(*this, width, height, num_channels, pixel_data_type);
-}
-
-::std::size_t ImageMetadata::layout::size() noexcept {
-  return open_comp_graph$internal$cxxbridge1$ImageMetadata$operator$sizeof();
-}
-
-::std::size_t ImageMetadata::layout::align() noexcept {
-  return open_comp_graph$internal$cxxbridge1$ImageMetadata$operator$alignof();
-}
-
-OCG_API_EXPORT ::rust::String ImageMetadata::color_space() const noexcept {
-  ::rust::MaybeUninit<::rust::String> return$;
-  open_comp_graph$internal$cxxbridge1$ImageMetadata$color_space(*this, &return$.value);
-  return ::std::move(return$.value);
-}
-
-OCG_API_EXPORT void ImageMetadata::set_color_space(::rust::String value) noexcept {
-  open_comp_graph$internal$cxxbridge1$ImageMetadata$set_color_space(*this, &value);
-}
-
-OCG_API_EXPORT float ImageMetadata::pixel_aspect() const noexcept {
-  return open_comp_graph$internal$cxxbridge1$ImageMetadata$pixel_aspect(*this);
-}
-
-OCG_API_EXPORT void ImageMetadata::set_pixel_aspect(float value) noexcept {
-  open_comp_graph$internal$cxxbridge1$ImageMetadata$set_pixel_aspect(*this, value);
-}
-
-OCG_API_EXPORT ::open_comp_graph::ImageOrientation ImageMetadata::orientation() const noexcept {
-  return open_comp_graph$internal$cxxbridge1$ImageMetadata$orientation(*this);
-}
-
-OCG_API_EXPORT void ImageMetadata::set_orientation(::open_comp_graph::ImageOrientation value) noexcept {
-  open_comp_graph$internal$cxxbridge1$ImageMetadata$set_orientation(*this, value);
-}
-
-OCG_API_EXPORT bool ImageMetadata::unassociated_alpha() const noexcept {
-  return open_comp_graph$internal$cxxbridge1$ImageMetadata$unassociated_alpha(*this);
-}
-
-OCG_API_EXPORT void ImageMetadata::set_unassociated_alpha(bool value) noexcept {
-  open_comp_graph$internal$cxxbridge1$ImageMetadata$set_unassociated_alpha(*this, value);
 }
 
 ::std::size_t StreamDataImplRc::layout::size() noexcept {
@@ -1453,10 +1383,6 @@ void cxxbridge1$box$open_comp_graph$internal$ConfigImpl$drop(::rust::Box<::open_
 void cxxbridge1$box$open_comp_graph$internal$PixelBlock$dealloc(::open_comp_graph::internal::PixelBlock *) noexcept;
 void cxxbridge1$box$open_comp_graph$internal$PixelBlock$drop(::rust::Box<::open_comp_graph::internal::PixelBlock> *ptr) noexcept;
 
-::open_comp_graph::internal::ImageMetadata *cxxbridge1$box$open_comp_graph$internal$ImageMetadata$alloc() noexcept;
-void cxxbridge1$box$open_comp_graph$internal$ImageMetadata$dealloc(::open_comp_graph::internal::ImageMetadata *) noexcept;
-void cxxbridge1$box$open_comp_graph$internal$ImageMetadata$drop(::rust::Box<::open_comp_graph::internal::ImageMetadata> *ptr) noexcept;
-
 static_assert(::rust::detail::is_complete<::open_comp_graph::internal::OcgLdPluginBase>::value, "definition of OcgLdPluginBase is required");
 static_assert(sizeof(::std::unique_ptr<::open_comp_graph::internal::OcgLdPluginBase>) == sizeof(void *), "");
 static_assert(alignof(::std::unique_ptr<::open_comp_graph::internal::OcgLdPluginBase>) == alignof(void *), "");
@@ -1578,18 +1504,6 @@ OCG_API_EXPORT void Box<::open_comp_graph::internal::PixelBlock>::allocation::de
 template <>
 OCG_API_EXPORT void Box<::open_comp_graph::internal::PixelBlock>::drop() noexcept {
   cxxbridge1$box$open_comp_graph$internal$PixelBlock$drop(this);
-}
-template <>
-OCG_API_EXPORT ::open_comp_graph::internal::ImageMetadata *Box<::open_comp_graph::internal::ImageMetadata>::allocation::alloc() noexcept {
-  return cxxbridge1$box$open_comp_graph$internal$ImageMetadata$alloc();
-}
-template <>
-OCG_API_EXPORT void Box<::open_comp_graph::internal::ImageMetadata>::allocation::dealloc(::open_comp_graph::internal::ImageMetadata *ptr) noexcept {
-  cxxbridge1$box$open_comp_graph$internal$ImageMetadata$dealloc(ptr);
-}
-template <>
-OCG_API_EXPORT void Box<::open_comp_graph::internal::ImageMetadata>::drop() noexcept {
-  cxxbridge1$box$open_comp_graph$internal$ImageMetadata$drop(this);
 }
 template <>
 OCG_API_EXPORT ::open_comp_graph::internal::StreamDataImpl *Box<::open_comp_graph::internal::StreamDataImpl>::allocation::alloc() noexcept {

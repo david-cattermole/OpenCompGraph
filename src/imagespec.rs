@@ -19,19 +19,17 @@
  *
  */
 
+use log::{debug, error, log_enabled, Level};
+use std::hash::{Hash, Hasher};
+use std::rc::Rc;
+
 use crate::cxxbridge::ffi::ImageOrientation;
+use crate::cxxbridge::ffi::ImageSpec;
+use crate::hashutils;
 
-#[derive(Debug, Clone)]
-pub struct ImageMetadata {
-    color_space: String,
-    pixel_aspect: f32,
-    orientation: ImageOrientation,
-    unassociated_alpha: bool,
-}
-
-impl ImageMetadata {
-    pub fn new() -> ImageMetadata {
-        ImageMetadata {
+impl ImageSpec {
+    pub fn new() -> ImageSpec {
+        ImageSpec {
             color_space: String::new(),
             pixel_aspect: 1.0,
             orientation: ImageOrientation::Normal,
@@ -69,5 +67,14 @@ impl ImageMetadata {
 
     pub fn set_unassociated_alpha(&mut self, value: bool) {
         self.unassociated_alpha = value;
+    }
+}
+
+impl Hash for ImageSpec {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.color_space.hash(state);
+        hashutils::HashableF32::new(self.pixel_aspect).hash(state);
+        self.orientation.hash(state);
+        self.unassociated_alpha.hash(state);
     }
 }

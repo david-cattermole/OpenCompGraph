@@ -32,7 +32,6 @@ use crate::graph::create_graph_box;
 use crate::graph::GraphImpl;
 use crate::hashutils::generate_id_from_name;
 use crate::hashutils::generate_random_id;
-use crate::imagemetadata::ImageMetadata;
 use crate::logger::initialize;
 use crate::node::create_node_box_with_id;
 use crate::node::NodeImpl;
@@ -121,11 +120,20 @@ pub mod ffi {
         inner: Box<ConfigImpl>,
     }
 
+    #[derive(Debug, Clone)]
+    #[namespace = "open_comp_graph::internal"]
+    pub(crate) struct ImageSpec {
+        color_space: String,
+        pixel_aspect: f32,
+        orientation: ImageOrientation,
+        unassociated_alpha: bool,
+    }
+
     #[derive(Debug)]
     #[namespace = "open_comp_graph::internal"]
     pub(crate) struct ImageShared {
         pixel_block: Box<PixelBlock>,
-        metadata: Box<ImageMetadata>,
+        spec: ImageSpec,
         display_window: BBox2Di,
         data_window: BBox2Di,
     }
@@ -298,7 +306,6 @@ pub mod ffi {
         Uninitialized = 255,
     }
 
-    // Color Spaces
     // The orientation of an image.
     //
     // https://openimageio.readthedocs.io/en/release-2.2.8.0/stdmetadata.html#cmdoption-arg-Orientation
@@ -345,6 +352,7 @@ pub mod ffi {
         #[cxx_name = "kUninitialized"]
         Uninitialized = 255,
     }
+    // Color Spaces (using OCIO)
     #[namespace = "open_comp_graph::internal"]
     unsafe extern "C++" {
         include!("opencompgraph/internal/colorspace.h");
@@ -495,23 +503,10 @@ pub mod ffi {
             pixel_data_type: PixelDataType);
     }
 
-    // ImageMetadata
-    #[namespace = "open_comp_graph::internal"]
-    extern "Rust" {
-        type ImageMetadata;
 
-        fn color_space(&self) -> String;
-        fn set_color_space(&mut self, value: String);
 
-        fn pixel_aspect(&self) -> f32;
-        fn set_pixel_aspect(&mut self, value: f32);
 
-        fn orientation(&self) -> ImageOrientation;
-        fn set_orientation(&mut self, value: ImageOrientation);
 
-        fn unassociated_alpha(&self) -> bool;
-        fn set_unassociated_alpha(&mut self, value: bool);
-    }
 
     // StreamData (Rc)
     #[namespace = "open_comp_graph::internal"]

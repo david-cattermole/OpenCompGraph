@@ -22,7 +22,7 @@
 use half::f16;
 use image;
 use image::GenericImageView;
-use log::{debug, error, log_enabled, Level};
+use log::{debug, error, log_enabled, warn, Level};
 use std::fmt;
 use std::hash::{Hash, Hasher};
 
@@ -305,7 +305,8 @@ impl PixelBlock {
         //
         // Each scanline may live inside or outside the original data
         // window.
-        let dst_offset_y = diff_window.min_y;
+        let dst_offset_y = crop_window.min_y;
+        let dst_offset_x = diff_window.min_x - crop_window.min_x;
         let src_offset_y = data_window.min_y;
         let src_offset_start_x = (diff_window.min_x - data_window.min_x) * num_channels;
         let src_offset_end_x = src_offset_start_x + (diff_window.width()) * num_channels;
@@ -313,7 +314,8 @@ impl PixelBlock {
         for y in diff_window.min_y..diff_window.max_y {
             // Destination indexes into the cropped output image.
             let dst_row = y - dst_offset_y;
-            let dst_start_index = (dst_row * crop_window.width() * num_channels) as usize;
+            let dst_start_index =
+                (((dst_row * crop_window.width()) + dst_offset_x) * num_channels) as usize;
             let dst_end_index = dst_start_index + (diff_window.width() * num_channels) as usize;
             let dst = &mut new_pixel_block.pixels[dst_start_index..dst_end_index];
 
@@ -413,7 +415,7 @@ impl PixelBlock {
 
     pub fn get_pixel_index(&self, x: i32, y: i32) -> isize {
         let x_stride = self.num_channels;
-        let y_stride = self.width * self.num_channels;
+        let y_stride = self.width * x_stride;
         get_pixel_index(self.width, self.height, x_stride, y_stride, x, y)
     }
 

@@ -84,15 +84,33 @@ impl BBox2Di {
     }
 
     pub fn intersection(a: BBox2Di, b: BBox2Di) -> BBox2Di {
-        let x1 = i32::max(a.min_x, b.min_x);
-        let y1 = i32::max(a.min_y, b.min_y);
-        let x2 = i32::max(x1, i32::min(a.max_x, b.max_x));
-        let y2 = i32::max(y1, i32::min(a.max_y, b.max_y));
-        BBox2Di {
-            min_x: x1,
-            min_y: y1,
-            max_x: x2,
-            max_y: y2,
+        if ((a.min_x > b.max_x)
+            || (b.min_x > a.max_x)
+            || (a.min_y > b.max_y)
+            || (b.min_y > a.max_y))
+        {
+            // No intersetion.
+            BBox2Di {
+                min_x: 0,
+                min_y: 0,
+                max_x: 0,
+                max_y: 0,
+            }
+        } else {
+            // Found intersection.
+            //
+            // Note: The region must be *at least* empty, that's why
+            // 'i32::max' is used.
+            let x1 = i32::max(a.min_x, b.min_x);
+            let x2 = i32::max(x1, i32::min(a.max_x, b.max_x));
+            let y1 = i32::max(a.min_y, b.min_y);
+            let y2 = i32::max(y1, i32::min(a.max_y, b.max_y));
+            BBox2Di {
+                min_x: x1,
+                min_y: y1,
+                max_x: x2,
+                max_y: y2,
+            }
         }
     }
 

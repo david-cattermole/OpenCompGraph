@@ -19,11 +19,12 @@
  *
  */
 
+use log::debug;
 use std::rc::Rc;
 
 use crate::cxxbridge::ffi::BBox2Di;
 use crate::cxxbridge::ffi::ImageShared;
-use crate::imagemetadata::ImageMetadata;
+use crate::cxxbridge::ffi::ImageSpec;
 use crate::pixelblock::PixelBlock;
 use crate::stream::StreamDataImpl;
 
@@ -32,9 +33,54 @@ pub fn do_image_process(
     crop_window: BBox2Di,
     reformat: bool,
     black_outside: bool,
-    _intersect: bool,
+    intersect: bool,
 ) -> ImageShared {
     debug_assert!(inputs.len() == 1);
+
+    let input = &inputs[0].clone();
+    let mut input_pixel_block = input.clone_pixel_block();
+
+    // let metadata = create_metadata_shared();
+    let mut image_out = ImageShared {
+        pixel_block: Box::new(input_pixel_block),
+        display_window: input.display_window(),
+        data_window: input.data_window(),
+        spec: ImageSpec::new(),
+    };
+
+    let ok = crop_image_in_place(
+        &mut image_out,
+        crop_window,
+        reformat,
+        black_outside,
+        intersect,
+    );
+
+    image_out
+}
+
+pub fn crop_image_in_place(
+    image: &mut ImageShared,
+    crop_window: BBox2Di,
+    reformat: bool,
+    black_outside: bool,
+    // TODO: Implement 'intersect'.
+    //
+    // When enabled, the output bounding box is an intersection of the
+    // crop bounding box and the incoming bounding box.
+    //
+    // When disabled, the output bounding box matches the crop
+    // bounding box and can extend outside the incoming bounding box.
+    //
+    intersect: bool,
+) -> bool {
+    let mut src_pixel_block = &mut *image.pixel_block;
+    let src_display_window = image.display_window;
+    let src_data_window = image.data_window;
+
+    debug!("Crop Window: {:?}", crop_window);
+    debug!("Source Display Window: {:?}", src_display_window);
+    debug!("Source Data Window: {:?}", src_data_window);
 
     let new_data_window = match black_outside {
         true => BBox2Di::new(
@@ -52,28 +98,33 @@ pub fn do_image_process(
         ),
     };
 
-    let input = &inputs[0].clone();
     let new_display_window = match reformat {
-        false => input.display_window(),
+        false => src_display_window,
         true => crop_window,
     };
 
     // TODO: Remove the clone once pixel_data_types other than f32 are
     // supported.
-    let mut src_pixel_block = input.clone_pixel_block();
     src_pixel_block.convert_into_f32_data();
     let pixel_block_box = Box::new(PixelBlock::from_pixel_block(
         &src_pixel_block,
-        input.data_window(),
+        src_data_window,
         crop_window,
     ));
 
-    let image_out = ImageShared {
-        pixel_block: pixel_block_box,
-        display_window: new_display_window,
-        data_window: new_data_window,
-        metadata: Box::new(ImageMetadata::new()),
-    };
+    debug!("Display Window: {:?}", new_display_window);
+    debug!("Data Window: {:?}", new_data_window);
+    debug!(
+        "PixelBlock (WxH): {}x{}",
+        pixel_block_box.width(),
+        pixel_block_box.height()
+    );
 
-    image_out
+    image.pixel_block = pixel_block_box;
+    image.display_window = new_display_window;
+    image.data_window = new_data_window;
+    assert!(image.data_window.width() == image.pixel_block.width());
+    assert!(image.data_window.height() == image.pixel_block.height());
+
+    true
 }

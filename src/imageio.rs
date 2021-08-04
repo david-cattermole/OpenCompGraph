@@ -29,10 +29,11 @@ use crate::cxxbridge::ffi::oiio_set_thread_count;
 use crate::cxxbridge::ffi::oiio_write_image;
 use crate::cxxbridge::ffi::BBox2Di;
 use crate::cxxbridge::ffi::ImageShared;
+use crate::cxxbridge::ffi::ImageSpec;
 use crate::cxxbridge::ffi::PixelDataType;
 use crate::imagebuffer::create_image_buffer_rgb_u8;
 use crate::imagebuffer::create_image_buffer_rgba_u8;
-use crate::imagemetadata::ImageMetadata;
+use crate::ops::imagecrop;
 use crate::pixelblock;
 
 pub fn read_image(path: &String, num_threads: i32) -> ImageShared {
@@ -47,7 +48,7 @@ pub fn read_image(path: &String, num_threads: i32) -> ImageShared {
                 pixel_block: Box::new(pixelblock::PixelBlock::empty(PixelDataType::Float32)),
                 display_window: BBox2Di::new(0, 0, 0, 0),
                 data_window: BBox2Di::new(0, 0, 0, 0),
-                metadata: Box::new(ImageMetadata::new()),
+                spec: ImageSpec::new(),
             };
 
             // Overrides the number of threads used for reading.
@@ -69,7 +70,7 @@ pub fn read_image(path: &String, num_threads: i32) -> ImageShared {
                 pixel_block,
                 display_window,
                 data_window,
-                metadata: Box::new(ImageMetadata::new()),
+                spec: ImageSpec::new(),
             }
         }
     };
@@ -83,10 +84,37 @@ pub fn write_image(
     image: &ImageShared,
     path: &String,
     num_threads: i32,
-    _crop_to_display_window: bool,
+    crop_to_display_window: bool,
 ) -> bool {
     debug!("Writing... {:?}", path);
+    debug!("Crop to Display Window: {:?}", crop_to_display_window);
     let start = Instant::now();
+
+    let mut new_pixel_block = (*image.pixel_block).clone();
+    let new_display_window = image.display_window;
+    let new_data_window = image.data_window;
+    let crop_window = image.display_window;
+
+    let mut image_out = ImageShared {
+        pixel_block: Box::new(new_pixel_block),
+        display_window: new_display_window,
+        data_window: new_data_window,
+        spec: ImageSpec::new(),
+    };
+
+    if crop_to_display_window == true {
+        let reformat = true;
+        let black_outside = false;
+        let intersect = false;
+        let crop_ok = imagecrop::crop_image_in_place(
+            &mut image_out,
+            crop_window,
+            reformat,
+            black_outside,
+            intersect,
+        );
+        debug!("Crop Ok: {:?}", crop_ok);
+    }
 
     let use_oiio = true;
     let ok = match use_oiio {
@@ -98,7 +126,7 @@ pub fn write_image(
             oiio_get_thread_count(&mut old_num_threads);
             oiio_set_thread_count(num_threads);
 
-            let ok = oiio_write_image(&path, &image);
+            let ok = oiio_write_image(&path, &image_out);
 
             oiio_set_thread_count(old_num_threads);
 
@@ -109,14 +137,14 @@ pub fn write_image(
             let mut ok = false;
             let num_channels = image.pixel_block.num_channels();
             if num_channels == 3 {
-                let img = create_image_buffer_rgb_u8(&image);
+                let img = create_image_buffer_rgb_u8(&image_out);
                 ok = match img.save(path) {
                     Ok(_value) => true,
                     Err(_) => false,
                 };
             }
             if num_channels == 4 {
-                let img = create_image_buffer_rgba_u8(&image);
+                let img = create_image_buffer_rgba_u8(&image_out);
                 ok = match img.save(path) {
                     Ok(_value) => true,
                     Err(_) => false,

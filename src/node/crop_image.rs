@@ -28,12 +28,15 @@ use crate::attrblock::AttrBlock;
 use crate::cache::CacheImpl;
 use crate::cxxbridge::ffi::AttrState;
 use crate::cxxbridge::ffi::BBox2Di;
+use crate::cxxbridge::ffi::ImageShared;
+use crate::cxxbridge::ffi::ImageSpec;
 use crate::cxxbridge::ffi::NodeStatus;
 use crate::cxxbridge::ffi::NodeType;
 use crate::data::Identifier;
 use crate::node::traits::Operation;
 use crate::node::NodeImpl;
 use crate::ops;
+use crate::pixelblock::PixelBlock;
 use crate::stream::StreamDataImpl;
 
 pub fn new(id: Identifier) -> NodeImpl {
@@ -123,11 +126,42 @@ impl Operation for CropImageOperation {
         let window_max_y = attr_block.get_attr_i32("window_max_y");
         let crop_window = BBox2Di::new(window_min_x, window_min_y, window_max_x, window_max_y);
 
+        debug_assert!(inputs.len() == 1);
+
+        let input = &inputs[0].clone();
+        let mut input_pixel_block = input.clone_pixel_block();
+
+        // TODO: 'from' should come from the input stream, and 'to'
+        // should be a common value in the graph.
+        // let metadata = input.metadata();
+        // let from_color_space = metadata.color_space();
+        let from_color_space = "sRGB".to_string();
+        let to_color_space = "ACES - ACEScg".to_string();
+
+        let display_window = input.display_window();
+        let mut data_window = input.data_window();
+        ops::bake::do_process(
+            &mut input_pixel_block,
+            display_window,
+            &mut data_window,
+            &input.deformers(),
+            input.color_matrix(),
+            from_color_space,
+            to_color_space,
+        );
+
+        let mut img = ImageShared {
+            pixel_block: Box::new(input_pixel_block),
+            display_window: display_window,
+            data_window: data_window,
+            spec: ImageSpec::new(),
+        };
+
         let reformat = attr_block.get_attr_i32("reformat") == 1;
         let black_outside = attr_block.get_attr_i32("black_outside") == 1;
         let intersect = attr_block.get_attr_i32("intersect") == 1;
-        let img = ops::imagecrop::do_image_process(
-            inputs,
+        let ok = ops::imagecrop::crop_image_in_place(
+            &mut img,
             crop_window,
             reformat,
             black_outside,
@@ -137,33 +171,6 @@ impl Operation for CropImageOperation {
         let pixel_block_rc = Rc::new(*img.pixel_block);
         let (pixel_block, data_window, display_window) =
             (pixel_block_rc.clone(), img.data_window, img.display_window);
-
-        // debug!(
-        //     "pixel_block: {:?} x {:?} x {:?}",
-        //     pixel_block.width(),
-        //     pixel_block.height(),
-        //     pixel_block.num_channels()
-        // );
-
-        // debug!(
-        //     "data_window: {},{} to {},{} | {}x{}",
-        //     data_window.min_x,
-        //     data_window.min_y,
-        //     data_window.max_x,
-        //     data_window.max_y,
-        //     data_window.width(),
-        //     data_window.height(),
-        // );
-
-        // debug!(
-        //     "display_window: {},{} to {},{} | {}x{}",
-        //     display_window.min_x,
-        //     display_window.min_y,
-        //     display_window.max_x,
-        //     display_window.max_y,
-        //     display_window.width(),
-        //     display_window.height(),
-        // );
 
         stream_data.set_data_window(data_window);
         stream_data.set_display_window(display_window);

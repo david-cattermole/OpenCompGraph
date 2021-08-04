@@ -33,7 +33,7 @@ int test_node_crop(const bool debug_print,
     auto bench = ocg::internal::BenchmarkTime();
 
     auto frames_a = generate_frame_range(1, 1);
-    auto frames_b = generate_frame_range(1, 100);
+    auto frames_b = generate_frame_range(1, 10);
     auto graph = ocg::Graph();
 
     auto read_image_type = ocg::NodeType::kReadImage;
@@ -51,6 +51,7 @@ int test_node_crop(const bool debug_print,
     auto write1_node = graph.create_node(write_image_type, "write1");
     auto write2_node = graph.create_node(write_image_type, "write2");
     auto write3_node = graph.create_node(write_image_type, "write3");
+    auto write4_node = graph.create_node(write_image_type, "write4");
 
     // Read Image Attributes
     graph.set_node_attr_str(read1_node, "file_path",
@@ -61,10 +62,10 @@ int test_node_crop(const bool debug_print,
                             "tests/data/openexr-images/Beachball/multipart.####.exr");
 
     // Crop Image Attributes
-    graph.set_node_attr_i32(crop1_node, "window_min_x", 0);
-    graph.set_node_attr_i32(crop1_node, "window_min_y", 0);
-    graph.set_node_attr_i32(crop1_node, "window_max_x", 200);
-    graph.set_node_attr_i32(crop1_node, "window_max_y", 100);
+    graph.set_node_attr_i32(crop1_node, "window_min_x", 800);
+    graph.set_node_attr_i32(crop1_node, "window_min_y", 900);
+    graph.set_node_attr_i32(crop1_node, "window_max_x", 1200);
+    graph.set_node_attr_i32(crop1_node, "window_max_y", 1300);
     graph.set_node_attr_i32(crop1_node, "reformat", 0);
     graph.set_node_attr_i32(crop1_node, "black_outside", 0);
     graph.set_node_attr_i32(crop1_node, "intersect", 0);
@@ -73,15 +74,15 @@ int test_node_crop(const bool debug_print,
     graph.set_node_attr_i32(crop2_node, "window_min_y", 0);
     graph.set_node_attr_i32(crop2_node, "window_max_x", 200);
     graph.set_node_attr_i32(crop2_node, "window_max_y", 100);
-    graph.set_node_attr_i32(crop2_node, "reformat", 0);
+    graph.set_node_attr_i32(crop2_node, "reformat", 1);
     graph.set_node_attr_i32(crop2_node, "black_outside", 0);
     graph.set_node_attr_i32(crop2_node, "intersect", 0);
 
-    graph.set_node_attr_i32(crop3_node, "window_min_x", 0);
-    graph.set_node_attr_i32(crop3_node, "window_min_y", 0);
-    graph.set_node_attr_i32(crop3_node, "window_max_x", 200);
-    graph.set_node_attr_i32(crop3_node, "window_max_y", 100);
-    graph.set_node_attr_i32(crop3_node, "reformat", 0);
+    graph.set_node_attr_i32(crop3_node, "window_min_x", 600);
+    graph.set_node_attr_i32(crop3_node, "window_min_y", 600);
+    graph.set_node_attr_i32(crop3_node, "window_max_x", 800);
+    graph.set_node_attr_i32(crop3_node, "window_max_y", 800);
+    graph.set_node_attr_i32(crop3_node, "reformat", 1);
     graph.set_node_attr_i32(crop3_node, "black_outside", 0);
     graph.set_node_attr_i32(crop3_node, "intersect", 0);
 
@@ -92,6 +93,8 @@ int test_node_crop(const bool debug_print,
                             "./tests/data/out/test_node_crop_out2.####.png");
     graph.set_node_attr_str(write3_node, "file_path",
                             "./tests/data/out/test_node_crop_out3.####.png");
+    graph.set_node_attr_str(write4_node, "file_path",
+                            "./tests/data/out/test_node_crop_out4.####.png");
 
     graph.connect(read1_node, crop1_node, 0);
     graph.connect(read2_node, crop2_node, 0);
@@ -99,6 +102,7 @@ int test_node_crop(const bool debug_print,
     graph.connect(crop1_node, write1_node, 0);
     graph.connect(crop2_node, write2_node, 0);
     graph.connect(crop3_node, write3_node, 0);
+    graph.connect(read3_node, write4_node, 0);
 
     // Execute
     if (debug_print) {
@@ -108,6 +112,7 @@ int test_node_crop(const bool debug_print,
     graph.execute(write1_node, frames_a, cache);
     graph.execute(write2_node, frames_a, cache);
     graph.execute(write3_node, frames_b, cache);
+    graph.execute(write4_node, frames_b, cache);
 
     if (debug_print) {
         std::cout << "Graph as string (after):\n"

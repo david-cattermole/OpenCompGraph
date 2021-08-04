@@ -19,6 +19,7 @@
  *
  */
 
+pub mod bake;
 pub mod imagecrop;
 pub mod imagemerge;
 pub mod pixelremap;

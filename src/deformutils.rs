@@ -56,7 +56,7 @@ pub fn apply_deformers_to_pixels(
     src_pixel_block: &PixelBlock,
     src_data_window: BBox2Di,
     dst_pixel_block: &mut PixelBlock,
-    _dst_data_window: &mut BBox2Di,
+    dst_data_window: &mut BBox2Di,
 ) {
     // TODO: Check if all deformers are 'uniform' (same deformation
     // for all points - can be simplified to a matrix), then compute
@@ -82,12 +82,11 @@ pub fn apply_deformers_to_pixels(
         tmp_data_window = deformer.apply_bounding_box(tmp_data_window, display_window_f32);
     }
 
-    let mut dst_data_window = BBox2Di::new(
-        tmp_data_window.min_x.floor() as i32,
-        tmp_data_window.min_y.floor() as i32,
-        tmp_data_window.max_x.ceil() as i32,
-        tmp_data_window.max_y.ceil() as i32,
-    );
+    dst_data_window.min_x = tmp_data_window.min_x.floor() as i32;
+    dst_data_window.min_y = tmp_data_window.min_y.floor() as i32;
+    dst_data_window.max_x = tmp_data_window.max_x.ceil() as i32;
+    dst_data_window.max_y = tmp_data_window.max_y.ceil() as i32;
+
     dst_pixel_block.data_resize(
         dst_data_window.width(),
         dst_data_window.height(),
@@ -135,6 +134,6 @@ pub fn apply_deformers_to_pixels(
         &src_pixel_block,
         src_data_window,
         dst_pixel_block,
-        &mut dst_data_window,
+        dst_data_window,
     )
 }

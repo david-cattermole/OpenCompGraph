@@ -28,15 +28,13 @@ use std::string::String;
 
 use crate::attrblock::AttrBlock;
 use crate::cache::CacheImpl;
-use crate::colorspace;
 use crate::cxxbridge::ffi::AttrState;
 use crate::cxxbridge::ffi::ImageShared;
+use crate::cxxbridge::ffi::ImageSpec;
 use crate::cxxbridge::ffi::NodeStatus;
 use crate::cxxbridge::ffi::NodeType;
 use crate::data::Identifier;
-use crate::deformutils;
 use crate::imageio;
-use crate::imagemetadata::ImageMetadata;
 use crate::node::traits::Operation;
 use crate::node::NodeImpl;
 use crate::ops;
@@ -119,47 +117,25 @@ impl Operation for WriteImageOperation {
                 let mut data_window = copy.data_window();
                 let mut pixel_block = copy.clone_pixel_block();
 
-                // Convert to f32 data and convert to linear color space.
-                //
-                // Before applying any changes to the pixels we
-                // must ensure we work in 32-bit floating-point linear
-                // color space.
-                pixel_block.convert_into_f32_data();
-
-                // TODO: Allow the user to give OCIO color spaces.
+                // TODO: This is meant to be the input color space.
                 let from_color_space = "Utility - sRGB - Texture".to_string();
+
+                // The color space to write to.
+                //
+                // TODO: This should be a user-settable option. For
+                // some formats, such as JPEG, we expect to write out
+                // 'sRGB'.
                 let to_color_space = "ACES - ACEScg".to_string();
-                let width = pixel_block.width();
-                let height = pixel_block.height();
-                let num_channels = pixel_block.num_channels();
-                colorspace::color_convert_inplace(
-                    &mut pixel_block.as_slice_mut(),
-                    width,
-                    height,
-                    num_channels,
-                    &from_color_space,
-                    &to_color_space,
+
+                ops::bake::do_process(
+                    &mut pixel_block,
+                    display_window,
+                    &mut data_window,
+                    &copy.deformers(),
+                    copy.color_matrix(),
+                    from_color_space,
+                    to_color_space,
                 );
-
-                {
-                    // Apply Deformations.
-                    let ref_pixel_block = pixel_block.clone();
-                    deformutils::apply_deformers_to_pixels(
-                        &copy.deformers(),
-                        display_window,
-                        &ref_pixel_block,
-                        src_data_window,
-                        &mut pixel_block,
-                        &mut data_window,
-                    );
-                }
-
-                // Apply Color Matrix
-                {
-                    let color_matrix = copy.color_matrix().to_na_matrix();
-                    let pixels = &mut pixel_block.as_slice_mut();
-                    ops::xformcolor::apply_color_matrix_inplace(pixels, num_channels, color_matrix);
-                }
 
                 let file_path = attr_block.get_attr_str("file_path");
                 let path_expanded = pathutils::expand_string(file_path.to_string(), frame);
@@ -173,7 +149,7 @@ impl Operation for WriteImageOperation {
                     pixel_block: pixel_block_box,
                     display_window,
                     data_window,
-                    metadata: Box::new(ImageMetadata::new()),
+                    spec: ImageSpec::new(),
                 };
                 let num_threads = 0;
                 let crop_on_write = attr_block.get_attr_i32("crop_on_write");
