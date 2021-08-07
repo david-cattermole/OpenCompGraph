@@ -19,7 +19,7 @@
  *
  */
 
-use log::{error, warn};
+use log::{debug, error};
 
 use crate::cxxbridge::ffi::BBox2Df;
 use crate::cxxbridge::ffi::BBox2Di;
@@ -39,10 +39,10 @@ pub fn pixels_remap_coords(
     _dst_data_window: &mut BBox2Di,
 ) {
     let display_window_f32 = BBox2Df::from(display_window);
-    warn!("display_window = {:?}", display_window);
-    warn!("display_window_f32 = {:?}", display_window_f32);
-    warn!("display_window.width() = {}", display_window.width());
-    warn!("display_window.height() = {}", display_window.height());
+    debug!("display_window = {:?}", display_window);
+    debug!("display_window_f32 = {:?}", display_window_f32);
+    debug!("display_window.width() = {}", display_window.width());
+    debug!("display_window.height() = {}", display_window.height());
 
     let dst_width = dst_pixel_block.width();
     let dst_height = dst_pixel_block.height();
@@ -53,17 +53,17 @@ pub fn pixels_remap_coords(
         return;
     }
     let dst_pixels = dst_pixel_block.as_slice_mut();
-    warn!("dst_width = {}", dst_width);
-    warn!("dst_height = {}", dst_height);
-    warn!("dst_num_channels = {}", dst_num_channels);
+    debug!("dst_width = {}", dst_width);
+    debug!("dst_height = {}", dst_height);
+    debug!("dst_num_channels = {}", dst_num_channels);
 
     let src_width = src_pixel_block.width();
     let src_height = src_pixel_block.height();
     let src_num_channels = src_pixel_block.num_channels();
     let src_pixels = src_pixel_block.as_slice();
-    warn!("src_width = {}", src_width);
-    warn!("src_height = {}", src_height);
-    warn!("src_num_channels = {}", src_num_channels);
+    debug!("src_width = {}", src_width);
+    debug!("src_height = {}", src_height);
+    debug!("src_num_channels = {}", src_num_channels);
 
     let src_x_stride = src_num_channels;
     let dst_x_stride = dst_num_channels;
