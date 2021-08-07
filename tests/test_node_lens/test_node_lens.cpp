@@ -58,32 +58,32 @@ int test_node_lens(const bool debug_print,
     // Distortion test values.
     auto undistort_dir = static_cast<int32_t>(ocg::LensDistortDirection::kUndistort);
     auto distort_dir = static_cast<int32_t>(ocg::LensDistortDirection::kDistort);
-    auto k1 = 0.2f;
-    auto k2 = 0.05f;
-    auto cx = 0.0f;
-    auto cy = 0.0f;
+    auto k1 = 0.2f;     // Distortion (degree 2)
+    auto k2 = 0.05f;    // Quartic Distortion (degree 4)
+    auto lco_x = 0.0f;  // Lens Center Offset X
+    auto lco_y = 0.0f;  // Lens Center Offset Y
 
     graph.set_node_attr_str(
         read_node, "file_path",
         "./tests/data/ocg-testdata/images/checker/checker_8bit_rgba_3840x2160.png");
 
     graph.set_node_attr_i32(lens_distort_node, "direction", distort_dir);
-    graph.set_node_attr_f32(lens_distort_node, "k1", k1);
-    graph.set_node_attr_f32(lens_distort_node, "k2", k2);
-    graph.set_node_attr_f32(lens_distort_node, "center_x", cx);
-    graph.set_node_attr_f32(lens_distort_node, "center_y", cy);
+    graph.set_node_attr_f32(lens_distort_node, "distortion", k1);
+    graph.set_node_attr_f32(lens_distort_node, "quartic_distortion", k2);
+    graph.set_node_attr_f32(lens_distort_node, "lens_center_offset_x", lco_x);
+    graph.set_node_attr_f32(lens_distort_node, "lens_center_offset_y", lco_y);
 
     graph.set_node_attr_i32(lens_undistort_node, "direction", undistort_dir);
-    graph.set_node_attr_f32(lens_undistort_node, "k1", k1);
-    graph.set_node_attr_f32(lens_undistort_node, "k2", k2);
-    graph.set_node_attr_f32(lens_undistort_node, "center_x", cx);
-    graph.set_node_attr_f32(lens_undistort_node, "center_y", cy);
+    graph.set_node_attr_f32(lens_undistort_node, "distortion", k1);
+    graph.set_node_attr_f32(lens_undistort_node, "quartic_distortion", k2);
+    graph.set_node_attr_f32(lens_undistort_node, "lens_center_offset_x", lco_x);
+    graph.set_node_attr_f32(lens_undistort_node, "lens_center_offset_y", lco_y);
 
     graph.set_node_attr_i32(lens_redistort_node, "direction", distort_dir);
-    graph.set_node_attr_f32(lens_redistort_node, "k1", k1);
-    graph.set_node_attr_f32(lens_redistort_node, "k2", k2);
-    graph.set_node_attr_f32(lens_redistort_node, "center_x", cx);
-    graph.set_node_attr_f32(lens_redistort_node, "center_y", cy);
+    graph.set_node_attr_f32(lens_redistort_node, "distortion", k1);
+    graph.set_node_attr_f32(lens_redistort_node, "quartic_distortion", k2);
+    graph.set_node_attr_f32(lens_redistort_node, "lens_center_offset_x", lco_x);
+    graph.set_node_attr_f32(lens_redistort_node, "lens_center_offset_y", lco_y);
 
     graph.set_node_attr_str(
         write_distort_png_node, "file_path",
