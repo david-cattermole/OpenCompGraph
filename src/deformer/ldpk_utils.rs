@@ -20,10 +20,10 @@
  */
 
 use cxx::UniquePtr;
-use log::{debug, warn};
 use std::cell::RefCell;
 use std::fmt;
 use std::os::raw::c_char;
+// use log::debug;
 
 use crate::cxxbridge::ffi::ldpk_new_plugin;
 use crate::cxxbridge::ffi::OcgLdPluginBase;
@@ -175,15 +175,15 @@ impl LensDistortionPlugin {
     }
 
     pub fn undistort(&self, x: f64, y: f64) -> (f64, f64) {
-        let mut ok = false;
+        let mut _ok = false;
         let mut x_out = 0.0;
         let mut y_out = 0.0;
         if let Some(plugin_obj) = self.plugin.borrow_mut().as_mut() {
-            ok = plugin_obj.undistort(x, y, &mut x_out, &mut y_out);
+            _ok = plugin_obj.undistort(x, y, &mut x_out, &mut y_out);
         }
         // debug!(
         //     "rust param undistort: {:?} to {:?} -> {:?} to {:?} | {}",
-        //     x, y, x_out, y_out, ok
+        //     x, y, x_out, y_out, _ok
         // );
         (x_out, y_out)
     }
