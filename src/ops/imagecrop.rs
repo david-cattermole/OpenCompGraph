@@ -33,12 +33,12 @@ pub fn do_image_process(
     crop_window: BBox2Di,
     reformat: bool,
     black_outside: bool,
-    intersect: bool,
+    _intersect: bool,
 ) -> ImageShared {
     debug_assert!(inputs.len() == 1);
 
     let input = &inputs[0].clone();
-    let mut input_pixel_block = input.clone_pixel_block();
+    let input_pixel_block = input.clone_pixel_block();
 
     // let metadata = create_metadata_shared();
     let mut image_out = ImageShared {
@@ -48,12 +48,12 @@ pub fn do_image_process(
         spec: ImageSpec::new(),
     };
 
-    let ok = crop_image_in_place(
+    let _ok = crop_image_in_place(
         &mut image_out,
         crop_window,
         reformat,
         black_outside,
-        intersect,
+        _intersect,
     );
 
     image_out
@@ -72,9 +72,9 @@ pub fn crop_image_in_place(
     // When disabled, the output bounding box matches the crop
     // bounding box and can extend outside the incoming bounding box.
     //
-    intersect: bool,
+    _intersect: bool,
 ) -> bool {
-    let mut src_pixel_block = &mut *image.pixel_block;
+    let src_pixel_block = &mut *image.pixel_block;
     let src_display_window = image.display_window;
     let src_data_window = image.data_window;
 

@@ -56,6 +56,9 @@ pub fn apply_color_matrix_inplace(pixels: &mut [f32], num_channels: i32, matrix:
                 pixels[index + 3] = rgba.w;
             }
         }
-        _ => panic!("apply matrix to {} channel image is not implemented."),
+        _ => panic!(
+            "apply matrix to {} channel image is not implemented.",
+            num_channels
+        ),
     };
 }

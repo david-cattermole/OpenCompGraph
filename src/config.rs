@@ -76,6 +76,7 @@ impl Default for ConfigThreading {
 }
 
 impl ConfigThreading {
+    #[allow(dead_code)]
     pub fn num_threads(&self) -> i32 {
         self.num_threads
     }

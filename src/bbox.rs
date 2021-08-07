@@ -84,10 +84,7 @@ impl BBox2Di {
     }
 
     pub fn intersection(a: BBox2Di, b: BBox2Di) -> BBox2Di {
-        if ((a.min_x > b.max_x)
-            || (b.min_x > a.max_x)
-            || (a.min_y > b.max_y)
-            || (b.min_y > a.max_y))
+        if (a.min_x > b.max_x) || (b.min_x > a.max_x) || (a.min_y > b.max_y) || (b.min_y > a.max_y)
         {
             // No intersetion.
             BBox2Di {

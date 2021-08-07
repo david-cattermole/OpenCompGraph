@@ -22,7 +22,7 @@
 use half::f16;
 use image;
 use image::GenericImageView;
-use log::{debug, error, log_enabled, warn, Level};
+use log::{debug, error, log_enabled, Level};
 use std::fmt;
 use std::hash::{Hash, Hasher};
 

@@ -19,7 +19,7 @@
  *
  */
 
-use log::debug;
+use log::{debug, warn};
 use std::collections::hash_map::DefaultHasher;
 use std::hash;
 use std::hash::Hash;
@@ -184,7 +184,10 @@ impl Operation for WriteImageOperation {
                 };
 
                 let ok = imageio::write_image(&image, &path_expanded, num_threads, do_crop);
-                debug!("Succcess: {}", ok);
+                if ok == false {
+                    warn!("Failed to write image: status={}", ok);
+                }
+                debug!("Success: {}", ok);
                 NodeStatus::Valid
             }
         }

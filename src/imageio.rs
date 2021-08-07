@@ -90,7 +90,7 @@ pub fn write_image(
     debug!("Crop to Display Window: {:?}", crop_to_display_window);
     let start = Instant::now();
 
-    let mut new_pixel_block = (*image.pixel_block).clone();
+    let new_pixel_block = (*image.pixel_block).clone();
     let new_display_window = image.display_window;
     let new_data_window = image.data_window;
     let crop_window = image.display_window;
