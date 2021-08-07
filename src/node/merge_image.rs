@@ -108,18 +108,13 @@ fn do_image_process(
     let copy_b = &mut (**input_b).clone();
     let mut pixel_block_a = input_a.clone_pixel_block();
     let mut pixel_block_b = copy_b.clone_pixel_block();
+    let mut image_spec_a = copy_a.clone_image_spec();
+    let mut image_spec_b = copy_b.clone_image_spec();
 
-    debug!("Merge Convert");
-
-    // TODO: Apply transform matrix, deformations and color
-    // corrections before attemping to merge. These operations are the
-    // same as those from the 'write_image.rs' file.
-
-    // TODO: Allow the user to give OCIO color spaces.
-    let from_color_space_a = "Utility - sRGB - Texture".to_string();
-    let to_color_space_a = "ACES - ACEScg".to_string();
-    let from_color_space_b = "Utility - sRGB - Texture".to_string();
-    let to_color_space_b = "ACES - ACEScg".to_string();
+    let from_color_space_a = &image_spec_a.color_space();
+    let from_color_space_b = &image_spec_b.color_space();
+    let to_color_space_a = "Linear".to_string();
+    let to_color_space_b = "Linear".to_string();
 
     // Stream A
     let display_window_a = copy_a.display_window();
@@ -128,10 +123,11 @@ fn do_image_process(
         &mut pixel_block_a,
         display_window_a,
         &mut data_window_a,
+        &mut image_spec_a,
         &copy_a.deformers(),
         copy_a.color_matrix(),
-        from_color_space_a,
-        to_color_space_a,
+        &from_color_space_a,
+        &to_color_space_a,
     );
     let pixel_block_a_box = Box::new(pixel_block_a);
     // let metadata_a_box = create_metadata_shared();
@@ -139,7 +135,7 @@ fn do_image_process(
         pixel_block: pixel_block_a_box,
         display_window: display_window_a,
         data_window: data_window_a,
-        spec: ImageSpec::new(),
+        spec: image_spec_a,
     };
 
     // Stream B
@@ -149,17 +145,18 @@ fn do_image_process(
         &mut pixel_block_b,
         display_window_b,
         &mut data_window_b,
+        &mut image_spec_b,
         &copy_b.deformers(),
         copy_b.color_matrix(),
-        from_color_space_b,
-        to_color_space_b,
+        &from_color_space_b,
+        &to_color_space_b,
     );
     let pixel_block_b_box = Box::new(pixel_block_b);
     let image_b = ImageShared {
         pixel_block: pixel_block_b_box,
         display_window: input_b.display_window(),
         data_window: input_b.data_window(),
-        spec: ImageSpec::new(),
+        spec: image_spec_b,
     };
 
     // Merge images
@@ -229,6 +226,7 @@ impl Operation for MergeImageOperation {
                 let pixel_block_rc = Rc::new(*img.pixel_block);
                 let cached_img = CachedImage {
                     pixel_block: pixel_block_rc.clone(),
+                    spec: img.spec,
                     data_window: img.data_window,
                     display_window: img.display_window,
                 };

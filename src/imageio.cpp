@@ -105,23 +105,41 @@ bool oiio_read_image(const rust::String &file_path, ImageShared &image) {
     // Read image metadata.
     //
     // https://openimageio.readthedocs.io/en/release-2.2.8.0/stdmetadata.html#cmdoption-arg-oiio-ColorSpace
-    int orientation = spec.get_int_attribute("Orientation", 0);
-    float pixel_aspect = spec.get_float_attribute("PixelAspectRatio", 1.0f);
+    //
+    // TODO: Add more metadata support, such as these commonly used
+    // metadata fields:
+    //
+    // "DateTime"
+    // "ImageDescription"
+    // "Artist"
+    // "DocumentName"
+    // "ResolutionUnit"
+    // "XResolution"
+    // "YResolution"
+    //
     std::string colorspace_text = spec.get_string_attribute("oiio:ColorSpace", "");
-    std::string desc_text = spec.get_string_attribute("ImageDescription", "");
+    float gamma = spec.get_float_attribute("oiio:Gamma", 1.0f);
+    float pixel_aspect = spec.get_float_attribute("PixelAspectRatio", 1.0f);
+    int orientation = spec.get_int_attribute("Orientation", 0);
     int unassociated_alpha = spec.get_int_attribute("oiio:UnassociatedAlpha", 0);
+    std::string desc_text = spec.get_string_attribute("ImageDescription", "");
+    int dither = spec.get_int_attribute("oiio:dither", 0);
 
-    // std::cout << "Orientation: " << orientation << '\n';
-    // std::cout << "Pixel Aspect: " << pixel_aspect << '\n';
-    // std::cout << "Color Space: " << colorspace_text << '\n';
-    // std::cout << "Unassociated Alpha: " << unassociated_alpha << '\n';
-    // std::cout << "Description: " << desc_text << '\n';
+    // std::cerr << "IN Color Space: " << colorspace_text << '\n';
+    // std::cerr << "IN Gamma: " << gamma << '\n';
+    // std::cerr << "IN Pixel Aspect: " << pixel_aspect << '\n';
+    // std::cerr << "IN Orientation: " << orientation << '\n';
+    // std::cerr << "IN Unassociated Alpha: " << unassociated_alpha << '\n';
+    // std::cerr << "IN Description: " << desc_text << '\n';
+    // std::cerr << "IN Dither: " << dither << '\n';
 
     auto color_space = rust::String(colorspace_text);
     image.spec.color_space = color_space;
+    image.spec.gamma = gamma;
     image.spec.pixel_aspect = pixel_aspect;
     image.spec.orientation = static_cast<ImageOrientation>(orientation);
     image.spec.unassociated_alpha = unassociated_alpha != 0;
+    image.spec.dither = dither;
 
     // // TODO: Find which channels are z-depth and which channels are
     // // alpha.
@@ -159,8 +177,12 @@ bool oiio_write_image(const rust::String &file_path, const ImageShared &image) {
     auto filename = std::string(file_path);
     auto out = OIIO::ImageOutput::create(filename);
     if (!out) {
+        std::cerr
+            << "No valid OIIO output plug-in could be found. "
+            << "Cannot write image!\n";
         return false;
     }
+    // std::cerr << "Output Format: " << out->format_name() << '\n';
 
     auto type_desc = ocg_format_to_oiio_format(image.pixel_block->pixel_data_type());
     OIIO::ImageSpec spec(xres, yres, channels, type_desc);
@@ -171,8 +193,37 @@ bool oiio_write_image(const rust::String &file_path, const ImageShared &image) {
     spec.x = image.data_window.min_x;
     spec.y = image.data_window.min_y;
 
+    // Set the 'colorspace', and other metadata, so that the image
+    // writing can correctly convert the data for the intended format.
+    auto color_space_str = std::string(image.spec.color_space);
+    auto gamma = static_cast<float>(image.spec.gamma);
+    auto pixel_aspect = static_cast<float>(image.spec.pixel_aspect);
+    auto orientation = static_cast<int32_t>(image.spec.orientation);
+    auto unassociated_alpha = static_cast<int32_t>(image.spec.unassociated_alpha);
+    auto dither = static_cast<int32_t>(image.spec.dither);
+    // std::cerr << "OUT Color Space: " << color_space_str << '\n';
+    // std::cerr << "OUT Gamma: " << gamma << '\n';
+    // std::cerr << "OUT Pixel Aspect: " << pixel_aspect << '\n';
+    // std::cerr << "OUT Orientation: " << orientation << '\n';
+    // std::cerr << "OUT Unassociated Alpha: " << unassociated_alpha << '\n';
+    // std::cerr << "OUT Dither: " << dither << '\n';
+    spec.attribute("oiio:ColorSpace", color_space_str);
+    spec.attribute("oiio:Gamma", gamma);
+    spec.attribute("PixelAspectRatio", pixel_aspect);
+    spec.attribute("Orientation", orientation);
+    spec.attribute("oiio:dither", dither);
+    spec.attribute("oiio:UnassociatedAlpha", unassociated_alpha);
+
+    // // Mark the file that it's been created using OpenCompGraph.
+    // auto software = std::string("OpenCompGraph");
+    // spec.attribute("Software", software);
+
     out->open(filename, spec);
-    out->write_image(type_desc, pixel_data);
+    auto ok = out->write_image(type_desc, pixel_data);
+    if (!ok) {
+        auto error_message = out->geterror();
+        std::cerr << "ERROR: " << error_message << '\n';
+    }
     out->close();
     return true;
 }

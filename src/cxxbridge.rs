@@ -124,9 +124,11 @@ pub mod ffi {
     #[namespace = "open_comp_graph::internal"]
     pub(crate) struct ImageSpec {
         color_space: String,
+        gamma: f32,
         pixel_aspect: f32,
         orientation: ImageOrientation,
         unassociated_alpha: bool,
+        dither: i32,
     }
 
     #[derive(Debug)]
@@ -359,11 +361,13 @@ pub mod ffi {
 
         fn ocio_print_color_spaces() -> bool;
 
-        fn ocio_color_convert_inplace(
+        fn oiio_color_convert_inplace(
             pixel_data: &mut [f32],
             width: i32,
             height: i32,
             num_channels: i32,
+            alpha_channel: i32,
+            unassociated_alpha: bool,
             src_color_space: &String,
             dst_color_space: &String) -> bool;
     }

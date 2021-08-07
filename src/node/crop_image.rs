@@ -29,14 +29,12 @@ use crate::cache::CacheImpl;
 use crate::cxxbridge::ffi::AttrState;
 use crate::cxxbridge::ffi::BBox2Di;
 use crate::cxxbridge::ffi::ImageShared;
-use crate::cxxbridge::ffi::ImageSpec;
 use crate::cxxbridge::ffi::NodeStatus;
 use crate::cxxbridge::ffi::NodeType;
 use crate::data::Identifier;
 use crate::node::traits::Operation;
 use crate::node::NodeImpl;
 use crate::ops;
-use crate::pixelblock::PixelBlock;
 use crate::stream::StreamDataImpl;
 
 pub fn new(id: Identifier) -> NodeImpl {
@@ -130,13 +128,12 @@ impl Operation for CropImageOperation {
 
         let input = &inputs[0].clone();
         let mut input_pixel_block = input.clone_pixel_block();
+        let mut image_spec = input.clone_image_spec();
 
-        // TODO: 'from' should come from the input stream, and 'to'
-        // should be a common value in the graph.
-        // let metadata = input.metadata();
-        // let from_color_space = metadata.color_space();
-        let from_color_space = "sRGB".to_string();
-        let to_color_space = "ACES - ACEScg".to_string();
+        // 'from' comes from the input stream, and 'to' is a common
+        // value in the graph.
+        let from_color_space = image_spec.color_space.clone();
+        let to_color_space = "Linear".to_string();
 
         let display_window = input.display_window();
         let mut data_window = input.data_window();
@@ -144,23 +141,24 @@ impl Operation for CropImageOperation {
             &mut input_pixel_block,
             display_window,
             &mut data_window,
+            &mut image_spec,
             &input.deformers(),
             input.color_matrix(),
-            from_color_space,
-            to_color_space,
+            &from_color_space,
+            &to_color_space,
         );
 
         let mut img = ImageShared {
             pixel_block: Box::new(input_pixel_block),
             display_window: display_window,
             data_window: data_window,
-            spec: ImageSpec::new(),
+            spec: image_spec,
         };
 
         let reformat = attr_block.get_attr_i32("reformat") == 1;
         let black_outside = attr_block.get_attr_i32("black_outside") == 1;
         let intersect = attr_block.get_attr_i32("intersect") == 1;
-        let ok = ops::imagecrop::crop_image_in_place(
+        let _ok = ops::imagecrop::crop_image_in_place(
             &mut img,
             crop_window,
             reformat,

@@ -35,9 +35,11 @@ OCG_API_EXPORT
 bool ocio_print_color_spaces();
 
 OCG_API_EXPORT
-bool ocio_color_convert_inplace(
+bool oiio_color_convert_inplace(
         rust::Slice<float> pixel_block,
         int width, int height, int num_channels,
+        int alpha_channel_index,
+        bool unassociated_alpha,
         const rust::String &src_color_space,
         const rust::String &dst_color_space);
 

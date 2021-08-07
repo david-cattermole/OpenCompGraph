@@ -218,9 +218,11 @@ struct ConfigImplShared final {
 #define CXXBRIDGE1_STRUCT_open_comp_graph$internal$ImageSpec
 struct ImageSpec final {
   ::rust::String color_space;
+  float gamma;
   float pixel_aspect;
   ::open_comp_graph::ImageOrientation orientation;
   bool unassociated_alpha;
+  ::std::int32_t dither;
 
   using IsRelocatable = ::std::true_type;
 };
@@ -564,9 +566,9 @@ OCG_API_EXPORT bool open_comp_graph$internal$cxxbridge1$ocio_print_color_spaces(
   return ocio_print_color_spaces$();
 }
 
-OCG_API_EXPORT bool open_comp_graph$internal$cxxbridge1$ocio_color_convert_inplace(::rust::Slice<float> pixel_data, ::std::int32_t width, ::std::int32_t height, ::std::int32_t num_channels, const ::rust::String &src_color_space, const ::rust::String &dst_color_space) noexcept {
-  bool (*ocio_color_convert_inplace$)(::rust::Slice<float>, ::std::int32_t, ::std::int32_t, ::std::int32_t, const ::rust::String &, const ::rust::String &) = ::open_comp_graph::internal::ocio_color_convert_inplace;
-  return ocio_color_convert_inplace$(pixel_data, width, height, num_channels, src_color_space, dst_color_space);
+OCG_API_EXPORT bool open_comp_graph$internal$cxxbridge1$oiio_color_convert_inplace(::rust::Slice<float> pixel_data, ::std::int32_t width, ::std::int32_t height, ::std::int32_t num_channels, ::std::int32_t alpha_channel, bool unassociated_alpha, const ::rust::String &src_color_space, const ::rust::String &dst_color_space) noexcept {
+  bool (*oiio_color_convert_inplace$)(::rust::Slice<float>, ::std::int32_t, ::std::int32_t, ::std::int32_t, ::std::int32_t, bool, const ::rust::String &, const ::rust::String &) = ::open_comp_graph::internal::oiio_color_convert_inplace;
+  return oiio_color_convert_inplace$(pixel_data, width, height, num_channels, alpha_channel, unassociated_alpha, src_color_space, dst_color_space);
 }
 
 OCG_API_EXPORT ::rust::repr::Fat open_comp_graph$internal$cxxbridge1$OcgLdPluginBase$get_version_string(const ::open_comp_graph::internal::OcgLdPluginBase &self) noexcept {

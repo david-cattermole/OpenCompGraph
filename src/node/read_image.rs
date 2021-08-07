@@ -107,8 +107,8 @@ impl Operation for ReadImageOperation {
         }
         let file_path = attr_block.get_attr_str("file_path");
         let path_expanded = pathutils::expand_string(file_path.to_string(), frame);
-        debug!("file_path: {:?}", file_path);
-        debug!("path_expanded: {:?}", path_expanded);
+        // debug!("file_path: {:?}", file_path);
+        // debug!("path_expanded: {:?}", path_expanded);
 
         let path = match Path::new(&path_expanded).canonicalize() {
             Ok(full_path) => full_path,
@@ -129,63 +129,74 @@ impl Operation for ReadImageOperation {
             let mut stream_data = StreamDataImpl::new();
 
             let hash_value = self.cache_hash(frame, node_type_id, &attr_block, inputs);
-            debug!("hash_value: {:?}", hash_value);
+            // debug!("hash_value: {:?}", hash_value);
 
-            let (pixel_block, data_window, display_window) = match cache.get(&hash_value) {
-                Some(cached_img) => {
-                    debug!("Cache Hit");
-                    (
-                        cached_img.pixel_block.clone(),
-                        cached_img.data_window,
-                        cached_img.display_window,
-                    )
-                }
-                _ => {
-                    debug!("Cache Miss");
-                    let num_threads = 0;
-                    let img = imageio::read_image(&path_expanded, num_threads);
-                    let pixel_block_rc = Rc::new(*img.pixel_block);
-                    let cached_img = CachedImage {
-                        pixel_block: pixel_block_rc.clone(),
-                        data_window: img.data_window,
-                        display_window: img.display_window,
-                    };
-                    cache.insert(hash_value, cached_img);
-                    (pixel_block_rc.clone(), img.data_window, img.display_window)
-                }
-            };
+            let (pixel_block, image_spec, data_window, display_window) =
+                match cache.get(&hash_value) {
+                    Some(cached_img) => {
+                        // debug!("Cache Hit");
+                        (
+                            cached_img.pixel_block.clone(),
+                            cached_img.spec.clone(),
+                            cached_img.data_window,
+                            cached_img.display_window,
+                        )
+                    }
+                    _ => {
+                        // debug!("Cache Miss");
+                        let num_threads = 0;
+                        let img = imageio::read_image(&path_expanded, num_threads);
+                        let pixel_block_rc = Rc::new(*img.pixel_block);
+                        let cached_img = CachedImage {
+                            pixel_block: pixel_block_rc.clone(),
+                            spec: img.spec.clone(),
+                            data_window: img.data_window,
+                            display_window: img.display_window,
+                        };
+                        cache.insert(hash_value, cached_img);
+                        (
+                            pixel_block_rc.clone(),
+                            img.spec.clone(),
+                            img.data_window,
+                            img.display_window,
+                        )
+                    }
+                };
 
-            debug!(
-                "pixel_block: {:?} x {:?} x {:?}",
-                pixel_block.width(),
-                pixel_block.height(),
-                pixel_block.num_channels()
-            );
+            // debug!(
+            //     "pixel_block: {:?} x {:?} x {:?}",
+            //     pixel_block.width(),
+            //     pixel_block.height(),
+            //     pixel_block.num_channels()
+            // );
 
-            debug!(
-                "data_window: {},{} to {},{} | {}x{}",
-                data_window.min_x,
-                data_window.min_y,
-                data_window.max_x,
-                data_window.max_y,
-                data_window.width(),
-                data_window.height(),
-            );
+            // debug!("spec: {:?}", image_spec);
 
-            debug!(
-                "display_window: {},{} to {},{} | {}x{}",
-                display_window.min_x,
-                display_window.min_y,
-                display_window.max_x,
-                display_window.max_y,
-                display_window.width(),
-                display_window.height(),
-            );
+            // debug!(
+            //     "data_window: {},{} to {},{} | {}x{}",
+            //     data_window.min_x,
+            //     data_window.min_y,
+            //     data_window.max_x,
+            //     data_window.max_y,
+            //     data_window.width(),
+            //     data_window.height(),
+            // );
+
+            // debug!(
+            //     "display_window: {},{} to {},{} | {}x{}",
+            //     display_window.min_x,
+            //     display_window.min_y,
+            //     display_window.max_x,
+            //     display_window.max_y,
+            //     display_window.width(),
+            //     display_window.height(),
+            // );
 
             stream_data.set_data_window(data_window);
             stream_data.set_display_window(display_window);
             stream_data.set_hash(hash_value);
             stream_data.set_pixel_block(pixel_block);
+            stream_data.set_image_spec(image_spec);
 
             *output = std::rc::Rc::new(stream_data);
         }

@@ -22,6 +22,7 @@
 // STL
 #include <iostream>
 #include <memory>
+#include <string>
 
 // OpenCompGraph
 #include <rust/cxx.h>
@@ -29,9 +30,11 @@
 #include <opencompgraph/internal/oiio_utils.h>
 #include <opencompgraph/internal/colorspace.h>
 
+#include <OpenImageIO/imagebufalgo.h>
+#include <OpenImageIO/color.h>
+
 // OCIO
 #include <OpenColorIO/OpenColorIO.h>
-
 namespace OCIO = OCIO_NAMESPACE;
 
 namespace open_comp_graph {
@@ -53,37 +56,40 @@ bool ocio_print_color_spaces() {
     return ok;
 }
 
-
-bool ocio_color_convert_inplace(
+bool oiio_color_convert_inplace(
         rust::Slice<float> pixel_data,
         int width, int height, int num_channels,
+        int alpha_channel_index,
+        bool unassociated_alpha,
         const rust::String &src_color_space_name,
         const rust::String &dst_color_space_name) {
-    std::cout << "SRC COLOR SPACE: " << src_color_space_name << '\n';
-    std::cout << "DST COLOR SPACE: " << dst_color_space_name << '\n';
+    auto src_color_space_name_str = std::string(src_color_space_name);
+    auto dst_color_space_name_str = std::string(dst_color_space_name);
 
-    bool ok = false;
-    try {
-        OCIO::ConstConfigRcPtr config = OCIO::GetCurrentConfig();
+    auto spec = OIIO::ImageSpec(
+        width, height, num_channels,
+        OIIO::TypeDesc::FLOAT);
+    spec.alpha_channel = alpha_channel_index;
+    void *data = static_cast<void*>(pixel_data.data());
+    auto image_buffer = OIIO::ImageBuf::ImageBuf(spec, data);
 
-        auto src_color_space_name_c = std::string(src_color_space_name).c_str();
-        auto dst_color_space_name_c = std::string(dst_color_space_name).c_str();
-        auto src_color_space = config->getColorSpace(src_color_space_name_c);
-        auto dst_color_space = config->getColorSpace(dst_color_space_name_c);
-
-        if (src_color_space && dst_color_space) {
-            std::cout << "applying color conversion\n";
-            OCIO::ConstProcessorRcPtr processor = config->getProcessor(
-                OCIO::ROLE_COMPOSITING_LOG, OCIO::ROLE_SCENE_LINEAR);
-            OCIO::PackedImageDesc img(pixel_data.data(), width, height, num_channels);
-            processor->apply(img);
-            ok = true;
-        }
-    } catch(OCIO::Exception & exception) {
-        std::cerr << "OpenColorIO Error: " << exception.what() << std::endl;
-        ok = false;
+    OIIO::ColorConfig colorConfig;
+    auto processor = colorConfig.createColorProcessor(
+        src_color_space_name_str,
+        dst_color_space_name_str);
+    if (!processor) {
+        std::cerr << "Color Processor is invalid\n";
+        return false;
     }
-    std::cout << "OK: " << ok << '\n';
+
+    auto roi = OIIO::get_roi_full(spec);
+    const int32_t num_threads = 0;
+    bool unpremult = unassociated_alpha;
+
+    bool ok = OIIO::ImageBufAlgo::colorconvert(
+        image_buffer, image_buffer,
+        &*processor,
+        unpremult, roi, num_threads);
     return ok;
 }
 

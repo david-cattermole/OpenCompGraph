@@ -24,12 +24,14 @@ use log::{debug, error};
 use std::rc::Rc;
 
 use crate::cxxbridge::ffi::BBox2Di;
+use crate::cxxbridge::ffi::ImageSpec;
 use crate::data::BYTES_TO_GIGABYTES;
 use crate::pixelblock::PixelBlock;
 
 #[derive(Debug, Clone)]
 pub struct CachedImage {
     pub pixel_block: Rc<PixelBlock>,
+    pub spec: ImageSpec,
     pub display_window: BBox2Di,
     pub data_window: BBox2Di,
 }

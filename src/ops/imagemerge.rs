@@ -101,6 +101,7 @@ pub fn merge(
         image_b.pixel_block.pixel_data_type(),
     );
     image_out.display_window = image_b.display_window;
+    image_out.spec = image_b.spec.clone();
 
     debug!(
         "Image OUT: WxH = {}x{}",

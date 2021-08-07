@@ -149,9 +149,11 @@ struct ConfigImplShared final {
 #define CXXBRIDGE1_STRUCT_open_comp_graph$internal$ImageSpec
 struct ImageSpec final {
   ::rust::String color_space;
+  float gamma;
   float pixel_aspect;
   ::open_comp_graph::ImageOrientation orientation;
   bool unassociated_alpha;
+  ::std::int32_t dither;
 
   using IsRelocatable = ::std::true_type;
 };

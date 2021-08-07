@@ -30,7 +30,6 @@ use crate::attrblock::AttrBlock;
 use crate::cache::CacheImpl;
 use crate::cxxbridge::ffi::AttrState;
 use crate::cxxbridge::ffi::ImageShared;
-use crate::cxxbridge::ffi::ImageSpec;
 use crate::cxxbridge::ffi::NodeStatus;
 use crate::cxxbridge::ffi::NodeType;
 use crate::data::Identifier;
@@ -115,37 +114,45 @@ impl Operation for WriteImageOperation {
             _ => {
                 let input = &inputs[0].clone();
 
+                let file_path = attr_block.get_attr_str("file_path");
+                let path_expanded = pathutils::expand_string(file_path.to_string(), frame);
+                // debug!("file_path: {:?}", file_path);
+                // debug!("path_expanded: {:?}", path_expanded);
+
                 // Copy input data
                 let copy = &mut (**input).clone();
                 let display_window = copy.display_window();
-                let src_data_window = copy.data_window();
                 let mut data_window = copy.data_window();
                 let mut pixel_block = copy.clone_pixel_block();
+                let mut image_spec = copy.clone_image_spec();
+                // debug!("ImageSpec: {:?}", image_spec);
 
-                // TODO: This is meant to be the input color space.
-                let from_color_space = "Utility - sRGB - Texture".to_string();
+                let from_color_space = &image_spec.color_space();
 
                 // The color space to write to.
-                //
-                // TODO: This should be a user-settable option. For
-                // some formats, such as JPEG, we expect to write out
-                // 'sRGB'.
-                let to_color_space = "ACES - ACEScg".to_string();
+                let to_color_space = if path_expanded.ends_with(".jpg")
+                    || path_expanded.ends_with(".png")
+                    || path_expanded.ends_with(".jpeg")
+                    || path_expanded.ends_with(".jpe")
+                    || path_expanded.ends_with(".jif")
+                    || path_expanded.ends_with(".jfif")
+                    || path_expanded.ends_with(".jfi")
+                {
+                    "sRGB".to_string()
+                } else {
+                    "Linear".to_string()
+                };
 
                 ops::bake::do_process(
                     &mut pixel_block,
                     display_window,
                     &mut data_window,
+                    &mut image_spec,
                     &copy.deformers(),
                     copy.color_matrix(),
-                    from_color_space,
-                    to_color_space,
+                    &from_color_space,
+                    &to_color_space,
                 );
-
-                let file_path = attr_block.get_attr_str("file_path");
-                let path_expanded = pathutils::expand_string(file_path.to_string(), frame);
-                debug!("file_path: {:?}", file_path);
-                debug!("path_expanded: {:?}", path_expanded);
 
                 // Write pixels
                 *output = inputs[0].clone();
@@ -154,7 +161,7 @@ impl Operation for WriteImageOperation {
                     pixel_block: pixel_block_box,
                     display_window,
                     data_window,
-                    spec: ImageSpec::new(),
+                    spec: image_spec,
                 };
                 let num_threads = 0;
                 let crop_on_write = attr_block.get_attr_i32("crop_on_write");

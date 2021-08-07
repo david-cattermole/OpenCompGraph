@@ -19,9 +19,7 @@
  *
  */
 
-use log::{debug, error, log_enabled, Level};
 use std::hash::{Hash, Hasher};
-use std::rc::Rc;
 
 use crate::cxxbridge::ffi::ImageOrientation;
 use crate::cxxbridge::ffi::ImageSpec;
@@ -30,10 +28,12 @@ use crate::hashutils;
 impl ImageSpec {
     pub fn new() -> ImageSpec {
         ImageSpec {
-            color_space: String::new(),
+            color_space: "Linear".to_string(),
+            gamma: 1.0,
             pixel_aspect: 1.0,
             orientation: ImageOrientation::Normal,
             unassociated_alpha: false,
+            dither: 0,
         }
     }
 
@@ -43,6 +43,14 @@ impl ImageSpec {
 
     pub fn set_color_space(&mut self, value: String) {
         self.color_space = value;
+    }
+
+    pub fn gamma(&self) -> f32 {
+        self.gamma
+    }
+
+    pub fn set_gamma(&mut self, value: f32) {
+        self.gamma = value;
     }
 
     pub fn pixel_aspect(&self) -> f32 {
@@ -68,13 +76,23 @@ impl ImageSpec {
     pub fn set_unassociated_alpha(&mut self, value: bool) {
         self.unassociated_alpha = value;
     }
+
+    pub fn dither(&self) -> i32 {
+        self.dither
+    }
+
+    pub fn set_dither(&mut self, value: i32) {
+        self.dither = value;
+    }
 }
 
 impl Hash for ImageSpec {
     fn hash<H: Hasher>(&self, state: &mut H) {
         self.color_space.hash(state);
+        hashutils::HashableF32::new(self.gamma).hash(state);
         hashutils::HashableF32::new(self.pixel_aspect).hash(state);
         self.orientation.hash(state);
         self.unassociated_alpha.hash(state);
+        self.dither.hash(state);
     }
 }
