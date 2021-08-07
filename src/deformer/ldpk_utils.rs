@@ -74,9 +74,9 @@ impl LensDistortionPlugin {
         if let Some(plugin_obj) = self.plugin.borrow_mut().as_mut() {
             ok = plugin_obj.get_model_name(&mut model_name[..]);
         }
-        debug!("rust model_name: {:?}", model_name);
+        // debug!("rust model_name: {:?}", model_name);
         let s = String::from_utf8_lossy(&model_name);
-        debug!("rust result: {}", s);
+        // debug!("rust result: {}", s);
         match ok {
             true => Ok(s.to_string()),
             false => Err("Could not model name.".to_string()),
@@ -89,7 +89,7 @@ impl LensDistortionPlugin {
         if let Some(plugin_obj) = self.plugin.borrow_mut().as_mut() {
             ok = plugin_obj.get_num_parameters(&mut value);
         }
-        debug!("rust num_parameters: {:?}", value);
+        // debug!("rust num_parameters: {:?}", value);
         match ok {
             true => Ok(value as u32),
             false => Err("Could not get number of parameters.".to_string()),
@@ -102,9 +102,9 @@ impl LensDistortionPlugin {
         if let Some(plugin_obj) = self.plugin.borrow_mut().as_mut() {
             ok = plugin_obj.get_parameter_name(index as i32, &mut parameter_name[..]);
         }
-        debug!("rust parameter_name: {:?}", parameter_name);
+        // debug!("rust parameter_name: {:?}", parameter_name);
         let s = String::from_utf8_lossy(&parameter_name);
-        debug!("rust result: {}", s);
+        // debug!("rust result: {}", s);
         match ok {
             true => Ok(s.to_string()),
             false => Err("Could not get parameter name.".to_string()),
@@ -117,7 +117,7 @@ impl LensDistortionPlugin {
         if let Some(plugin_obj) = self.plugin.borrow_mut().as_mut() {
             ok = plugin_obj.get_parameter_type(name, &mut param_type.repr);
         }
-        debug!("rust param_type: {:?}", param_type);
+        // debug!("rust param_type: {:?}", param_type);
         match ok {
             true => Ok(param_type),
             false => Err("Could not get parameter name.".to_string()),
@@ -130,7 +130,7 @@ impl LensDistortionPlugin {
         if let Some(plugin_obj) = self.plugin.borrow_mut().as_mut() {
             ok = plugin_obj.get_parameter_default_value_f64(name, &mut value);
         }
-        debug!("rust param default_value f64: {:?}", value);
+        // debug!("rust param default_value f64: {:?}", value);
         match ok {
             true => Ok(value),
             false => Err(format!("Could not get parameter default value: {}.", name).to_string()),
@@ -144,7 +144,7 @@ impl LensDistortionPlugin {
         if let Some(plugin_obj) = self.plugin.borrow_mut().as_mut() {
             ok = plugin_obj.get_parameter_range(name, &mut min_value, &mut max_value);
         }
-        debug!("rust param range f64: {:?} to {:?}", min_value, max_value);
+        // debug!("rust param range f64: {:?} to {:?}", min_value, max_value);
         match ok {
             true => Ok((min_value, max_value)),
             false => Err(format!("Could not get parameter range: {}.", name).to_string()),
@@ -167,7 +167,7 @@ impl LensDistortionPlugin {
         if let Some(plugin_obj) = self.plugin.borrow_mut().as_mut() {
             ok = plugin_obj.initialize_parameters();
         }
-        warn!("initialize_parameters: {}", ok);
+        // debug!("initialize_parameters: {}", ok);
         match ok {
             true => Ok(()),
             false => Err("Could not initialize parameters.".to_string()),
@@ -181,10 +181,10 @@ impl LensDistortionPlugin {
         if let Some(plugin_obj) = self.plugin.borrow_mut().as_mut() {
             ok = plugin_obj.undistort(x, y, &mut x_out, &mut y_out);
         }
-        debug!(
-            "rust param undistort: {:?} to {:?} -> {:?} to {:?} | {}",
-            x, y, x_out, y_out, ok
-        );
+        // debug!(
+        //     "rust param undistort: {:?} to {:?} -> {:?} to {:?} | {}",
+        //     x, y, x_out, y_out, ok
+        // );
         (x_out, y_out)
     }
 
@@ -194,7 +194,7 @@ impl LensDistortionPlugin {
         if let Some(plugin_obj) = self.plugin.borrow_mut().as_mut() {
             plugin_obj.distort(x, y, &mut x_out, &mut y_out);
         }
-        debug!("rust param distort: {:?} to {:?}", x_out, y_out);
+        // debug!("rust param distort: {:?} to {:?}", x_out, y_out);
         (x_out, y_out)
     }
 
@@ -204,7 +204,7 @@ impl LensDistortionPlugin {
         if let Some(plugin_obj) = self.plugin.borrow_mut().as_mut() {
             plugin_obj.distort_with_guess(x, y, x_start, y_start, &mut x_out, &mut y_out);
         }
-        debug!("rust param distort_with_guess: {:?} to {:?}", x_out, y_out);
+        // debug!("rust param distort_with_guess: {:?} to {:?}", x_out, y_out);
         (x_out, y_out)
     }
 
@@ -251,10 +251,10 @@ impl LensDistortionPlugin {
                 samples_y,
             );
         }
-        debug!(
-            "rust param get bounding_box_undistort: {:?} {:?} {:?} {:?}",
-            xa_out, ya_out, xb_out, yb_out
-        );
+        // debug!(
+        //     "rust param get bounding_box_undistort: {:?} {:?} {:?} {:?}",
+        //     xa_out, ya_out, xb_out, yb_out
+        // );
         (xa_out, ya_out, xb_out, yb_out)
     }
 
@@ -288,10 +288,10 @@ impl LensDistortionPlugin {
                 samples_y,
             );
         }
-        debug!(
-            "rust param get bounding_box_distort: {:?} {:?} {:?} {:?}",
-            xa_out, ya_out, xb_out, yb_out
-        );
+        // debug!(
+        //     "rust param get bounding_box_distort: {:?} {:?} {:?} {:?}",
+        //     xa_out, ya_out, xb_out, yb_out
+        // );
         (xa_out, ya_out, xb_out, yb_out)
     }
 }
