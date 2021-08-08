@@ -19,28 +19,34 @@
  *
  */
 
-pub mod attrblock;
-pub mod bbox;
-pub mod cache;
-pub mod colorspace;
-pub mod colorutils;
-pub mod config;
-pub mod cxxbridge;
-pub mod data;
-pub mod deformer;
-pub mod deformutils;
-pub mod geom;
-pub mod graph;
-pub mod graphiter;
-pub mod hashutils;
-pub mod imagebuffer;
-pub mod imageio;
-pub mod imagespec;
-pub mod logger;
-pub mod math;
-pub mod node;
-pub mod ops;
-pub mod pathutils;
-pub mod pixel;
-pub mod pixelblock;
-pub mod stream;
+use nalgebra as na;
+
+use crate::cxxbridge::ffi::Vector4i32;
+
+impl Vector4i32 {
+    pub fn new(x: i32, y: i32, z: i32, w: i32) -> Vector4i32 {
+        Vector4i32 { x, y, z, w }
+    }
+
+    pub fn identity() -> Vector4i32 {
+        Vector4i32 {
+            x: 0,
+            y: 0,
+            z: 0,
+            w: 0,
+        }
+    }
+
+    pub fn to_na_vector(&self) -> na::Vector4<i32> {
+        na::Vector4::<i32>::new(self.x, self.y, self.z, self.w)
+    }
+
+    pub fn from_na_vector(value: na::Vector4<i32>) -> Vector4i32 {
+        Vector4i32 {
+            x: value[(0)],
+            y: value[(1)],
+            z: value[(2)],
+            w: value[(3)],
+        }
+    }
+}

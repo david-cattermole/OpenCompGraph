@@ -19,6 +19,10 @@
  *
  */
 
+pub mod matrix;
+pub mod vector4f32;
+pub mod vector4i32;
+
 use petgraph;
 
 pub type GraphIdx = usize;

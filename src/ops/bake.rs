@@ -26,20 +26,25 @@ use crate::colorspace;
 use crate::cxxbridge::ffi::BBox2Di;
 use crate::cxxbridge::ffi::ImageSpec;
 use crate::cxxbridge::ffi::Matrix4;
+use crate::cxxbridge::ffi::Vector4f32;
 use crate::deformer::Deformer;
 use crate::deformutils;
 use crate::ops;
 use crate::pixelblock::PixelBlock;
+use crate::stream::StreamDataImpl;
 
-// Apply transform matrix, deformations and color corrections before
-// image operations.
-pub fn do_process(
+#[derive(Debug, Copy, Clone, Hash, PartialEq)]
+pub enum BakeOption {
+    Nothing = 0,
+    ColorSpace = 1,
+    ColorSpaceAndGrade = 2,
+    All = 3,
+}
+
+// Convert from user color space to linear space.
+fn do_process_colorspace(
     pixel_block: &mut PixelBlock,
-    display_window: BBox2Di,
-    data_window: &mut BBox2Di,
     image_spec: &mut ImageSpec,
-    deformers: &Vec<Box<dyn Deformer>>,
-    color_matrix: Matrix4,
     from_color_space: &String,
     to_color_space: &String,
 ) {
@@ -53,80 +58,115 @@ pub fn do_process(
         alpha_channel_index = 3;
     }
 
-    // Convert from user color space to linear space.
-    {
-        // Convert to f32 data and convert to linear color space.
-        //
-        // Before applying any changes to the pixels we must ensure we
-        // work with 32-bit floating-point data.
-        pixel_block.convert_into_f32_data();
+    // Convert to f32 data and convert to linear color space.
+    //
+    // Before applying any changes to the pixels we must ensure we
+    // work with 32-bit floating-point data.
+    pixel_block.convert_into_f32_data();
 
-        let linear_color_space = "Linear".to_string();
-        let ok = colorspace::color_convert_inplace(
-            &mut pixel_block.as_slice_mut(),
-            width,
-            height,
-            num_channels,
-            alpha_channel_index,
-            unassociated_alpha,
-            &from_color_space,
-            &linear_color_space,
-        );
-        if ok {
-            image_spec.set_color_space(linear_color_space.clone())
-        } else {
-            warn!(
-                "Could not convert color space from \"{0}\" to \"{1}\" ",
-                from_color_space, linear_color_space
-            )
+    let ok = colorspace::color_convert_inplace(
+        &mut pixel_block.as_slice_mut(),
+        width,
+        height,
+        num_channels,
+        alpha_channel_index,
+        unassociated_alpha,
+        &from_color_space,
+        &to_color_space,
+    );
+    if ok {
+        image_spec.set_color_space(to_color_space.clone())
+    } else {
+        warn!(
+            "Could not convert color space from \"{0}\" to \"{1}\" ",
+            from_color_space, to_color_space
+        )
+    }
+}
+
+// Apply transform matrix, deformations and color corrections before
+// image operations.
+pub fn do_process(
+    bake_option: BakeOption,
+    pixel_block: &mut PixelBlock,
+    display_window: BBox2Di,
+    data_window: &mut BBox2Di,
+    image_spec: &mut ImageSpec,
+    stream_data: &mut StreamDataImpl,
+    from_color_space: &String,
+    to_color_space: &String,
+) {
+    match bake_option {
+        // BakeOption::Nothing => panic!("Nothing"),
+        BakeOption::ColorSpace => {
+            do_process_colorspace(pixel_block, image_spec, &from_color_space, &to_color_space)
         }
-    }
+        BakeOption::ColorSpaceAndGrade => {
+            // Convert from user color space to linear space.
+            let linear_color_space = "Linear".to_string();
+            do_process_colorspace(
+                pixel_block,
+                image_spec,
+                &from_color_space,
+                &linear_color_space,
+            );
 
-    // Apply Deformations.
-    {
-        let src_data_window = data_window.clone();
-        let ref_pixel_block = pixel_block.clone();
-        deformutils::apply_deformers_to_pixels(
-            &deformers,
-            display_window,
-            &ref_pixel_block,
-            src_data_window,
-            pixel_block,
-            data_window,
-        );
-    }
+            // Apply Color Matrix (in linear color space)
+            let num_channels = pixel_block.num_channels();
+            let pixels = &mut pixel_block.as_slice_mut();
+            let color_matrix = stream_data.color_matrix().to_na_matrix();
+            ops::xformcolor::apply_color_matrix_inplace(pixels, num_channels, color_matrix);
+            stream_data.set_color_matrix(Matrix4::identity());
 
-    // Apply Color Matrix (in linear color space)
-    {
-        let num_channels = pixel_block.num_channels();
-        let pixels = &mut pixel_block.as_slice_mut();
-        ops::xformcolor::apply_color_matrix_inplace(
-            pixels,
-            num_channels,
-            color_matrix.to_na_matrix(),
-        );
-    }
-
-    // Convert from Linear to user given color space.
-    {
-        let linear_color_space = image_spec.color_space();
-        let ok = colorspace::color_convert_inplace(
-            &mut pixel_block.as_slice_mut(),
-            width,
-            height,
-            num_channels,
-            alpha_channel_index,
-            unassociated_alpha,
-            &linear_color_space,
-            &to_color_space,
-        );
-        if ok {
-            image_spec.set_color_space(to_color_space.clone())
-        } else {
-            warn!(
-                "Could not convert color space from \"{0}\" to \"{1}\" ",
-                linear_color_space, to_color_space
-            )
+            // Convert from Linear to user given color space.
+            do_process_colorspace(
+                pixel_block,
+                image_spec,
+                &linear_color_space,
+                &to_color_space,
+            );
+            image_spec.set_color_space(to_color_space.clone());
         }
+        BakeOption::All => {
+            // Convert from user color space to linear space.
+            let linear_color_space = "Linear".to_string();
+            do_process_colorspace(
+                pixel_block,
+                image_spec,
+                &from_color_space,
+                &linear_color_space,
+            );
+
+            // Apply Color Matrix (in linear color space)
+            let num_channels = pixel_block.num_channels();
+            let pixels = &mut pixel_block.as_slice_mut();
+            let color_matrix = stream_data.color_matrix().to_na_matrix();
+            ops::xformcolor::apply_color_matrix_inplace(pixels, num_channels, color_matrix);
+            stream_data.set_color_matrix(Matrix4::identity());
+
+            // Apply Deformations.
+            let src_data_window = data_window.clone();
+            let ref_pixel_block = pixel_block.clone();
+            let deformers = &stream_data.deformers();
+            deformutils::apply_deformers_to_pixels(
+                &deformers,
+                display_window,
+                &ref_pixel_block,
+                src_data_window,
+                pixel_block,
+                data_window,
+            );
+            stream_data.clear_deformers();
+
+            // Convert from Linear to user given color space.
+            do_process_colorspace(
+                pixel_block,
+                image_spec,
+                &linear_color_space,
+                &to_color_space,
+            );
+            image_spec.set_color_space(to_color_space.clone());
+        }
+        _ => panic!("Unknown"),
     }
 }

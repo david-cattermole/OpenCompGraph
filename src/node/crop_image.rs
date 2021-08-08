@@ -34,7 +34,8 @@ use crate::cxxbridge::ffi::NodeType;
 use crate::data::Identifier;
 use crate::node::traits::Operation;
 use crate::node::NodeImpl;
-use crate::ops;
+use crate::ops::bake;
+use crate::ops::imagecrop;
 use crate::stream::StreamDataImpl;
 
 pub fn new(id: Identifier) -> NodeImpl {
@@ -97,24 +98,22 @@ impl Operation for CropImageOperation {
         // debug!("AttrBlock: {:?}", attr_block);
         // debug!("Inputs: {:?}", inputs);
         // debug!("Output: {:?}", output);
+
+        let input = &inputs[0].clone();
+        let mut copy = (**input).clone();
+
+        let hash_value = self.cache_hash(frame, node_type_id, &attr_block, inputs);
+        copy.set_hash(hash_value);
+
         let enable = attr_block.get_attr_i32("enable");
         if enable != 1 {
-            let hash_value = self.cache_hash(frame, node_type_id, &attr_block, inputs);
-            let mut stream_data = StreamDataImpl::new();
-            stream_data.set_hash(hash_value);
-            *output = std::rc::Rc::new(stream_data);
+            *output = std::rc::Rc::new(copy);
             return NodeStatus::Warning;
         }
         if inputs.len() != 1 {
-            let hash_value = self.cache_hash(frame, node_type_id, &attr_block, inputs);
-            let mut stream_data = StreamDataImpl::new();
-            stream_data.set_hash(hash_value);
-            *output = std::rc::Rc::new(stream_data);
+            *output = std::rc::Rc::new(copy);
             return NodeStatus::Error;
         }
-
-        let mut stream_data = StreamDataImpl::new();
-        let hash_value = self.cache_hash(frame, node_type_id, &attr_block, inputs);
 
         // Cache the results of the crop. If the input values do not
         // change we can easily look up the pixels again.
@@ -125,9 +124,7 @@ impl Operation for CropImageOperation {
         let crop_window = BBox2Di::new(window_min_x, window_min_y, window_max_x, window_max_y);
 
         debug_assert!(inputs.len() == 1);
-
-        let input = &inputs[0].clone();
-        let mut input_pixel_block = input.clone_pixel_block();
+        let mut pixel_block = input.clone_pixel_block();
         let mut image_spec = input.clone_image_spec();
 
         // 'from' comes from the input stream, and 'to' is a common
@@ -137,19 +134,20 @@ impl Operation for CropImageOperation {
 
         let display_window = input.display_window();
         let mut data_window = input.data_window();
-        ops::bake::do_process(
-            &mut input_pixel_block,
+        let bake_option = bake::BakeOption::All;
+        bake::do_process(
+            bake_option,
+            &mut pixel_block,
             display_window,
             &mut data_window,
             &mut image_spec,
-            &input.deformers(),
-            input.color_matrix(),
+            &mut copy,
             &from_color_space,
             &to_color_space,
         );
 
         let mut img = ImageShared {
-            pixel_block: Box::new(input_pixel_block),
+            pixel_block: Box::new(pixel_block),
             display_window: display_window,
             data_window: data_window,
             spec: image_spec,
@@ -158,7 +156,7 @@ impl Operation for CropImageOperation {
         let reformat = attr_block.get_attr_i32("reformat") == 1;
         let black_outside = attr_block.get_attr_i32("black_outside") == 1;
         let intersect = attr_block.get_attr_i32("intersect") == 1;
-        let _ok = ops::imagecrop::crop_image_in_place(
+        let _ok = imagecrop::crop_image_in_place(
             &mut img,
             crop_window,
             reformat,
@@ -170,12 +168,12 @@ impl Operation for CropImageOperation {
         let (pixel_block, data_window, display_window) =
             (pixel_block_rc.clone(), img.data_window, img.display_window);
 
-        stream_data.set_data_window(data_window);
-        stream_data.set_display_window(display_window);
-        stream_data.set_hash(hash_value);
-        stream_data.set_pixel_block(pixel_block);
+        copy.set_data_window(data_window);
+        copy.set_display_window(display_window);
+        copy.set_hash(hash_value);
+        copy.set_pixel_block(pixel_block);
 
-        *output = std::rc::Rc::new(stream_data);
+        *output = std::rc::Rc::new(copy);
         NodeStatus::Valid
     }
 }

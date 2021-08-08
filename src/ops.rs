@@ -20,6 +20,7 @@
  */
 
 pub mod bake;
+pub mod colorgrade;
 pub mod imagecrop;
 pub mod imagemerge;
 pub mod pixelremap;

@@ -73,6 +73,24 @@ pub mod ffi {
 
     #[derive(Debug, Copy, Clone, Default, PartialEq, PartialOrd)]
     #[namespace = "open_comp_graph"]
+    struct Vector4f32 {
+        x: f32,
+        y: f32,
+        z: f32,
+        w: f32,
+    }
+
+    #[derive(Debug, Copy, Clone, Default, PartialEq, PartialOrd, Hash)]
+    #[namespace = "open_comp_graph"]
+    struct Vector4i32 {
+        x: i32,
+        y: i32,
+        z: i32,
+        w: i32,
+    }
+
+    #[derive(Debug, Copy, Clone, Default, PartialEq, PartialOrd)]
+    #[namespace = "open_comp_graph"]
     struct Matrix4 {
         m00: f32,
         m01: f32,
@@ -175,6 +193,8 @@ pub mod ffi {
         ReadImage = 1,
         #[cxx_name = "kWriteImage"]
         WriteImage = 2,
+        #[cxx_name = "kViewer"]
+        Viewer = 8,
         // ColorBars,
         // Constant,
 
@@ -354,6 +374,7 @@ pub mod ffi {
         #[cxx_name = "kUninitialized"]
         Uninitialized = 255,
     }
+
     // Color Spaces (using OCIO)
     #[namespace = "open_comp_graph::internal"]
     unsafe extern "C++" {
@@ -506,11 +527,6 @@ pub mod ffi {
             num_channels: i32,
             pixel_data_type: PixelDataType);
     }
-
-
-
-
-
 
     // StreamData (Rc)
     #[namespace = "open_comp_graph::internal"]

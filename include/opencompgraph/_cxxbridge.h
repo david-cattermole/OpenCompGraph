@@ -10,6 +10,8 @@
 namespace open_comp_graph {
   struct BBox2Df;
   struct BBox2Di;
+  struct Vector4f32;
+  struct Vector4i32;
   struct Matrix4;
   enum class GraphState : ::std::uint8_t;
   enum class ExecuteStatus : ::std::uint8_t;
@@ -77,6 +79,42 @@ struct BBox2Di final {
   using IsRelocatable = ::std::true_type;
 };
 #endif // CXXBRIDGE1_STRUCT_open_comp_graph$BBox2Di
+
+#ifndef CXXBRIDGE1_STRUCT_open_comp_graph$Vector4f32
+#define CXXBRIDGE1_STRUCT_open_comp_graph$Vector4f32
+struct Vector4f32 final {
+  float x;
+  float y;
+  float z;
+  float w;
+
+  bool operator==(const Vector4f32 &) const noexcept;
+  bool operator!=(const Vector4f32 &) const noexcept;
+  bool operator<(const Vector4f32 &) const noexcept;
+  bool operator<=(const Vector4f32 &) const noexcept;
+  bool operator>(const Vector4f32 &) const noexcept;
+  bool operator>=(const Vector4f32 &) const noexcept;
+  using IsRelocatable = ::std::true_type;
+};
+#endif // CXXBRIDGE1_STRUCT_open_comp_graph$Vector4f32
+
+#ifndef CXXBRIDGE1_STRUCT_open_comp_graph$Vector4i32
+#define CXXBRIDGE1_STRUCT_open_comp_graph$Vector4i32
+struct Vector4i32 final {
+  ::std::int32_t x;
+  ::std::int32_t y;
+  ::std::int32_t z;
+  ::std::int32_t w;
+
+  bool operator==(const Vector4i32 &) const noexcept;
+  bool operator!=(const Vector4i32 &) const noexcept;
+  bool operator<(const Vector4i32 &) const noexcept;
+  bool operator<=(const Vector4i32 &) const noexcept;
+  bool operator>(const Vector4i32 &) const noexcept;
+  bool operator>=(const Vector4i32 &) const noexcept;
+  using IsRelocatable = ::std::true_type;
+};
+#endif // CXXBRIDGE1_STRUCT_open_comp_graph$Vector4i32
 
 #ifndef CXXBRIDGE1_STRUCT_open_comp_graph$Matrix4
 #define CXXBRIDGE1_STRUCT_open_comp_graph$Matrix4
@@ -196,6 +234,7 @@ enum class NodeType : ::std::uint8_t {
   kNull = 0,
   kReadImage = 1,
   kWriteImage = 2,
+  kViewer = 8,
   kTransform = 5,
   kCropImage = 7,
   kMergeImage = 6,

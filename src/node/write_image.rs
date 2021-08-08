@@ -120,7 +120,7 @@ impl Operation for WriteImageOperation {
                 // debug!("path_expanded: {:?}", path_expanded);
 
                 // Copy input data
-                let copy = &mut (**input).clone();
+                let mut copy = &mut (**input).clone();
                 let display_window = copy.display_window();
                 let mut data_window = copy.data_window();
                 let mut pixel_block = copy.clone_pixel_block();
@@ -143,13 +143,14 @@ impl Operation for WriteImageOperation {
                     "Linear".to_string()
                 };
 
+                let bake_option = ops::bake::BakeOption::All;
                 ops::bake::do_process(
+                    bake_option,
                     &mut pixel_block,
                     display_window,
                     &mut data_window,
                     &mut image_spec,
-                    &copy.deformers(),
-                    copy.color_matrix(),
+                    &mut copy,
                     &from_color_space,
                     &to_color_space,
                 );

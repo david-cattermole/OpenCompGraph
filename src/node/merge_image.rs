@@ -104,30 +104,30 @@ fn do_image_process(
     );
 
     // Copy input data
-    let copy_a = &mut (**input_a).clone();
-    let copy_b = &mut (**input_b).clone();
-    let mut pixel_block_a = input_a.clone_pixel_block();
+    let mut copy_a = &mut (**input_a).clone();
+    let mut copy_b = &mut (**input_b).clone();
+    let mut pixel_block_a = copy_a.clone_pixel_block();
     let mut pixel_block_b = copy_b.clone_pixel_block();
     let mut image_spec_a = copy_a.clone_image_spec();
     let mut image_spec_b = copy_b.clone_image_spec();
 
+    let bake_option = bake::BakeOption::All;
     let from_color_space_a = &image_spec_a.color_space();
     let from_color_space_b = &image_spec_b.color_space();
-    let to_color_space_a = "Linear".to_string();
-    let to_color_space_b = "Linear".to_string();
+    let to_color_space = "Linear".to_string();
 
     // Stream A
     let display_window_a = copy_a.display_window();
     let mut data_window_a = copy_a.data_window();
     bake::do_process(
+        bake_option,
         &mut pixel_block_a,
         display_window_a,
         &mut data_window_a,
         &mut image_spec_a,
-        &copy_a.deformers(),
-        copy_a.color_matrix(),
+        &mut copy_a,
         &from_color_space_a,
-        &to_color_space_a,
+        &to_color_space,
     );
     let pixel_block_a_box = Box::new(pixel_block_a);
     // let metadata_a_box = create_metadata_shared();
@@ -142,14 +142,14 @@ fn do_image_process(
     let display_window_b = copy_b.display_window();
     let mut data_window_b = copy_b.data_window();
     bake::do_process(
+        bake_option,
         &mut pixel_block_b,
         display_window_b,
         &mut data_window_b,
         &mut image_spec_b,
-        &copy_b.deformers(),
-        copy_b.color_matrix(),
+        &mut copy_b,
         &from_color_space_b,
-        &to_color_space_b,
+        &to_color_space,
     );
     let pixel_block_b_box = Box::new(pixel_block_b);
     let image_b = ImageShared {
@@ -187,6 +187,7 @@ impl Operation for MergeImageOperation {
         // debug!("AttrBlock: {:?}", attr_block);
         // debug!("Inputs: {:?}", inputs);
         // debug!("Output: {:?}", output);
+
         let enable = attr_block.get_attr_i32("enable");
         if enable != 1 {
             let hash_value = self.cache_hash(frame, node_type_id, &attr_block, inputs);
@@ -203,11 +204,9 @@ impl Operation for MergeImageOperation {
             return NodeStatus::Error;
         }
 
-        let mut stream_data = StreamDataImpl::new();
-        let hash_value = self.cache_hash(frame, node_type_id, &attr_block, inputs);
-
         // Cache the results of the merge. If the input values do not
         // change we can easily look up the pixels again.
+        let hash_value = self.cache_hash(frame, node_type_id, &attr_block, inputs);
         let (pixel_block, data_window, display_window) = match cache.get(&hash_value) {
             Some(cached_img) => {
                 debug!("Cache Hit");
@@ -234,6 +233,7 @@ impl Operation for MergeImageOperation {
                 (pixel_block_rc.clone(), img.data_window, img.display_window)
             }
         };
+
         debug!(
             "pixel_block: {:?} x {:?} x {:?}",
             pixel_block.width(),
@@ -261,6 +261,7 @@ impl Operation for MergeImageOperation {
             display_window.height(),
         );
 
+        let mut stream_data = StreamDataImpl::new();
         stream_data.set_data_window(data_window);
         stream_data.set_display_window(display_window);
         stream_data.set_hash(hash_value);

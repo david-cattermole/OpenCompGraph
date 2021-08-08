@@ -79,6 +79,8 @@ template <> struct deleter_if<true> {
 namespace open_comp_graph {
   struct BBox2Df;
   struct BBox2Di;
+  struct Vector4f32;
+  struct Vector4i32;
   struct Matrix4;
   enum class GraphState : ::std::uint8_t;
   enum class ExecuteStatus : ::std::uint8_t;
@@ -146,6 +148,42 @@ struct BBox2Di final {
   using IsRelocatable = ::std::true_type;
 };
 #endif // CXXBRIDGE1_STRUCT_open_comp_graph$BBox2Di
+
+#ifndef CXXBRIDGE1_STRUCT_open_comp_graph$Vector4f32
+#define CXXBRIDGE1_STRUCT_open_comp_graph$Vector4f32
+struct Vector4f32 final {
+  float x;
+  float y;
+  float z;
+  float w;
+
+  bool operator==(const Vector4f32 &) const noexcept;
+  bool operator!=(const Vector4f32 &) const noexcept;
+  bool operator<(const Vector4f32 &) const noexcept;
+  bool operator<=(const Vector4f32 &) const noexcept;
+  bool operator>(const Vector4f32 &) const noexcept;
+  bool operator>=(const Vector4f32 &) const noexcept;
+  using IsRelocatable = ::std::true_type;
+};
+#endif // CXXBRIDGE1_STRUCT_open_comp_graph$Vector4f32
+
+#ifndef CXXBRIDGE1_STRUCT_open_comp_graph$Vector4i32
+#define CXXBRIDGE1_STRUCT_open_comp_graph$Vector4i32
+struct Vector4i32 final {
+  ::std::int32_t x;
+  ::std::int32_t y;
+  ::std::int32_t z;
+  ::std::int32_t w;
+
+  bool operator==(const Vector4i32 &) const noexcept;
+  bool operator!=(const Vector4i32 &) const noexcept;
+  bool operator<(const Vector4i32 &) const noexcept;
+  bool operator<=(const Vector4i32 &) const noexcept;
+  bool operator>(const Vector4i32 &) const noexcept;
+  bool operator>=(const Vector4i32 &) const noexcept;
+  using IsRelocatable = ::std::true_type;
+};
+#endif // CXXBRIDGE1_STRUCT_open_comp_graph$Vector4i32
 
 #ifndef CXXBRIDGE1_STRUCT_open_comp_graph$Matrix4
 #define CXXBRIDGE1_STRUCT_open_comp_graph$Matrix4
@@ -265,6 +303,7 @@ enum class NodeType : ::std::uint8_t {
   kNull = 0,
   kReadImage = 1,
   kWriteImage = 2,
+  kViewer = 8,
   kTransform = 5,
   kCropImage = 7,
   kMergeImage = 6,
@@ -549,6 +588,19 @@ bool open_comp_graph$cxxbridge1$BBox2Di$operator$le(const BBox2Di &, const BBox2
 bool open_comp_graph$cxxbridge1$BBox2Di$operator$gt(const BBox2Di &, const BBox2Di &) noexcept;
 bool open_comp_graph$cxxbridge1$BBox2Di$operator$ge(const BBox2Di &, const BBox2Di &) noexcept;
 ::std::size_t open_comp_graph$cxxbridge1$BBox2Di$operator$hash(const BBox2Di &) noexcept;
+bool open_comp_graph$cxxbridge1$Vector4f32$operator$eq(const Vector4f32 &, const Vector4f32 &) noexcept;
+bool open_comp_graph$cxxbridge1$Vector4f32$operator$ne(const Vector4f32 &, const Vector4f32 &) noexcept;
+bool open_comp_graph$cxxbridge1$Vector4f32$operator$lt(const Vector4f32 &, const Vector4f32 &) noexcept;
+bool open_comp_graph$cxxbridge1$Vector4f32$operator$le(const Vector4f32 &, const Vector4f32 &) noexcept;
+bool open_comp_graph$cxxbridge1$Vector4f32$operator$gt(const Vector4f32 &, const Vector4f32 &) noexcept;
+bool open_comp_graph$cxxbridge1$Vector4f32$operator$ge(const Vector4f32 &, const Vector4f32 &) noexcept;
+bool open_comp_graph$cxxbridge1$Vector4i32$operator$eq(const Vector4i32 &, const Vector4i32 &) noexcept;
+bool open_comp_graph$cxxbridge1$Vector4i32$operator$ne(const Vector4i32 &, const Vector4i32 &) noexcept;
+bool open_comp_graph$cxxbridge1$Vector4i32$operator$lt(const Vector4i32 &, const Vector4i32 &) noexcept;
+bool open_comp_graph$cxxbridge1$Vector4i32$operator$le(const Vector4i32 &, const Vector4i32 &) noexcept;
+bool open_comp_graph$cxxbridge1$Vector4i32$operator$gt(const Vector4i32 &, const Vector4i32 &) noexcept;
+bool open_comp_graph$cxxbridge1$Vector4i32$operator$ge(const Vector4i32 &, const Vector4i32 &) noexcept;
+::std::size_t open_comp_graph$cxxbridge1$Vector4i32$operator$hash(const Vector4i32 &) noexcept;
 bool open_comp_graph$cxxbridge1$Matrix4$operator$eq(const Matrix4 &, const Matrix4 &) noexcept;
 bool open_comp_graph$cxxbridge1$Matrix4$operator$ne(const Matrix4 &, const Matrix4 &) noexcept;
 bool open_comp_graph$cxxbridge1$Matrix4$operator$lt(const Matrix4 &, const Matrix4 &) noexcept;
@@ -869,6 +921,12 @@ template <> struct hash<::open_comp_graph::BBox2Di> {
   }
 };
 
+template <> struct hash<::open_comp_graph::Vector4i32> {
+  ::std::size_t operator()(const ::open_comp_graph::Vector4i32 &self) const noexcept {
+    return ::open_comp_graph::open_comp_graph$cxxbridge1$Vector4i32$operator$hash(self);
+  }
+};
+
 template <> struct hash<::open_comp_graph::internal::StreamDataImplShared> {
   ::std::size_t operator()(const ::open_comp_graph::internal::StreamDataImplShared &self) const noexcept {
     return ::open_comp_graph::internal::open_comp_graph$internal$cxxbridge1$StreamDataImplShared$operator$hash(self);
@@ -923,6 +981,54 @@ bool BBox2Di::operator>(const BBox2Di &rhs) const noexcept {
 
 bool BBox2Di::operator>=(const BBox2Di &rhs) const noexcept {
   return open_comp_graph$cxxbridge1$BBox2Di$operator$ge(*this, rhs);
+}
+
+bool Vector4f32::operator==(const Vector4f32 &rhs) const noexcept {
+  return open_comp_graph$cxxbridge1$Vector4f32$operator$eq(*this, rhs);
+}
+
+bool Vector4f32::operator!=(const Vector4f32 &rhs) const noexcept {
+  return open_comp_graph$cxxbridge1$Vector4f32$operator$ne(*this, rhs);
+}
+
+bool Vector4f32::operator<(const Vector4f32 &rhs) const noexcept {
+  return open_comp_graph$cxxbridge1$Vector4f32$operator$lt(*this, rhs);
+}
+
+bool Vector4f32::operator<=(const Vector4f32 &rhs) const noexcept {
+  return open_comp_graph$cxxbridge1$Vector4f32$operator$le(*this, rhs);
+}
+
+bool Vector4f32::operator>(const Vector4f32 &rhs) const noexcept {
+  return open_comp_graph$cxxbridge1$Vector4f32$operator$gt(*this, rhs);
+}
+
+bool Vector4f32::operator>=(const Vector4f32 &rhs) const noexcept {
+  return open_comp_graph$cxxbridge1$Vector4f32$operator$ge(*this, rhs);
+}
+
+bool Vector4i32::operator==(const Vector4i32 &rhs) const noexcept {
+  return open_comp_graph$cxxbridge1$Vector4i32$operator$eq(*this, rhs);
+}
+
+bool Vector4i32::operator!=(const Vector4i32 &rhs) const noexcept {
+  return open_comp_graph$cxxbridge1$Vector4i32$operator$ne(*this, rhs);
+}
+
+bool Vector4i32::operator<(const Vector4i32 &rhs) const noexcept {
+  return open_comp_graph$cxxbridge1$Vector4i32$operator$lt(*this, rhs);
+}
+
+bool Vector4i32::operator<=(const Vector4i32 &rhs) const noexcept {
+  return open_comp_graph$cxxbridge1$Vector4i32$operator$le(*this, rhs);
+}
+
+bool Vector4i32::operator>(const Vector4i32 &rhs) const noexcept {
+  return open_comp_graph$cxxbridge1$Vector4i32$operator$gt(*this, rhs);
+}
+
+bool Vector4i32::operator>=(const Vector4i32 &rhs) const noexcept {
+  return open_comp_graph$cxxbridge1$Vector4i32$operator$ge(*this, rhs);
 }
 
 bool Matrix4::operator==(const Matrix4 &rhs) const noexcept {

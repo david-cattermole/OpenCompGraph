@@ -28,6 +28,7 @@ use crate::cxxbridge::ffi::ImageSpec;
 use crate::cxxbridge::ffi::Matrix4;
 use crate::cxxbridge::ffi::PixelDataType;
 use crate::cxxbridge::ffi::StreamDataState;
+use crate::cxxbridge::ffi::Vector4f32;
 use crate::data::HashValue;
 use crate::deformer::Deformer;
 use crate::deformutils;
