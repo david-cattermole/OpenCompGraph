@@ -122,7 +122,7 @@ int test_node_viewer(const bool debug_print,
     }
 
     // Execute Write nodes
-    auto exec_status = graph.execute(write1_node, frames, cache);
+    exec_status = graph.execute(write1_node, frames, cache);
     if (debug_print) {
         std::cout << "execute status: "
                   << static_cast<uint32_t>(exec_status) << '\n';
