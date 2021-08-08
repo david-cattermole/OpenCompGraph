@@ -39,6 +39,7 @@ pub mod null;
 pub mod read_image;
 pub mod traits;
 pub mod transform;
+pub mod viewer;
 pub mod write_image;
 
 #[derive(Debug)]
@@ -178,6 +179,7 @@ pub fn create_node(node_type: NodeType, id: Identifier) -> NodeImpl {
         NodeType::MergeImage => merge_image::new(id),
         NodeType::CropImage => crop_image::new(id),
         NodeType::Transform => transform::new(id),
+        NodeType::Viewer => viewer::new(id),
         _ => panic!("Invalid NodeType: {:?}", node_type),
     }
 }
