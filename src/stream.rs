@@ -145,6 +145,10 @@ impl StreamDataImpl {
         self.deformers.push(value);
     }
 
+    pub fn clear_deformers(&mut self) {
+        self.deformers.clear();
+    }
+
     pub fn clone_pixel_block(&self) -> PixelBlock {
         (*self.pixel_block).clone()
     }
