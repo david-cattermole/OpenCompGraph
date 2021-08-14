@@ -9,6 +9,10 @@ THIS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 # The root of this project.
 ROOT=`readlink -f ${THIS_DIR}`
 
+# Install the needed cxxbridge.exe command to be installed with the
+# exact version we need.
+cargo install cxxbridge-cmd --version 1.0.52
+
 # Build Rust
 #
 # Assumes 'cxxbridge' (cxxbridge-cmd) is installed.
