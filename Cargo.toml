@@ -22,6 +22,7 @@ serde_yaml = "0.8"
 anyhow = "1.0.38"
 linked-hash-map = "0.5.4"
 num-traits = "0.2"
+shellexpand = "2.1"
 
 [dependencies.half]
 version = "1.7.1"

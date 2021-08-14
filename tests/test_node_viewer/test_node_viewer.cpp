@@ -96,10 +96,9 @@ int test_node_viewer(const bool debug_print,
     // Viewer Nodess
     graph.set_node_attr_i32(viewer1_node, "bake_option", 1);
     graph.set_node_attr_i32(viewer1_node, "crop_to_format", 1);
-    graph.set_node_attr_i32(viewer1_node, "disk_cache", 0);
+    graph.set_node_attr_i32(viewer1_node, "disk_cache", 1);
     graph.set_node_attr_str(
-        viewer1_node, "file_path",
-        "./tests/data/out/test_node_viewer_disk_cache1.####.png");
+        viewer1_node, "disk_cache_dir", "${TEMP}");
 
     // Write Nodes
     graph.set_node_attr_str(
