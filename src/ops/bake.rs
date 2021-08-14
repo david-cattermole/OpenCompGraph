@@ -34,13 +34,24 @@ use crate::ops;
 use crate::pixelblock::PixelBlock;
 use crate::stream::StreamDataImpl;
 
-// Convert from user color space to linear space.
+// Convert pixels from color space to another color space.
 fn do_process_colorspace(
     pixel_block: &mut PixelBlock,
     image_spec: &mut ImageSpec,
     from_color_space: &String,
     to_color_space: &String,
 ) {
+    // Convert to f32 data.
+    //
+    // Before applying any changes to the pixels we must ensure we
+    // work with 32-bit floating-point data.
+    pixel_block.convert_into_f32_data();
+
+    if from_color_space == to_color_space {
+        // Nothing to convert.
+        return;
+    }
+
     let width = pixel_block.width();
     let height = pixel_block.height();
     let num_channels = pixel_block.num_channels();
@@ -50,12 +61,6 @@ fn do_process_colorspace(
     if num_channels > 3 {
         alpha_channel_index = 3;
     }
-
-    // Convert to f32 data and convert to linear color space.
-    //
-    // Before applying any changes to the pixels we must ensure we
-    // work with 32-bit floating-point data.
-    pixel_block.convert_into_f32_data();
 
     let ok = colorspace::color_convert_inplace(
         &mut pixel_block.as_slice_mut(),
@@ -90,7 +95,7 @@ pub fn do_process(
     to_color_space: &String,
 ) {
     match bake_option {
-        // BakeOption::Nothing => panic!("Nothing"),
+        BakeOption::Nothing => {}
         BakeOption::ColorSpace => {
             do_process_colorspace(pixel_block, image_spec, &from_color_space, &to_color_space)
         }

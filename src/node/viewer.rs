@@ -220,10 +220,10 @@ impl AttrBlock for ViewerAttrs {
     fn attr_hash(&self, frame: i32, state: &mut DefaultHasher) {
         self.enable.hash(state);
         if self.enable == 1 {
+            self.bake_option.hash(state);
             self.crop_to_format.hash(state);
             self.disk_cache.hash(state);
             self.file_path.hash(state);
-            self.bake_option.hash(state);
         }
     }
 
