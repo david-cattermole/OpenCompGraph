@@ -75,12 +75,21 @@ void generate_mesh(const bool debug_print,
 
     // Apply deformations
     if (stream_data.deformers_len() > 0) {
-        auto image_window = ocg::BBox2Df();
-        image_window.min_x = -0.5;
-        image_window.min_y = -0.5;
-        image_window.max_x = +0.5;
-        image_window.max_y = +0.5;
-        stream_data.apply_deformers(slice_vertex_pos, image_window);
+        auto display_window = ocg::BBox2Df();
+        display_window.min_x = -0.5;
+        display_window.min_y = -0.5;
+        display_window.max_x = +0.5;
+        display_window.max_y = +0.5;
+
+        auto data_window = ocg::BBox2Df();
+        data_window.min_x = -0.5;
+        data_window.min_y = -0.5;
+        data_window.max_x = +0.5;
+        data_window.max_y = +0.5;
+        stream_data.apply_deformers(
+            slice_vertex_pos,
+            display_window,
+            data_window);
     }
 
     // TODO: Apply the image 2D transforms (from the StreamData).

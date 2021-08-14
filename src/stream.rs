@@ -128,9 +128,19 @@ impl StreamDataImpl {
         self.image_spec = value;
     }
 
-    pub fn apply_deformers(&self, buffer: &mut [f32], image_window: BBox2Df) {
+    pub fn apply_deformers(
+        &self,
+        buffer: &mut [f32],
+        display_window: BBox2Df,
+        data_window: BBox2Df,
+    ) {
         debug!("StreamData.apply_deformers...");
-        deformutils::apply_deformers_to_positions(&self.deformers, image_window, buffer);
+        deformutils::apply_deformers_to_positions(
+            &self.deformers,
+            display_window,
+            data_window,
+            buffer,
+        );
     }
 
     pub fn deformers(&self) -> &Vec<Box<dyn Deformer>> {
@@ -253,8 +263,14 @@ impl StreamDataImplRc {
         self.inner.color_matrix()
     }
 
-    pub fn apply_deformers(&self, buffer: &mut [f32], image_window: BBox2Df) {
-        self.inner.apply_deformers(buffer, image_window);
+    pub fn apply_deformers(
+        &self,
+        buffer: &mut [f32],
+        display_window: BBox2Df,
+        data_window: BBox2Df,
+    ) {
+        self.inner
+            .apply_deformers(buffer, display_window, data_window);
     }
 
     pub fn deformers(&self) -> &Vec<Box<dyn Deformer>> {

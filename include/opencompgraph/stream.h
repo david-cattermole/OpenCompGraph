@@ -69,7 +69,8 @@ public:
 
     OCG_API_EXPORT
     void apply_deformers(rust::Slice<float> &buffer,
-                         BBox2Df image_window) noexcept;
+                         BBox2Df display_window,
+                         BBox2Df data_window) noexcept;
 
     OCG_API_EXPORT
     rust::Slice<const float> pixel_buffer() const noexcept;

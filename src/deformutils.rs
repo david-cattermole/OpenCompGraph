@@ -27,11 +27,11 @@ use crate::pixelblock::PixelBlock;
 
 pub fn apply_deformers_to_positions(
     deformers: &Vec<Box<dyn Deformer>>,
-    image_window: BBox2Df,
+    display_window: BBox2Df,
+    data_window: BBox2Df,
     buffer: &mut [f32],
 ) {
     if deformers.len() == 0 {
-        // TODO: Copy src to dst.
         return;
     }
     let enabled_deformers: Vec<_> = deformers
@@ -39,14 +39,13 @@ pub fn apply_deformers_to_positions(
         .filter(|x| x.get_attr_i32("enable") == 1)
         .collect();
     if enabled_deformers.len() == 0 {
-        // TODO: Copy src to dst.
         return;
     }
 
     let stride = 3;
     let inverse = false;
     for deformer in enabled_deformers {
-        deformer.apply_slice_in_place(buffer, image_window, inverse, stride);
+        deformer.apply_slice_in_place(buffer, data_window, inverse, stride);
     }
 }
 
@@ -63,7 +62,9 @@ pub fn apply_deformers_to_pixels(
     // the matrix and perform the computation once.
 
     if deformers.len() == 0 {
-        // TODO: Copy src to dst.
+        // Copy src to dst.
+        *dst_pixel_block = src_pixel_block.clone();
+        *dst_data_window = src_data_window.clone();
         return;
     }
     let enabled_deformers: Vec<_> = deformers
@@ -71,7 +72,9 @@ pub fn apply_deformers_to_pixels(
         .filter(|x| x.get_attr_i32("enable") == 1)
         .collect();
     if enabled_deformers.len() == 0 {
-        // TODO: Copy src to dst.
+        // Copy src to dst.
+        *dst_pixel_block = src_pixel_block.clone();
+        *dst_data_window = src_data_window.clone();
         return;
     }
 

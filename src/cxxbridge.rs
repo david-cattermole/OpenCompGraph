@@ -559,7 +559,8 @@ pub mod ffi {
         fn apply_deformers(
             &self,
             buffer: &mut [f32],
-            image_window: BBox2Df,
+            display_window: BBox2Df,
+            data_window: BBox2Df,
         );
         fn pixel_buffer(&self) -> &[f32];
         fn pixel_width(&self) -> i32;
