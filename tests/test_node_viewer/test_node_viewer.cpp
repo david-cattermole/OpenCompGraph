@@ -94,7 +94,7 @@ int test_node_viewer(const bool debug_print,
     graph.set_node_attr_f32(lens_node, "lens_center_offset_y", lco_y);
 
     // Viewer Nodess
-    graph.set_node_attr_i32(viewer1_node, "bake_option_num", 1);
+    graph.set_node_attr_i32(viewer1_node, "bake_option", 1);
     graph.set_node_attr_i32(viewer1_node, "crop_to_format", 1);
     graph.set_node_attr_i32(viewer1_node, "disk_cache", 0);
     graph.set_node_attr_str(

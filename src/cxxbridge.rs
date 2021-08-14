@@ -183,6 +183,22 @@ pub mod ffi {
     }
 
     #[repr(u8)]
+    #[derive(Debug, Copy, Clone, Hash, PartialEq)]
+    #[namespace = "open_comp_graph"]
+    pub enum BakeOption {
+        #[cxx_name = "kNothing"]
+        Nothing = 0,
+        #[cxx_name = "kColorSpace"]
+        ColorSpace = 1,
+        #[cxx_name = "kColorSpaceAndGrade"]
+        ColorSpaceAndGrade = 2,
+        #[cxx_name = "kAll"]
+        All = 3,
+        #[cxx_name = "kUninitialized"]
+        Uninitialized = 255,
+    }
+
+    #[repr(u8)]
     #[derive(Debug, Copy, Clone, Hash)]
     #[namespace = "open_comp_graph"]
     pub(crate) enum NodeType {
@@ -695,6 +711,18 @@ pub mod ffi {
     extern "Rust" {
         fn generate_random_id() -> u64;
         fn generate_id_from_name(name: &str) -> u64;
+    }
+}
+
+impl From<i32> for ffi::BakeOption {
+    fn from(value: i32) -> Self {
+        match value {
+            0 => ffi::BakeOption::Nothing,
+            1 => ffi::BakeOption::ColorSpace,
+            2 => ffi::BakeOption::ColorSpaceAndGrade,
+            3 => ffi::BakeOption::All,
+            _ => ffi::BakeOption::Uninitialized,
+        }
     }
 }
 

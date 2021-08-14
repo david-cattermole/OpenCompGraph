@@ -24,6 +24,7 @@ use std::string::String;
 
 use crate::colorspace;
 use crate::cxxbridge::ffi::BBox2Di;
+use crate::cxxbridge::ffi::BakeOption;
 use crate::cxxbridge::ffi::ImageSpec;
 use crate::cxxbridge::ffi::Matrix4;
 use crate::cxxbridge::ffi::Vector4f32;
@@ -32,14 +33,6 @@ use crate::deformutils;
 use crate::ops;
 use crate::pixelblock::PixelBlock;
 use crate::stream::StreamDataImpl;
-
-#[derive(Debug, Copy, Clone, Hash, PartialEq)]
-pub enum BakeOption {
-    Nothing = 0,
-    ColorSpace = 1,
-    ColorSpaceAndGrade = 2,
-    All = 3,
-}
 
 // Convert from user color space to linear space.
 fn do_process_colorspace(

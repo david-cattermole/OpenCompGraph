@@ -15,6 +15,7 @@ namespace open_comp_graph {
   struct Matrix4;
   enum class GraphState : ::std::uint8_t;
   enum class ExecuteStatus : ::std::uint8_t;
+  enum class BakeOption : ::std::uint8_t;
   enum class NodeType : ::std::uint8_t;
   enum class PixelDataType : ::std::uint8_t;
   enum class NodeStatus : ::std::uint8_t;
@@ -227,6 +228,17 @@ enum class ExecuteStatus : ::std::uint8_t {
   kUninitialized = 255,
 };
 #endif // CXXBRIDGE1_ENUM_open_comp_graph$ExecuteStatus
+
+#ifndef CXXBRIDGE1_ENUM_open_comp_graph$BakeOption
+#define CXXBRIDGE1_ENUM_open_comp_graph$BakeOption
+enum class BakeOption : ::std::uint8_t {
+  kNothing = 0,
+  kColorSpace = 1,
+  kColorSpaceAndGrade = 2,
+  kAll = 3,
+  kUninitialized = 255,
+};
+#endif // CXXBRIDGE1_ENUM_open_comp_graph$BakeOption
 
 #ifndef CXXBRIDGE1_ENUM_open_comp_graph$NodeType
 #define CXXBRIDGE1_ENUM_open_comp_graph$NodeType

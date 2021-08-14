@@ -31,6 +31,7 @@ use crate::attrblock::AttrBlock;
 use crate::cache::CacheImpl;
 use crate::cache::CachedImage;
 use crate::cxxbridge::ffi::AttrState;
+use crate::cxxbridge::ffi::BakeOption;
 use crate::cxxbridge::ffi::ImageShared;
 use crate::cxxbridge::ffi::NodeStatus;
 use crate::cxxbridge::ffi::NodeType;
@@ -59,7 +60,7 @@ pub struct ViewerOperation {}
 #[derive(Debug, Clone, Default, hash::Hash)]
 pub struct ViewerAttrs {
     pub enable: i32,
-    pub bake_option_num: i32,
+    pub bake_option: i32, // index for a BakeOption.
     pub crop_to_format: i32,
     pub disk_cache: i32,
     pub file_path: String,
@@ -75,8 +76,8 @@ impl ViewerAttrs {
     pub fn new() -> ViewerAttrs {
         ViewerAttrs {
             enable: 1,
-            bake_option_num: 1,
-            crop_to_format: 1,
+            bake_option: 1,
+            crop_to_format: 0,
             disk_cache: 0,
             file_path: "".to_string(),
         }
@@ -111,24 +112,18 @@ impl Operation for ViewerOperation {
 
                 let crop_to_format = attr_block.get_attr_i32("crop_to_format") != 0;
                 let bake_option_num = if crop_to_format {
-                    3 as i32 // Bake All.
+                    3 as i32 // 3 == Bake All.
                 } else {
-                    attr_block.get_attr_i32("bake_option_num")
+                    attr_block.get_attr_i32("bake_option")
                 };
-                let bake_option = match bake_option_num {
-                    0 => bake::BakeOption::Nothing,
-                    1 => bake::BakeOption::ColorSpace,
-                    2 => bake::BakeOption::ColorSpaceAndGrade,
-                    3 => bake::BakeOption::All,
-                    _ => panic!("Unsupported BakeOption value: {}", bake_option_num),
-                };
+                let bake_option = BakeOption::from(bake_option_num);
 
                 // TODO: Determine if we really need to change the
                 // pixels or not. For example, Check if the color
                 // space is already set correctly, check if there are
                 // any deformers, check if the color matrix is not
                 // identity.
-                let change_pixels = (bake_option != bake::BakeOption::Nothing) || crop_to_format;
+                let change_pixels = (bake_option != BakeOption::Nothing) || crop_to_format;
 
                 if change_pixels {
                     let hash_value = self.cache_hash(frame, node_type_id, &attr_block, inputs);
@@ -228,7 +223,7 @@ impl AttrBlock for ViewerAttrs {
             self.crop_to_format.hash(state);
             self.disk_cache.hash(state);
             self.file_path.hash(state);
-            self.bake_option_num.hash(state);
+            self.bake_option.hash(state);
         }
     }
 
@@ -252,7 +247,7 @@ impl AttrBlock for ViewerAttrs {
             // "down_res" => AttrState::Exists,
             "crop_to_format" => AttrState::Exists,
 
-            "bake_option_num" => AttrState::Exists,
+            "bake_option" => AttrState::Exists,
             "disk_cache" => AttrState::Exists,
             "file_path" => AttrState::Exists,
             _ => AttrState::Missing,
@@ -277,7 +272,7 @@ impl AttrBlock for ViewerAttrs {
         match name {
             "enable" => self.enable,
             "crop_to_format" => self.crop_to_format,
-            "bake_option_num" => self.bake_option_num,
+            "bake_option" => self.bake_option,
             "disk_cache" => self.disk_cache,
             _ => 0,
         }
@@ -287,7 +282,7 @@ impl AttrBlock for ViewerAttrs {
         match name {
             "enable" => self.enable = value,
             "crop_to_format" => self.crop_to_format = value,
-            "bake_option_num" => self.bake_option_num = value,
+            "bake_option" => self.bake_option = value,
             "disk_cache" => self.disk_cache = value,
             _ => (),
         };

@@ -29,6 +29,7 @@ use std::string::String;
 use crate::attrblock::AttrBlock;
 use crate::cache::CacheImpl;
 use crate::cxxbridge::ffi::AttrState;
+use crate::cxxbridge::ffi::BakeOption;
 use crate::cxxbridge::ffi::ImageShared;
 use crate::cxxbridge::ffi::NodeStatus;
 use crate::cxxbridge::ffi::NodeType;
@@ -143,7 +144,7 @@ impl Operation for WriteImageOperation {
                     "Linear".to_string()
                 };
 
-                let bake_option = ops::bake::BakeOption::All;
+                let bake_option = BakeOption::All;
                 ops::bake::do_process(
                     bake_option,
                     &mut pixel_block,

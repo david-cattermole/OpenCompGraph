@@ -29,6 +29,7 @@ use crate::cache::CacheImpl;
 use crate::cache::CachedImage;
 use crate::cxxbridge::ffi::AttrState;
 use crate::cxxbridge::ffi::BBox2Di;
+use crate::cxxbridge::ffi::BakeOption;
 use crate::cxxbridge::ffi::ImageShared;
 use crate::cxxbridge::ffi::ImageSpec;
 use crate::cxxbridge::ffi::MergeImageMode;
@@ -111,7 +112,7 @@ fn do_image_process(
     let mut image_spec_a = copy_a.clone_image_spec();
     let mut image_spec_b = copy_b.clone_image_spec();
 
-    let bake_option = bake::BakeOption::All;
+    let bake_option = BakeOption::All;
     let from_color_space_a = &image_spec_a.color_space();
     let from_color_space_b = &image_spec_b.color_space();
     let to_color_space = "Linear".to_string();

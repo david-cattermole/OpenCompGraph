@@ -29,6 +29,7 @@ use crate::attrblock::AttrBlock;
 use crate::cache::CacheImpl;
 use crate::cache::CachedImage;
 use crate::cxxbridge::ffi::AttrState;
+use crate::cxxbridge::ffi::BakeOption;
 use crate::cxxbridge::ffi::ImageShared;
 use crate::cxxbridge::ffi::NodeStatus;
 use crate::cxxbridge::ffi::NodeType;
@@ -246,7 +247,7 @@ fn do_image_process(
     let from_color_space = &image_spec.color_space();
     let to_color_space = "Linear".to_string();
 
-    let bake_option = bake::BakeOption::ColorSpaceAndGrade;
+    let bake_option = BakeOption::ColorSpaceAndGrade;
     bake::do_process(
         bake_option,
         &mut pixel_block,

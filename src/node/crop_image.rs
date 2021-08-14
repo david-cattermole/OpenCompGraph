@@ -28,6 +28,7 @@ use crate::attrblock::AttrBlock;
 use crate::cache::CacheImpl;
 use crate::cxxbridge::ffi::AttrState;
 use crate::cxxbridge::ffi::BBox2Di;
+use crate::cxxbridge::ffi::BakeOption;
 use crate::cxxbridge::ffi::ImageShared;
 use crate::cxxbridge::ffi::NodeStatus;
 use crate::cxxbridge::ffi::NodeType;
@@ -134,7 +135,7 @@ impl Operation for CropImageOperation {
 
         let display_window = input.display_window();
         let mut data_window = input.data_window();
-        let bake_option = bake::BakeOption::All;
+        let bake_option = BakeOption::All;
         bake::do_process(
             bake_option,
             &mut pixel_block,
