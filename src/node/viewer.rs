@@ -131,6 +131,17 @@ impl Operation for ViewerOperation {
                         match cache.get(&hash_value) {
                             Some(cached_img) => {
                                 // debug!("Cache Hit");
+
+                                // If the cached image was generated
+                                // while baking deformations to
+                                // pixels, then we must remove
+                                // deformers from the stream so that
+                                // we do not get a double-deformation
+                                // effect when reading from the cache.
+                                if bake_option == BakeOption::All {
+                                    copy.clear_deformers();
+                                }
+
                                 (
                                     cached_img.pixel_block.clone(),
                                     cached_img.spec.clone(),
