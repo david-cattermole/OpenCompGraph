@@ -21,7 +21,7 @@
 
 use crate::pixelblock::get_pixel_index;
 
-// This assumes the 'pixels' have RGBA channels.
+/// This assumes the 'pixels' have RGBA channels.
 #[inline]
 pub fn get_pixel_rgba(
     pixels: &[f32],
@@ -55,7 +55,7 @@ pub fn get_pixel_rgba(
     return (out_r, out_g, out_b, out_a);
 }
 
-// This assumes the 'pixels' have RGB channels.
+/// This assumes the 'pixels' have RGB channels.
 #[inline]
 pub fn get_pixel_rgb(
     pixels: &[f32],
