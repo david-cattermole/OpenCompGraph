@@ -19,20 +19,26 @@
  *
  */
 
-#ifndef OPENCOMPGRAPH_H
-#define OPENCOMPGRAPH_H
-
-#include <rust/cxx.h>
-#include <opencompgraph/_cxxbridge.h>
-#include <opencompgraph/internal/colorspace.h>
-#include <opencompgraph/internal/debug.h>
-#include <opencompgraph/internal/ldpk_utils.h>
-#include <opencompgraph/internal/imageio.h>
+#include <iostream>
+#include <string>
 #include <opencompgraph/colorlutimage.h>
-#include <opencompgraph/cache.h>
-#include <opencompgraph/config.h>
-#include <opencompgraph/graph.h>
-#include <opencompgraph/node.h>
-#include <opencompgraph/stream.h>
 
-#endif // OPENCOMPGRAPH_H
+namespace open_comp_graph {
+
+internal::ImageShared get_color_transform_3dlut(
+    rust::Str from_color_space,
+    rust::Str to_color_space,
+    int32_t edge_size,  // Common values; 20, 32 or 64.
+    std::shared_ptr<Cache> &cache) noexcept
+{
+    auto cache_box = cache->get_box();  // Borrow the underlying cache object.
+    auto img = internal::get_color_transform_3dlut(
+        from_color_space,
+        to_color_space,
+        edge_size,
+        cache_box);
+    cache->set_box(std::move(cache_box));  // Return the cache to it's owner.
+    return img;
+}
+
+} // namespace open_comp_graph

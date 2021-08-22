@@ -19,20 +19,25 @@
  *
  */
 
-#ifndef OPENCOMPGRAPH_H
-#define OPENCOMPGRAPH_H
+#ifndef OPENCOMPGRAPH_COLOR_LUT_IMAGE_H
+#define OPENCOMPGRAPH_COLOR_LUT_IMAGE_H
 
+#include <memory>
+#include <string>
 #include <rust/cxx.h>
 #include <opencompgraph/_cxxbridge.h>
-#include <opencompgraph/internal/colorspace.h>
-#include <opencompgraph/internal/debug.h>
-#include <opencompgraph/internal/ldpk_utils.h>
-#include <opencompgraph/internal/imageio.h>
-#include <opencompgraph/colorlutimage.h>
 #include <opencompgraph/cache.h>
-#include <opencompgraph/config.h>
-#include <opencompgraph/graph.h>
-#include <opencompgraph/node.h>
-#include <opencompgraph/stream.h>
+#include "symbol_export.h"
 
-#endif // OPENCOMPGRAPH_H
+namespace open_comp_graph {
+
+OCG_API_EXPORT
+internal::ImageShared get_color_transform_3dlut(
+    rust::Str from_color_space,
+    rust::Str to_color_space,
+    int32_t edge_size,  // Common values; 20, 32 or 64.
+    std::shared_ptr<Cache> &cache) noexcept;
+
+} // namespace open_comp_graph
+
+#endif // OPENCOMPGRAPH_COLOR_LUT_IMAGE_H

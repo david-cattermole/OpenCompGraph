@@ -22,6 +22,7 @@
 pub mod attrblock;
 pub mod bbox;
 pub mod cache;
+pub mod colorlutimage;
 pub mod colorspace;
 pub mod colorutils;
 pub mod config;

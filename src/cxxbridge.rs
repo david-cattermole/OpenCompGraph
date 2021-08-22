@@ -23,6 +23,7 @@ use log::debug;
 
 use crate::cache::create_cache_box_with_capacity;
 use crate::cache::CacheImpl;
+use crate::colorlutimage::get_color_transform_3dlut;
 use crate::config::get_config;
 use crate::config::ConfigImpl;
 use crate::geom::export_mesh;
@@ -676,6 +677,17 @@ pub mod ffi {
             divisions_x: u32,
             divisions_y: u32
         ) -> Box<GeometryPlaneImpl>;
+    }
+
+    // Color LUT Image
+    #[namespace = "open_comp_graph::internal"]
+    extern "Rust" {
+        fn get_color_transform_3dlut(
+            from_color_space: &str,
+            to_color_space: &str,
+            cube_size: i32,
+            cache: &mut Box<CacheImpl>,
+        ) -> ImageShared;
     }
 
     // Geometry

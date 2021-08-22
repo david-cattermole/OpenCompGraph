@@ -19,20 +19,7 @@
  *
  */
 
-#ifndef OPENCOMPGRAPH_H
-#define OPENCOMPGRAPH_H
+#include <opencompgraph.h>
 
-#include <rust/cxx.h>
-#include <opencompgraph/_cxxbridge.h>
-#include <opencompgraph/internal/colorspace.h>
-#include <opencompgraph/internal/debug.h>
-#include <opencompgraph/internal/ldpk_utils.h>
-#include <opencompgraph/internal/imageio.h>
-#include <opencompgraph/colorlutimage.h>
-#include <opencompgraph/cache.h>
-#include <opencompgraph/config.h>
-#include <opencompgraph/graph.h>
-#include <opencompgraph/node.h>
-#include <opencompgraph/stream.h>
-
-#endif // OPENCOMPGRAPH_H
+int test_node_viewer_3dlut(const bool debug_print,
+                           std::shared_ptr<open_comp_graph::Cache> cache);
