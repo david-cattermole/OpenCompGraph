@@ -543,6 +543,8 @@ OCG_API_EXPORT ::open_comp_graph::internal::GraphImplShared create_graph_shared(
 
 OCG_API_EXPORT ::rust::Box<::open_comp_graph::internal::GeometryPlaneImpl> create_geometry_plane_box(float center_x, float center_y, float size_x, float size_y, ::std::uint32_t divisions_x, ::std::uint32_t divisions_y) noexcept;
 
+OCG_API_EXPORT ::open_comp_graph::internal::ImageShared get_color_transform_3dlut(::rust::Str from_color_space, ::rust::Str to_color_space, ::std::int32_t cube_size, ::rust::Box<::open_comp_graph::internal::CacheImpl> &cache) noexcept;
+
 OCG_API_EXPORT void export_mesh(::rust::Slice<const float> buffer_vertex_positions, ::rust::Slice<const float> buffer_vertex_uvs, ::rust::Slice<const ::std::uint32_t> buffer_index_tris, ::rust::Str file_path) noexcept;
 } // namespace internal
 

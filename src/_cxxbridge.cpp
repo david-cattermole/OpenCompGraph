@@ -899,6 +899,8 @@ bool open_comp_graph$internal$cxxbridge1$GeometryPlaneImpl$fill_buffer_index_wir
 
 ::open_comp_graph::internal::GeometryPlaneImpl *open_comp_graph$internal$cxxbridge1$create_geometry_plane_box(float center_x, float center_y, float size_x, float size_y, ::std::uint32_t divisions_x, ::std::uint32_t divisions_y) noexcept;
 
+void open_comp_graph$internal$cxxbridge1$get_color_transform_3dlut(::rust::Str from_color_space, ::rust::Str to_color_space, ::std::int32_t cube_size, ::rust::Box<::open_comp_graph::internal::CacheImpl> &cache, ::open_comp_graph::internal::ImageShared *return$) noexcept;
+
 void open_comp_graph$internal$cxxbridge1$export_mesh(::rust::Slice<const float> buffer_vertex_positions, ::rust::Slice<const float> buffer_vertex_uvs, ::rust::Slice<const ::std::uint32_t> buffer_index_tris, ::rust::Str file_path) noexcept;
 } // extern "C"
 } // namespace internal
@@ -1431,6 +1433,12 @@ OCG_API_EXPORT bool GeometryPlaneImpl::fill_buffer_index_wire_lines(::rust::Slic
 
 OCG_API_EXPORT ::rust::Box<::open_comp_graph::internal::GeometryPlaneImpl> create_geometry_plane_box(float center_x, float center_y, float size_x, float size_y, ::std::uint32_t divisions_x, ::std::uint32_t divisions_y) noexcept {
   return ::rust::Box<::open_comp_graph::internal::GeometryPlaneImpl>::from_raw(open_comp_graph$internal$cxxbridge1$create_geometry_plane_box(center_x, center_y, size_x, size_y, divisions_x, divisions_y));
+}
+
+OCG_API_EXPORT ::open_comp_graph::internal::ImageShared get_color_transform_3dlut(::rust::Str from_color_space, ::rust::Str to_color_space, ::std::int32_t cube_size, ::rust::Box<::open_comp_graph::internal::CacheImpl> &cache) noexcept {
+  ::rust::MaybeUninit<::open_comp_graph::internal::ImageShared> return$;
+  open_comp_graph$internal$cxxbridge1$get_color_transform_3dlut(from_color_space, to_color_space, cube_size, cache, &return$.value);
+  return ::std::move(return$.value);
 }
 
 OCG_API_EXPORT void export_mesh(::rust::Slice<const float> buffer_vertex_positions, ::rust::Slice<const float> buffer_vertex_uvs, ::rust::Slice<const ::std::uint32_t> buffer_index_tris, ::rust::Str file_path) noexcept {
