@@ -20,7 +20,7 @@
  */
 
 use anyhow::Result;
-use log::{debug, error, info, warn};
+use log::{debug, error, warn};
 use petgraph;
 use petgraph::dot::{Config, Dot};
 use petgraph::Direction;
@@ -441,7 +441,7 @@ impl GraphImpl {
         frame: i32,
         cache: &mut Box<CacheImpl>,
     ) -> Result<(), ErrorCode> {
-        info!("Execute Frame Context: {}", frame);
+        debug!("Execute Frame Context: {}", frame);
         let start = Instant::now();
 
         // Compute all hash values for each node in the entire
