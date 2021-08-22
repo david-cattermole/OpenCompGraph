@@ -19,8 +19,6 @@
  *
  */
 
-use nalgebra as na;
-
 use crate::cxxbridge::ffi::Vector4f32;
 use crate::cxxbridge::ffi::Vector4i32;
 
@@ -34,9 +32,9 @@ fn grade_single(
     offset: f32,
     gamma: f32,
     reverse: bool,
-    clamp_black: bool,
-    clamp_white: bool,
-    premult: bool,
+    _clamp_black: bool,
+    _clamp_white: bool,
+    _premult: bool,
 ) -> f32 {
     let mut a = multiply * (gain - lift) / (white_point - black_point);
     let mut b = offset + lift - a * black_point;
@@ -52,8 +50,8 @@ fn grade_single(
             }
         } else if gamma != 1.0 {
             let mut v = pixel;
-            if (v <= 0.0) { // v = 0.0;
-            } else if (v < 1.0) {
+            if v <= 0.0 { // v = 0.0;
+            } else if v < 1.0 {
                 v = v.powf(gamma);
             } else {
                 v = 1.0 + (v - 1.0) * gamma;

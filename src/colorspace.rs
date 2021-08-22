@@ -28,8 +28,8 @@ pub fn color_convert_inplace(
     num_channels: i32,
     alpha_channel_index: i32,
     unassociated_alpha: bool,
-    src_color_space: &String,
-    dst_color_space: &String,
+    src_color_space: &str,
+    dst_color_space: &str,
 ) -> bool {
     oiio_color_convert_inplace(
         pixel_data,

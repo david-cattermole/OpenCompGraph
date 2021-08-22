@@ -28,8 +28,20 @@ use crate::attrblock::AttrBlock;
 use crate::cache::CacheImpl;
 use crate::cxxbridge::ffi::NodeStatus;
 use crate::data::HashValue;
+use crate::data::NodeComputeMode;
+use crate::node::NodeImpl;
 use crate::stream::StreamDataImpl;
 
+pub trait Validate: std::fmt::Debug {
+    fn validate_inputs(
+        &self,
+        node_type_id: u8,
+        attr_block: &Box<dyn AttrBlock>,
+        hash_value: HashValue,
+        node_compute_mode: NodeComputeMode,
+        input_nodes: &Vec<&Box<NodeImpl>>,
+    ) -> Vec<NodeComputeMode>;
+}
 
 pub trait Operation: std::fmt::Debug {
     // TODO: Add a "OperationCacheType". This will allow us to
@@ -52,13 +64,13 @@ pub trait Operation: std::fmt::Debug {
         frame: i32,
         node_type_id: u8,
         attr_block: &Box<dyn AttrBlock>,
-        inputs: &Vec<Rc<StreamDataImpl>>,
+        inputs_hash: &Vec<HashValue>,
     ) -> HashValue {
         let mut state = DefaultHasher::new();
         node_type_id.hash(&mut state);
         attr_block.attr_hash(frame, &mut state);
-        for input in inputs {
-            (*input).hash(&mut state);
+        for input_hash in inputs_hash {
+            input_hash.hash(&mut state);
         }
         state.finish()
     }
@@ -75,6 +87,8 @@ pub trait Operation: std::fmt::Debug {
         frame: i32,
         node_type_id: u8,
         attr_block: &Box<dyn AttrBlock>,
+        hash_value: HashValue,
+        node_compute_mode: NodeComputeMode,
         inputs: &Vec<Rc<StreamDataImpl>>,
         output: &mut Rc<StreamDataImpl>,
         cache: &mut Box<CacheImpl>,

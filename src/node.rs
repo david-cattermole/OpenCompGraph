@@ -29,6 +29,7 @@ use crate::cxxbridge::ffi::NodeStatus;
 use crate::cxxbridge::ffi::NodeType;
 use crate::data::HashValue;
 use crate::data::Identifier;
+use crate::data::NodeComputeMode;
 use crate::stream::StreamDataImpl;
 
 pub mod crop_image;
@@ -49,6 +50,7 @@ pub struct NodeImpl {
     status: NodeStatus,
     attr_block: Box<dyn AttrBlock>,
     compute: Box<dyn traits::Operation>,
+    validate: Box<dyn traits::Validate>,
 }
 
 impl NodeImpl {
@@ -78,7 +80,7 @@ impl NodeImpl {
 
     // This method is used to determine "has this node changed?
     // If I re-compute this Node, do I expect a different value?"
-    pub fn hash(&self, frame: i32, inputs: &Vec<Rc<StreamDataImpl>>) -> HashValue {
+    pub fn hash(&self, frame: i32, inputs: &Vec<HashValue>) -> HashValue {
         let node_type_id = self.get_node_type_id();
         let value = self
             .compute
@@ -87,17 +89,44 @@ impl NodeImpl {
         value
     }
 
+    pub fn validate_inputs(
+        &self,
+        node_compute_mode: NodeComputeMode,
+        hash_value: HashValue,
+        input_nodes: &Vec<&Box<NodeImpl>>,
+    ) -> Vec<NodeComputeMode> {
+        let node_type_id = self.get_node_type_id();
+        self.validate.validate_inputs(
+            node_type_id,
+            &self.attr_block,
+            hash_value,
+            node_compute_mode,
+            input_nodes,
+        )
+    }
+
     pub fn compute(
         &mut self,
         frame: i32,
+        node_compute_mode: NodeComputeMode,
         inputs: &Vec<Rc<StreamDataImpl>>,
         output: &mut Rc<StreamDataImpl>,
         cache: &mut Box<CacheImpl>,
     ) -> NodeStatus {
         let node_type_id = self.get_node_type_id();
-        let status =
-            self.compute
-                .compute(frame, node_type_id, &self.attr_block, inputs, output, cache);
+
+        let input_hash_values: Vec<HashValue> = inputs.iter().map(|v| v.hash()).collect();
+        let hash_value = self.hash(frame, &input_hash_values);
+        let status = self.compute.compute(
+            frame,
+            node_type_id,
+            &self.attr_block,
+            hash_value,
+            node_compute_mode,
+            inputs,
+            output,
+            cache,
+        );
         self.status = status;
         status
     }

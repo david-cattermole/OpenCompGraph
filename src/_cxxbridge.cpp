@@ -442,6 +442,7 @@ struct StreamDataImplRc final : public ::rust::Opaque {
   OCG_API_EXPORT ::open_comp_graph::BBox2Di display_window() const noexcept;
   OCG_API_EXPORT ::open_comp_graph::BBox2Di data_window() const noexcept;
   OCG_API_EXPORT ::open_comp_graph::Matrix4 color_matrix() const noexcept;
+  OCG_API_EXPORT ::open_comp_graph::internal::ImageSpec clone_image_spec() const noexcept;
   OCG_API_EXPORT ::std::size_t deformers_len() const noexcept;
   OCG_API_EXPORT void apply_deformers(::rust::Slice<float> buffer, ::open_comp_graph::BBox2Df display_window, ::open_comp_graph::BBox2Df data_window) const noexcept;
   OCG_API_EXPORT ::rust::Slice<const float> pixel_buffer() const noexcept;
@@ -630,8 +631,8 @@ OCG_API_EXPORT bool open_comp_graph$internal$cxxbridge1$ocio_print_color_spaces(
   return ocio_print_color_spaces$();
 }
 
-OCG_API_EXPORT bool open_comp_graph$internal$cxxbridge1$oiio_color_convert_inplace(::rust::Slice<float> pixel_data, ::std::int32_t width, ::std::int32_t height, ::std::int32_t num_channels, ::std::int32_t alpha_channel, bool unassociated_alpha, const ::rust::String &src_color_space, const ::rust::String &dst_color_space) noexcept {
-  bool (*oiio_color_convert_inplace$)(::rust::Slice<float>, ::std::int32_t, ::std::int32_t, ::std::int32_t, ::std::int32_t, bool, const ::rust::String &, const ::rust::String &) = ::open_comp_graph::internal::oiio_color_convert_inplace;
+OCG_API_EXPORT bool open_comp_graph$internal$cxxbridge1$oiio_color_convert_inplace(::rust::Slice<float> pixel_data, ::std::int32_t width, ::std::int32_t height, ::std::int32_t num_channels, ::std::int32_t alpha_channel, bool unassociated_alpha, ::rust::Str src_color_space, ::rust::Str dst_color_space) noexcept {
+  bool (*oiio_color_convert_inplace$)(::rust::Slice<float>, ::std::int32_t, ::std::int32_t, ::std::int32_t, ::std::int32_t, bool, ::rust::Str, ::rust::Str) = ::open_comp_graph::internal::oiio_color_convert_inplace;
   return oiio_color_convert_inplace$(pixel_data, width, height, num_channels, alpha_channel, unassociated_alpha, src_color_space, dst_color_space);
 }
 
@@ -773,6 +774,8 @@ void open_comp_graph$internal$cxxbridge1$PixelBlock$data_resize(::open_comp_grap
 ::open_comp_graph::BBox2Di open_comp_graph$internal$cxxbridge1$StreamDataImplRc$data_window(const ::open_comp_graph::internal::StreamDataImplRc &self) noexcept;
 
 ::open_comp_graph::Matrix4 open_comp_graph$internal$cxxbridge1$StreamDataImplRc$color_matrix(const ::open_comp_graph::internal::StreamDataImplRc &self) noexcept;
+
+void open_comp_graph$internal$cxxbridge1$StreamDataImplRc$clone_image_spec(const ::open_comp_graph::internal::StreamDataImplRc &self, ::open_comp_graph::internal::ImageSpec *return$) noexcept;
 
 ::std::size_t open_comp_graph$internal$cxxbridge1$StreamDataImplRc$deformers_len(const ::open_comp_graph::internal::StreamDataImplRc &self) noexcept;
 
@@ -1142,6 +1145,12 @@ OCG_API_EXPORT ::open_comp_graph::BBox2Di StreamDataImplRc::data_window() const 
 
 OCG_API_EXPORT ::open_comp_graph::Matrix4 StreamDataImplRc::color_matrix() const noexcept {
   return open_comp_graph$internal$cxxbridge1$StreamDataImplRc$color_matrix(*this);
+}
+
+OCG_API_EXPORT ::open_comp_graph::internal::ImageSpec StreamDataImplRc::clone_image_spec() const noexcept {
+  ::rust::MaybeUninit<::open_comp_graph::internal::ImageSpec> return$;
+  open_comp_graph$internal$cxxbridge1$StreamDataImplRc$clone_image_spec(*this, &return$.value);
+  return ::std::move(return$.value);
 }
 
 OCG_API_EXPORT ::std::size_t StreamDataImplRc::deformers_len() const noexcept {

@@ -62,6 +62,9 @@ public:
     Matrix4 color_matrix() const noexcept;
 
     OCG_API_EXPORT
+    internal::ImageSpec clone_image_spec() const noexcept;
+
+    OCG_API_EXPORT
     Matrix4 transform_matrix() const noexcept;
 
     OCG_API_EXPORT

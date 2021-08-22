@@ -20,26 +20,24 @@
  */
 
 use log::warn;
-use std::string::String;
 
 use crate::colorspace;
 use crate::cxxbridge::ffi::BBox2Di;
 use crate::cxxbridge::ffi::BakeOption;
 use crate::cxxbridge::ffi::ImageSpec;
 use crate::cxxbridge::ffi::Matrix4;
-use crate::cxxbridge::ffi::Vector4f32;
-use crate::deformer::Deformer;
+use crate::data::COLOR_SPACE_NAME_LINEAR;
 use crate::deformutils;
 use crate::ops;
 use crate::pixelblock::PixelBlock;
 use crate::stream::StreamDataImpl;
 
-// Convert pixels from color space to another color space.
-fn do_process_colorspace(
+/// Convert pixels from color space to another color space.
+pub fn do_process_colorspace(
     pixel_block: &mut PixelBlock,
     image_spec: &mut ImageSpec,
-    from_color_space: &String,
-    to_color_space: &String,
+    from_color_space: &str,
+    to_color_space: &str,
 ) {
     // Convert to f32 data.
     //
@@ -69,11 +67,11 @@ fn do_process_colorspace(
         num_channels,
         alpha_channel_index,
         unassociated_alpha,
-        &from_color_space,
-        &to_color_space,
+        from_color_space,
+        to_color_space,
     );
     if ok {
-        image_spec.set_color_space(to_color_space.clone())
+        image_spec.set_color_space(to_color_space.to_string())
     } else {
         warn!(
             "Could not convert color space from \"{0}\" to \"{1}\" ",
@@ -82,8 +80,8 @@ fn do_process_colorspace(
     }
 }
 
-// Apply transform matrix, deformations and color corrections before
-// image operations.
+/// Apply transform matrix, deformations and color corrections before
+/// image operations.
 pub fn do_process(
     bake_option: BakeOption,
     pixel_block: &mut PixelBlock,
@@ -91,8 +89,8 @@ pub fn do_process(
     data_window: &mut BBox2Di,
     image_spec: &mut ImageSpec,
     stream_data: &mut StreamDataImpl,
-    from_color_space: &String,
-    to_color_space: &String,
+    from_color_space: &str,
+    to_color_space: &str,
 ) {
     match bake_option {
         BakeOption::Nothing => {}
@@ -101,7 +99,7 @@ pub fn do_process(
         }
         BakeOption::ColorSpaceAndGrade => {
             // Convert from user color space to linear space.
-            let linear_color_space = "Linear".to_string();
+            let linear_color_space = COLOR_SPACE_NAME_LINEAR;
             do_process_colorspace(
                 pixel_block,
                 image_spec,
@@ -123,11 +121,11 @@ pub fn do_process(
                 &linear_color_space,
                 &to_color_space,
             );
-            image_spec.set_color_space(to_color_space.clone());
+            image_spec.set_color_space(to_color_space.to_string());
         }
         BakeOption::All => {
             // Convert from user color space to linear space.
-            let linear_color_space = "Linear".to_string();
+            let linear_color_space = COLOR_SPACE_NAME_LINEAR;
             do_process_colorspace(
                 pixel_block,
                 image_spec,
@@ -163,7 +161,7 @@ pub fn do_process(
                 &linear_color_space,
                 &to_color_space,
             );
-            image_spec.set_color_space(to_color_space.clone());
+            image_spec.set_color_space(to_color_space.to_string());
         }
         _ => panic!("Unknown"),
     }

@@ -33,9 +33,14 @@ use crate::cxxbridge::ffi::BakeOption;
 use crate::cxxbridge::ffi::ImageShared;
 use crate::cxxbridge::ffi::NodeStatus;
 use crate::cxxbridge::ffi::NodeType;
+use crate::data::HashValue;
 use crate::data::Identifier;
+use crate::data::NodeComputeMode;
+use crate::data::COLOR_SPACE_NAME_LINEAR;
+use crate::data::COLOR_SPACE_NAME_SRGB;
 use crate::imageio;
 use crate::node::traits::Operation;
+use crate::node::traits::Validate;
 use crate::node::NodeImpl;
 use crate::ops;
 use crate::pathutils;
@@ -47,6 +52,7 @@ pub fn new(id: Identifier) -> NodeImpl {
         id,
         status: NodeStatus::Uninitialized,
         compute: Box::new(WriteImageOperation::new()),
+        validate: Box::new(WriteImageValidate::new()),
         attr_block: Box::new(WriteImageAttrs::new()),
     }
 }
@@ -97,14 +103,21 @@ impl Operation for WriteImageOperation {
         frame: i32,
         _node_type_id: u8,
         attr_block: &Box<dyn AttrBlock>,
+        _hash_value: HashValue,
+        node_compute_mode: NodeComputeMode,
         inputs: &Vec<Rc<StreamDataImpl>>,
         output: &mut Rc<StreamDataImpl>,
         _cache: &mut Box<CacheImpl>,
     ) -> NodeStatus {
         debug!("WriteImageOperation.compute()");
+        debug!(
+            "WriteImageOperation NodeComputeMode={:#?}",
+            node_compute_mode
+        );
         // debug!("AttrBlock: {:?}", attr_block);
         // debug!("Inputs: {:?}", inputs);
         // debug!("Output: {:?}", output);
+
         let enable = attr_block.get_attr_i32("enable");
         if enable != 1 {
             return NodeStatus::Valid;
@@ -117,8 +130,6 @@ impl Operation for WriteImageOperation {
 
                 let file_path = attr_block.get_attr_str("file_path");
                 let path_expanded = pathutils::expand_string(file_path.to_string(), frame);
-                // debug!("file_path: {:?}", file_path);
-                // debug!("path_expanded: {:?}", path_expanded);
 
                 // Copy input data
                 let mut copy = &mut (**input).clone();
@@ -126,8 +137,6 @@ impl Operation for WriteImageOperation {
                 let mut data_window = copy.data_window();
                 let mut pixel_block = copy.clone_pixel_block();
                 let mut image_spec = copy.clone_image_spec();
-                // debug!("ImageSpec: {:?}", image_spec);
-
                 let from_color_space = &image_spec.color_space();
 
                 // The color space to write to.
@@ -139,9 +148,9 @@ impl Operation for WriteImageOperation {
                     || path_expanded.ends_with(".jfif")
                     || path_expanded.ends_with(".jfi")
                 {
-                    "sRGB".to_string()
+                    COLOR_SPACE_NAME_SRGB.to_string()
                 } else {
-                    "Linear".to_string()
+                    COLOR_SPACE_NAME_LINEAR.to_string()
                 };
 
                 let bake_option = BakeOption::All;
@@ -250,5 +259,38 @@ impl AttrBlock for WriteImageAttrs {
 
     fn set_attr_f32(&mut self, _name: &str, _value: f32) {
         ()
+    }
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct WriteImageValidate {}
+
+impl WriteImageValidate {
+    pub fn new() -> WriteImageValidate {
+        WriteImageValidate {}
+    }
+}
+
+impl Validate for WriteImageValidate {
+    fn validate_inputs(
+        &self,
+        _node_type_id: u8,
+        _attr_block: &Box<dyn AttrBlock>,
+        hash_value: HashValue,
+        node_compute_mode: NodeComputeMode,
+        input_nodes: &Vec<&Box<NodeImpl>>,
+    ) -> Vec<NodeComputeMode> {
+        debug!(
+            "writeImageValidate::validate_inputs(): NodeComputeMode={:#?} HashValue={:#?}",
+            node_compute_mode, hash_value
+        );
+        let mut node_compute_modes = Vec::new();
+        if input_nodes.len() > 0 {
+            node_compute_modes.push(node_compute_mode & NodeComputeMode::ALL);
+            for _ in input_nodes.iter().skip(1) {
+                node_compute_modes.push(node_compute_mode & NodeComputeMode::NONE);
+            }
+        }
+        node_compute_modes
     }
 }

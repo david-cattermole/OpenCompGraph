@@ -28,7 +28,6 @@ use crate::cxxbridge::ffi::ImageSpec;
 use crate::cxxbridge::ffi::Matrix4;
 use crate::cxxbridge::ffi::PixelDataType;
 use crate::cxxbridge::ffi::StreamDataState;
-use crate::cxxbridge::ffi::Vector4f32;
 use crate::data::HashValue;
 use crate::deformer::Deformer;
 use crate::deformutils;
@@ -263,6 +262,10 @@ impl StreamDataImplRc {
         self.inner.color_matrix()
     }
 
+    pub fn clone_image_spec(&self) -> ImageSpec {
+        self.inner.clone_image_spec()
+    }
+
     pub fn apply_deformers(
         &self,
         buffer: &mut [f32],
@@ -281,9 +284,9 @@ impl StreamDataImplRc {
         self.inner.deformers_len()
     }
 
-    pub fn pixel_block(&self) -> Rc<PixelBlock> {
-        self.inner.pixel_block()
-    }
+    // pub fn pixel_block(&self) -> Rc<PixelBlock> {
+    //     self.inner.pixel_block()
+    // }
 
     pub fn pixel_buffer(&self) -> &[f32] {
         self.inner.pixel_buffer()

@@ -35,9 +35,12 @@ use crate::cxxbridge::ffi::ImageSpec;
 use crate::cxxbridge::ffi::MergeImageMode;
 use crate::cxxbridge::ffi::NodeStatus;
 use crate::cxxbridge::ffi::NodeType;
+use crate::data::HashValue;
 use crate::data::Identifier;
+use crate::data::NodeComputeMode;
 use crate::hashutils::HashableF32;
 use crate::node::traits::Operation;
+use crate::node::traits::Validate;
 use crate::node::NodeImpl;
 use crate::ops::bake;
 use crate::ops::imagemerge;
@@ -50,6 +53,7 @@ pub fn new(id: Identifier) -> NodeImpl {
         id,
         status: NodeStatus::Uninitialized,
         compute: Box::new(MergeImageOperation::new()),
+        validate: Box::new(MergeImageValidate::new()),
         attr_block: Box::new(MergeImageAttrs::new()),
     }
 }
@@ -131,7 +135,6 @@ fn do_image_process(
         &to_color_space,
     );
     let pixel_block_a_box = Box::new(pixel_block_a);
-    // let metadata_a_box = create_metadata_shared();
     let image_a = ImageShared {
         pixel_block: pixel_block_a_box,
         display_window: display_window_a,
@@ -177,9 +180,11 @@ fn do_image_process(
 impl Operation for MergeImageOperation {
     fn compute(
         &mut self,
-        frame: i32,
-        node_type_id: u8,
+        _frame: i32,
+        _node_type_id: u8,
         attr_block: &Box<dyn AttrBlock>,
+        hash_value: HashValue,
+        _node_compute_mode: NodeComputeMode,
         inputs: &Vec<Rc<StreamDataImpl>>,
         output: &mut Rc<StreamDataImpl>,
         cache: &mut Box<CacheImpl>,
@@ -191,14 +196,12 @@ impl Operation for MergeImageOperation {
 
         let enable = attr_block.get_attr_i32("enable");
         if enable != 1 {
-            let hash_value = self.cache_hash(frame, node_type_id, &attr_block, inputs);
             let mut stream_data = StreamDataImpl::new();
             stream_data.set_hash(hash_value);
             *output = std::rc::Rc::new(stream_data);
             return NodeStatus::Warning;
         }
         if inputs.len() != 2 {
-            let hash_value = self.cache_hash(frame, node_type_id, &attr_block, inputs);
             let mut stream_data = StreamDataImpl::new();
             stream_data.set_hash(hash_value);
             *output = std::rc::Rc::new(stream_data);
@@ -207,7 +210,6 @@ impl Operation for MergeImageOperation {
 
         // Cache the results of the merge. If the input values do not
         // change we can easily look up the pixels again.
-        let hash_value = self.cache_hash(frame, node_type_id, &attr_block, inputs);
         let (pixel_block, data_window, display_window) = match cache.get(&hash_value) {
             Some(cached_img) => {
                 debug!("Cache Hit");
@@ -327,5 +329,41 @@ impl AttrBlock for MergeImageAttrs {
             "mix" => self.mix = value,
             _ => (),
         };
+    }
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct MergeImageValidate {}
+
+impl MergeImageValidate {
+    pub fn new() -> MergeImageValidate {
+        MergeImageValidate {}
+    }
+}
+
+impl Validate for MergeImageValidate {
+    fn validate_inputs(
+        &self,
+        _node_type_id: u8,
+        _attr_block: &Box<dyn AttrBlock>,
+        hash_value: HashValue,
+        node_compute_mode: NodeComputeMode,
+        input_nodes: &Vec<&Box<NodeImpl>>,
+    ) -> Vec<NodeComputeMode> {
+        debug!(
+            "MergeImageValidate::validate_inputs(): NodeComputeMode={:#?} HashValue={:#?}",
+            node_compute_mode, hash_value
+        );
+        let mut node_compute_modes = Vec::new();
+        if input_nodes.len() > 0 {
+            node_compute_modes.push(node_compute_mode & NodeComputeMode::ALL);
+            if input_nodes.len() >= 2 {
+                node_compute_modes.push(node_compute_mode & NodeComputeMode::ALL);
+                for _ in input_nodes.iter().skip(2) {
+                    node_compute_modes.push(node_compute_mode & NodeComputeMode::NONE);
+                }
+            }
+        }
+        node_compute_modes
     }
 }

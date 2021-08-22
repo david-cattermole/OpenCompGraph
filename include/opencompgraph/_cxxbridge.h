@@ -373,6 +373,7 @@ struct StreamDataImplRc final : public ::rust::Opaque {
   OCG_API_EXPORT ::open_comp_graph::BBox2Di display_window() const noexcept;
   OCG_API_EXPORT ::open_comp_graph::BBox2Di data_window() const noexcept;
   OCG_API_EXPORT ::open_comp_graph::Matrix4 color_matrix() const noexcept;
+  OCG_API_EXPORT ::open_comp_graph::internal::ImageSpec clone_image_spec() const noexcept;
   OCG_API_EXPORT ::std::size_t deformers_len() const noexcept;
   OCG_API_EXPORT void apply_deformers(::rust::Slice<float> buffer, ::open_comp_graph::BBox2Df display_window, ::open_comp_graph::BBox2Df data_window) const noexcept;
   OCG_API_EXPORT ::rust::Slice<const float> pixel_buffer() const noexcept;

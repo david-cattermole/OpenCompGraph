@@ -32,8 +32,11 @@ use crate::cxxbridge::ffi::BakeOption;
 use crate::cxxbridge::ffi::ImageShared;
 use crate::cxxbridge::ffi::NodeStatus;
 use crate::cxxbridge::ffi::NodeType;
+use crate::data::HashValue;
 use crate::data::Identifier;
+use crate::data::NodeComputeMode;
 use crate::node::traits::Operation;
+use crate::node::traits::Validate;
 use crate::node::NodeImpl;
 use crate::ops::bake;
 use crate::ops::imagecrop;
@@ -45,6 +48,7 @@ pub fn new(id: Identifier) -> NodeImpl {
         id,
         status: NodeStatus::Uninitialized,
         compute: Box::new(CropImageOperation::new()),
+        validate: Box::new(CropImageValidate::new()),
         attr_block: Box::new(CropImageAttrs::new()),
     }
 }
@@ -88,22 +92,26 @@ impl CropImageAttrs {
 impl Operation for CropImageOperation {
     fn compute(
         &mut self,
-        frame: i32,
-        node_type_id: u8,
+        _frame: i32,
+        _node_type_id: u8,
         attr_block: &Box<dyn AttrBlock>,
+        hash_value: HashValue,
+        node_compute_mode: NodeComputeMode,
         inputs: &Vec<Rc<StreamDataImpl>>,
         output: &mut Rc<StreamDataImpl>,
         _cache: &mut Box<CacheImpl>,
     ) -> NodeStatus {
         debug!("CropImageOperation.compute()");
+        debug!(
+            "CropImageOperation NodeComputeMode={:#?}",
+            node_compute_mode
+        );
         // debug!("AttrBlock: {:?}", attr_block);
         // debug!("Inputs: {:?}", inputs);
         // debug!("Output: {:?}", output);
 
         let input = &inputs[0].clone();
         let mut copy = (**input).clone();
-
-        let hash_value = self.cache_hash(frame, node_type_id, &attr_block, inputs);
         copy.set_hash(hash_value);
 
         let enable = attr_block.get_attr_i32("enable");
@@ -253,5 +261,38 @@ impl AttrBlock for CropImageAttrs {
         match name {
             _ => (),
         };
+    }
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct CropImageValidate {}
+
+impl CropImageValidate {
+    pub fn new() -> CropImageValidate {
+        CropImageValidate {}
+    }
+}
+
+impl Validate for CropImageValidate {
+    fn validate_inputs(
+        &self,
+        _node_type_id: u8,
+        _attr_block: &Box<dyn AttrBlock>,
+        hash_value: HashValue,
+        node_compute_mode: NodeComputeMode,
+        input_nodes: &Vec<&Box<NodeImpl>>,
+    ) -> Vec<NodeComputeMode> {
+        debug!(
+            "CropImageValidate::validate_inputs(): NodeComputeMode={:#?} HashValue={:#?}",
+            node_compute_mode, hash_value
+        );
+        let mut node_compute_modes = Vec::new();
+        if input_nodes.len() > 0 {
+            node_compute_modes.push(node_compute_mode & NodeComputeMode::ALL);
+            for _ in input_nodes.iter().skip(1) {
+                node_compute_modes.push(node_compute_mode & NodeComputeMode::NONE);
+            }
+        }
+        node_compute_modes
     }
 }

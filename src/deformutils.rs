@@ -27,7 +27,7 @@ use crate::pixelblock::PixelBlock;
 
 pub fn apply_deformers_to_positions(
     deformers: &Vec<Box<dyn Deformer>>,
-    display_window: BBox2Df,
+    _display_window: BBox2Df,
     data_window: BBox2Df,
     buffer: &mut [f32],
 ) {

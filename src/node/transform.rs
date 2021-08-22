@@ -30,12 +30,14 @@ use crate::cache::CacheImpl;
 use crate::cxxbridge::ffi::AttrState;
 use crate::cxxbridge::ffi::NodeStatus;
 use crate::cxxbridge::ffi::NodeType;
+use crate::data::HashValue;
 use crate::data::Identifier;
+use crate::data::NodeComputeMode;
 use crate::deformer::transform::DeformerTransform;
 use crate::deformer::Deformer;
 use crate::hashutils::HashableF32;
-
 use crate::node::traits::Operation;
+use crate::node::traits::Validate;
 use crate::node::NodeImpl;
 use crate::stream::StreamDataImpl;
 
@@ -45,6 +47,7 @@ pub fn new(id: Identifier) -> NodeImpl {
         id,
         status: NodeStatus::Uninitialized,
         compute: Box::new(TransformOperation::new()),
+        validate: Box::new(TransformValidate::new()),
         attr_block: Box::new(TransformAttrs::new()),
     }
 }
@@ -105,14 +108,20 @@ impl TransformAttrs {
 impl Operation for TransformOperation {
     fn compute(
         &mut self,
-        frame: i32,
-        node_type_id: u8,
+        _frame: i32,
+        _node_type_id: u8,
         attr_block: &Box<dyn AttrBlock>,
+        hash_value: HashValue,
+        node_compute_mode: NodeComputeMode,
         inputs: &Vec<Rc<StreamDataImpl>>,
         output: &mut Rc<StreamDataImpl>,
         _cache: &mut Box<CacheImpl>,
     ) -> NodeStatus {
         debug!("TransformOperation.compute()");
+        debug!(
+            "TransformOperation NodeComputeMode={:#?}",
+            node_compute_mode
+        );
         // debug!("AttrBlock: {:?}", attr_block);
         // debug!("Inputs: {:?}", inputs);
         // debug!("Output: {:?}", output);
@@ -147,7 +156,6 @@ impl Operation for TransformOperation {
                 }
 
                 // Set Output data
-                let hash_value = self.cache_hash(frame, node_type_id, &attr_block, inputs);
                 copy.set_hash(hash_value);
                 *output = Rc::new(copy);
                 NodeStatus::Valid
@@ -224,5 +232,35 @@ impl AttrBlock for TransformAttrs {
             "scale_y" => self.scale_y = value,
             _ => (),
         }
+    }
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct TransformValidate {}
+
+impl TransformValidate {
+    pub fn new() -> TransformValidate {
+        TransformValidate {}
+    }
+}
+
+impl Validate for TransformValidate {
+    fn validate_inputs(
+        &self,
+        _node_type_id: u8,
+        _attr_block: &Box<dyn AttrBlock>,
+        _hash_value: HashValue,
+        node_compute_mode: NodeComputeMode,
+        input_nodes: &Vec<&Box<NodeImpl>>,
+    ) -> Vec<NodeComputeMode> {
+        debug!("TransformValidate::validate_inputs()");
+        let mut node_compute_modes = Vec::new();
+        if input_nodes.len() > 0 {
+            node_compute_modes.push(node_compute_mode & NodeComputeMode::ALL);
+            for _ in input_nodes.iter().skip(1) {
+                node_compute_modes.push(node_compute_mode & NodeComputeMode::NONE);
+            }
+        }
+        node_compute_modes
     }
 }

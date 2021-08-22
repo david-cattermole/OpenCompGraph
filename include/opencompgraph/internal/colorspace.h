@@ -40,8 +40,8 @@ bool oiio_color_convert_inplace(
         int width, int height, int num_channels,
         int alpha_channel_index,
         bool unassociated_alpha,
-        const rust::String &src_color_space,
-        const rust::String &dst_color_space);
+        const rust::Str src_color_space,
+        const rust::Str dst_color_space);
 
 } // namespace internal
 } // namespace open_comp_graph

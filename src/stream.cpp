@@ -69,6 +69,10 @@ Matrix4 StreamData::color_matrix() const noexcept {
     return this->inner.inner->color_matrix();
 };
 
+internal::ImageSpec StreamData::clone_image_spec() const noexcept {
+    return this->inner.inner->clone_image_spec();
+};
+
 size_t StreamData::deformers_len() const noexcept {
     return this->inner.inner->deformers_len();
 };

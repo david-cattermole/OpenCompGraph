@@ -61,10 +61,10 @@ bool oiio_color_convert_inplace(
         int width, int height, int num_channels,
         int alpha_channel_index,
         bool unassociated_alpha,
-        const rust::String &src_color_space_name,
-        const rust::String &dst_color_space_name) {
-    auto src_color_space_name_str = std::string(src_color_space_name);
-    auto dst_color_space_name_str = std::string(dst_color_space_name);
+        const rust::Str src_color_space,
+        const rust::Str dst_color_space) {
+    auto src_color_space_name_str = std::string(src_color_space);
+    auto dst_color_space_name_str = std::string(dst_color_space);
 
     auto spec = OIIO::ImageSpec(
         width, height, num_channels,

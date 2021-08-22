@@ -30,11 +30,14 @@ use crate::cache::CacheImpl;
 use crate::cxxbridge::ffi::AttrState;
 use crate::cxxbridge::ffi::NodeStatus;
 use crate::cxxbridge::ffi::NodeType;
+use crate::data::HashValue;
 use crate::data::Identifier;
+use crate::data::NodeComputeMode;
 use crate::deformer::tde4_classic::DeformerTde4Classic;
 use crate::deformer::Deformer;
 use crate::hashutils::HashableF32;
 use crate::node::traits::Operation;
+use crate::node::traits::Validate;
 use crate::node::NodeImpl;
 use crate::stream::StreamDataImpl;
 
@@ -44,6 +47,7 @@ pub fn new(id: Identifier) -> NodeImpl {
         id,
         status: NodeStatus::Uninitialized,
         compute: Box::new(LensDistortOperation::new()),
+        validate: Box::new(LensDistortValidate::new()),
         attr_block: Box::new(LensDistortAttrs::new()),
     }
 }
@@ -102,14 +106,20 @@ impl LensDistortAttrs {
 impl Operation for LensDistortOperation {
     fn compute(
         &mut self,
-        frame: i32,
-        node_type_id: u8,
+        _frame: i32,
+        _node_type_id: u8,
         attr_block: &Box<dyn AttrBlock>,
+        hash_value: HashValue,
+        node_compute_mode: NodeComputeMode,
         inputs: &Vec<Rc<StreamDataImpl>>,
         output: &mut Rc<StreamDataImpl>,
         _cache: &mut Box<CacheImpl>,
     ) -> NodeStatus {
         debug!("LensDistortOperation.compute()");
+        debug!(
+            "LensDistortOperation NodeComputeMode={:#?}",
+            node_compute_mode
+        );
         // debug!("AttrBlock: {:?}", attr_block);
         // debug!("Inputs: {:?}", inputs);
         // debug!("Output: {:?}", output);
@@ -145,7 +155,6 @@ impl Operation for LensDistortOperation {
                 }
 
                 // Set Output data
-                let hash_value = self.cache_hash(frame, node_type_id, &attr_block, inputs);
                 copy.set_hash(hash_value);
                 *output = Rc::new(copy);
                 NodeStatus::Valid
@@ -222,5 +231,38 @@ impl AttrBlock for LensDistortAttrs {
             "quartic_distortion" => self.quartic_distortion = value,
             _ => (),
         }
+    }
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct LensDistortValidate {}
+
+impl LensDistortValidate {
+    pub fn new() -> LensDistortValidate {
+        LensDistortValidate {}
+    }
+}
+
+impl Validate for LensDistortValidate {
+    fn validate_inputs(
+        &self,
+        _node_type_id: u8,
+        _attr_block: &Box<dyn AttrBlock>,
+        hash_value: HashValue,
+        node_compute_mode: NodeComputeMode,
+        input_nodes: &Vec<&Box<NodeImpl>>,
+    ) -> Vec<NodeComputeMode> {
+        debug!(
+            "LensDistortValidate::validate_inputs(): NodeComputeMode={:#?} HashValue={:#?}",
+            node_compute_mode, hash_value
+        );
+        let mut node_compute_modes = Vec::new();
+        if input_nodes.len() > 0 {
+            node_compute_modes.push(node_compute_mode & NodeComputeMode::ALL);
+            for _ in input_nodes.iter().skip(1) {
+                node_compute_modes.push(node_compute_mode & NodeComputeMode::NONE);
+            }
+        }
+        node_compute_modes
     }
 }

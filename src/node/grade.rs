@@ -27,20 +27,16 @@ use std::rc::Rc;
 
 use crate::attrblock::AttrBlock;
 use crate::cache::CacheImpl;
-use crate::cache::CachedImage;
 use crate::cxxbridge::ffi::AttrState;
-use crate::cxxbridge::ffi::BakeOption;
-use crate::cxxbridge::ffi::ImageShared;
 use crate::cxxbridge::ffi::NodeStatus;
 use crate::cxxbridge::ffi::NodeType;
-use crate::cxxbridge::ffi::Vector4f32;
-use crate::cxxbridge::ffi::Vector4i32;
+use crate::data::HashValue;
 use crate::data::Identifier;
+use crate::data::NodeComputeMode;
 use crate::hashutils::HashableF32;
 use crate::node::traits::Operation;
+use crate::node::traits::Validate;
 use crate::node::NodeImpl;
-use crate::ops::bake;
-use crate::ops::colorgrade;
 use crate::stream::StreamDataImpl;
 
 pub fn new(id: Identifier) -> NodeImpl {
@@ -49,6 +45,7 @@ pub fn new(id: Identifier) -> NodeImpl {
         id,
         status: NodeStatus::Uninitialized,
         compute: Box::new(GradeOperation::new()),
+        validate: Box::new(GradeValidate::new()),
         attr_block: Box::new(GradeAttrs::new()),
     }
 }
@@ -176,7 +173,9 @@ impl GradeAttrs {
             process_r: 1,
             process_g: 1,
             process_b: 1,
-            process_a: 0,
+            // TODO: Disable process_a by default. Do not adjust alpha
+            // channel.
+            process_a: 1,
 
             black_point_r: 0.0,
             black_point_g: 0.0,
@@ -221,82 +220,20 @@ impl GradeAttrs {
     }
 }
 
-fn do_image_process(
-    inputs: &Vec<Rc<StreamDataImpl>>,
-    process: Vector4i32,
-    black_point: Vector4f32,
-    white_point: Vector4f32,
-    lift: Vector4f32,
-    gain: Vector4f32,
-    multiply: Vector4f32,
-    offset: Vector4f32,
-    gamma: Vector4f32,
-    reverse: bool,
-    clamp_black: bool,
-    clamp_white: bool,
-    premult: bool,
-) -> ImageShared {
-    let input = &inputs[0].clone();
-    let mut stream_data = (**input).clone();
-
-    let mut pixel_block = input.clone_pixel_block();
-    let mut image_spec = stream_data.clone_image_spec();
-
-    let display_window = stream_data.display_window();
-    let mut data_window = stream_data.data_window();
-    let from_color_space = &image_spec.color_space();
-    let to_color_space = "Linear".to_string();
-
-    let bake_option = BakeOption::ColorSpaceAndGrade;
-    bake::do_process(
-        bake_option,
-        &mut pixel_block,
-        display_window,
-        &mut data_window,
-        &mut image_spec,
-        &mut stream_data,
-        &from_color_space,
-        &to_color_space,
-    );
-
-    let num_channels = pixel_block.num_channels();
-    let pixels = &mut pixel_block.as_slice_mut();
-    colorgrade::apply_color_grade_inplace(
-        pixels,
-        num_channels,
-        process,
-        black_point,
-        white_point,
-        lift,
-        gain,
-        multiply,
-        offset,
-        gamma,
-        reverse,
-        clamp_black,
-        clamp_white,
-        premult,
-    );
-
-    ImageShared {
-        pixel_block: Box::new(pixel_block),
-        display_window,
-        data_window,
-        spec: image_spec,
-    }
-}
-
 impl Operation for GradeOperation {
     fn compute(
         &mut self,
-        frame: i32,
-        node_type_id: u8,
-        attr_block: &Box<dyn AttrBlock>,
+        _frame: i32,
+        _node_type_id: u8,
+        _attr_block: &Box<dyn AttrBlock>,
+        hash_value: HashValue,
+        node_compute_mode: NodeComputeMode,
         inputs: &Vec<Rc<StreamDataImpl>>,
         output: &mut Rc<StreamDataImpl>,
-        cache: &mut Box<CacheImpl>,
+        _cache: &mut Box<CacheImpl>,
     ) -> NodeStatus {
         debug!("GradeOperation.compute()");
+        debug!("GradeOperation NodeComputeMode={:#?}", node_compute_mode);
         // debug!("AttrBlock: {:?}", attr_block);
         // debug!("Inputs: {:?}", inputs);
         // debug!("Output: {:?}", output);
@@ -304,135 +241,16 @@ impl Operation for GradeOperation {
         match inputs.len() {
             0 => NodeStatus::Error,
             _ => {
-                let enable = attr_block.get_attr_i32("enable");
-                let process = Vector4i32::new(
-                    attr_block.get_attr_i32("process_r"),
-                    attr_block.get_attr_i32("process_g"),
-                    attr_block.get_attr_i32("process_b"),
-                    attr_block.get_attr_i32("process_a"),
-                );
-                let has_work_to_do = enable == 1
-                    && ((process.x != 0)
-                        || (process.y != 0)
-                        || (process.z != 0)
-                        || (process.w != 0));
-
-                if !has_work_to_do {
-                    // Set Output data
-                    let input = &inputs[0].clone();
-                    let mut copy = (**input).clone();
-                    let hash_value = self.cache_hash(frame, node_type_id, &attr_block, inputs);
-                    copy.set_hash(hash_value);
-                    *output = std::rc::Rc::new(copy);
-                    NodeStatus::Valid
-                } else {
-                    // Attributes that change are non-linear.
-                    let gamma = Vector4f32::new(
-                        attr_block.get_attr_f32("gamma_r"),
-                        attr_block.get_attr_f32("gamma_g"),
-                        attr_block.get_attr_f32("gamma_b"),
-                        attr_block.get_attr_f32("gamma_a"),
-                    );
-                    let reverse = attr_block.get_attr_i32("reverse");
-                    let clamp_black = attr_block.get_attr_i32("clamp_black");
-                    let clamp_white = attr_block.get_attr_i32("clamp_white");
-                    let premult = attr_block.get_attr_i32("premult");
-
-                    // Attributes making linear changes to the colour.
-                    let black_point = Vector4f32::new(
-                        attr_block.get_attr_f32("black_point_r"),
-                        attr_block.get_attr_f32("black_point_g"),
-                        attr_block.get_attr_f32("black_point_b"),
-                        attr_block.get_attr_f32("black_point_a"),
-                    );
-                    let white_point = Vector4f32::new(
-                        attr_block.get_attr_f32("white_point_r"),
-                        attr_block.get_attr_f32("white_point_g"),
-                        attr_block.get_attr_f32("white_point_b"),
-                        attr_block.get_attr_f32("white_point_a"),
-                    );
-                    let lift = Vector4f32::new(
-                        attr_block.get_attr_f32("lift_r"),
-                        attr_block.get_attr_f32("lift_g"),
-                        attr_block.get_attr_f32("lift_b"),
-                        attr_block.get_attr_f32("lift_a"),
-                    );
-                    let gain = Vector4f32::new(
-                        attr_block.get_attr_f32("gain_r"),
-                        attr_block.get_attr_f32("gain_g"),
-                        attr_block.get_attr_f32("gain_b"),
-                        attr_block.get_attr_f32("gain_a"),
-                    );
-                    let multiply = Vector4f32::new(
-                        attr_block.get_attr_f32("multiply_r"),
-                        attr_block.get_attr_f32("multiply_g"),
-                        attr_block.get_attr_f32("multiply_b"),
-                        attr_block.get_attr_f32("multiply_a"),
-                    );
-                    let offset = Vector4f32::new(
-                        attr_block.get_attr_f32("offset_r"),
-                        attr_block.get_attr_f32("offset_g"),
-                        attr_block.get_attr_f32("offset_b"),
-                        attr_block.get_attr_f32("offset_a"),
-                    );
-
-                    let mut stream_data = StreamDataImpl::new();
-                    let hash_value = self.cache_hash(frame, node_type_id, &attr_block, inputs);
-
-                    // Cache the results of the merge. If the input values do not
-                    // change we can easily look up the pixels again.
-                    let (pixel_block, data_window, display_window) = match cache.get(&hash_value) {
-                        Some(cached_img) => {
-                            debug!("Cache Hit");
-                            (
-                                cached_img.pixel_block.clone(),
-                                cached_img.data_window,
-                                cached_img.display_window,
-                            )
-                        }
-                        _ => {
-                            debug!("Cache Miss");
-                            let img = do_image_process(
-                                inputs,
-                                process,
-                                black_point,
-                                white_point,
-                                lift,
-                                gain,
-                                multiply,
-                                offset,
-                                gamma,
-                                reverse != 0,
-                                clamp_black != 0,
-                                clamp_white != 0,
-                                premult != 0,
-                            );
-
-                            let pixel_block_rc = Rc::new(*img.pixel_block);
-                            let cached_img = CachedImage {
-                                pixel_block: pixel_block_rc.clone(),
-                                spec: img.spec,
-                                data_window: img.data_window,
-                                display_window: img.display_window,
-                            };
-                            cache.insert(hash_value, cached_img);
-                            (pixel_block_rc.clone(), img.data_window, img.display_window)
-                        }
-                    };
-
-                    stream_data.set_data_window(data_window);
-                    stream_data.set_display_window(display_window);
-                    stream_data.set_hash(hash_value);
-                    stream_data.set_pixel_block(pixel_block);
-
-                    *output = std::rc::Rc::new(stream_data);
-                    NodeStatus::Valid
-                }
+                // Set Output data
+                let input = &inputs[0].clone();
+                let mut copy = (**input).clone();
+                copy.set_hash(hash_value);
+                *output = std::rc::Rc::new(copy);
+                NodeStatus::Valid
             }
         }
     }
 }
-
 
 impl AttrBlock for GradeAttrs {
     fn attr_hash(&self, _frame: i32, state: &mut DefaultHasher) {
@@ -616,5 +434,38 @@ impl AttrBlock for GradeAttrs {
 
             _ => (),
         }
+    }
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct GradeValidate {}
+
+impl GradeValidate {
+    pub fn new() -> GradeValidate {
+        GradeValidate {}
+    }
+}
+
+impl Validate for GradeValidate {
+    fn validate_inputs(
+        &self,
+        _node_type_id: u8,
+        _attr_block: &Box<dyn AttrBlock>,
+        hash_value: HashValue,
+        node_compute_mode: NodeComputeMode,
+        input_nodes: &Vec<&Box<NodeImpl>>,
+    ) -> Vec<NodeComputeMode> {
+        debug!(
+            "GradeValidate::validate_inputs(): NodeComputeMode={:#?} HashValue={:#?}",
+            node_compute_mode, hash_value
+        );
+        let mut node_compute_modes = Vec::new();
+        if input_nodes.len() > 0 {
+            node_compute_modes.push(node_compute_mode & NodeComputeMode::ALL);
+            for _ in input_nodes.iter().skip(1) {
+                node_compute_modes.push(node_compute_mode & NodeComputeMode::NONE);
+            }
+        }
+        node_compute_modes
     }
 }

@@ -25,6 +25,7 @@ use petgraph;
 use petgraph::dot::{Config, Dot};
 use petgraph::Direction;
 use rustc_hash::FxHashMap;
+use std::collections::VecDeque;
 use std::rc::Rc;
 use std::time::Instant;
 
@@ -37,7 +38,9 @@ use crate::cxxbridge::ffi::StreamDataImplShared;
 use crate::data::EdgeWeight;
 use crate::data::ErrorCode;
 use crate::data::GraphIdx;
+use crate::data::HashValue;
 use crate::data::Identifier;
+use crate::data::NodeComputeMode;
 use crate::data::NodeIdx;
 use crate::data::NodeWeight;
 use crate::graphiter::UpstreamEvalSearch;
@@ -326,9 +329,10 @@ impl GraphImpl {
         node_indexes
     }
 
-    /// Get upstream parent inputs (so we can calculate the node hash)
-    fn compute_node_metadata(
-        &mut self,
+    /// Get upstream parent inputs (so we can calculate the node
+    /// hash).
+    fn compute_node_input_stream_data(
+        &self,
         node_idx: NodeIdx,
         stream_data_cache: &FxHashMap<GraphIdx, Rc<StreamDataImpl>>,
     ) -> Result<Vec<Rc<StreamDataImpl>>, ErrorCode> {
@@ -349,6 +353,30 @@ impl GraphImpl {
         Ok(inputs)
     }
 
+    /// Get upstream parent inputs (so we can calculate the node
+    /// hash).
+    fn compute_node_input_hash_values(
+        &self,
+        node_idx: NodeIdx,
+        hash_cache: &FxHashMap<GraphIdx, HashValue>,
+    ) -> Vec<HashValue> {
+        let mut input_hash_values = Vec::<HashValue>::new();
+
+        let parent_node_indexes = self.find_direct_upstream_nodes(node_idx.index());
+        debug!("Parent input count: {}", parent_node_indexes.len());
+        for parent_node_index in parent_node_indexes {
+            let parent_index = parent_node_index.index();
+            debug!("parent index: {}", parent_index);
+
+            if let Some(hash_value) = hash_cache.get(&parent_index) {
+                input_hash_values.push(*hash_value);
+            } else {
+                panic!("Parent node index is missing: {}", parent_index);
+            }
+        }
+        input_hash_values
+    }
+
     /// Compute the node.
     fn compute_node_output(
         &mut self,
@@ -357,6 +385,7 @@ impl GraphImpl {
         // TODO: Convert 'frame' to f64, so we can evaluate sub-frames
         // and frame blending.
         frame: i32,
+        compute_mode: NodeComputeMode,
         cache: &mut Box<CacheImpl>,
         stream_data_cache: &mut FxHashMap<GraphIdx, Rc<StreamDataImpl>>,
     ) -> Result<(), ErrorCode> {
@@ -386,7 +415,7 @@ impl GraphImpl {
         // Both 'B' and 'C' expect 'A' to have already been called so
         // that any data structures are valid and up-to-date.
 
-        match node.compute(frame, &inputs, &mut self.output, cache) {
+        match node.compute(frame, compute_mode, &inputs, &mut self.output, cache) {
             NodeStatus::Valid | NodeStatus::Warning => {
                 stream_data_cache.insert(node_index, self.output.clone());
                 Ok(())
@@ -415,17 +444,68 @@ impl GraphImpl {
         info!("Execute Frame Context: {}", frame);
         let start = Instant::now();
 
+        // Compute all hash values for each node in the entire
+        // connected graph.
+        //
+        // Start at upstream nodes and move down toward main node.
+        let mut hash_cache = FxHashMap::<GraphIdx, HashValue>::default();
+        let mut hash_values = Vec::new();
+        for node_index in node_indexes.iter().rev() {
+            debug!("Compute Node Hash: {:?}", node_index);
+            let node = &self.nodes[node_index.index()];
+            let input_hash_values =
+                self.compute_node_input_hash_values(*node_index, &mut hash_cache);
+            let hash_value = node.hash(frame, &input_hash_values);
+            hash_cache.insert(node_index.index(), hash_value);
+            hash_values.push(hash_value);
+        }
+
+        // Validate node, start at node and walk up the graph.
+        let mut validated_node_indexes = Vec::new();
+        let mut node_stack = VecDeque::<(NodeIdx, NodeComputeMode)>::new();
+        let start_node_index = node_indexes[0];
+        let start_node_compute_mode = NodeComputeMode::ALL;
+        node_stack.push_front((start_node_index, start_node_compute_mode));
+        validated_node_indexes.push((start_node_index, start_node_compute_mode));
+        while let Some((node_index, node_compute_mode)) = node_stack.pop_front() {
+            debug!("Validate Node: {:?}", node_index);
+            let input_node_indexes = self.find_direct_upstream_nodes(node_index.index());
+            let mut input_nodes = Vec::<&Box<NodeImpl>>::new();
+            for up_node_index in &input_node_indexes {
+                debug!("up_node_index: {:?}", up_node_index);
+                let up_node = &self.nodes[up_node_index.index()];
+                input_nodes.push(up_node);
+            }
+
+            let node = &self.nodes[node_index.index()];
+            let hash_value = hash_cache.get(&node_index.index()).unwrap();
+            let node_compute_modes =
+                node.validate_inputs(node_compute_mode, *hash_value, &input_nodes);
+
+            for (up_node_index, up_node_compute_mode) in
+                input_node_indexes.iter().zip(node_compute_modes.iter())
+            {
+                debug!("Validate Up Node: {:?}", up_node_index);
+                node_stack.push_front((*up_node_index, *up_node_compute_mode));
+                validated_node_indexes.push((*up_node_index, *up_node_compute_mode));
+            }
+        }
+
+        // Start at upstream nodes to compute first.
+        //
         // TODO: Metadata is independant of frame number, so maybe we
         // can re-factor it and only calculate it once?
         let mut stream_data_cache = FxHashMap::<GraphIdx, Rc<StreamDataImpl>>::default();
-        for node_index in node_indexes.iter().rev() {
+        for (node_index, node_compute_mode) in validated_node_indexes.iter().rev() {
             debug!("Compute Node: {:?}", node_index);
 
-            let node_inputs = self.compute_node_metadata(*node_index, &stream_data_cache)?;
+            let node_inputs =
+                self.compute_node_input_stream_data(*node_index, &stream_data_cache)?;
             self.compute_node_output(
                 &node_inputs,
                 node_index.index(),
                 frame,
+                *node_compute_mode,
                 cache,
                 &mut stream_data_cache,
             )?;
@@ -453,7 +533,7 @@ impl GraphImpl {
         frames: &[i32],
         cache: &mut Box<CacheImpl>,
     ) -> ExecuteStatus {
-        info!("Execute: {}", start_node_id);
+        debug!("Execute: {}", start_node_id);
         let start = Instant::now();
 
         let start_node_idx = match self.find_node_index_from_id(start_node_id) {

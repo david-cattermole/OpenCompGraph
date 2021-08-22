@@ -405,8 +405,8 @@ pub mod ffi {
             num_channels: i32,
             alpha_channel: i32,
             unassociated_alpha: bool,
-            src_color_space: &String,
-            dst_color_space: &String) -> bool;
+            src_color_space: &str,
+            dst_color_space: &str) -> bool;
     }
 
     // LDPK and the tde4_ld_plugin class.
@@ -555,6 +555,7 @@ pub mod ffi {
         fn display_window(&self) -> BBox2Di;
         fn data_window(&self) -> BBox2Di;
         fn color_matrix(&self) -> Matrix4;
+        fn clone_image_spec(&self) -> ImageSpec;
         fn deformers_len(&self) -> usize;
         fn apply_deformers(
             &self,

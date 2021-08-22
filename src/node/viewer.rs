@@ -22,34 +22,27 @@
 
 use log::{debug, warn};
 use shellexpand;
-use std::borrow::Cow;
 use std::collections::hash_map::DefaultHasher;
-use std::env;
+use std::fs;
 use std::hash;
 use std::hash::Hash;
 use std::path::Path;
+use std::path::MAIN_SEPARATOR;
 use std::rc::Rc;
 use std::string::String;
 
 use crate::attrblock::AttrBlock;
 use crate::cache::CacheImpl;
-use crate::cache::CachedImage;
 use crate::cxxbridge::ffi::AttrState;
-use crate::cxxbridge::ffi::BBox2Di;
 use crate::cxxbridge::ffi::BakeOption;
-use crate::cxxbridge::ffi::ImageShared;
-use crate::cxxbridge::ffi::ImageSpec;
 use crate::cxxbridge::ffi::NodeStatus;
 use crate::cxxbridge::ffi::NodeType;
 use crate::data::HashValue;
 use crate::data::Identifier;
-use crate::imageio;
+use crate::data::NodeComputeMode;
 use crate::node::traits::Operation;
+use crate::node::traits::Validate;
 use crate::node::NodeImpl;
-use crate::ops::bake;
-use crate::ops::imagecrop;
-use crate::pathutils;
-use crate::pixelblock::PixelBlock;
 use crate::stream::StreamDataImpl;
 
 pub fn new(id: Identifier) -> NodeImpl {
@@ -58,6 +51,7 @@ pub fn new(id: Identifier) -> NodeImpl {
         id,
         status: NodeStatus::Uninitialized,
         compute: Box::new(ViewerOperation::new()),
+        validate: Box::new(ViewerValidate::new()),
         attr_block: Box::new(ViewerAttrs::new()),
     }
 }
@@ -108,82 +102,34 @@ fn expand_directory(directory: &str) -> String {
 
 fn compute_file_path(directory: &str, hash_value: HashValue, file_ext: &str) -> String {
     let expanded_dir = expand_directory(directory);
-    let file_path = format!(
-        "{}/ocg_disk_cache_{}.{}",
-        expanded_dir, hash_value, file_ext
+    let format_path = format!(
+        "{}{}ocg_disk_cache_{}.{}",
+        expanded_dir, MAIN_SEPARATOR, hash_value, file_ext
     );
+    let file_path = match fs::canonicalize(&format_path) {
+        Ok(v) => match v.to_str() {
+            Some(s) => s.to_string(),
+            None => format_path.to_string(),
+        },
+        Err(_) => format_path.to_string(),
+    };
     file_path
-}
-
-fn do_process(
-    mut stream_data: &mut StreamDataImpl,
-    bake_option: BakeOption,
-    crop_to_format: bool,
-) -> (Rc<PixelBlock>, ImageSpec, BBox2Di, BBox2Di) {
-    // Stream input data
-    let mut display_window = stream_data.display_window();
-    let mut data_window = stream_data.data_window();
-    let mut pixel_block = stream_data.clone_pixel_block();
-    let mut image_spec = stream_data.clone_image_spec();
-
-    let from_color_space = &image_spec.color_space();
-    let to_color_space = "Linear".to_string();
-    bake::do_process(
-        bake_option,
-        &mut pixel_block,
-        display_window,
-        &mut data_window,
-        &mut image_spec,
-        &mut stream_data,
-        &from_color_space,
-        &to_color_space,
-    );
-
-    if crop_to_format {
-        let mut img = ImageShared {
-            pixel_block: Box::new(pixel_block),
-            display_window: display_window,
-            data_window: data_window,
-            spec: image_spec,
-        };
-
-        let reformat = true;
-        let black_outside = false;
-        let intersect = false;
-        let _ok = imagecrop::crop_image_in_place(
-            &mut img,
-            display_window,
-            reformat,
-            black_outside,
-            intersect,
-        );
-
-        pixel_block = *img.pixel_block;
-        display_window = img.display_window;
-        data_window = img.data_window;
-        image_spec = img.spec;
-    }
-
-    let pixel_block_rc = Rc::new(pixel_block);
-    (
-        pixel_block_rc.clone(),
-        image_spec,
-        data_window,
-        display_window,
-    )
 }
 
 impl Operation for ViewerOperation {
     fn compute(
         &mut self,
-        frame: i32,
-        node_type_id: u8,
+        _frame: i32,
+        _node_type_id: u8,
         attr_block: &Box<dyn AttrBlock>,
+        _hash_value: HashValue,
+        node_compute_mode: NodeComputeMode,
         inputs: &Vec<Rc<StreamDataImpl>>,
         output: &mut Rc<StreamDataImpl>,
-        cache: &mut Box<CacheImpl>,
+        _cache: &mut Box<CacheImpl>,
     ) -> NodeStatus {
         debug!("ViewerOperation.compute()");
+        debug!("ViewerOperation NodeComputeMode={:#?}", node_compute_mode);
         // debug!("AttrBlock: {:?}", attr_block);
         // debug!("Inputs: {:?}", inputs);
         // debug!("Output: {:?}", output);
@@ -197,146 +143,8 @@ impl Operation for ViewerOperation {
             0 => NodeStatus::Error,
             _ => {
                 let input = &inputs[0].clone();
-                let mut copy = (**input).clone();
-
-                let crop_to_format = attr_block.get_attr_i32("crop_to_format") != 0;
-                let bake_option_num = if crop_to_format {
-                    3 as i32 // 3 == Bake All.
-                } else {
-                    attr_block.get_attr_i32("bake_option")
-                };
-                let bake_option = BakeOption::from(bake_option_num);
-                let disk_cache = attr_block.get_attr_i32("disk_cache") != 0;
-
-                // TODO: Determine if we really need to change the
-                // pixels or not. For example, Check if the color
-                // space is already set correctly, check if there are
-                // any deformers, check if the color matrix is not
-                // identity.
-                let change_pixels = (bake_option != BakeOption::Nothing) || crop_to_format;
-
-                if change_pixels {
-                    let hash_value = self.cache_hash(frame, node_type_id, &attr_block, inputs);
-                    let (pixel_block, image_spec, data_window, display_window) = match cache
-                        .get(&hash_value)
-                    {
-                        Some(cached_img) => {
-                            // debug!("Cache Hit");
-                            (
-                                cached_img.pixel_block.clone(),
-                                cached_img.spec.clone(),
-                                cached_img.data_window,
-                                cached_img.display_window,
-                            )
-                        }
-                        _ => {
-                            // debug!("Cache Miss");
-                            if disk_cache {
-                                // Compute file path
-                                let disk_cache_dir = attr_block.get_attr_str("disk_cache_dir");
-                                debug!("disk_cache_dir: {:?}", disk_cache_dir);
-                                // let file_ext = "jp2"; // JPEG2000 - lossless fast playblack
-                                // let file_ext = "jpg"; // JPEG - lossy fast playback.
-                                let file_ext = "exr"; // EXR - 16-bit half-float High-Dynamic-Range
-                                let file_path =
-                                    compute_file_path(disk_cache_dir, hash_value, file_path);
-                                debug!("file_path: {:?}", file_path);
-
-                                // Try to read file path.
-                                let file_exists = Path::new(&file_path).exists();
-                                if file_exists {
-                                    // Read file (that we know exists)
-                                    let num_threads = 0;
-                                    let img = imageio::read_image(&file_path, num_threads);
-                                    let pixel_block_rc = Rc::new(*img.pixel_block);
-
-                                    // Add into cache.
-                                    let cached_img = CachedImage {
-                                        pixel_block: pixel_block_rc.clone(),
-                                        spec: img.spec.clone(),
-                                        data_window: img.data_window,
-                                        display_window: img.display_window,
-                                    };
-                                    cache.insert(hash_value, cached_img);
-
-                                    (
-                                        pixel_block_rc,
-                                        img.spec,
-                                        img.data_window,
-                                        img.display_window,
-                                    )
-                                } else {
-                                    // Compute image
-                                    let (pixel_block_rc, image_spec, data_window, display_window) =
-                                        do_process(&mut copy, bake_option, crop_to_format);
-
-                                    // Add into cache.
-                                    let cached_img = CachedImage {
-                                        pixel_block: pixel_block_rc.clone(),
-                                        spec: image_spec.clone(),
-                                        data_window: data_window,
-                                        display_window: display_window,
-                                    };
-                                    cache.insert(hash_value, cached_img);
-
-                                    // Write image
-                                    let mut img = ImageShared {
-                                        pixel_block: Box::new((*pixel_block_rc).clone()),
-                                        display_window: display_window,
-                                        data_window: data_window,
-                                        spec: image_spec.clone(),
-                                    };
-                                    let do_crop = false;
-                                    let num_threads = 0;
-                                    let ok = imageio::write_image(
-                                        &img,
-                                        &file_path,
-                                        num_threads,
-                                        do_crop,
-                                    );
-                                    if ok == false {
-                                        warn!("Failed to write image: status={}", ok);
-                                    }
-                                    debug!("Success: {}", ok);
-
-                                    (pixel_block_rc, image_spec, data_window, display_window)
-                                }
-                            } else {
-                                let (pixel_block_rc, image_spec, data_window, display_window) =
-                                    do_process(&mut copy, bake_option, crop_to_format);
-                                let cached_img = CachedImage {
-                                    pixel_block: pixel_block_rc.clone(),
-                                    spec: image_spec.clone(),
-                                    data_window: data_window,
-                                    display_window: display_window,
-                                };
-                                cache.insert(hash_value, cached_img);
-                                (pixel_block_rc, image_spec, data_window, display_window)
-                            }
-                        }
-                    };
-
-                    // Ensure the stream does not double up on
-                    // deformers if the image is expected to already
-                    // have baked deformations in it.
-                    //
-                    // If the cached image was generated while baking
-                    // deformations to pixels, then we must remove
-                    // deformers from the stream so that we do not get
-                    // a double-deformation effect when reading from
-                    // the cache.
-                    if bake_option == BakeOption::All {
-                        copy.clear_deformers();
-                    }
-
-                    copy.set_data_window(data_window);
-                    copy.set_display_window(display_window);
-                    copy.set_hash(hash_value);
-                    copy.set_pixel_block(pixel_block);
-                    copy.set_image_spec(image_spec);
-                    *output = std::rc::Rc::new(copy);
-                }
-
+                let copy = (**input).clone();
+                *output = std::rc::Rc::new(copy);
                 NodeStatus::Valid
             }
         }
@@ -344,7 +152,7 @@ impl Operation for ViewerOperation {
 }
 
 impl AttrBlock for ViewerAttrs {
-    fn attr_hash(&self, frame: i32, state: &mut DefaultHasher) {
+    fn attr_hash(&self, _frame: i32, state: &mut DefaultHasher) {
         self.enable.hash(state);
         if self.enable == 1 {
             self.bake_option.hash(state);
@@ -352,6 +160,7 @@ impl AttrBlock for ViewerAttrs {
             if self.disk_cache == 1 {
                 self.disk_cache.hash(state);
                 self.disk_cache_dir.hash(state);
+                // TODO: Look up the file path and use existance as hash?
             }
         }
     }
@@ -423,5 +232,90 @@ impl AttrBlock for ViewerAttrs {
 
     fn set_attr_f32(&mut self, _name: &str, _value: f32) {
         ()
+    }
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct ViewerValidate {}
+
+impl ViewerValidate {
+    pub fn new() -> ViewerValidate {
+        ViewerValidate {}
+    }
+}
+
+impl Validate for ViewerValidate {
+    fn validate_inputs(
+        &self,
+        _node_type_id: u8,
+        attr_block: &Box<dyn AttrBlock>,
+        hash_value: HashValue,
+        node_compute_mode: NodeComputeMode,
+        input_nodes: &Vec<&Box<NodeImpl>>,
+    ) -> Vec<NodeComputeMode> {
+        debug!(
+            "ViewerValidate::validate_inputs(): NodeComputeMode={:#?} HashValue={:#?}",
+            node_compute_mode, hash_value
+        );
+        let mut node_compute_modes = Vec::new();
+
+        if input_nodes.len() > 0 {
+            let enable = attr_block.get_attr_i32("enable") != 0;
+            let disk_cache = attr_block.get_attr_i32("disk_cache") != 0;
+            let crop_to_format = attr_block.get_attr_i32("crop_to_format") != 0;
+            let bake_option_num = if crop_to_format {
+                3 as i32 // 3 == Bake All.
+            } else {
+                attr_block.get_attr_i32("bake_option")
+            };
+            let bake_option = BakeOption::from(bake_option_num);
+
+            if enable == false {
+                node_compute_modes.push(NodeComputeMode::ALL);
+            } else {
+                if disk_cache == true {
+                    let disk_cache_dir = attr_block.get_attr_str("disk_cache_dir");
+                    let file_ext = "jpg"; // JPEG - lossy fast playback.
+                    let file_path = compute_file_path(disk_cache_dir, hash_value, file_ext);
+
+                    // Try to read file path.
+                    let file_exists = Path::new(&file_path).exists();
+                    if file_exists == false {
+                        node_compute_modes.push(node_compute_mode & NodeComputeMode::ALL)
+                    } else {
+                        match bake_option {
+                            BakeOption::Nothing => {
+                                node_compute_modes.push(node_compute_mode & NodeComputeMode::ALL)
+                            }
+                            BakeOption::ColorSpace => node_compute_modes.push(
+                                node_compute_mode
+                                    & (NodeComputeMode::ALL - NodeComputeMode::COLOR_SPACE),
+                            ),
+                            BakeOption::ColorSpaceAndGrade => node_compute_modes.push(
+                                node_compute_mode
+                                    & (NodeComputeMode::ALL
+                                        - NodeComputeMode::COLOR_SPACE
+                                        - NodeComputeMode::COLOR),
+                            ),
+                            BakeOption::All => node_compute_modes.push(
+                                node_compute_mode
+                                    & (NodeComputeMode::ALL
+                                        - NodeComputeMode::COLOR_SPACE
+                                        - NodeComputeMode::COLOR
+                                        - NodeComputeMode::DEFORMER
+                                        - NodeComputeMode::PIXEL),
+                            ),
+                            _ => panic!("BakeOption is invalid value: {:#?}", bake_option),
+                        }
+                    }
+                } else {
+                    node_compute_modes.push(NodeComputeMode::ALL);
+                }
+            }
+            for _ in input_nodes.iter().skip(1) {
+                node_compute_modes.push(node_compute_mode & NodeComputeMode::NONE);
+            }
+        }
+        node_compute_modes
     }
 }

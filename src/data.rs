@@ -23,6 +23,7 @@ pub mod matrix;
 pub mod vector4f32;
 pub mod vector4i32;
 
+use bitflags::bitflags;
 use petgraph;
 
 pub type GraphIdx = usize;
@@ -39,6 +40,9 @@ pub const BYTES_TO_MEGABYTES: usize = 1048576; // int(pow(2, 20))
 pub const BYTES_TO_GIGABYTES: usize = 1073741824; // int(pow(2, 30))
 pub const KILOBYTES_TO_MEGABYTES: usize = 1024; // int(pow(2, 10))
 pub const KILOBYTES_TO_GIGABYTES: usize = 1048576; // int(pow(2, 20))
+
+pub const COLOR_SPACE_NAME_LINEAR: &'static str = "Linear";
+pub const COLOR_SPACE_NAME_SRGB: &'static str = "sRGB";
 
 // Color Bars Texture, for debug.
 //
@@ -94,4 +98,24 @@ pub enum ErrorCode {
     Failure,
     Invalid,
     Uninitialized,
+}
+
+bitflags! {
+    #[derive(Default)]
+    pub struct NodeComputeMode: u32 {
+        const NONE = 0b00000000;
+        const PIXEL = 0b00000001;
+        const COLOR = 0b00000010;
+        const COLOR_SPACE = 0b00000100;
+        const DEFORMER = 0b00001000;
+        const ALL = Self::PIXEL.bits | Self::COLOR.bits | Self::COLOR_SPACE.bits | Self::DEFORMER.bits;
+    }
+}
+
+impl NodeComputeMode {
+    pub fn clear(&mut self) {
+        // The `bits` field can be accessed from within the same
+        // module where the `bitflags!` macro was invoked.
+        self.bits = 0;
+    }
 }
