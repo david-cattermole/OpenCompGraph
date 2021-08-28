@@ -83,8 +83,6 @@ int test_node_viewer_3dlut(const bool debug_print,
     graph.set_node_attr_i32(viewer1_node, "bake_option", 0);
     graph.set_node_attr_i32(viewer1_node, "crop_to_format", 0);
     graph.set_node_attr_i32(viewer1_node, "disk_cache", 0);
-    graph.set_node_attr_str(
-        viewer1_node, "disk_cache_dir", "${TEMP}");
 
     // Write Nodes
     graph.set_node_attr_str(
@@ -126,10 +124,13 @@ int test_node_viewer_3dlut(const bool debug_print,
 
         auto pixel_buffer = lut_image.pixel_block->as_slice();
         std::cout << "lut_image.pixel_block length=" << pixel_buffer.length() << '\n';
-        for (auto i = 0; i < pixel_buffer.length(); ++i) {
+        auto max_index = pixel_buffer.length();
+        if (max_index >= 32) {
+            max_index = 32;
+        }
+        for (auto i = 0; i < max_index; ++i) {
             std::cout << "num: " << i << "=" << pixel_buffer[i] << "\n";
         }
-
     }
 
     // Execute Write nodes
