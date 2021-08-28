@@ -56,7 +56,7 @@ int test_node_imageio_jpeg(const bool debug_print,
     graph.set_node_attr_str(
         read4_node, "file_path", "./tests/data/ocg-testdata/images/vancouver_stills/full_res_jpg/DSC05974.jpg");
     graph.set_node_attr_str(
-        read5_node, "file_path", "./tests/data/ocg-testdata/images/color_bars/3840x2160_exr/color_bars.0951.exr");
+        read5_node, "file_path", "./tests/data/ocg-testdata/images/color_bars/3840x2160_jpg/color_bars.0951.jpg");
 
     graph.set_node_attr_str(
         write1_node, "file_path", "./tests/data/out/test_node_imageio_jpeg_out1.png");
@@ -67,7 +67,7 @@ int test_node_imageio_jpeg(const bool debug_print,
     graph.set_node_attr_str(
         write4_node, "file_path", "./tests/data/out/test_node_imageio_jpeg_out4.png");
     graph.set_node_attr_str(
-        write4_node, "file_path", "./tests/data/out/test_node_imageio_jpeg_out5.png");
+        write5_node, "file_path", "./tests/data/out/test_node_imageio_jpeg_out5.png");
 
     graph.connect(read1_node, write1_node, 0);
     graph.connect(read2_node, write2_node, 0);
