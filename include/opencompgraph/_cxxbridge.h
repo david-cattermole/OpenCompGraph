@@ -469,7 +469,7 @@ struct GraphImpl final : public ::rust::Opaque {
   OCG_API_EXPORT void set_node_attr_str(::std::uint64_t node_id, ::rust::Str name, ::rust::Str value) noexcept;
   OCG_API_EXPORT bool node_exists(::std::uint64_t node_id) noexcept;
   OCG_API_EXPORT void connect(::std::uint64_t src_node_id, ::std::uint64_t dst_node_id, ::std::uint8_t input_num) noexcept;
-  OCG_API_EXPORT ::open_comp_graph::ExecuteStatus execute(::std::uint64_t node_id, ::rust::Slice<const ::std::int32_t> frames, ::rust::Box<::open_comp_graph::internal::CacheImpl> &cache) noexcept;
+  OCG_API_EXPORT ::open_comp_graph::ExecuteStatus execute(::std::uint64_t node_id, ::rust::Slice<const double> frames, ::rust::Box<::open_comp_graph::internal::CacheImpl> &cache) noexcept;
   OCG_API_EXPORT ::rust::String data_debug_string() const noexcept;
   OCG_API_EXPORT ::open_comp_graph::internal::StreamDataImplShared output_stream() const noexcept;
   ~GraphImpl() = delete;

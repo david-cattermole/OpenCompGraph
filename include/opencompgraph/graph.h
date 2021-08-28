@@ -92,6 +92,12 @@ public:
         std::shared_ptr<Cache> &cache) noexcept;
 
     OCG_API_EXPORT
+    ExecuteStatus execute(
+        const Node& node,
+        std::vector<double> &frames,
+        std::shared_ptr<Cache> &cache) noexcept;
+
+    OCG_API_EXPORT
     NodeStatus node_status(const Node &node) const noexcept;
 
     OCG_API_EXPORT

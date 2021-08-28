@@ -33,6 +33,7 @@ pub type NodeIdx = petgraph::graph::NodeIndex<GraphIdx>;
 pub type EdgeIdx = petgraph::graph::EdgeIndex<GraphIdx>;
 pub type HashValue = u64;
 pub type Identifier = u64;
+pub type FrameValue = f64;
 
 // Memory Conversion
 pub const BYTES_TO_KILOBYTES: usize = 1024; // int(pow(2, 10))

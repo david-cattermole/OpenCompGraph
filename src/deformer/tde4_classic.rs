@@ -29,6 +29,7 @@ use crate::attrblock::AttrBlock;
 use crate::cxxbridge::ffi::AttrState;
 use crate::cxxbridge::ffi::BBox2Df;
 use crate::cxxbridge::ffi::ParameterType;
+use crate::data::FrameValue;
 use crate::deformer::ldpk_utils::LensDistortionPlugin;
 use crate::deformer::Deformer;
 use crate::hashutils::HashableF32;
@@ -325,7 +326,7 @@ impl Deformer for DeformerTde4Classic {
 }
 
 impl AttrBlock for DeformerTde4Classic {
-    fn attr_hash(&self, _frame: i32, state: &mut DefaultHasher) {
+    fn attr_hash(&self, _frame: FrameValue, state: &mut DefaultHasher) {
         self.hash(state)
     }
 

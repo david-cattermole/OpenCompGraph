@@ -27,6 +27,7 @@ use std::rc::Rc;
 use crate::attrblock::AttrBlock;
 use crate::cache::CacheImpl;
 use crate::cxxbridge::ffi::NodeStatus;
+use crate::data::FrameValue;
 use crate::data::HashValue;
 use crate::data::NodeComputeMode;
 use crate::node::NodeImpl;
@@ -61,7 +62,7 @@ pub trait Operation: std::fmt::Debug {
 
     fn cache_hash(
         &self,
-        frame: i32,
+        frame: FrameValue,
         node_type_id: u8,
         attr_block: &Box<dyn AttrBlock>,
         inputs_hash: &Vec<HashValue>,
@@ -84,7 +85,7 @@ pub trait Operation: std::fmt::Debug {
 
     fn compute(
         &mut self,
-        frame: i32,
+        frame: FrameValue,
         node_type_id: u8,
         attr_block: &Box<dyn AttrBlock>,
         hash_value: HashValue,

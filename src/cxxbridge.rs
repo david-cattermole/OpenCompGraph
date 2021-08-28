@@ -658,7 +658,7 @@ pub mod ffi {
         fn execute(
             &mut self,
             node_id: u64,
-            frames: &[i32],
+            frames: &[f64],
             cache: &mut Box<CacheImpl>) -> ExecuteStatus;
         fn data_debug_string(&self) -> String;
         fn output_stream(&self) -> StreamDataImplShared;

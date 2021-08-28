@@ -34,6 +34,7 @@ use crate::cxxbridge::ffi::ImageShared;
 use crate::cxxbridge::ffi::NodeStatus;
 use crate::cxxbridge::ffi::NodeType;
 use crate::cxxbridge::ffi::PixelDataType;
+use crate::data::FrameValue;
 use crate::data::HashValue;
 use crate::data::Identifier;
 use crate::data::NodeComputeMode;
@@ -106,7 +107,7 @@ impl WriteImageAttrs {
 impl Operation for WriteImageOperation {
     fn compute(
         &mut self,
-        frame: i32,
+        frame: FrameValue,
         _node_type_id: u8,
         attr_block: &Box<dyn AttrBlock>,
         _hash_value: HashValue,
@@ -135,7 +136,8 @@ impl Operation for WriteImageOperation {
                 let input = &inputs[0].clone();
 
                 let file_path = attr_block.get_attr_str("file_path");
-                let path_expanded = pathutils::expand_string(file_path.to_string(), frame);
+                let frame_num = frame.round().trunc() as i32;
+                let path_expanded = pathutils::expand_string(file_path.to_string(), frame_num);
 
                 // Copy input data
                 let mut copy = &mut (**input).clone();
@@ -222,10 +224,11 @@ impl Operation for WriteImageOperation {
 }
 
 impl AttrBlock for WriteImageAttrs {
-    fn attr_hash(&self, frame: i32, state: &mut DefaultHasher) {
+    fn attr_hash(&self, frame: FrameValue, state: &mut DefaultHasher) {
         self.enable.hash(state);
         if self.enable == 1 {
-            let path_expanded = pathutils::expand_string(self.file_path.to_string(), frame);
+            let frame_num = frame.round().trunc() as i32;
+            let path_expanded = pathutils::expand_string(self.file_path.to_string(), frame_num);
             path_expanded.hash(state);
         }
     }

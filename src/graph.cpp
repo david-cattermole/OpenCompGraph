@@ -127,8 +127,21 @@ void Graph::connect(const Node& src_node, const Node& dst_node, uint8_t input_nu
 ExecuteStatus Graph::execute(const Node &node,
                              std::vector<int32_t> &frames,
                              std::shared_ptr<Cache> &cache) noexcept {
+    std::vector<double> float_frames(frames.size());
+    for (uint32_t i = 0; i < frames.size(); ++i) {
+        float_frames.push_back(frames[i]);
+    }
+    return Graph::execute(
+        node,
+        float_frames,
+        cache);
+}
+
+ExecuteStatus Graph::execute(const Node &node,
+                             std::vector<double> &frames,
+                             std::shared_ptr<Cache> &cache) noexcept {
     auto node_id = node.get_id();
-    rust::Slice<const int32_t> slice_frames{frames.data(), frames.size()};
+    rust::Slice<const double> slice_frames{frames.data(), frames.size()};
     auto cache_box = cache->get_box();  // Borrow the underlying cache object.
     auto status = this->inner.inner->execute(node_id, slice_frames, cache_box);
     cache->set_box(std::move(cache_box));  // Return the cache to it's owner.

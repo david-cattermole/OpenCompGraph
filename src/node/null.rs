@@ -29,6 +29,7 @@ use crate::cache::CacheImpl;
 use crate::cxxbridge::ffi::AttrState;
 use crate::cxxbridge::ffi::NodeStatus;
 use crate::cxxbridge::ffi::NodeType;
+use crate::data::FrameValue;
 use crate::data::HashValue;
 use crate::data::Identifier;
 use crate::data::NodeComputeMode;
@@ -69,7 +70,7 @@ impl NullAttrs {
 impl Operation for NullOperation {
     fn compute(
         &mut self,
-        _frame: i32,
+        _frame: FrameValue,
         _node_type_id: u8,
         _attr_block: &Box<dyn AttrBlock>,
         _hash_value: HashValue,
@@ -94,7 +95,7 @@ impl Operation for NullOperation {
 }
 
 impl AttrBlock for NullAttrs {
-    fn attr_hash(&self, _frame: i32, state: &mut DefaultHasher) {
+    fn attr_hash(&self, _frame: FrameValue, state: &mut DefaultHasher) {
         self.hash(state)
     }
 

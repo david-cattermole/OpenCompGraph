@@ -22,9 +22,10 @@
 use std::collections::hash_map::DefaultHasher;
 
 use crate::cxxbridge::ffi::AttrState;
+use crate::data::FrameValue;
 
 pub trait AttrBlock: std::fmt::Debug {
-    fn attr_hash(&self, frame: i32, state: &mut DefaultHasher);
+    fn attr_hash(&self, frame: FrameValue, state: &mut DefaultHasher);
 
     fn attr_exists(&self, name: &str) -> AttrState;
 

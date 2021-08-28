@@ -29,6 +29,7 @@ use std::hash::Hasher;
 use crate::attrblock::AttrBlock;
 use crate::cxxbridge::ffi::AttrState;
 use crate::cxxbridge::ffi::BBox2Df;
+use crate::data::FrameValue;
 use crate::deformer::Deformer;
 use crate::hashutils::HashableF32;
 use crate::math::interp;
@@ -157,7 +158,7 @@ impl Deformer for DeformerTransform {
 }
 
 impl AttrBlock for DeformerTransform {
-    fn attr_hash(&self, _frame: i32, state: &mut DefaultHasher) {
+    fn attr_hash(&self, _frame: FrameValue, state: &mut DefaultHasher) {
         self.hash(state)
     }
 

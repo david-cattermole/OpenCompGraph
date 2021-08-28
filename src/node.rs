@@ -27,6 +27,7 @@ use crate::cache::CacheImpl;
 use crate::cxxbridge::ffi::AttrState;
 use crate::cxxbridge::ffi::NodeStatus;
 use crate::cxxbridge::ffi::NodeType;
+use crate::data::FrameValue;
 use crate::data::HashValue;
 use crate::data::Identifier;
 use crate::data::NodeComputeMode;
@@ -80,7 +81,7 @@ impl NodeImpl {
 
     // This method is used to determine "has this node changed?
     // If I re-compute this Node, do I expect a different value?"
-    pub fn hash(&self, frame: i32, inputs: &Vec<HashValue>) -> HashValue {
+    pub fn hash(&self, frame: FrameValue, inputs: &Vec<HashValue>) -> HashValue {
         let node_type_id = self.get_node_type_id();
         let value = self
             .compute
@@ -107,7 +108,7 @@ impl NodeImpl {
 
     pub fn compute(
         &mut self,
-        frame: i32,
+        frame: FrameValue,
         node_compute_mode: NodeComputeMode,
         inputs: &Vec<Rc<StreamDataImpl>>,
         output: &mut Rc<StreamDataImpl>,

@@ -32,6 +32,7 @@ use crate::cache::CachedImage;
 use crate::cxxbridge::ffi::AttrState;
 use crate::cxxbridge::ffi::NodeStatus;
 use crate::cxxbridge::ffi::NodeType;
+use crate::data::FrameValue;
 use crate::data::HashValue;
 use crate::data::Identifier;
 use crate::data::NodeComputeMode;
@@ -90,7 +91,7 @@ impl ReadImageAttrs {
 impl Operation for ReadImageOperation {
     fn compute(
         &mut self,
-        frame: i32,
+        frame: FrameValue,
         _node_type_id: u8,
         attr_block: &Box<dyn AttrBlock>,
         hash_value: HashValue,
@@ -117,7 +118,8 @@ impl Operation for ReadImageOperation {
                 return NodeStatus::Warning;
             }
             let file_path = attr_block.get_attr_str("file_path");
-            let path_expanded = pathutils::expand_string(file_path.to_string(), frame);
+            let frame_num = frame.round().trunc() as i32;
+            let path_expanded = pathutils::expand_string(file_path.to_string(), frame_num);
 
             let path = match Path::new(&path_expanded).canonicalize() {
                 Ok(full_path) => full_path,
@@ -218,10 +220,11 @@ impl Operation for ReadImageOperation {
 }
 
 impl AttrBlock for ReadImageAttrs {
-    fn attr_hash(&self, frame: i32, state: &mut DefaultHasher) {
+    fn attr_hash(&self, frame: FrameValue, state: &mut DefaultHasher) {
         self.enable.hash(state);
         if self.enable == 1 {
-            let path_expanded = pathutils::expand_string(self.file_path.to_string(), frame);
+            let frame_num = frame.round().trunc() as i32;
+            let path_expanded = pathutils::expand_string(self.file_path.to_string(), frame_num);
             path_expanded.hash(state);
         }
     }

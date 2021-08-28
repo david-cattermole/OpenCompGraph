@@ -37,6 +37,7 @@ use crate::cxxbridge::ffi::NodeStatus;
 use crate::cxxbridge::ffi::StreamDataImplShared;
 use crate::data::EdgeWeight;
 use crate::data::ErrorCode;
+use crate::data::FrameValue;
 use crate::data::GraphIdx;
 use crate::data::HashValue;
 use crate::data::Identifier;
@@ -382,9 +383,9 @@ impl GraphImpl {
         &mut self,
         inputs: &Vec<Rc<StreamDataImpl>>,
         node_index: GraphIdx,
-        // TODO: Convert 'frame' to f64, so we can evaluate sub-frames
-        // and frame blending.
-        frame: i32,
+        // Frame is floating point so we can evaluate sub-frames and
+        // frame blending.
+        frame: FrameValue,
         compute_mode: NodeComputeMode,
         cache: &mut Box<CacheImpl>,
         stream_data_cache: &mut FxHashMap<GraphIdx, Rc<StreamDataImpl>>,
@@ -438,7 +439,7 @@ impl GraphImpl {
     fn execute_frame(
         &mut self,
         node_indexes: &Vec<NodeIdx>,
-        frame: i32,
+        frame: FrameValue,
         cache: &mut Box<CacheImpl>,
     ) -> Result<(), ErrorCode> {
         debug!("Execute Frame Context: {}", frame);
@@ -530,7 +531,7 @@ impl GraphImpl {
     pub fn execute(
         &mut self,
         start_node_id: u64,
-        frames: &[i32],
+        frames: &[FrameValue],
         cache: &mut Box<CacheImpl>,
     ) -> ExecuteStatus {
         debug!("Execute: {}", start_node_id);

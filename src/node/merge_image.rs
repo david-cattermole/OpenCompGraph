@@ -36,6 +36,7 @@ use crate::cxxbridge::ffi::MergeImageMode;
 use crate::cxxbridge::ffi::NodeStatus;
 use crate::cxxbridge::ffi::NodeType;
 use crate::cxxbridge::ffi::PixelDataType;
+use crate::data::FrameValue;
 use crate::data::HashValue;
 use crate::data::Identifier;
 use crate::data::NodeComputeMode;
@@ -184,7 +185,7 @@ fn do_image_process(
 impl Operation for MergeImageOperation {
     fn compute(
         &mut self,
-        _frame: i32,
+        _frame: FrameValue,
         _node_type_id: u8,
         attr_block: &Box<dyn AttrBlock>,
         hash_value: HashValue,
@@ -280,7 +281,7 @@ impl Operation for MergeImageOperation {
 }
 
 impl AttrBlock for MergeImageAttrs {
-    fn attr_hash(&self, _frame: i32, state: &mut DefaultHasher) {
+    fn attr_hash(&self, _frame: FrameValue, state: &mut DefaultHasher) {
         if self.enable == 1 {
             self.enable.hash(state);
             self.mode.hash(state);

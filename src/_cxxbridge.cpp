@@ -538,7 +538,7 @@ struct GraphImpl final : public ::rust::Opaque {
   OCG_API_EXPORT void set_node_attr_str(::std::uint64_t node_id, ::rust::Str name, ::rust::Str value) noexcept;
   OCG_API_EXPORT bool node_exists(::std::uint64_t node_id) noexcept;
   OCG_API_EXPORT void connect(::std::uint64_t src_node_id, ::std::uint64_t dst_node_id, ::std::uint8_t input_num) noexcept;
-  OCG_API_EXPORT ::open_comp_graph::ExecuteStatus execute(::std::uint64_t node_id, ::rust::Slice<const ::std::int32_t> frames, ::rust::Box<::open_comp_graph::internal::CacheImpl> &cache) noexcept;
+  OCG_API_EXPORT ::open_comp_graph::ExecuteStatus execute(::std::uint64_t node_id, ::rust::Slice<const double> frames, ::rust::Box<::open_comp_graph::internal::CacheImpl> &cache) noexcept;
   OCG_API_EXPORT ::rust::String data_debug_string() const noexcept;
   OCG_API_EXPORT ::open_comp_graph::internal::StreamDataImplShared output_stream() const noexcept;
   ~GraphImpl() = delete;
@@ -866,7 +866,7 @@ bool open_comp_graph$internal$cxxbridge1$GraphImpl$node_exists(::open_comp_graph
 
 void open_comp_graph$internal$cxxbridge1$GraphImpl$connect(::open_comp_graph::internal::GraphImpl &self, ::std::uint64_t src_node_id, ::std::uint64_t dst_node_id, ::std::uint8_t input_num) noexcept;
 
-::open_comp_graph::ExecuteStatus open_comp_graph$internal$cxxbridge1$GraphImpl$execute(::open_comp_graph::internal::GraphImpl &self, ::std::uint64_t node_id, ::rust::Slice<const ::std::int32_t> frames, ::rust::Box<::open_comp_graph::internal::CacheImpl> &cache) noexcept;
+::open_comp_graph::ExecuteStatus open_comp_graph$internal$cxxbridge1$GraphImpl$execute(::open_comp_graph::internal::GraphImpl &self, ::std::uint64_t node_id, ::rust::Slice<const double> frames, ::rust::Box<::open_comp_graph::internal::CacheImpl> &cache) noexcept;
 
 void open_comp_graph$internal$cxxbridge1$GraphImpl$data_debug_string(const ::open_comp_graph::internal::GraphImpl &self, ::rust::String *return$) noexcept;
 
@@ -1346,7 +1346,7 @@ OCG_API_EXPORT void GraphImpl::connect(::std::uint64_t src_node_id, ::std::uint6
   open_comp_graph$internal$cxxbridge1$GraphImpl$connect(*this, src_node_id, dst_node_id, input_num);
 }
 
-OCG_API_EXPORT ::open_comp_graph::ExecuteStatus GraphImpl::execute(::std::uint64_t node_id, ::rust::Slice<const ::std::int32_t> frames, ::rust::Box<::open_comp_graph::internal::CacheImpl> &cache) noexcept {
+OCG_API_EXPORT ::open_comp_graph::ExecuteStatus GraphImpl::execute(::std::uint64_t node_id, ::rust::Slice<const double> frames, ::rust::Box<::open_comp_graph::internal::CacheImpl> &cache) noexcept {
   return open_comp_graph$internal$cxxbridge1$GraphImpl$execute(*this, node_id, frames, cache);
 }
 
