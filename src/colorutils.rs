@@ -22,6 +22,7 @@
 use fastapprox::faster;
 
 /// https://www.excamera.com/sphinx/article-srgb.html
+#[inline]
 pub fn convert_srgb_to_linear(x: f32) -> f32 {
     let a: f32 = 0.055;
     if x <= 0.04045 {
@@ -32,6 +33,7 @@ pub fn convert_srgb_to_linear(x: f32) -> f32 {
 }
 
 /// https://www.excamera.com/sphinx/article-srgb.html
+#[inline]
 pub fn convert_linear_to_srgb(x: f32) -> f32 {
     let a = 0.055;
     if x <= 0.0031308 {
