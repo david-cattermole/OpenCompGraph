@@ -42,7 +42,6 @@ pub fn do_image_process(
     let input = &inputs[0].clone();
     let input_pixel_block = input.clone_pixel_block();
 
-    // let metadata = create_metadata_shared();
     let mut image_out = ImageShared {
         pixel_block: Box::new(input_pixel_block),
         display_window: input.display_window(),
