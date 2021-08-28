@@ -21,6 +21,7 @@
 
 use log::debug;
 use std::rc::Rc;
+use std::time::Instant;
 
 use crate::cxxbridge::ffi::BBox2Di;
 use crate::cxxbridge::ffi::ImageShared;
@@ -75,6 +76,7 @@ pub fn crop_image_in_place(
     //
     _intersect: bool,
 ) -> bool {
+    let start = Instant::now();
     let src_pixel_block = &mut *image.pixel_block;
     let src_display_window = image.display_window;
     let src_data_window = image.data_window;
@@ -127,5 +129,7 @@ pub fn crop_image_in_place(
     assert!(image.data_window.width() == image.pixel_block.width());
     assert!(image.data_window.height() == image.pixel_block.height());
 
+    let duration = start.elapsed();
+    debug!("Total time: {:?}", duration);
     true
 }

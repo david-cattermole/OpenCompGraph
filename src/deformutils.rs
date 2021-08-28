@@ -19,6 +19,9 @@
  *
  */
 
+use log::debug;
+use std::time::Instant;
+
 use crate::cxxbridge::ffi::BBox2Df;
 use crate::cxxbridge::ffi::BBox2Di;
 use crate::deformer::Deformer;
@@ -57,6 +60,8 @@ pub fn apply_deformers_to_pixels(
     dst_pixel_block: &mut PixelBlock,
     dst_data_window: &mut BBox2Di,
 ) {
+    let func_start = Instant::now();
+    let startup_start = Instant::now();
     // TODO: Check if all deformers are 'uniform' (same deformation
     // for all points - can be simplified to a matrix), then compute
     // the matrix and perform the computation once.
@@ -96,6 +101,8 @@ pub fn apply_deformers_to_pixels(
         src_pixel_block.num_channels(),
         src_pixel_block.pixel_data_type(),
     );
+    let startup_duration = startup_start.elapsed();
+    let pixel_coords_start = Instant::now();
 
     let dst_width = dst_pixel_block.width();
     let dst_height = dst_pixel_block.height();
@@ -118,6 +125,8 @@ pub fn apply_deformers_to_pixels(
             index += stride;
         }
     }
+    let pixel_coords_duration = pixel_coords_start.elapsed();
+    let apply_start = Instant::now();
 
     // Apply deformers to 2D position buffer.
     let stride = 2;
@@ -129,6 +138,8 @@ pub fn apply_deformers_to_pixels(
         let buffer = pixel_coords.as_mut_slice();
         deformer.apply_slice_in_place(buffer, display_window_f32, inverse, stride);
     }
+    let apply_duration = apply_start.elapsed();
+    let remap_start = Instant::now();
 
     // Sample the image pixels with the position values.
     ops::pixelremap::pixels_remap_coords(
@@ -138,5 +149,12 @@ pub fn apply_deformers_to_pixels(
         src_data_window,
         dst_pixel_block,
         dst_data_window,
-    )
+    );
+    let remap_duration = remap_start.elapsed();
+    let func_duration = func_start.elapsed();
+    debug!("Start-up time     : {:?}", startup_duration);
+    debug!("Pixel Coords time : {:?}", pixel_coords_duration);
+    debug!("Apply time        : {:?}", apply_duration);
+    debug!("Remap time        : {:?}", remap_duration);
+    debug!("Total time        : {:?}", func_duration);
 }

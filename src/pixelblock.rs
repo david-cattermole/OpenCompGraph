@@ -538,6 +538,10 @@ impl PixelBlock {
         num_channels: i32,
         pixel_data_type: PixelDataType,
     ) {
+        debug!(
+            "data_resize: width={} height={} num_channels={} pixel_data_type={:#?}",
+            width, height, num_channels, pixel_data_type
+        );
         self.width = width;
         self.height = height;
         self.num_channels = num_channels;

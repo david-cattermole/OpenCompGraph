@@ -40,6 +40,11 @@ pub fn do_process_colorspace(
     from_color_space: &str,
     to_color_space: &str,
 ) {
+    debug!(
+        "ops::bake::do_process_colorspace(from_color_space={:#?}, to_color_space={:#?}) START",
+        from_color_space, to_color_space
+    );
+
     // Convert to f32 data.
     //
     // Before applying any changes to the pixels we must ensure we
@@ -79,6 +84,11 @@ pub fn do_process_colorspace(
             from_color_space, to_color_space
         )
     }
+
+    debug!(
+        "ops::bake::do_process_colorspace(from_color_space={:#?}, to_color_space={:#?}) END",
+        from_color_space, to_color_space
+    );
 }
 
 /// Apply transform matrix, deformations and color corrections before
@@ -94,6 +104,11 @@ pub fn do_process(
     to_color_space: &str,
     out_pixel_data_type: PixelDataType,
 ) {
+    debug!(
+        "ops::bake::do_process(bake_option={:#?} from_color_space={:#?} to_color_space={:#?} pixel_data_type={:#?})",
+        bake_option, from_color_space, to_color_space, out_pixel_data_type
+    );
+
     match bake_option {
         BakeOption::Nothing => {}
         BakeOption::ColorSpace => {
@@ -133,6 +148,7 @@ pub fn do_process(
         }
         BakeOption::All => {
             // Convert from user color space to linear space.
+            debug!("apply PRE colorspace: START");
             let linear_color_space = COLOR_SPACE_NAME_LINEAR;
             do_process_colorspace(
                 pixel_block,
@@ -140,15 +156,19 @@ pub fn do_process(
                 &from_color_space,
                 &linear_color_space,
             );
+            debug!("apply PRE colorspace: END");
 
             // Apply Color Matrix (in linear color space)
+            debug!("apply color matrix: START");
             let num_channels = pixel_block.num_channels();
             let pixels = &mut pixel_block.as_slice_mut();
             let color_matrix = stream_data.color_matrix().to_na_matrix();
             ops::xformcolor::apply_color_matrix_inplace(pixels, num_channels, color_matrix);
             stream_data.set_color_matrix(Matrix4::identity());
+            debug!("apply color matrix: END");
 
             // Apply Deformations.
+            debug!("apply deformations: START");
             let src_data_window = data_window.clone();
             let ref_pixel_block = pixel_block.clone();
             let deformers = &stream_data.deformers();
@@ -161,8 +181,10 @@ pub fn do_process(
                 data_window,
             );
             stream_data.clear_deformers();
+            debug!("apply deformations: END");
 
             // Convert from Linear to user given color space.
+            debug!("apply POST colorspace: START");
             do_process_colorspace(
                 pixel_block,
                 image_spec,
@@ -170,6 +192,7 @@ pub fn do_process(
                 &to_color_space,
             );
             image_spec.set_color_space(to_color_space.to_string());
+            debug!("apply POST colorspace: END");
 
             // Convert to whatever output data type requested.
             pixel_block.convert_into_pixel_data_type(out_pixel_data_type);

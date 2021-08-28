@@ -20,6 +20,7 @@
  */
 
 use log::debug;
+use std::time::Instant;
 
 use crate::cxxbridge::ffi::BBox2Di;
 use crate::cxxbridge::ffi::ImageShared;
@@ -77,6 +78,7 @@ pub fn merge(
     mix: f32,
     image_out: &mut ImageShared,
 ) -> bool {
+    let start = Instant::now();
     debug!("merge...");
     if mode == MergeImageMode::Uninitialized {
         return false;
@@ -159,5 +161,7 @@ pub fn merge(
             index += stride;
         }
     }
+    let duration = start.elapsed();
+    debug!("Total time: {:?}", duration);
     true
 }

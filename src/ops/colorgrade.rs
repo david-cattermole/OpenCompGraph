@@ -19,6 +19,9 @@
  *
  */
 
+use log::debug;
+use std::time::Instant;
+
 use crate::cxxbridge::ffi::Vector4f32;
 use crate::cxxbridge::ffi::Vector4i32;
 
@@ -170,6 +173,7 @@ pub fn apply_color_grade_inplace(
     clamp_white: bool,
     premult: bool,
 ) {
+    let start = Instant::now();
     let pixel_mask = Vector4f32::new(
         process.x as f32,
         process.y as f32,
@@ -244,4 +248,6 @@ pub fn apply_color_grade_inplace(
             num_channels
         ),
     };
+    let duration = start.elapsed();
+    debug!("Total time: {:?}", duration);
 }

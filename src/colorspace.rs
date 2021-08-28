@@ -19,6 +19,9 @@
  *
  */
 
+use log::debug;
+use std::time::Instant;
+
 use crate::cxxbridge::ffi::oiio_color_convert_inplace;
 
 pub fn color_convert_inplace(
@@ -31,7 +34,8 @@ pub fn color_convert_inplace(
     src_color_space: &str,
     dst_color_space: &str,
 ) -> bool {
-    oiio_color_convert_inplace(
+    let start = Instant::now();
+    let ok = oiio_color_convert_inplace(
         pixel_data,
         width,
         height,
@@ -40,5 +44,8 @@ pub fn color_convert_inplace(
         unassociated_alpha,
         src_color_space,
         dst_color_space,
-    )
+    );
+    let duration = start.elapsed();
+    debug!("Total time: {:?}", duration);
+    ok
 }
