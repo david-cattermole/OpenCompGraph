@@ -71,6 +71,9 @@ pub struct LensDistortAttrs {
 impl hash::Hash for LensDistortAttrs {
     fn hash<H: hash::Hasher>(&self, state: &mut H) {
         self.enable.hash(state);
+        if self.enable == 0 {
+            return;
+        }
         HashableF32::new(self.lens_center_offset_x).hash(state);
         HashableF32::new(self.lens_center_offset_y).hash(state);
         HashableF32::new(self.distortion).hash(state);

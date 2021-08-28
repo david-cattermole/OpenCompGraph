@@ -105,13 +105,10 @@ pub struct GradeAttrs {
 
 impl hash::Hash for GradeAttrs {
     fn hash<H: hash::Hasher>(&self, state: &mut H) {
-        // TODO: The hash should change based on the values actually
-        // used.
-        //
-        // For example, when enable=0, all attributes are not used and
-        // should therefore not be used to compute the hash.
         self.enable.hash(state);
-
+        if self.enable == 0 {
+            return;
+        }
         self.process_r.hash(state);
         self.process_g.hash(state);
         self.process_b.hash(state);
