@@ -405,12 +405,42 @@ impl PixelBlock {
         let pixel_slice = self.pixels.as_slice();
         let mut new_pixels = Vec::<f32>::new();
         match old_pixel_data_type {
-            // PixelDataType::UInt8 => {}
+            PixelDataType::UInt8 => {
+                // Convert from u8 to f16
+                let num_items_per_f32 = std::mem::size_of::<f32>() / std::mem::size_of::<f16>();
+                let pixels_native_count = pixel_slice.len() * num_items_per_f32;
+                new_pixels.reserve_exact(pixels_native_count);
+                for v in pixel_slice {
+                    // Convert (1 x f32) to (4 x u8) bytes.
+                    let bytes = v.to_ne_bytes();
+
+                    // Convert (4 x u8) to (4 x f32).
+                    let v0_f32 = (bytes[0] as f32) / (u8::max_value() as f32);
+                    let v1_f32 = (bytes[1] as f32) / (u8::max_value() as f32);
+                    let v2_f32 = (bytes[2] as f32) / (u8::max_value() as f32);
+                    let v3_f32 = (bytes[3] as f32) / (u8::max_value() as f32);
+
+                    // Convert (4 x f32) to (4 x f16) byts
+                    let v0_bytes = f16::to_ne_bytes(f16::from_f32(v0_f32));
+                    let v1_bytes = f16::to_ne_bytes(f16::from_f32(v1_f32));
+                    let v2_bytes = f16::to_ne_bytes(f16::from_f32(v2_f32));
+                    let v3_bytes = f16::to_ne_bytes(f16::from_f32(v3_f32));
+
+                    // Convert (4 x f16) bytes to (2 x f32) bytes
+                    let a_bytes: [u8; 4] = [v0_bytes[0], v0_bytes[1], v1_bytes[0], v1_bytes[1]];
+                    let b_bytes: [u8; 4] = [v2_bytes[0], v2_bytes[1], v3_bytes[0], v3_bytes[1]];
+                    let a = f32::from_ne_bytes(a_bytes);
+                    let b = f32::from_ne_bytes(b_bytes);
+                    new_pixels.push(a);
+                    new_pixels.push(b);
+                }
+            }
             // PixelDataType::UInt16 => {}
             PixelDataType::Float32 => {
+                // Convert from f32 to f16
                 let num_items_per_f32 = std::mem::size_of::<f32>() / std::mem::size_of::<f16>();
-                let capacity = pixel_slice.len() / num_items_per_f32;
-                new_pixels.reserve_exact(capacity);
+                let pixels_native_count = pixel_slice.len() / num_items_per_f32;
+                new_pixels.reserve_exact(pixels_native_count);
                 for v in pixel_slice.chunks_exact(num_items_per_f32) {
                     let a_bytes = f16::from_f32(v[0]).to_ne_bytes();
                     let b_bytes = f16::from_f32(v[1]).to_ne_bytes();
