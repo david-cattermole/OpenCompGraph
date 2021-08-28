@@ -58,7 +58,7 @@ int main() {
 
         auto cache = std::make_shared<ocg::Cache>();
         const size_t kBytesToGigabytes = 1073741824;  // int(pow(2, 30))
-        auto capacity = 1 * kBytesToGigabytes;
+        auto capacity = 4 * kBytesToGigabytes;
         cache->set_capacity_bytes(capacity);
 
         auto count = 1;  // Increase the 'count' to test cache read performance.
