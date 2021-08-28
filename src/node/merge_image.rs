@@ -35,9 +35,11 @@ use crate::cxxbridge::ffi::ImageSpec;
 use crate::cxxbridge::ffi::MergeImageMode;
 use crate::cxxbridge::ffi::NodeStatus;
 use crate::cxxbridge::ffi::NodeType;
+use crate::cxxbridge::ffi::PixelDataType;
 use crate::data::HashValue;
 use crate::data::Identifier;
 use crate::data::NodeComputeMode;
+use crate::data::COLOR_SPACE_NAME_LINEAR;
 use crate::hashutils::HashableF32;
 use crate::node::traits::Operation;
 use crate::node::traits::Validate;
@@ -119,7 +121,7 @@ fn do_image_process(
     let bake_option = BakeOption::All;
     let from_color_space_a = &image_spec_a.color_space();
     let from_color_space_b = &image_spec_b.color_space();
-    let to_color_space = "Linear".to_string();
+    let to_color_space = COLOR_SPACE_NAME_LINEAR.to_string();
 
     // Stream A
     let display_window_a = copy_a.display_window();
@@ -133,6 +135,7 @@ fn do_image_process(
         &mut copy_a,
         &from_color_space_a,
         &to_color_space,
+        PixelDataType::Float32,
     );
     let pixel_block_a_box = Box::new(pixel_block_a);
     let image_a = ImageShared {
@@ -154,6 +157,7 @@ fn do_image_process(
         &mut copy_b,
         &from_color_space_b,
         &to_color_space,
+        PixelDataType::Float32,
     );
     let pixel_block_b_box = Box::new(pixel_block_b);
     let image_b = ImageShared {

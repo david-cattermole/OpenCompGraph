@@ -16,6 +16,8 @@ add_executable(${target_test_exe}
   ${CMAKE_CURRENT_SOURCE_DIR}/test_node_lens/test_node_lens.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/test_node_transform/test_node_transform.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/test_node_imageio/test_node_imageio.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/test_node_imageio/test_node_imageio_jpeg.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/test_node_imageio/test_node_imageio_tiff.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/test_node_null/test_node_null.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/test_node_grade/test_node_grade.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/test_node_grade/test_node_grade_concat.cpp

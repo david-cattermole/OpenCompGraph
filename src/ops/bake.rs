@@ -19,13 +19,14 @@
  *
  */
 
-use log::warn;
+use log::{debug, warn};
 
 use crate::colorspace;
 use crate::cxxbridge::ffi::BBox2Di;
 use crate::cxxbridge::ffi::BakeOption;
 use crate::cxxbridge::ffi::ImageSpec;
 use crate::cxxbridge::ffi::Matrix4;
+use crate::cxxbridge::ffi::PixelDataType;
 use crate::data::COLOR_SPACE_NAME_LINEAR;
 use crate::deformutils;
 use crate::ops;
@@ -43,7 +44,7 @@ pub fn do_process_colorspace(
     //
     // Before applying any changes to the pixels we must ensure we
     // work with 32-bit floating-point data.
-    pixel_block.convert_into_f32_data();
+    pixel_block.convert_into_pixel_data_type(PixelDataType::Float32);
 
     if from_color_space == to_color_space {
         // Nothing to convert.
@@ -91,11 +92,15 @@ pub fn do_process(
     stream_data: &mut StreamDataImpl,
     from_color_space: &str,
     to_color_space: &str,
+    out_pixel_data_type: PixelDataType,
 ) {
     match bake_option {
         BakeOption::Nothing => {}
         BakeOption::ColorSpace => {
-            do_process_colorspace(pixel_block, image_spec, &from_color_space, &to_color_space)
+            do_process_colorspace(pixel_block, image_spec, &from_color_space, &to_color_space);
+
+            // Convert to whatever output data type requested.
+            pixel_block.convert_into_pixel_data_type(out_pixel_data_type);
         }
         BakeOption::ColorSpaceAndGrade => {
             // Convert from user color space to linear space.
@@ -122,6 +127,9 @@ pub fn do_process(
                 &to_color_space,
             );
             image_spec.set_color_space(to_color_space.to_string());
+
+            // Convert to whatever output data type requested.
+            pixel_block.convert_into_pixel_data_type(out_pixel_data_type);
         }
         BakeOption::All => {
             // Convert from user color space to linear space.
@@ -162,6 +170,9 @@ pub fn do_process(
                 &to_color_space,
             );
             image_spec.set_color_space(to_color_space.to_string());
+
+            // Convert to whatever output data type requested.
+            pixel_block.convert_into_pixel_data_type(out_pixel_data_type);
         }
         _ => panic!("Unknown"),
     }

@@ -23,6 +23,7 @@ use log::{debug, error};
 
 use crate::cxxbridge::ffi::BBox2Df;
 use crate::cxxbridge::ffi::BBox2Di;
+use crate::cxxbridge::ffi::PixelDataType;
 use crate::math;
 use crate::pixel::get_pixel_rgb;
 use crate::pixel::get_pixel_rgba;
@@ -38,6 +39,9 @@ pub fn pixels_remap_coords(
     dst_pixel_block: &mut PixelBlock,
     _dst_data_window: &mut BBox2Di,
 ) {
+    assert_eq!(src_pixel_block.pixel_data_type(), PixelDataType::Float32);
+    assert_eq!(dst_pixel_block.pixel_data_type(), PixelDataType::Float32);
+
     let display_window_f32 = BBox2Df::from(display_window);
     debug!("display_window = {:?}", display_window);
     debug!("display_window_f32 = {:?}", display_window_f32);
@@ -64,11 +68,28 @@ pub fn pixels_remap_coords(
     debug!("src_width = {}", src_width);
     debug!("src_height = {}", src_height);
     debug!("src_num_channels = {}", src_num_channels);
+    assert!(src_num_channels == 4 || src_num_channels == 3);
 
     let src_x_stride = src_num_channels;
     let dst_x_stride = dst_num_channels;
     let src_y_stride = src_width * src_x_stride;
     let dst_y_stride = dst_width * dst_x_stride;
+
+    let dst_pixels_max_index = (dst_height * dst_width * dst_num_channels) as usize;
+    assert!(
+        dst_pixels.len() >= dst_pixels_max_index,
+        "dst_pixels.len()={} dst_pixels_max_index={}",
+        dst_pixels.len(),
+        dst_pixels_max_index,
+    );
+
+    let pixel_coords_max_index = ((dst_height * dst_width) + 1) as usize;
+    assert!(
+        pixel_coords.len() >= pixel_coords_max_index,
+        "pixel_coords.len()={} pixel_coords_max_index={}",
+        dst_pixels.len(),
+        dst_pixels_max_index,
+    );
 
     let mut pixel_coord_index = 0;
     for dy in 0..dst_height as usize {

@@ -32,9 +32,11 @@ use crate::cxxbridge::ffi::BakeOption;
 use crate::cxxbridge::ffi::ImageShared;
 use crate::cxxbridge::ffi::NodeStatus;
 use crate::cxxbridge::ffi::NodeType;
+use crate::cxxbridge::ffi::PixelDataType;
 use crate::data::HashValue;
 use crate::data::Identifier;
 use crate::data::NodeComputeMode;
+use crate::data::COLOR_SPACE_NAME_LINEAR;
 use crate::node::traits::Operation;
 use crate::node::traits::Validate;
 use crate::node::NodeImpl;
@@ -139,7 +141,7 @@ impl Operation for CropImageOperation {
         // 'from' comes from the input stream, and 'to' is a common
         // value in the graph.
         let from_color_space = image_spec.color_space.clone();
-        let to_color_space = "Linear".to_string();
+        let to_color_space = COLOR_SPACE_NAME_LINEAR.to_string();
 
         let display_window = input.display_window();
         let mut data_window = input.data_window();
@@ -153,6 +155,7 @@ impl Operation for CropImageOperation {
             &mut copy,
             &from_color_space,
             &to_color_space,
+            PixelDataType::Float32,
         );
 
         let mut img = ImageShared {

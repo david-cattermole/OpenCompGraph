@@ -94,11 +94,14 @@ int test_node_viewer(const bool debug_print,
     graph.set_node_attr_f32(lens_node, "lens_center_offset_y", lco_y);
 
     // Viewer Nodes
-    graph.set_node_attr_i32(viewer1_node, "bake_option", 1);
+    auto bake_option = static_cast<int32_t>(ocg::BakeOption::kColorSpace);
+    auto bake_color_space = "Linear";
+    auto bake_pixel_data_type = static_cast<int32_t>(ocg::PixelDataType::kHalf16);
+    graph.set_node_attr_i32(viewer1_node, "bake_option", bake_option);
+    graph.set_node_attr_str(viewer1_node, "bake_color_space", bake_color_space);
+    graph.set_node_attr_i32(viewer1_node, "bake_pixel_data_type", bake_pixel_data_type);
     graph.set_node_attr_i32(viewer1_node, "crop_to_format", 0);
-    graph.set_node_attr_i32(viewer1_node, "disk_cache", 1);
-    graph.set_node_attr_str(
-        viewer1_node, "disk_cache_dir", "${TEMP}");
+    graph.set_node_attr_i32(viewer1_node, "disk_cache", 0);
 
     // Write Nodes
     graph.set_node_attr_str(

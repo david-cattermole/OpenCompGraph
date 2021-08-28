@@ -17,7 +17,7 @@
  * along with OpenCompGraph.  If not, see <https://www.gnu.org/licenses/>.
  * ====================================================================
  *
- * Read TIFF and write PNG image.
+ * Read EXR and write PNG image.
  */
 
 #include <iostream>
@@ -36,21 +36,91 @@ int test_node_imageio(const bool debug_print,
     auto frames = generate_frame_range(1, 1);
     auto graph = ocg::Graph();
 
-    auto read_node = graph.create_node(ocg::NodeType::kReadImage, "my_read_node");
-    auto write_node = graph.create_node(ocg::NodeType::kWriteImage, "my_write_node");
-    if (debug_print) {
-        std::cout << "read_node=" << &read_node << '\n';
-        std::cout << "write_node=" << &write_node << '\n';
-    }
-    auto read_node_id1 = read_node.get_id();
-    auto write_node_id1 = write_node.get_id();
-    graph.set_node_attr_str(
-        read_node, "file_path", "./tests/data/oiio-images/checker.tif");
-    graph.set_node_attr_str(
-        write_node, "file_path", "./tests/data/out/test_node_imageio_out1.png");
+    auto read1_node = graph.create_node(ocg::NodeType::kReadImage, "read1");
+    auto read2_node = graph.create_node(ocg::NodeType::kReadImage, "read2");
+    auto read3_node = graph.create_node(ocg::NodeType::kReadImage, "read3");
+    auto read4_node = graph.create_node(ocg::NodeType::kReadImage, "read4");
+    // auto read5_node = graph.create_node(ocg::NodeType::kReadImage, "read5");
+    // auto read6_node = graph.create_node(ocg::NodeType::kReadImage, "read6");
+    auto read7_node = graph.create_node(ocg::NodeType::kReadImage, "read7");
+    auto read8_node = graph.create_node(ocg::NodeType::kReadImage, "read8");
+    auto read9_node = graph.create_node(ocg::NodeType::kReadImage, "read9");
+    // auto read10_node = graph.create_node(ocg::NodeType::kReadImage, "read10");
+    auto write1_node = graph.create_node(ocg::NodeType::kWriteImage, "write1");
+    auto write2_node = graph.create_node(ocg::NodeType::kWriteImage, "write2");
+    auto write3_node = graph.create_node(ocg::NodeType::kWriteImage, "write3");
+    auto write4_node = graph.create_node(ocg::NodeType::kWriteImage, "write4");
+    // auto write5_node = graph.create_node(ocg::NodeType::kWriteImage, "write5");
+    // auto write6_node = graph.create_node(ocg::NodeType::kWriteImage, "write6");
+    auto write7_node = graph.create_node(ocg::NodeType::kWriteImage, "write7");
+    auto write8_node = graph.create_node(ocg::NodeType::kWriteImage, "write8");
+    auto write9_node = graph.create_node(ocg::NodeType::kWriteImage, "write9");
+    // auto write10_node = graph.create_node(ocg::NodeType::kWriteImage, "write10");
 
-    graph.connect(read_node, write_node, 0);
-    graph.execute(write_node, frames, cache);
+    graph.set_node_attr_str(
+        read1_node, "file_path", "./tests/data/openexr-images/TestImages/AllHalfValues.exr");
+    graph.set_node_attr_str(
+        read2_node, "file_path", "./tests/data/openexr-images/TestImages/BrightRings.exr");
+    graph.set_node_attr_str(
+        read3_node, "file_path", "./tests/data/openexr-images/TestImages/BrightRingsNanInf.exr");
+    graph.set_node_attr_str(
+        read4_node, "file_path", "./tests/data/openexr-images/TestImages/GammaChart.exr.exr");
+    // graph.set_node_attr_str(
+    //     read5_node, "file_path", "./tests/data/openexr-images/TestImages/GrayRampsDiagonal.exr");
+    // graph.set_node_attr_str(
+    //     read6_node, "file_path", "./tests/data/openexr-images/TestImages/GrayRampsHorizontal.exr");
+    graph.set_node_attr_str(
+        read7_node, "file_path", "./tests/data/openexr-images/TestImages/RgbRampsDiagonal.exr");
+    graph.set_node_attr_str(
+        read8_node, "file_path", "./tests/data/openexr-images/TestImages/SquaresSwirls.exr");
+    graph.set_node_attr_str(
+        read9_node, "file_path", "./tests/data/openexr-images/TestImages/WideColorGamut.exr");
+    // graph.set_node_attr_str(
+    //     read10_node, "file_path", "./tests/data/openexr-images/TestImages/WideFloatRange.exr");
+
+    graph.set_node_attr_str(
+        write1_node, "file_path", "./tests/data/out/test_node_imageio_exr_out1.png");
+    graph.set_node_attr_str(
+        write2_node, "file_path", "./tests/data/out/test_node_imageio_exr_out2.png");
+    graph.set_node_attr_str(
+        write3_node, "file_path", "./tests/data/out/test_node_imageio_exr_out3.png");
+    graph.set_node_attr_str(
+        write4_node, "file_path", "./tests/data/out/test_node_imageio_exr_out4.png");
+    // graph.set_node_attr_str(
+    //     write5_node, "file_path", "./tests/data/out/test_node_imageio_exr_out5.png");
+    // graph.set_node_attr_str(
+    //     write6_node, "file_path", "./tests/data/out/test_node_imageio_exr_out6.png");
+    graph.set_node_attr_str(
+        write7_node, "file_path", "./tests/data/out/test_node_imageio_exr_out7.png");
+    graph.set_node_attr_str(
+        write8_node, "file_path", "./tests/data/out/test_node_imageio_exr_out8.png");
+    graph.set_node_attr_str(
+        write9_node, "file_path", "./tests/data/out/test_node_imageio_exr_out9.png");
+    // graph.set_node_attr_str(
+    //     write10_node, "file_path", "./tests/data/out/test_node_imageio_exr_out10.png");
+
+    graph.connect(read1_node, write1_node, 0);
+    graph.connect(read2_node, write2_node, 0);
+    graph.connect(read3_node, write3_node, 0);
+    graph.connect(read4_node, write4_node, 0);
+    // graph.connect(read5_node, write5_node, 0);
+    // graph.connect(read6_node, write6_node, 0);
+    graph.connect(read7_node, write7_node, 0);
+    graph.connect(read8_node, write8_node, 0);
+    graph.connect(read9_node, write9_node, 0);
+    // graph.connect(read10_node, write10_node, 0);
+
+    graph.execute(write1_node, frames, cache);
+    graph.execute(write2_node, frames, cache);
+    graph.execute(write3_node, frames, cache);
+    graph.execute(write4_node, frames, cache);
+    // graph.execute(write5_node, frames, cache);
+    // graph.execute(write6_node, frames, cache);
+    graph.execute(write7_node, frames, cache);
+    graph.execute(write8_node, frames, cache);
+    graph.execute(write9_node, frames, cache);
+    // graph.execute(write10_node, frames, cache);
+
     if (debug_print) {
         std::cout << "Graph as string:\n"
                   << graph.data_debug_string();

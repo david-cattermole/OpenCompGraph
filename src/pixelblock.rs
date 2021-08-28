@@ -195,6 +195,34 @@ pub fn transmute_slice_f32_to_f16(pixel_slice: &[f32]) -> &[f16] {
     pixels_f16
 }
 
+/// Convert a slice of pixels from T to f32 type.
+///
+/// The results are
+/// stored in a Vec<f32>, but the real bytes are of type T. Therefore
+/// the number of elements in the Vec<f32> will be less than the
+/// pixel_slice.
+#[inline]
+pub fn convert_pixel_data_to_f32<T, F>(
+    pixel_slice: &[f32],
+    new_pixels: &mut Vec<f32>,
+    convert_func: F,
+) where
+    T: Copy,
+    F: Fn(T) -> f32,
+{
+    assert_eq!(new_pixels.len(), 0);
+    let num_items_per_f32 = std::mem::align_of::<f32>() / std::mem::align_of::<T>();
+    let pixels_native_count = pixel_slice.len() * num_items_per_f32;
+    new_pixels.reserve_exact(pixels_native_count);
+    let pixels_native = unsafe { std::mem::transmute::<&[f32], &[T]>(pixel_slice) };
+    let ptr = pixels_native.as_ptr();
+    for i in 0..pixels_native_count {
+        let x = unsafe { *ptr.add(i) };
+        let v = convert_func(x);
+        new_pixels.push(v);
+    }
+}
+
 #[derive(Clone)]
 pub struct PixelBlock {
     width: i32,
@@ -296,10 +324,7 @@ impl PixelBlock {
         let height = crop_window.height();
         let num_channels = pixel_block.num_channels();
 
-        // TODO: Support other pixel data types.
-        let pixel_data_type = PixelDataType::Float32;
-        // let pixel_data_type = pixel_block.pixel_data_type();
-
+        let pixel_data_type = pixel_block.pixel_data_type();
         let mut new_pixel_block = PixelBlock::new(width, height, num_channels, pixel_data_type);
 
         // Detect if there are any pixels to copy over. If not, simply
@@ -339,39 +364,119 @@ impl PixelBlock {
         new_pixel_block
     }
 
-    pub fn convert_into_f32_data(&mut self) {
-        if self.pixel_data_type == PixelDataType::Float32 {
+    fn convert_into_u8_data(&mut self) {
+        let old_pixel_data_type = self.pixel_data_type;
+        let new_pixel_data_type = PixelDataType::UInt8;
+        assert!(old_pixel_data_type != new_pixel_data_type);
+
+        let pixel_slice = self.pixels.as_slice();
+        let mut new_pixels = Vec::<f32>::new();
+        match old_pixel_data_type {
+            // PixelDataType::Half16 => {}
+            // PixelDataType::UInt16 => {}
+            PixelDataType::Float32 => {
+                let num_items_per_f32 = std::mem::align_of::<f32>() / std::mem::align_of::<u8>();
+                let pixels_native_count = pixel_slice.len() / num_items_per_f32;
+                new_pixels.reserve_exact(pixels_native_count);
+                for v in pixel_slice.chunks_exact(num_items_per_f32) {
+                    // TODO: Should this data be stored in sRGB colour space?
+                    let bytes: [u8; 4] = [
+                        (v[0] * (u8::max_value() as f32)) as u8,
+                        (v[1] * (u8::max_value() as f32)) as u8,
+                        (v[2] * (u8::max_value() as f32)) as u8,
+                        (v[3] * (u8::max_value() as f32)) as u8,
+                    ];
+                    let value = f32::from_ne_bytes(bytes);
+                    new_pixels.push(value);
+                }
+            }
+            _ => panic!("Unsupported pixel data type: {:#?}", old_pixel_data_type),
+        };
+
+        self.pixels = new_pixels;
+        self.pixel_data_type = new_pixel_data_type;
+    }
+
+    fn convert_into_f16_data(&mut self) {
+        let old_pixel_data_type = self.pixel_data_type;
+        let new_pixel_data_type = PixelDataType::Half16;
+        assert!(old_pixel_data_type != new_pixel_data_type);
+
+        let pixel_slice = self.pixels.as_slice();
+        let mut new_pixels = Vec::<f32>::new();
+        match old_pixel_data_type {
+            // PixelDataType::UInt8 => {}
+            // PixelDataType::UInt16 => {}
+            PixelDataType::Float32 => {
+                let num_items_per_f32 = std::mem::size_of::<f32>() / std::mem::size_of::<f16>();
+                let capacity = pixel_slice.len() / num_items_per_f32;
+                new_pixels.reserve_exact(capacity);
+                for v in pixel_slice.chunks_exact(num_items_per_f32) {
+                    let a_bytes = f16::from_f32(v[0]).to_ne_bytes();
+                    let b_bytes = f16::from_f32(v[1]).to_ne_bytes();
+                    let bytes: [u8; 4] = [a_bytes[0], a_bytes[1], b_bytes[0], b_bytes[1]];
+                    let x = f32::from_ne_bytes(bytes);
+                    new_pixels.push(x);
+                }
+            }
+            _ => panic!("Unsupported pixel data type: {:#?}", old_pixel_data_type),
+        };
+
+        self.pixels = new_pixels;
+        self.pixel_data_type = new_pixel_data_type;
+    }
+
+    fn convert_into_f32_data(&mut self) {
+        let old_pixel_data_type = self.pixel_data_type;
+        let new_pixel_data_type = PixelDataType::Float32;
+        assert!(old_pixel_data_type != new_pixel_data_type);
+
+        let pixel_slice = self.pixels.as_slice();
+        let mut new_pixels = Vec::<f32>::new();
+        match old_pixel_data_type {
+            PixelDataType::UInt8 => {
+                let f = |x: u8| (x as f32) / (u8::max_value() as f32);
+                convert_pixel_data_to_f32(pixel_slice, &mut new_pixels, f);
+            }
+            PixelDataType::UInt16 => {
+                let f = |x: u16| (x as f32) / (u16::max_value() as f32);
+                convert_pixel_data_to_f32(pixel_slice, &mut new_pixels, f);
+            }
+            PixelDataType::Half16 => {
+                let f = |x: f16| x.to_f32();
+                convert_pixel_data_to_f32(pixel_slice, &mut new_pixels, f);
+            }
+            _ => panic!("Unsupported pixel data type: {:#?}", old_pixel_data_type),
+        };
+
+        self.pixels = new_pixels;
+        self.pixel_data_type = new_pixel_data_type;
+    }
+
+    pub fn convert_into_pixel_data_type(&mut self, out_pixel_data_type: PixelDataType) {
+        let old_pixel_data_type = self.pixel_data_type;
+        let new_pixel_data_type = out_pixel_data_type;
+        debug!(
+            "Convert Pixel Data Type from {:#?} to {:#?}",
+            old_pixel_data_type, new_pixel_data_type
+        );
+        if old_pixel_data_type == new_pixel_data_type {
             return;
-        } else {
-            let old_pixel_data_type = self.pixel_data_type;
-            let new_pixel_data_type = PixelDataType::Float32;
-
-            let pixel_slice = self.pixels.as_slice();
-            let new_pixels: Vec<f32> = match old_pixel_data_type {
-                PixelDataType::UInt8 => {
-                    let pixels_u8 = transmute_slice_f32_to_u8(pixel_slice);
-                    pixels_u8
-                        .into_iter()
-                        .map(|x| (*x as f32) / (u8::max_value() as f32))
-                        .collect()
-                }
-                PixelDataType::UInt16 => {
-                    let pixels_u16 = transmute_slice_f32_to_u16(pixel_slice);
-                    pixels_u16
-                        .into_iter()
-                        .map(|x| (*x as f32) / (u16::max_value() as f32))
-                        .collect()
-                }
-                PixelDataType::Half16 => {
-                    let pixels_f16 = transmute_slice_f32_to_f16(pixel_slice);
-                    pixels_f16.into_iter().map(|x| (*x).to_f32()).collect()
-                }
-                _ => panic!("Unsupported pixel data type: {:#?}", old_pixel_data_type),
-            };
-
-            self.pixels = new_pixels;
-            self.pixel_data_type = new_pixel_data_type;
         }
+
+        let pixel_values_num_before = self.pixels.as_slice().len();
+        match new_pixel_data_type {
+            PixelDataType::Float32 => self.convert_into_f32_data(),
+            PixelDataType::Half16 => self.convert_into_f16_data(),
+            PixelDataType::UInt8 => self.convert_into_u8_data(),
+            PixelDataType::UInt16 => {
+                panic!("Convert to {:#?} is not supported", PixelDataType::UInt16)
+            }
+            _ => panic!("Convert invalid data type is not supported"),
+        }
+
+        let pixel_values_num_after = self.pixels.as_slice().len();
+        assert_ne!(pixel_values_num_before, pixel_values_num_after);
     }
 
     pub fn as_slice(&self) -> &[f32] {
@@ -439,11 +544,13 @@ impl PixelBlock {
         self.pixel_data_type = pixel_data_type;
 
         let new_capacity = pixel_block_size(width, height, num_channels, pixel_data_type) as usize;
+        let new_capacity_elements = new_capacity
+            / (channel_size_bytes(PixelDataType::Float32) / channel_size_bytes(pixel_data_type));
 
         // Resize with all values defaulting to "1.0" in the native
         // pixel data type.
         let fill_value = convert_value_to_f32_bytes(1.0, pixel_data_type);
-        self.pixels.resize(new_capacity, fill_value);
+        self.pixels.resize(new_capacity_elements, fill_value);
     }
 }
 

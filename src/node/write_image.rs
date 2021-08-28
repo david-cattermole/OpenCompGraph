@@ -33,6 +33,7 @@ use crate::cxxbridge::ffi::BakeOption;
 use crate::cxxbridge::ffi::ImageShared;
 use crate::cxxbridge::ffi::NodeStatus;
 use crate::cxxbridge::ffi::NodeType;
+use crate::cxxbridge::ffi::PixelDataType;
 use crate::data::HashValue;
 use crate::data::Identifier;
 use crate::data::NodeComputeMode;
@@ -74,11 +75,15 @@ pub struct WriteImageAttrs {
     // not support a data windows, the image is cropped, otherwise it
     // is not.
     pub crop_on_write: i32,
+
     // TODO: Add attributes:
     //
     // - Pre-multiply (?)
     // - Output Channels
     // - Output colour space.
+    //
+    // The pixel data type for pixels written out.
+    pub pixel_data_type: i32, // index for PixelDataType.
 }
 
 impl WriteImageOperation {
@@ -93,6 +98,7 @@ impl WriteImageAttrs {
             enable: 1,
             file_path: "".to_string(),
             crop_on_write: -1,
+            pixel_data_type: 255, // 255 = PixelDataType::Unknown
         }
     }
 }
@@ -139,6 +145,15 @@ impl Operation for WriteImageOperation {
                 let mut image_spec = copy.clone_image_spec();
                 let from_color_space = &image_spec.color_space();
 
+                // The Pixels will be baked into this data type before
+                // writing out.
+                let bake_pixel_data_type =
+                    PixelDataType::from(attr_block.get_attr_i32("pixel_data_type"));
+                let out_pixel_data_type = match bake_pixel_data_type {
+                    PixelDataType::Unknown => copy.pixel_data_type(),
+                    _ => bake_pixel_data_type,
+                };
+
                 // The color space to write to.
                 let to_color_space = if path_expanded.ends_with(".jpg")
                     || path_expanded.ends_with(".png")
@@ -163,6 +178,7 @@ impl Operation for WriteImageOperation {
                     &mut copy,
                     &from_color_space,
                     &to_color_space,
+                    out_pixel_data_type,
                 );
 
                 // Write pixels
@@ -219,6 +235,7 @@ impl AttrBlock for WriteImageAttrs {
             "enable" => AttrState::Exists,
             "file_path" => AttrState::Exists,
             "crop_on_write" => AttrState::Exists,
+            "pixel_data_type" => AttrState::Exists,
             _ => AttrState::Missing,
         }
     }
@@ -241,6 +258,7 @@ impl AttrBlock for WriteImageAttrs {
         match name {
             "enable" => self.enable,
             "crop_on_write" => self.crop_on_write,
+            "pixel_data_type" => self.pixel_data_type,
             _ => 0,
         }
     }
@@ -249,6 +267,7 @@ impl AttrBlock for WriteImageAttrs {
         match name {
             "enable" => self.enable = value,
             "crop_on_write" => self.crop_on_write = value,
+            "pixel_data_type" => self.pixel_data_type = value,
             _ => (),
         };
     }

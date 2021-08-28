@@ -245,7 +245,7 @@ pub mod ffi {
 
     // Each pixel has this type of data.
     #[repr(u8)]
-    #[derive(Debug, Copy, Clone, Hash)]
+    #[derive(Debug, Copy, Clone, Hash, PartialEq, PartialOrd)]
     #[namespace = "open_comp_graph"]
     pub(crate) enum PixelDataType {
         #[cxx_name = "kFloat32"]
@@ -725,6 +725,18 @@ pub mod ffi {
     extern "Rust" {
         fn generate_random_id() -> u64;
         fn generate_id_from_name(name: &str) -> u64;
+    }
+}
+
+impl From<i32> for ffi::PixelDataType {
+    fn from(value: i32) -> Self {
+        match value {
+            0 => ffi::PixelDataType::Float32,
+            1 => ffi::PixelDataType::Half16,
+            2 => ffi::PixelDataType::UInt8,
+            3 => ffi::PixelDataType::UInt16,
+            _ => ffi::PixelDataType::Unknown,
+        }
     }
 }
 
