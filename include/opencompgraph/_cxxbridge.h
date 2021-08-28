@@ -24,6 +24,7 @@ namespace open_comp_graph {
   enum class LensDistortDirection : ::std::uint8_t;
   enum class MergeImageMode : ::std::uint8_t;
   enum class ImageOrientation : ::std::uint8_t;
+  enum class DiskCacheImageType : ::std::uint8_t;
   namespace internal {
     struct GraphImplShared;
     struct StreamDataImplShared;
@@ -341,6 +342,18 @@ enum class ImageOrientation : ::std::uint8_t {
   kUninitialized = 255,
 };
 #endif // CXXBRIDGE1_ENUM_open_comp_graph$ImageOrientation
+
+#ifndef CXXBRIDGE1_ENUM_open_comp_graph$DiskCacheImageType
+#define CXXBRIDGE1_ENUM_open_comp_graph$DiskCacheImageType
+enum class DiskCacheImageType : ::std::uint8_t {
+  kJpegLossyUInt8 = 0,
+  kJpeg2000LossyUInt8 = 1,
+  kJpeg2000LosslessUInt8 = 2,
+  kExrLossyHalf16 = 3,
+  kExrLosslessHalf16 = 4,
+  kUninitialized = 255,
+};
+#endif // CXXBRIDGE1_ENUM_open_comp_graph$DiskCacheImageType
 
 namespace internal {
 #ifndef CXXBRIDGE1_STRUCT_open_comp_graph$internal$PixelBlock

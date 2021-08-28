@@ -392,6 +392,30 @@ pub mod ffi {
         Uninitialized = 255,
     }
 
+    // The type of image type used for disk caching.
+    #[repr(u8)]
+    #[derive(Debug, Copy, Clone, Hash, PartialEq, PartialOrd)]
+    #[namespace = "open_comp_graph"]
+    pub(crate) enum DiskCacheImageType {
+        #[cxx_name = "kJpegLossyUInt8"]
+        JPEG_UInt8 = 0,
+
+        #[cxx_name = "kJpeg2000LossyUInt8"]
+        JPEG_2000_Lossy_UInt8 = 1,
+
+        #[cxx_name = "kJpeg2000LosslessUInt8"]
+        JPEG_2000_Lossless_UInt8 = 2,
+
+        #[cxx_name = "kExrLossyHalf16"]
+        EXR_Lossy_Half16 = 3,
+
+        #[cxx_name = "kExrLosslessHalf16"]
+        EXR_Lossless_Half16 = 4,
+
+        #[cxx_name = "kUninitialized"]
+        Uninitialized = 255,
+    }
+
     // Color Spaces (using OCIO)
     #[namespace = "open_comp_graph::internal"]
     unsafe extern "C++" {
@@ -785,6 +809,19 @@ impl From<i32> for ffi::ImageOrientation {
             6 => ffi::ImageOrientation::Transverse,
             7 => ffi::ImageOrientation::Rotated90CounterClockwise,
             _ => ffi::ImageOrientation::Uninitialized,
+        }
+    }
+}
+
+impl From<i32> for ffi::DiskCacheImageType {
+    fn from(value: i32) -> Self {
+        match value {
+            0 => ffi::DiskCacheImageType::JPEG_UInt8,
+            1 => ffi::DiskCacheImageType::JPEG_2000_Lossy_UInt8,
+            2 => ffi::DiskCacheImageType::JPEG_2000_Lossless_UInt8,
+            3 => ffi::DiskCacheImageType::EXR_Lossy_Half16,
+            4 => ffi::DiskCacheImageType::EXR_Lossless_Half16,
+            _ => ffi::DiskCacheImageType::Uninitialized,
         }
     }
 }
