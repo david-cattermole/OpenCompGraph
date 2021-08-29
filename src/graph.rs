@@ -386,7 +386,7 @@ impl GraphImpl {
         // Frame is floating point so we can evaluate sub-frames and
         // frame blending.
         frame: FrameValue,
-        compute_mode: NodeComputeMode,
+        node_compute_mode: NodeComputeMode,
         cache: &mut Box<CacheImpl>,
         stream_data_cache: &mut FxHashMap<GraphIdx, Rc<StreamDataImpl>>,
     ) -> Result<(), ErrorCode> {
@@ -416,7 +416,7 @@ impl GraphImpl {
         // Both 'B' and 'C' expect 'A' to have already been called so
         // that any data structures are valid and up-to-date.
 
-        match node.compute(frame, compute_mode, &inputs, &mut self.output, cache) {
+        match node.compute(frame, node_compute_mode, &inputs, &mut self.output, cache) {
             NodeStatus::Valid | NodeStatus::Warning => {
                 stream_data_cache.insert(node_index, self.output.clone());
                 Ok(())
