@@ -24,7 +24,7 @@ add_executable(${target_test_exe}
   ${CMAKE_CURRENT_SOURCE_DIR}/test_node_merge/test_node_merge.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/test_node_crop/test_node_crop.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/test_node_viewer/test_node_viewer.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/test_node_viewer/test_node_viewer_disk_cache.cpp
+  # ${CMAKE_CURRENT_SOURCE_DIR}/test_node_viewer/test_node_viewer_disk_cache.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/test_node_viewer/test_node_viewer_3dlut.cpp
   )
 target_link_libraries(${target_test_exe} ${target_lib})

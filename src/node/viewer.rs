@@ -20,14 +20,9 @@
  * Viewer node to be used to apply last-minute changes to the image.
  */
 
-use log::{debug, warn};
-use shellexpand;
+use log::debug;
 use std::collections::hash_map::DefaultHasher;
-use std::fs;
-use std::hash;
 use std::hash::Hash;
-use std::path::Path;
-use std::path::MAIN_SEPARATOR;
 use std::rc::Rc;
 use std::string::String;
 
@@ -37,7 +32,6 @@ use crate::cache::CachedImage;
 use crate::cxxbridge::ffi::AttrState;
 use crate::cxxbridge::ffi::BBox2Di;
 use crate::cxxbridge::ffi::BakeOption;
-use crate::cxxbridge::ffi::DiskCacheImageType;
 use crate::cxxbridge::ffi::ImageShared;
 use crate::cxxbridge::ffi::ImageSpec;
 use crate::cxxbridge::ffi::NodeStatus;
@@ -48,8 +42,6 @@ use crate::data::HashValue;
 use crate::data::Identifier;
 use crate::data::NodeComputeMode;
 use crate::data::COLOR_SPACE_NAME_LINEAR;
-use crate::data::COLOR_SPACE_NAME_SRGB;
-use crate::imageio;
 use crate::node::traits::Operation;
 use crate::node::traits::Validate;
 use crate::node::NodeImpl;
@@ -72,16 +64,13 @@ pub fn new(id: Identifier) -> NodeImpl {
 #[derive(Debug, Clone, Default)]
 pub struct ViewerOperation {}
 
-#[derive(Debug, Clone, Default, hash::Hash)]
+#[derive(Debug, Clone, Default)]
 pub struct ViewerAttrs {
     pub enable: i32,
     pub bake_option: i32,          // index for a BakeOption.
     pub bake_pixel_data_type: i32, // index for PixelDataType.
     pub bake_color_space: String,
     pub crop_to_format: i32,
-    pub disk_cache: i32,
-    pub disk_cache_image_type: i32, // index for DiskCacheImageType.
-    pub disk_cache_dir: String,
 }
 
 impl ViewerOperation {
@@ -98,83 +87,18 @@ impl ViewerAttrs {
             bake_pixel_data_type: 1, // 1 = PixelDataType::Half16
             bake_color_space: COLOR_SPACE_NAME_LINEAR.to_string(),
             crop_to_format: 0,
-            disk_cache: 0,
-            disk_cache_image_type: 0, // 0 = DiskCacheImageType::JPEG_UInt8
-            disk_cache_dir: "".to_string(),
         }
     }
 }
 
-fn expand_directory(directory: &str) -> String {
-    let expanded_dir = match shellexpand::full(directory) {
-        Ok(v) => (*v).to_string(),
-        Err(e) => {
-            warn!(
-                "Environment variable unknown: name={} cause={}",
-                e.var_name, e.cause
-            );
-            directory.to_string()
-        }
-    };
-    expanded_dir.to_string()
-}
-
-fn compute_file_path(directory: &str, hash_value: HashValue, file_ext: &str) -> String {
-    let expanded_dir = expand_directory(directory);
-    let format_path = format!(
-        "{}{}ocg_disk_cache_{}.{}",
-        expanded_dir, MAIN_SEPARATOR, hash_value, file_ext
-    );
-    let file_path = match fs::canonicalize(&format_path) {
-        Ok(v) => match v.to_str() {
-            Some(s) => s.to_string(),
-            None => format_path.to_string(),
-        },
-        Err(_) => format_path.to_string(),
-    };
-    file_path
-}
-
-fn get_disk_cache_image_type_values<'a, 'b, 'c>(
-    value: DiskCacheImageType,
-) -> (&'a str, &'b str, &'c str, PixelDataType) {
-    match value {
-        DiskCacheImageType::JPEG_UInt8 => {
-            ("jpg", "lossy", COLOR_SPACE_NAME_SRGB, PixelDataType::UInt8)
-        }
-        DiskCacheImageType::JPEG_2000_Lossy_UInt8 => {
-            ("jp2", "lossy", COLOR_SPACE_NAME_SRGB, PixelDataType::UInt8)
-        }
-        DiskCacheImageType::JPEG_2000_Lossless_UInt8 => (
-            "jp2",
-            "lossless",
-            COLOR_SPACE_NAME_SRGB,
-            PixelDataType::UInt8,
-        ),
-        DiskCacheImageType::EXR_Lossy_Half16 => (
-            "exr",
-            "lossy",
-            COLOR_SPACE_NAME_LINEAR,
-            PixelDataType::Half16,
-        ),
-        DiskCacheImageType::EXR_Lossless_Half16 => (
-            "exr",
-            "lossless",
-            COLOR_SPACE_NAME_LINEAR,
-            PixelDataType::Half16,
-        ),
-        _ => panic!("DiskCacheImageType is unsupported: {:#?}", value),
-    }
-}
-
-fn do_process(
+fn do_viewer_bake(
     mut stream_data: &mut StreamDataImpl,
     bake_option: BakeOption,
     bake_pixel_data_type: PixelDataType,
     crop_to_format: bool,
     to_color_space: &str,
 ) -> (Rc<PixelBlock>, ImageSpec, BBox2Di, BBox2Di) {
-    debug!("ViewerOperation::do_process(bake_option={:#?}, bake_pixel_data_type={:#?}, to_color_space={:#?})", bake_option, bake_pixel_data_type, to_color_space);
+    debug!("ViewerOperation::do_viewer_bake(bake_option={:#?}, bake_pixel_data_type={:#?}, to_color_space={:#?})", bake_option, bake_pixel_data_type, to_color_space);
 
     // Stream input data
     let mut display_window = stream_data.display_window();
@@ -235,85 +159,6 @@ fn do_process(
     )
 }
 
-fn get_image_from_disk_cache(
-    hash_value: HashValue,
-    mut copy: &mut StreamDataImpl,
-    disk_cache_dir: &str,
-    disk_cache_image_type: DiskCacheImageType,
-    bake_option: BakeOption,
-    crop_to_format: bool,
-) -> (Rc<PixelBlock>, ImageSpec, BBox2Di, BBox2Di) {
-    // Compute file path
-    // TODO: Use compression hints.
-    let (file_ext, compression_mode, disk_color_space, disk_pixel_data_type) =
-        get_disk_cache_image_type_values(disk_cache_image_type);
-    debug!("file_ext: {:?}", file_ext);
-    debug!("compression_mode: {:?}", compression_mode);
-    debug!("disk_color_space: {:?}", disk_color_space);
-    debug!("disk_pixel_data_type: {:?}", disk_pixel_data_type);
-
-    let file_path = compute_file_path(disk_cache_dir, hash_value, file_ext);
-    debug!("file_path: {:?}", file_path);
-
-    // Try to read file path.
-    let file_exists = Path::new(&file_path).exists();
-    if file_exists {
-        // Read file (that we know exists)
-        let num_threads = 0;
-        let mut img = imageio::read_image(&file_path, num_threads);
-        let from_color_space = &img.spec.color_space();
-        let to_color_space = COLOR_SPACE_NAME_LINEAR;
-        bake::do_process(
-            BakeOption::ColorSpace,
-            &mut img.pixel_block,
-            img.display_window,
-            &mut img.data_window,
-            &mut img.spec,
-            &mut copy,
-            &from_color_space,
-            &to_color_space,
-            disk_pixel_data_type,
-        );
-
-        let pixel_block_rc = Rc::new(*img.pixel_block);
-        (
-            pixel_block_rc,
-            img.spec,
-            img.data_window,
-            img.display_window,
-        )
-    } else {
-        // Image was not found on-disk.
-
-        // Compute image
-        let to_color_space = disk_color_space;
-        let (pixel_block_rc, image_spec, data_window, display_window) = do_process(
-            &mut copy,
-            bake_option,
-            disk_pixel_data_type,
-            crop_to_format,
-            &to_color_space,
-        );
-
-        // Write image
-        let img = ImageShared {
-            pixel_block: Box::new((*pixel_block_rc).clone()),
-            display_window: display_window,
-            data_window: data_window,
-            spec: image_spec.clone(),
-        };
-        let do_crop = false;
-        let num_threads = 0;
-        let ok = imageio::write_image(&img, &file_path, num_threads, do_crop);
-        if ok == false {
-            warn!("Failed to write image: status={}", ok);
-        }
-        debug!("Success: {}", ok);
-
-        (pixel_block_rc, image_spec, data_window, display_window)
-    }
-}
-
 impl Operation for ViewerOperation {
     fn compute(
         &mut self,
@@ -343,60 +188,35 @@ impl Operation for ViewerOperation {
                 let input = &inputs[0].clone();
                 let mut copy = (**input).clone();
 
-                let crop_to_format = attr_block.get_attr_i32("crop_to_format") != 0;
-                let bake_option_num = if crop_to_format {
-                    3 as i32 // 3 == Bake All.
-                } else {
-                    attr_block.get_attr_i32("bake_option")
-                };
-                let bake_option = BakeOption::from(bake_option_num);
-                let bake_pixel_data_type =
-                    PixelDataType::from(attr_block.get_attr_i32("bake_pixel_data_type"));
-                let disk_cache = attr_block.get_attr_i32("disk_cache") != 0;
-                let disk_cache_image_type =
-                    DiskCacheImageType::from(attr_block.get_attr_i32("disk_cache_image_type"));
+                let bake_option_initial = BakeOption::from(attr_block.get_attr_i32("bake_option"));
+                debug!("bake_option={:#?}", bake_option_initial);
 
-                debug!("Viewer bake_option={:#?}", bake_option);
-                debug!("Viewer bake_pixel_data_type={:#?}", bake_pixel_data_type);
-                debug!("Viewer disk_cache={:#?}", disk_cache);
-                debug!("Viewer disk_cache_image_type={:#?}", disk_cache_image_type);
+                if bake_option_initial != BakeOption::Nothing {
+                    let crop_to_format = attr_block.get_attr_i32("crop_to_format") != 0;
+                    let bake_option = if crop_to_format {
+                        BakeOption::All
+                    } else {
+                        BakeOption::from(bake_option_initial)
+                    };
 
-                // TODO: Determine if we really need to change the
-                // pixels or not. For example, Check if the color
-                // space is already set correctly, check if there are
-                // any deformers, check if the color matrix is not
-                // identity.
-                let change_pixels = (bake_option != BakeOption::Nothing)
-                    || crop_to_format
-                    || (bake_pixel_data_type != copy.pixel_data_type());
+                    let bake_pixel_data_type =
+                        PixelDataType::from(attr_block.get_attr_i32("bake_pixel_data_type"));
+                    debug!("crop_to_format={:#?}", crop_to_format);
+                    debug!("bake_pixel_data_type={:#?}", bake_pixel_data_type);
 
-                if change_pixels {
-                    let (pixel_block, image_spec, data_window, display_window) = match cache
-                        .get(&hash_value)
-                    {
-                        Some(cached_img) => {
-                            debug!("Cache Hit");
-                            (
-                                cached_img.pixel_block.clone(),
-                                cached_img.spec.clone(),
-                                cached_img.data_window,
-                                cached_img.display_window,
-                            )
-                        }
-                        _ => {
-                            debug!("Cache Miss");
-                            if disk_cache {
-                                let disk_cache_dir = attr_block.get_attr_str("disk_cache_dir");
-                                debug!("disk_cache_dir: {:?}", disk_cache_dir);
-                                get_image_from_disk_cache(
-                                    hash_value,
-                                    &mut copy,
-                                    disk_cache_dir,
-                                    disk_cache_image_type,
-                                    bake_option,
-                                    crop_to_format,
+                    let (pixel_block, image_spec, data_window, display_window) =
+                        match cache.get(&hash_value) {
+                            Some(cached_img) => {
+                                debug!("Cache Hit");
+                                (
+                                    cached_img.pixel_block.clone(),
+                                    cached_img.spec.clone(),
+                                    cached_img.data_window,
+                                    cached_img.display_window,
                                 )
-                            } else {
+                            }
+                            _ => {
+                                debug!("Cache Miss");
                                 // Bake the image data down and add to
                                 // the image cache.
 
@@ -404,7 +224,7 @@ impl Operation for ViewerOperation {
                                 debug!("bake_color_space: {:?}", bake_color_space);
 
                                 let (pixel_block_rc, image_spec, data_window, display_window) =
-                                    do_process(
+                                    do_viewer_bake(
                                         &mut copy,
                                         bake_option,
                                         bake_pixel_data_type,
@@ -420,8 +240,7 @@ impl Operation for ViewerOperation {
                                 cache.insert(hash_value, cached_img);
                                 (pixel_block_rc, image_spec, data_window, display_window)
                             }
-                        }
-                    };
+                        };
 
                     // Ensure the stream does not double up on
                     // deformers if the image is expected to already
@@ -453,17 +272,16 @@ impl Operation for ViewerOperation {
 impl AttrBlock for ViewerAttrs {
     fn attr_hash(&self, _frame: FrameValue, state: &mut DefaultHasher) {
         self.enable.hash(state);
-        if self.enable == 1 {
+        if self.enable == 0 {
+            return;
+        }
+
+        let bake_option = BakeOption::from(self.bake_option);
+        if bake_option != BakeOption::Nothing {
             self.bake_option.hash(state);
             self.crop_to_format.hash(state);
-            if self.disk_cache == 1 {
-                self.disk_cache.hash(state);
-                self.disk_cache_image_type.hash(state);
-                // NOTE: Hash is the same regardless of 'disk_cache_dir'.
-            } else {
-                self.bake_pixel_data_type.hash(state);
-                self.bake_color_space.hash(state);
-            }
+            self.bake_pixel_data_type.hash(state);
+            self.bake_color_space.hash(state);
         }
     }
 
@@ -491,16 +309,12 @@ impl AttrBlock for ViewerAttrs {
             "bake_pixel_data_type" => AttrState::Exists,
             "bake_color_space" => AttrState::Exists,
 
-            "disk_cache" => AttrState::Exists,
-            "disk_cache_image_type" => AttrState::Exists,
-            "disk_cache_dir" => AttrState::Exists,
             _ => AttrState::Missing,
         }
     }
 
     fn get_attr_str(&self, name: &str) -> &str {
         match name {
-            "disk_cache_dir" => &self.disk_cache_dir,
             "bake_color_space" => &self.bake_color_space,
             _ => "",
         }
@@ -508,7 +322,6 @@ impl AttrBlock for ViewerAttrs {
 
     fn set_attr_str(&mut self, name: &str, value: &str) {
         match name {
-            "disk_cache_dir" => self.disk_cache_dir = value.to_string(),
             "bake_color_space" => self.bake_color_space = value.to_string(),
             _ => (),
         };
@@ -520,8 +333,6 @@ impl AttrBlock for ViewerAttrs {
             "crop_to_format" => self.crop_to_format,
             "bake_option" => self.bake_option,
             "bake_pixel_data_type" => self.bake_pixel_data_type,
-            "disk_cache" => self.disk_cache,
-            "disk_cache_image_type" => self.disk_cache_image_type,
             _ => 0,
         }
     }
@@ -532,8 +343,6 @@ impl AttrBlock for ViewerAttrs {
             "crop_to_format" => self.crop_to_format = value,
             "bake_option" => self.bake_option = value,
             "bake_pixel_data_type" => self.bake_pixel_data_type = value,
-            "disk_cache" => self.disk_cache = value,
-            "disk_cache_image_type" => self.disk_cache_image_type = value,
             _ => (),
         };
     }
@@ -573,58 +382,47 @@ impl Validate for ViewerValidate {
 
         if input_nodes.len() > 0 {
             let enable = attr_block.get_attr_i32("enable") != 0;
-            let disk_cache = attr_block.get_attr_i32("disk_cache") != 0;
+
             let crop_to_format = attr_block.get_attr_i32("crop_to_format") != 0;
-            let bake_option_num = if crop_to_format {
-                3 as i32 // 3 == Bake All.
+            let bake_option_num = attr_block.get_attr_i32("bake_option");
+            let bake_option_initial = BakeOption::from(bake_option_num);
+            let bake_option = if bake_option_initial != BakeOption::Nothing {
+                if crop_to_format {
+                    // If cropping, then All must be used because
+                    // we'll affect the pixel data when cropping.
+                    BakeOption::All
+                } else {
+                    BakeOption::from(bake_option_num)
+                }
             } else {
-                attr_block.get_attr_i32("bake_option")
+                BakeOption::Nothing
             };
-            let bake_option = BakeOption::from(bake_option_num);
-            let disk_cache_image_type =
-                DiskCacheImageType::from(attr_block.get_attr_i32("disk_cache_image_type"));
 
             if enable == false {
                 node_compute_modes.push(NodeComputeMode::ALL);
             } else {
-                if disk_cache == true {
-                    let disk_cache_dir = attr_block.get_attr_str("disk_cache_dir");
-                    let (file_ext, _compression_mode, _disk_color_space, _disk_pixel_data_type) =
-                        get_disk_cache_image_type_values(disk_cache_image_type);
-                    let file_path = compute_file_path(disk_cache_dir, hash_value, file_ext);
-
-                    // Try to read file path.
-                    let file_exists = Path::new(&file_path).exists();
-                    if file_exists == false {
+                match bake_option {
+                    BakeOption::Nothing => {
                         node_compute_modes.push(node_compute_mode & NodeComputeMode::ALL)
-                    } else {
-                        match bake_option {
-                            BakeOption::Nothing => {
-                                node_compute_modes.push(node_compute_mode & NodeComputeMode::ALL)
-                            }
-                            BakeOption::ColorSpace => node_compute_modes.push(
-                                node_compute_mode
-                                    & (NodeComputeMode::ALL - NodeComputeMode::COLOR_SPACE),
-                            ),
-                            BakeOption::ColorSpaceAndGrade => node_compute_modes.push(
-                                node_compute_mode
-                                    & (NodeComputeMode::ALL
-                                        - NodeComputeMode::COLOR_SPACE
-                                        - NodeComputeMode::COLOR),
-                            ),
-                            BakeOption::All => node_compute_modes.push(
-                                node_compute_mode
-                                    & (NodeComputeMode::ALL
-                                        - NodeComputeMode::COLOR_SPACE
-                                        - NodeComputeMode::COLOR
-                                        - NodeComputeMode::DEFORMER
-                                        - NodeComputeMode::PIXEL),
-                            ),
-                            _ => panic!("BakeOption is invalid value: {:#?}", bake_option),
-                        }
                     }
-                } else {
-                    node_compute_modes.push(NodeComputeMode::ALL);
+                    BakeOption::ColorSpace => node_compute_modes.push(
+                        node_compute_mode & (NodeComputeMode::ALL - NodeComputeMode::COLOR_SPACE),
+                    ),
+                    BakeOption::ColorSpaceAndGrade => node_compute_modes.push(
+                        node_compute_mode
+                            & (NodeComputeMode::ALL
+                                - NodeComputeMode::COLOR_SPACE
+                                - NodeComputeMode::COLOR),
+                    ),
+                    BakeOption::All => node_compute_modes.push(
+                        node_compute_mode
+                            & (NodeComputeMode::ALL
+                                - NodeComputeMode::COLOR_SPACE
+                                - NodeComputeMode::COLOR
+                                - NodeComputeMode::DEFORMER
+                                - NodeComputeMode::PIXEL),
+                    ),
+                    _ => panic!("BakeOption is invalid value: {:#?}", bake_option),
                 }
             }
             for _ in input_nodes.iter().skip(1) {

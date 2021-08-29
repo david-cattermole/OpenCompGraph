@@ -39,7 +39,7 @@
 #include "test_node_merge/test_node_merge.h"
 #include "test_node_crop/test_node_crop.h"
 #include "test_node_viewer/test_node_viewer.h"
-#include "test_node_viewer/test_node_viewer_disk_cache.h"
+// #include "test_node_viewer/test_node_viewer_disk_cache.h"
 #include "test_node_viewer/test_node_viewer_3dlut.h"
 
 namespace ocg = open_comp_graph;
@@ -82,7 +82,7 @@ int main() {
             test_node_merge(debug_print, cache);
             test_node_crop(debug_print, cache);
             test_node_viewer(debug_print, cache);
-            test_node_viewer_disk_cache(debug_print, cache);
+            // test_node_viewer_disk_cache(debug_print, cache);
             test_node_viewer_3dlut(debug_print, cache);
         }
 
