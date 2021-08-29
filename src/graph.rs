@@ -493,9 +493,6 @@ impl GraphImpl {
         }
 
         // Start at upstream nodes to compute first.
-        //
-        // TODO: Metadata is independant of frame number, so maybe we
-        // can re-factor it and only calculate it once?
         let mut stream_data_cache = FxHashMap::<GraphIdx, Rc<StreamDataImpl>>::default();
         for (node_index, node_compute_mode) in validated_node_indexes.iter().rev() {
             debug!("Compute Node: {:?}", node_index);
