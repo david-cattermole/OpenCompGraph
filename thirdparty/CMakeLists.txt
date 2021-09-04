@@ -36,6 +36,7 @@ set(THIRDPARTY_INSTALL_PREFIX "${CMAKE_CURRENT_SOURCE_DIR}/install")
 SET(BZIP2_INSTALL_PATH ${THIRDPARTY_INSTALL_PREFIX}/bzip2)
 SET(ZLIB_INSTALL_PATH ${THIRDPARTY_INSTALL_PREFIX}/zlib)
 SET(LIBJPEG_INSTALL_PATH ${THIRDPARTY_INSTALL_PREFIX}/libjpeg_turbo)
+SET(OPENJPEG_INSTALL_PATH ${THIRDPARTY_INSTALL_PREFIX}/openjpeg)
 SET(LIBTIFF_INSTALL_PATH ${THIRDPARTY_INSTALL_PREFIX}/libtiff)
 SET(LIBPNG_INSTALL_PATH ${THIRDPARTY_INSTALL_PREFIX}/libpng)
 SET(ILMBASE_INSTALL_PATH ${THIRDPARTY_INSTALL_PREFIX}/ilmbase_openexr)
@@ -180,11 +181,35 @@ ExternalProject_Add(libpng
 # OpenJPEG
 ##################
 #
-# Reference:
-#     ???
-#
-# TODO: Add OpenJPEG support.
+SET(OPENJPEG_C_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
+if(MSVC)
+  # On Windows
+  SET(OPENJPEG_C_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /O2 /arch:AVX2 /DNDEBUG")
+else()
+  # On Linux and MacOS (Clang and GCC)
+  SET(OPENJPEG_C_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -mavx2 -DNDEBUG")
+endif()
 
+ExternalProject_Add(openjpeg
+    PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/openjpeg
+    GIT_REPOSITORY "https://github.com/uclouvain/openjpeg.git"
+    # OpenImageIO v2.2.10.1 CMake files can only find up to v2.3
+    # automatically, so we're currently limited.
+    #
+    # TODO: Fix the CMake files in OpenImageIO and submit a PR.
+    GIT_TAG "v2.3.1"
+    INSTALL_DIR ${OPENJPEG_INSTALL_PATH}
+    CMAKE_ARGS
+        -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+        -DCMAKE_C_FLAGS_RELEASE=${OPENJPEG_C_FLAGS_RELEASE}
+        -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
+        -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}
+        -DCMAKE_INSTALL_PREFIX=${OPENJPEG_INSTALL_PATH}
+        -DCMAKE_PREFIX_PATH="${CMAKE_PREFIX_PATH}"
+        -DCMAKE_IGNORE_PATH=${CMAKE_IGNORE_PATH}
+        -DBUILD_SHARED_LIBS:BOOL=ON
+        -DBUILD_THIRDPARTY:BOOL=ON
+)
 
 ##################
 # WebP
@@ -301,7 +326,7 @@ ExternalProject_Add(opencolorio
 ##################
 ExternalProject_Add(openimageio
     PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/openimageio
-    DEPENDS bzip2 zlib libjpeg_turbo libtiff libpng ilmbase openexr opencolorio
+    DEPENDS bzip2 zlib libjpeg_turbo libtiff libpng openjpeg ilmbase openexr opencolorio
     GIT_REPOSITORY "https://github.com/OpenImageIO/oiio.git"
     GIT_TAG "v2.2.10.1"
     INSTALL_DIR ${OPENIMAGEIO_INSTALL_PATH}
@@ -319,6 +344,7 @@ ExternalProject_Add(openimageio
         -DUSE_JPEGTURBO=ON
         -DJPEGTurbo_ROOT=${LIBJPEG_INSTALL_PATH}
         -DJPEG_ROOT=${LIBJPEG_INSTALL_PATH}
+        -DOpenJpeg_ROOT=${OPENJPEG_INSTALL_PATH}
         -DPNG_ROOT=${LIBPNG_INSTALL_PATH}
         -DTIFF_ROOT=${LIBTIFF_INSTALL_PATH}
         -DILMBASE_ROOT=${ILMBASE_INSTALL_PATH}
@@ -336,7 +362,6 @@ ExternalProject_Add(openimageio
         # -DGIF_ROOT=?
         # -DLibheif_ROOT=?
         # -DLibRaw_ROOT=?
-        # -DOpenJpeg_ROOT=?
         # -DPTex_ROOT=?
         # -DWebP_ROOT=?
         # -DR3DSDK_ROOT=?

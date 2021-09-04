@@ -31,6 +31,7 @@
 #include "test_node_null/test_node_null.h"
 #include "test_node_imageio/test_node_imageio.h"
 #include "test_node_imageio/test_node_imageio_jpeg.h"
+#include "test_node_imageio/test_node_imageio_j2k.h"
 #include "test_node_imageio/test_node_imageio_tiff.h"
 #include "test_node_lens/test_node_lens.h"
 #include "test_node_transform/test_node_transform.h"
@@ -75,6 +76,7 @@ int main() {
             test_node_transform(debug_print, cache);
             test_node_imageio(debug_print, cache);
             test_node_imageio_jpeg(debug_print, cache);
+            test_node_imageio_j2k(debug_print, cache);
             test_node_imageio_tiff(debug_print, cache);
             test_node_null(debug_print, cache);
             test_node_grade(debug_print, cache);

@@ -10,3 +10,6 @@
 [submodule "tests/data/ocg-testdata"]
 	path = tests/data/ocg-testdata
 	url = https://github.com/david-cattermole/OpenCompGraph-testdata.git
+[submodule "tests/data/openjpeg-images"]
+	path = tests/data/openjpeg-images
+	url = https://github.com/uclouvain/openjpeg-data.git
