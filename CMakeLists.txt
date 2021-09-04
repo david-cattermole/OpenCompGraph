@@ -29,7 +29,7 @@ project(OpenCompGraph
 set(PROJECT_HOMEPAGE_URL "https://github.com/david-cattermole/OpenCompGraph")
 set(PROJECT_DESCRIPTION "Image compositing node graph library.")
 set(PROJECT_AUTHOR "David Cattermole")
-set(PROJECT_COPYRIGHT "2019, 2020, David Cattermole.")
+set(PROJECT_COPYRIGHT "2019, 2020, 2021 David Cattermole.")
 
 # Add custom modules to the module path
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules)
