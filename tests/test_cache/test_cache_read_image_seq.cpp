@@ -18,6 +18,7 @@
  * ====================================================================
  *
  * Read an image sequence, in different orders to stress the caching system.
+ *
  */
 
 #include <iostream>
@@ -44,7 +45,17 @@ int test_cache_read_image_seq(const bool debug_print) {
     auto write_node = graph.create_node(ocg::NodeType::kWriteImage, "write");
     graph.set_node_attr_str(
         read_node, "file_path",
-        "tests/data/ocg-testdata/images/color_bars/3840x2160_png/color_bars.####.png");
+        // "tests/data/ocg-testdata/images/color_bars/3840x2160_jpg/color_bars.####.jpg"
+        // "tests/data/ocg-testdata/images/color_bars/3840x2160_png_compress0/color_bars.####.png"
+        // "tests/data/ocg-testdata/images/color_bars/3840x2160_png_compress1/color_bars.####.png"
+        // "tests/data/ocg-testdata/images/color_bars/3840x2160_png_compress2/color_bars.####.png"
+        "tests/data/ocg-testdata/images/color_bars/3840x2160_png_compress3/color_bars.####.png"
+        // "tests/data/ocg-testdata/images/color_bars/3840x2160_png/color_bars.####.png" // compress 6
+        // "tests/data/ocg-testdata/images/color_bars/3840x2160_exr/color_bars.####.exr"
+        // "tests/data/ocg-testdata/images/color_bars/3840x2160_exr_dwaa/color_bars.####.exr"
+        // "tests/data/ocg-testdata/images/color_bars/3840x2160_exr_dwab/color_bars.####.exr"
+    );
+
     graph.set_node_attr_str(
         write_node, "file_path",
         "./tests/data/out/test_cache_read_image_seq_out_color_bars_3840x2160.####.png");
