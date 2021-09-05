@@ -227,8 +227,12 @@ ExternalProject_Add(openjpeg
 #
 # Reference:
 #     https://github.com/OpenImageIO/oiio/blob/master/src/build-scripts/build_libraw.bash
+#     https://github.com/LibRaw/LibRaw-cmake
+#     https://github.com/LibRaw/LibRaw
+#     https://github.com/LibRaw/LibRaw.git
 #
 # TODO: Add LibRaw support.
+#
 
 
 ##################
