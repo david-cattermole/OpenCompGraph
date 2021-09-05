@@ -25,6 +25,7 @@
 #include "test_graph/test_graph_non_linear_graph.h"
 #include "test_graph/test_graph_no_ops.h"
 #include "test_graph/test_graph_re_eval_modified_graph.h"
+#include "test_graph/test_graph_re_connect_graph.h"
 #include "test_stream/test_stream_empty_write_geom.h"
 #include "test_cache/test_cache_read_image_seq.h"
 #include "test_cache/test_cache_init.h"
@@ -71,6 +72,7 @@ int main() {
             test_graph_non_linear_graph(debug_print, cache);
             test_graph_no_ops(debug_print, cache);
             test_graph_re_eval_modified_graph(debug_print, cache);
+            test_graph_re_connect_graph(debug_print, cache);
 
             test_node_lens(debug_print, cache);
             test_node_transform(debug_print, cache);

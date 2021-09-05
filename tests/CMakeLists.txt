@@ -10,6 +10,7 @@ add_executable(${target_test_exe}
   ${CMAKE_CURRENT_SOURCE_DIR}/test_graph/test_graph_non_linear_graph.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/test_graph/test_graph_no_ops.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/test_graph/test_graph_re_eval_modified_graph.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/test_graph/test_graph_re_connect_graph.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/test_stream/test_stream_empty_write_geom.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/test_cache/test_cache_read_image_seq.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/test_cache/test_cache_init.cpp

@@ -23,6 +23,7 @@ use anyhow::Result;
 use log::{debug, error, warn};
 use petgraph;
 use petgraph::dot::{Config, Dot};
+use petgraph::visit::EdgeRef;
 use petgraph::Direction;
 use rustc_hash::FxHashMap;
 use std::collections::VecDeque;
@@ -288,14 +289,26 @@ impl GraphImpl {
         // Check there is no other edge from src to dst, with
         // the same input_num value.
         let incoming_edges = self.graph.edges_directed(dst_index, Direction::Incoming);
-        let edges_existing = incoming_edges
+        let edges_existing: Vec<_> = incoming_edges
             .into_iter()
-            .fold(0, |acc, x| acc + (*x.weight() == input_num) as usize);
+            .take_while(|x| *x.weight() == input_num)
+            .map(|x| (x.source(), x.target()))
+            .collect();
 
-        if edges_existing == 0 {
-            self.state = GraphState::Dirty;
-            self.graph.add_edge(src_index, dst_index, input_num);
+        // Remove the existing edges first.
+        for (edge_src_index, edge_dst_index) in edges_existing {
+            if let Some(edge_index) = self.graph.find_edge(edge_src_index, edge_dst_index) {
+                debug!(
+                    "Remove edge: src_index={:#?} dst_index={:#?} edge_index={:#?}",
+                    edge_src_index, edge_dst_index, edge_index
+                );
+                self.graph.remove_edge(edge_index);
+                ()
+            }
         }
+
+        self.state = GraphState::Dirty;
+        self.graph.update_edge(src_index, dst_index, input_num);
     }
 
     // Get the stack of indices to be computed, going upstream
