@@ -25,6 +25,13 @@
 
 namespace open_comp_graph {
 
+Node::Node() noexcept
+        : m_id(0), m_node_type(NodeType::kNull) {
+    // std::cout << "Node() with id"
+    //           << " node_type=" << static_cast<uint32_t>(node_type)
+    //           << " id=" << id
+    //           << '\n';
+}
 
 Node::Node(NodeType node_type, uint64_t id) noexcept
         : m_id(id), m_node_type(node_type) {

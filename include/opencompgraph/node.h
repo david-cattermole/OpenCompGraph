@@ -31,6 +31,9 @@ namespace open_comp_graph {
 class Node {
 public:
     OCG_API_EXPORT
+    Node() noexcept;
+
+    OCG_API_EXPORT
     Node(NodeType node_type, size_t id) noexcept;
 
     OCG_API_EXPORT
