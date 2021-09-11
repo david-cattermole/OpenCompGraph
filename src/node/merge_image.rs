@@ -201,16 +201,14 @@ impl Operation for MergeImageOperation {
 
         let enable = attr_block.get_attr_i32("enable");
         if enable != 1 {
-            let mut stream_data = StreamDataImpl::new();
-            stream_data.set_hash(hash_value);
+            let stream_data = StreamDataImpl::new();
             *output = std::rc::Rc::new(stream_data);
             return NodeStatus::Warning;
         }
         if inputs.len() != 2 {
-            let mut stream_data = StreamDataImpl::new();
-            stream_data.set_hash(hash_value);
+            let stream_data = StreamDataImpl::new();
             *output = std::rc::Rc::new(stream_data);
-            return NodeStatus::Error;
+            return NodeStatus::Warning;
         }
 
         // Cache the results of the merge. If the input values do not

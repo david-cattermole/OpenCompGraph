@@ -182,95 +182,93 @@ impl Operation for ViewerOperation {
             return NodeStatus::Valid;
         }
 
-        match inputs.len() {
+        let mut stream_data = match inputs.len() {
             0 => {
                 // No input given, return an empty default stream.
-                let mut stream_data = StreamDataImpl::new();
-                *output = std::rc::Rc::new(stream_data);
-                NodeStatus::Warning
+                StreamDataImpl::new()
             }
             _ => {
                 let input = &inputs[0].clone();
-                let mut copy = (**input).clone();
-
-                let bake_option_initial = BakeOption::from(attr_block.get_attr_i32("bake_option"));
-                debug!("bake_option={:#?}", bake_option_initial);
-
-                if bake_option_initial != BakeOption::Nothing {
-                    let crop_to_format = attr_block.get_attr_i32("crop_to_format") != 0;
-                    let bake_option = if crop_to_format {
-                        BakeOption::All
-                    } else {
-                        BakeOption::from(bake_option_initial)
-                    };
-
-                    let bake_pixel_data_type =
-                        PixelDataType::from(attr_block.get_attr_i32("bake_pixel_data_type"));
-                    debug!("crop_to_format={:#?}", crop_to_format);
-                    debug!("bake_pixel_data_type={:#?}", bake_pixel_data_type);
-
-                    let (pixel_block, image_spec, data_window, display_window) =
-                        match cache.get(&hash_value) {
-                            Some(cached_img) => {
-                                debug!("Cache Hit");
-                                (
-                                    cached_img.pixel_block.clone(),
-                                    cached_img.spec.clone(),
-                                    cached_img.data_window,
-                                    cached_img.display_window,
-                                )
-                            }
-                            _ => {
-                                debug!("Cache Miss");
-                                // Bake the image data down and add to
-                                // the image cache.
-
-                                let bake_color_space = attr_block.get_attr_str("bake_color_space");
-                                debug!("bake_color_space: {:?}", bake_color_space);
-
-                                let (pixel_block_rc, image_spec, data_window, display_window) =
-                                    do_viewer_bake(
-                                        &mut copy,
-                                        bake_option,
-                                        bake_pixel_data_type,
-                                        crop_to_format,
-                                        &bake_color_space,
-                                    );
-                                let cached_img = CachedImage {
-                                    pixel_block: pixel_block_rc.clone(),
-                                    spec: image_spec.clone(),
-                                    data_window: data_window,
-                                    display_window: display_window,
-                                };
-                                cache.insert(hash_value, cached_img);
-                                (pixel_block_rc, image_spec, data_window, display_window)
-                            }
-                        };
-
-                    // Ensure the stream does not double up on
-                    // deformers if the image is expected to already
-                    // have baked deformations in it.
-                    //
-                    // If the cached image was generated while baking
-                    // deformations to pixels, then we must remove
-                    // deformers from the stream so that we do not get
-                    // a double-deformation effect when reading from
-                    // the cache.
-                    if bake_option == BakeOption::All {
-                        copy.clear_deformers();
-                    }
-
-                    copy.set_data_window(data_window);
-                    copy.set_display_window(display_window);
-                    copy.set_hash(hash_value);
-                    copy.set_pixel_block(pixel_block);
-                    copy.set_image_spec(image_spec);
-                    *output = std::rc::Rc::new(copy);
-                }
-
-                NodeStatus::Valid
+                (**input).clone()
             }
+        };
+
+        let bake_option_initial = BakeOption::from(attr_block.get_attr_i32("bake_option"));
+        debug!("bake_option={:#?}", bake_option_initial);
+
+        if bake_option_initial != BakeOption::Nothing {
+            let crop_to_format = attr_block.get_attr_i32("crop_to_format") != 0;
+            let bake_option = if crop_to_format {
+                BakeOption::All
+            } else {
+                BakeOption::from(bake_option_initial)
+            };
+
+            let bake_pixel_data_type =
+                PixelDataType::from(attr_block.get_attr_i32("bake_pixel_data_type"));
+            debug!("crop_to_format={:#?}", crop_to_format);
+            debug!("bake_pixel_data_type={:#?}", bake_pixel_data_type);
+
+            let (pixel_block, image_spec, data_window, display_window) = match cache
+                .get(&hash_value)
+            {
+                Some(cached_img) => {
+                    debug!("Cache Hit");
+                    (
+                        cached_img.pixel_block.clone(),
+                        cached_img.spec.clone(),
+                        cached_img.data_window,
+                        cached_img.display_window,
+                    )
+                }
+                _ => {
+                    debug!("Cache Miss");
+                    // Bake the image data down and add to
+                    // the image cache.
+
+                    let bake_color_space = attr_block.get_attr_str("bake_color_space");
+                    debug!("bake_color_space: {:?}", bake_color_space);
+
+                    let (pixel_block_rc, image_spec, data_window, display_window) = do_viewer_bake(
+                        &mut stream_data,
+                        bake_option,
+                        bake_pixel_data_type,
+                        crop_to_format,
+                        &bake_color_space,
+                    );
+                    let cached_img = CachedImage {
+                        pixel_block: pixel_block_rc.clone(),
+                        spec: image_spec.clone(),
+                        data_window: data_window,
+                        display_window: display_window,
+                    };
+                    cache.insert(hash_value, cached_img);
+                    (pixel_block_rc, image_spec, data_window, display_window)
+                }
+            };
+
+            // Ensure the stream does not double up on
+            // deformers if the image is expected to already
+            // have baked deformations in it.
+            //
+            // If the cached image was generated while baking
+            // deformations to pixels, then we must remove
+            // deformers from the stream so that we do not get
+            // a double-deformation effect when reading from
+            // the cache.
+            if bake_option == BakeOption::All {
+                stream_data.clear_deformers();
+            }
+
+            stream_data.set_data_window(data_window);
+            stream_data.set_display_window(display_window);
+            stream_data.set_hash(hash_value);
+            stream_data.set_pixel_block(pixel_block);
+            stream_data.set_image_spec(image_spec);
         }
+
+        *output = std::rc::Rc::new(stream_data);
+        NodeStatus::Valid
     }
 }
 

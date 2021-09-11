@@ -128,42 +128,47 @@ impl Operation for LensDistortOperation {
         // debug!("Inputs: {:?}", inputs);
         // debug!("Output: {:?}", output);
 
-        match inputs.len() {
-            0 => NodeStatus::Error,
+        let mut status = NodeStatus::Valid;
+        let mut stream_data = match inputs.len() {
+            0 => {
+                // No input given, return an empty default stream.
+                status = NodeStatus::Warning;
+                StreamDataImpl::new()
+            }
             _ => {
                 let input = &inputs[0].clone();
-                let mut copy = (**input).clone();
-
-                let enable = attr_block.get_attr_i32("enable");
-                if enable == 1 {
-                    let mut deformer = DeformerTde4Classic::default();
-
-                    let direction = attr_block.get_attr_i32("direction");
-                    let lco_x = attr_block.get_attr_f32("lens_center_offset_x");
-                    let lco_y = attr_block.get_attr_f32("lens_center_offset_y");
-                    let distortion = attr_block.get_attr_f32("distortion");
-                    let anamorphic_squeeze = attr_block.get_attr_f32("anamorphic_squeeze");
-                    let curvature_x = attr_block.get_attr_f32("curvature_x");
-                    let curvature_y = attr_block.get_attr_f32("curvature_y");
-                    let quartic_distortion = attr_block.get_attr_f32("quartic_distortion");
-                    deformer.set_attr_i32("direction", direction);
-                    deformer.set_attr_f32("lens_center_offset_x", lco_x);
-                    deformer.set_attr_f32("lens_center_offset_y", lco_y);
-                    deformer.set_attr_f32("distortion", distortion);
-                    deformer.set_attr_f32("anamorphic_squeeze", anamorphic_squeeze);
-                    deformer.set_attr_f32("curvature_x", curvature_x);
-                    deformer.set_attr_f32("curvature_y", curvature_y);
-                    deformer.set_attr_f32("quartic_distortion", quartic_distortion);
-                    deformer.commit_data().unwrap();
-                    copy.push_deformer(Box::new(deformer));
-                }
-
-                // Set Output data
-                copy.set_hash(hash_value);
-                *output = Rc::new(copy);
-                NodeStatus::Valid
+                (**input).clone()
             }
+        };
+
+        let enable = attr_block.get_attr_i32("enable");
+        if enable == 1 {
+            let mut deformer = DeformerTde4Classic::default();
+
+            let direction = attr_block.get_attr_i32("direction");
+            let lco_x = attr_block.get_attr_f32("lens_center_offset_x");
+            let lco_y = attr_block.get_attr_f32("lens_center_offset_y");
+            let distortion = attr_block.get_attr_f32("distortion");
+            let anamorphic_squeeze = attr_block.get_attr_f32("anamorphic_squeeze");
+            let curvature_x = attr_block.get_attr_f32("curvature_x");
+            let curvature_y = attr_block.get_attr_f32("curvature_y");
+            let quartic_distortion = attr_block.get_attr_f32("quartic_distortion");
+            deformer.set_attr_i32("direction", direction);
+            deformer.set_attr_f32("lens_center_offset_x", lco_x);
+            deformer.set_attr_f32("lens_center_offset_y", lco_y);
+            deformer.set_attr_f32("distortion", distortion);
+            deformer.set_attr_f32("anamorphic_squeeze", anamorphic_squeeze);
+            deformer.set_attr_f32("curvature_x", curvature_x);
+            deformer.set_attr_f32("curvature_y", curvature_y);
+            deformer.set_attr_f32("quartic_distortion", quartic_distortion);
+            deformer.commit_data().unwrap();
+            stream_data.push_deformer(Box::new(deformer));
         }
+
+        // Set Output data
+        stream_data.set_hash(hash_value);
+        *output = Rc::new(stream_data);
+        status
     }
 }
 

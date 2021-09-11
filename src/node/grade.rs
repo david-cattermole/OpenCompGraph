@@ -27,17 +27,26 @@ use std::rc::Rc;
 
 use crate::attrblock::AttrBlock;
 use crate::cache::CacheImpl;
+use crate::cache::CachedImage;
 use crate::cxxbridge::ffi::AttrState;
+use crate::cxxbridge::ffi::BakeOption;
+use crate::cxxbridge::ffi::ImageShared;
 use crate::cxxbridge::ffi::NodeStatus;
 use crate::cxxbridge::ffi::NodeType;
+use crate::cxxbridge::ffi::PixelDataType;
+use crate::cxxbridge::ffi::Vector4f32;
+use crate::cxxbridge::ffi::Vector4i32;
 use crate::data::FrameValue;
 use crate::data::HashValue;
 use crate::data::Identifier;
 use crate::data::NodeComputeMode;
+use crate::data::COLOR_SPACE_NAME_LINEAR;
 use crate::hashutils::HashableF32;
 use crate::node::traits::Operation;
 use crate::node::traits::Validate;
 use crate::node::NodeImpl;
+use crate::ops::bake;
+use crate::ops::colorgrade;
 use crate::stream::StreamDataImpl;
 
 pub fn new(id: Identifier) -> NodeImpl {
@@ -102,6 +111,7 @@ pub struct GradeAttrs {
     pub clamp_black: i32,
     pub clamp_white: i32,
     pub premult: i32,
+    pub mix: f32,
 }
 
 impl hash::Hash for GradeAttrs {
@@ -110,50 +120,60 @@ impl hash::Hash for GradeAttrs {
         if self.enable == 0 {
             return;
         }
+
         self.process_r.hash(state);
         self.process_g.hash(state);
         self.process_b.hash(state);
         self.process_a.hash(state);
 
-        HashableF32::new(self.black_point_r).hash(state);
-        HashableF32::new(self.black_point_g).hash(state);
-        HashableF32::new(self.black_point_b).hash(state);
-        HashableF32::new(self.black_point_a).hash(state);
+        if self.process_r != 0 {
+            HashableF32::new(self.black_point_r).hash(state);
+            HashableF32::new(self.white_point_r).hash(state);
+            HashableF32::new(self.lift_r).hash(state);
+            HashableF32::new(self.gain_r).hash(state);
+            HashableF32::new(self.multiply_r).hash(state);
+            HashableF32::new(self.offset_r).hash(state);
+            HashableF32::new(self.gamma_r).hash(state);
+        }
+        if self.process_g != 0 {
+            HashableF32::new(self.black_point_g).hash(state);
+            HashableF32::new(self.white_point_g).hash(state);
+            HashableF32::new(self.lift_g).hash(state);
+            HashableF32::new(self.gain_g).hash(state);
+            HashableF32::new(self.multiply_g).hash(state);
+            HashableF32::new(self.offset_g).hash(state);
+            HashableF32::new(self.gamma_g).hash(state);
+        }
+        if self.process_b != 0 {
+            HashableF32::new(self.black_point_b).hash(state);
+            HashableF32::new(self.white_point_b).hash(state);
+            HashableF32::new(self.lift_b).hash(state);
+            HashableF32::new(self.gain_b).hash(state);
+            HashableF32::new(self.multiply_b).hash(state);
+            HashableF32::new(self.offset_b).hash(state);
+            HashableF32::new(self.gamma_b).hash(state);
+        }
+        if self.process_a != 0 {
+            HashableF32::new(self.black_point_a).hash(state);
+            HashableF32::new(self.white_point_a).hash(state);
+            HashableF32::new(self.lift_a).hash(state);
+            HashableF32::new(self.gain_a).hash(state);
+            HashableF32::new(self.multiply_a).hash(state);
+            HashableF32::new(self.offset_a).hash(state);
+            HashableF32::new(self.gamma_a).hash(state);
+        }
 
-        HashableF32::new(self.white_point_r).hash(state);
-        HashableF32::new(self.white_point_g).hash(state);
-        HashableF32::new(self.white_point_b).hash(state);
-        HashableF32::new(self.white_point_a).hash(state);
-
-        HashableF32::new(self.lift_r).hash(state);
-        HashableF32::new(self.lift_g).hash(state);
-        HashableF32::new(self.lift_b).hash(state);
-        HashableF32::new(self.lift_a).hash(state);
-
-        HashableF32::new(self.gain_r).hash(state);
-        HashableF32::new(self.gain_g).hash(state);
-        HashableF32::new(self.gain_b).hash(state);
-        HashableF32::new(self.gain_a).hash(state);
-
-        HashableF32::new(self.multiply_r).hash(state);
-        HashableF32::new(self.multiply_g).hash(state);
-        HashableF32::new(self.multiply_b).hash(state);
-        HashableF32::new(self.multiply_a).hash(state);
-
-        HashableF32::new(self.offset_r).hash(state);
-        HashableF32::new(self.offset_g).hash(state);
-        HashableF32::new(self.offset_b).hash(state);
-        HashableF32::new(self.offset_a).hash(state);
-
-        HashableF32::new(self.gamma_r).hash(state);
-        HashableF32::new(self.gamma_g).hash(state);
-        HashableF32::new(self.gamma_b).hash(state);
-        HashableF32::new(self.gamma_a).hash(state);
-
-        self.reverse.hash(state);
-        self.clamp_black.hash(state);
-        self.clamp_white.hash(state);
-        self.premult.hash(state);
+        if (self.process_r != 0)
+            || (self.process_g != 0)
+            || (self.process_b != 0)
+            || (self.process_a != 0)
+        {
+            self.reverse.hash(state);
+            self.clamp_black.hash(state);
+            self.clamp_white.hash(state);
+            self.premult.hash(state);
+            HashableF32::new(self.mix).hash(state);
+        }
     }
 }
 
@@ -171,9 +191,8 @@ impl GradeAttrs {
             process_r: 1,
             process_g: 1,
             process_b: 1,
-            // TODO: Disable process_a by default. Do not adjust alpha
-            // channel.
-            process_a: 1,
+            // Do not adjust alpha channel by default.
+            process_a: 0,
 
             black_point_r: 0.0,
             black_point_g: 0.0,
@@ -214,7 +233,75 @@ impl GradeAttrs {
             clamp_black: 1,
             clamp_white: 0,
             premult: 0,
+
+            mix: 1.0,
         }
+    }
+}
+
+fn do_image_process(
+    mut stream_data: &mut StreamDataImpl,
+    process: Vector4i32,
+    black_point: Vector4f32,
+    white_point: Vector4f32,
+    lift: Vector4f32,
+    gain: Vector4f32,
+    multiply: Vector4f32,
+    offset: Vector4f32,
+    gamma: Vector4f32,
+    reverse: bool,
+    clamp_black: bool,
+    clamp_white: bool,
+    premult: bool,
+    mix: f32,
+) -> ImageShared {
+    let mut pixel_block = stream_data.clone_pixel_block();
+    let mut image_spec = stream_data.clone_image_spec();
+
+    let display_window = stream_data.display_window();
+    let mut data_window = stream_data.data_window();
+    let from_color_space = &image_spec.color_space();
+    let to_color_space = COLOR_SPACE_NAME_LINEAR.to_string();
+
+    let bake_option = BakeOption::ColorSpaceAndGrade;
+    let bake_pixel_data_type = PixelDataType::Float32;
+    bake::do_process(
+        bake_option,
+        &mut pixel_block,
+        display_window,
+        &mut data_window,
+        &mut image_spec,
+        &mut stream_data,
+        &from_color_space,
+        &to_color_space,
+        bake_pixel_data_type,
+    );
+
+    let num_channels = pixel_block.num_channels();
+    let pixels = &mut pixel_block.as_slice_mut();
+    colorgrade::apply_color_grade_inplace(
+        pixels,
+        num_channels,
+        process,
+        black_point,
+        white_point,
+        lift,
+        gain,
+        multiply,
+        offset,
+        gamma,
+        reverse,
+        clamp_black,
+        clamp_white,
+        premult,
+        mix,
+    );
+
+    ImageShared {
+        pixel_block: Box::new(pixel_block),
+        display_window,
+        data_window,
+        spec: image_spec,
     }
 }
 
@@ -223,12 +310,12 @@ impl Operation for GradeOperation {
         &mut self,
         _frame: FrameValue,
         _node_type_id: u8,
-        _attr_block: &Box<dyn AttrBlock>,
+        attr_block: &Box<dyn AttrBlock>,
         hash_value: HashValue,
         node_compute_mode: NodeComputeMode,
         inputs: &Vec<Rc<StreamDataImpl>>,
         output: &mut Rc<StreamDataImpl>,
-        _cache: &mut Box<CacheImpl>,
+        cache: &mut Box<CacheImpl>,
     ) -> NodeStatus {
         debug!("GradeOperation.compute()");
         debug!("GradeOperation NodeComputeMode={:#?}", node_compute_mode);
@@ -236,17 +323,135 @@ impl Operation for GradeOperation {
         // debug!("Inputs: {:?}", inputs);
         // debug!("Output: {:?}", output);
 
-        match inputs.len() {
-            0 => NodeStatus::Error,
-            _ => {
-                // Set Output data
-                let input = &inputs[0].clone();
-                let mut copy = (**input).clone();
-                copy.set_hash(hash_value);
-                *output = std::rc::Rc::new(copy);
-                NodeStatus::Valid
+        let mut status = NodeStatus::Valid;
+        let mut stream_data = match inputs.len() {
+            0 => {
+                // No input given, return an empty default stream.
+                status = NodeStatus::Warning;
+                StreamDataImpl::new()
             }
+            _ => {
+                let input = &inputs[0].clone();
+                (**input).clone()
+            }
+        };
+
+        let enable = attr_block.get_attr_i32("enable");
+        let process = Vector4i32::new(
+            attr_block.get_attr_i32("process_r"),
+            attr_block.get_attr_i32("process_g"),
+            attr_block.get_attr_i32("process_b"),
+            attr_block.get_attr_i32("process_a"),
+        );
+        let has_work_to_do = enable == 1
+            && ((process.x != 0) || (process.y != 0) || (process.z != 0) || (process.w != 0));
+
+        if has_work_to_do == false {
+            // Set Output data
+            *output = std::rc::Rc::new(stream_data);
+            return status;
         }
+
+        // Attributes that change are non-linear.
+        let gamma = Vector4f32::new(
+            attr_block.get_attr_f32("gamma_r"),
+            attr_block.get_attr_f32("gamma_g"),
+            attr_block.get_attr_f32("gamma_b"),
+            attr_block.get_attr_f32("gamma_a"),
+        );
+        let reverse = attr_block.get_attr_i32("reverse") != 0;
+        let clamp_black = attr_block.get_attr_i32("clamp_black") != 0;
+        let clamp_white = attr_block.get_attr_i32("clamp_white") != 0;
+        let premult = attr_block.get_attr_i32("premult") != 0;
+        let mix = attr_block.get_attr_f32("mix");
+
+        // Attributes making linear changes to the colour.
+        let black_point = Vector4f32::new(
+            attr_block.get_attr_f32("black_point_r"),
+            attr_block.get_attr_f32("black_point_g"),
+            attr_block.get_attr_f32("black_point_b"),
+            attr_block.get_attr_f32("black_point_a"),
+        );
+        let white_point = Vector4f32::new(
+            attr_block.get_attr_f32("white_point_r"),
+            attr_block.get_attr_f32("white_point_g"),
+            attr_block.get_attr_f32("white_point_b"),
+            attr_block.get_attr_f32("white_point_a"),
+        );
+        let lift = Vector4f32::new(
+            attr_block.get_attr_f32("lift_r"),
+            attr_block.get_attr_f32("lift_g"),
+            attr_block.get_attr_f32("lift_b"),
+            attr_block.get_attr_f32("lift_a"),
+        );
+        let gain = Vector4f32::new(
+            attr_block.get_attr_f32("gain_r"),
+            attr_block.get_attr_f32("gain_g"),
+            attr_block.get_attr_f32("gain_b"),
+            attr_block.get_attr_f32("gain_a"),
+        );
+        let multiply = Vector4f32::new(
+            attr_block.get_attr_f32("multiply_r"),
+            attr_block.get_attr_f32("multiply_g"),
+            attr_block.get_attr_f32("multiply_b"),
+            attr_block.get_attr_f32("multiply_a"),
+        );
+        let offset = Vector4f32::new(
+            attr_block.get_attr_f32("offset_r"),
+            attr_block.get_attr_f32("offset_g"),
+            attr_block.get_attr_f32("offset_b"),
+            attr_block.get_attr_f32("offset_a"),
+        );
+
+        // Cache the results of the merge. If the input values do not
+        // change we can easily look up the pixels again.
+        let (pixel_block, data_window, display_window) = match cache.get(&hash_value) {
+            Some(cached_img) => {
+                debug!("Cache Hit");
+                (
+                    cached_img.pixel_block.clone(),
+                    cached_img.data_window,
+                    cached_img.display_window,
+                )
+            }
+            _ => {
+                debug!("Cache Miss");
+                let img = do_image_process(
+                    &mut stream_data,
+                    process,
+                    black_point,
+                    white_point,
+                    lift,
+                    gain,
+                    multiply,
+                    offset,
+                    gamma,
+                    reverse,
+                    clamp_black,
+                    clamp_white,
+                    premult,
+                    mix,
+                );
+
+                let pixel_block_rc = Rc::new(*img.pixel_block);
+                let cached_img = CachedImage {
+                    pixel_block: pixel_block_rc.clone(),
+                    spec: img.spec,
+                    data_window: img.data_window,
+                    display_window: img.display_window,
+                };
+                cache.insert(hash_value, cached_img);
+                (pixel_block_rc.clone(), img.data_window, img.display_window)
+            }
+        };
+
+        stream_data.set_data_window(data_window);
+        stream_data.set_display_window(display_window);
+        stream_data.set_hash(hash_value);
+        stream_data.set_pixel_block(pixel_block);
+
+        *output = std::rc::Rc::new(stream_data);
+        status
     }
 }
 
@@ -303,6 +508,7 @@ impl AttrBlock for GradeAttrs {
             "clamp_black" => AttrState::Exists,
             "clamp_white" => AttrState::Exists,
             "premult" => AttrState::Exists,
+            "mix" => AttrState::Exists,
 
             _ => AttrState::Missing,
         }
@@ -389,6 +595,8 @@ impl AttrBlock for GradeAttrs {
             "gamma_b" => self.gamma_b,
             "gamma_a" => self.gamma_a,
 
+            "mix" => self.mix,
+
             _ => 0.0,
         }
     }
@@ -429,6 +637,8 @@ impl AttrBlock for GradeAttrs {
             "gamma_g" => self.gamma_g = value,
             "gamma_b" => self.gamma_b = value,
             "gamma_a" => self.gamma_a = value,
+
+            "mix" => self.mix = value,
 
             _ => (),
         }

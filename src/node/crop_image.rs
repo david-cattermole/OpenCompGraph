@@ -113,19 +113,23 @@ impl Operation for CropImageOperation {
         // debug!("Inputs: {:?}", inputs);
         // debug!("Output: {:?}", output);
 
-        let input = &inputs[0].clone();
-        let mut copy = (**input).clone();
-        copy.set_hash(hash_value);
+        if inputs.len() == 0 {
+            // No input given, return an empty default stream.
+            let stream_data = StreamDataImpl::new();
+            *output = std::rc::Rc::new(stream_data);
+            return NodeStatus::Warning;
+        }
 
         let enable = attr_block.get_attr_i32("enable");
         if enable != 1 {
-            *output = std::rc::Rc::new(copy);
-            return NodeStatus::Warning;
+            let stream_data = StreamDataImpl::new();
+            *output = std::rc::Rc::new(stream_data);
+            return NodeStatus::Valid;
         }
-        if inputs.len() != 1 {
-            *output = std::rc::Rc::new(copy);
-            return NodeStatus::Error;
-        }
+
+        let input = &inputs[0].clone();
+        let mut copy = (**input).clone();
+        copy.set_hash(hash_value);
 
         // Cache the results of the crop. If the input values do not
         // change we can easily look up the pixels again.

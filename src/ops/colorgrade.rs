@@ -172,13 +172,14 @@ pub fn apply_color_grade_inplace(
     clamp_black: bool,
     clamp_white: bool,
     premult: bool,
+    mix: f32,
 ) {
     let start = Instant::now();
     let pixel_mask = Vector4f32::new(
-        process.x as f32,
-        process.y as f32,
-        process.z as f32,
-        process.w as f32,
+        process.x as f32 * mix,
+        process.y as f32 * mix,
+        process.z as f32 * mix,
+        process.w as f32 * mix,
     );
 
     let pixel_count = pixels.len() / (num_channels as usize);

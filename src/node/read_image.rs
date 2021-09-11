@@ -112,8 +112,7 @@ impl Operation for ReadImageOperation {
         if node_compute_mode.contains(NodeComputeMode::PIXEL) {
             let enable = attr_block.get_attr_i32("enable");
             if enable != 1 {
-                let mut stream_data = StreamDataImpl::new();
-                stream_data.set_hash(hash_value);
+                let stream_data = StreamDataImpl::new();
                 *output = std::rc::Rc::new(stream_data);
                 return NodeStatus::Warning;
             }
@@ -126,7 +125,7 @@ impl Operation for ReadImageOperation {
                 Err(_) => {
                     // The path could not be canonicalised, probably
                     // meaning the path does not exist.
-                    let mut stream_data = StreamDataImpl::new();
+                    let stream_data = StreamDataImpl::new();
                     *output = std::rc::Rc::new(stream_data);
                     return NodeStatus::Warning;
                 }

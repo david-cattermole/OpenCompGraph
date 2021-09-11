@@ -127,41 +127,46 @@ impl Operation for TransformOperation {
         // debug!("Inputs: {:?}", inputs);
         // debug!("Output: {:?}", output);
 
-        match inputs.len() {
-            0 => NodeStatus::Error,
+        let mut status = NodeStatus::Valid;
+        let mut stream_data = match inputs.len() {
+            0 => {
+                // No input given, return an empty default stream.
+                status = NodeStatus::Warning;
+                StreamDataImpl::new()
+            }
             _ => {
                 let input = &inputs[0].clone();
-                let mut copy = (**input).clone();
-
-                let enable = attr_block.get_attr_i32("enable");
-                if enable == 1 {
-                    let mut deformer = DeformerTransform::default();
-
-                    deformer.set_attr_i32("invert", attr_block.get_attr_i32("invert"));
-                    deformer.set_attr_f32("translate_x", attr_block.get_attr_f32("translate_x"));
-                    deformer.set_attr_f32("translate_y", attr_block.get_attr_f32("translate_y"));
-                    deformer.set_attr_f32("rotate", attr_block.get_attr_f32("rotate"));
-                    deformer.set_attr_f32(
-                        "rotate_center_x",
-                        attr_block.get_attr_f32("rotate_center_x"),
-                    );
-                    deformer.set_attr_f32(
-                        "rotate_center_y",
-                        attr_block.get_attr_f32("rotate_center_y"),
-                    );
-                    deformer.set_attr_f32("scale_x", attr_block.get_attr_f32("scale_x"));
-                    deformer.set_attr_f32("scale_y", attr_block.get_attr_f32("scale_y"));
-
-                    deformer.commit_data().unwrap();
-                    copy.push_deformer(Box::new(deformer));
-                }
-
-                // Set Output data
-                copy.set_hash(hash_value);
-                *output = Rc::new(copy);
-                NodeStatus::Valid
+                (**input).clone()
             }
+        };
+
+        let enable = attr_block.get_attr_i32("enable");
+        if enable == 1 {
+            let mut deformer = DeformerTransform::default();
+
+            deformer.set_attr_i32("invert", attr_block.get_attr_i32("invert"));
+            deformer.set_attr_f32("translate_x", attr_block.get_attr_f32("translate_x"));
+            deformer.set_attr_f32("translate_y", attr_block.get_attr_f32("translate_y"));
+            deformer.set_attr_f32("rotate", attr_block.get_attr_f32("rotate"));
+            deformer.set_attr_f32(
+                "rotate_center_x",
+                attr_block.get_attr_f32("rotate_center_x"),
+            );
+            deformer.set_attr_f32(
+                "rotate_center_y",
+                attr_block.get_attr_f32("rotate_center_y"),
+            );
+            deformer.set_attr_f32("scale_x", attr_block.get_attr_f32("scale_x"));
+            deformer.set_attr_f32("scale_y", attr_block.get_attr_f32("scale_y"));
+
+            deformer.commit_data().unwrap();
+            stream_data.push_deformer(Box::new(deformer));
         }
+
+        // Set Output data
+        stream_data.set_hash(hash_value);
+        *output = Rc::new(stream_data);
+        status
     }
 }
 

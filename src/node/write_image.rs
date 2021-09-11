@@ -125,13 +125,20 @@ impl Operation for WriteImageOperation {
         // debug!("Inputs: {:?}", inputs);
         // debug!("Output: {:?}", output);
 
-        let enable = attr_block.get_attr_i32("enable");
-        if enable != 1 {
+        let enable = attr_block.get_attr_i32("enable") != 0;
+        if enable == false {
+            let stream_data = StreamDataImpl::new();
+            *output = std::rc::Rc::new(stream_data);
             return NodeStatus::Valid;
         }
 
         match inputs.len() {
-            0 => NodeStatus::Error,
+            0 => {
+                // No input given, return an empty default stream.
+                let stream_data = StreamDataImpl::new();
+                *output = std::rc::Rc::new(stream_data);
+                NodeStatus::Warning
+            }
             _ => {
                 let input = &inputs[0].clone();
 

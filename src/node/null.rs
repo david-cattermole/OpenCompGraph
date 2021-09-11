@@ -85,7 +85,12 @@ impl Operation for NullOperation {
         // debug!("Output: {:?}", output);
 
         match inputs.len() {
-            0 => NodeStatus::Error,
+            0 => {
+                // No input given, return an empty default stream.
+                let stream_data = StreamDataImpl::new();
+                *output = std::rc::Rc::new(stream_data);
+                NodeStatus::Warning
+            }
             _ => {
                 *output = inputs[0].clone();
                 NodeStatus::Valid
