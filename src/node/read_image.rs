@@ -127,7 +127,6 @@ impl Operation for ReadImageOperation {
                     // The path could not be canonicalised, probably
                     // meaning the path does not exist.
                     let mut stream_data = StreamDataImpl::new();
-                    stream_data.set_hash(hash_value);
                     *output = std::rc::Rc::new(stream_data);
                     return NodeStatus::Warning;
                 }
