@@ -654,6 +654,7 @@ pub mod ffi {
         fn set_node_attr_str(&mut self, node_id: u64, name: &str, value: &str);
 
         fn node_exists(&mut self, node_id: u64) -> bool;
+        fn disconnect_input(&mut self, dst_node_id: u64, input_num: u8);
         fn connect(&mut self, src_node_id: u64, dst_node_id: u64, input_num: u8);
         fn execute(
             &mut self,

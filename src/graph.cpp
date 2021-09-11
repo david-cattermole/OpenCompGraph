@@ -118,6 +118,11 @@ bool Graph::node_exists(const Node &node) noexcept {
     return this->inner.inner->node_exists(node_id);
 }
 
+void Graph::disconnect_input(const Node& dst_node, uint8_t input_num) noexcept {
+    auto dst_node_id = dst_node.get_id();
+    this->inner.inner->disconnect_input(dst_node_id, input_num);
+}
+
 void Graph::connect(const Node& src_node, const Node& dst_node, uint8_t input_num) noexcept {
     auto src_node_id = src_node.get_id();
     auto dst_node_id = dst_node.get_id();

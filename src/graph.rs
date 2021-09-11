@@ -257,6 +257,45 @@ impl GraphImpl {
         maybe_node_idx
     }
 
+    /// Disconnect the source node(s) connected to the destination
+    /// node (dst_node_id), with the input number (input_num).
+    ///
+    /// Ensures the destination node's input is empty and ready for a
+    /// new connection.
+    pub fn disconnect_input(&mut self, dst_node_id: Identifier, input_num: u8) {
+        debug!("Disconnect input node from {}:{}", dst_node_id, input_num);
+        let dst_node_idx = match self.find_node_index_from_id(dst_node_id) {
+            Some(value) => value,
+            None => {
+                warn!("Destination node id not found: id={}", dst_node_id);
+                return; // TODO: Return an error code?
+            }
+        };
+        let dst_index = petgraph::graph::NodeIndex::new(dst_node_idx);
+
+        // Check there is no other edge from src to dst, with
+        // the same input_num value.
+        let incoming_edges = self.graph.edges_directed(dst_index, Direction::Incoming);
+        let edges_existing: Vec<_> = incoming_edges
+            .into_iter()
+            .take_while(|x| *x.weight() == input_num)
+            .map(|x| (x.source(), x.target()))
+            .collect();
+
+        // Remove the existing edges first.
+        for (edge_src_index, edge_dst_index) in edges_existing {
+            if let Some(edge_index) = self.graph.find_edge(edge_src_index, edge_dst_index) {
+                debug!(
+                    "Remove edge: src_index={:#?} dst_index={:#?} edge_index={:#?}",
+                    edge_src_index, edge_dst_index, edge_index
+                );
+                self.graph.remove_edge(edge_index);
+                self.state = GraphState::Dirty;
+                ()
+            }
+        }
+    }
+
     /// Connect the source node (src_node_id) to destination node
     /// (dst_node_id), with the input number (input_num).
     ///
@@ -286,29 +325,10 @@ impl GraphImpl {
         let src_index = petgraph::graph::NodeIndex::new(src_node_idx);
         let dst_index = petgraph::graph::NodeIndex::new(dst_node_idx);
 
-        // Check there is no other edge from src to dst, with
-        // the same input_num value.
-        let incoming_edges = self.graph.edges_directed(dst_index, Direction::Incoming);
-        let edges_existing: Vec<_> = incoming_edges
-            .into_iter()
-            .take_while(|x| *x.weight() == input_num)
-            .map(|x| (x.source(), x.target()))
-            .collect();
+        self.disconnect_input(dst_node_id, input_num);
 
-        // Remove the existing edges first.
-        for (edge_src_index, edge_dst_index) in edges_existing {
-            if let Some(edge_index) = self.graph.find_edge(edge_src_index, edge_dst_index) {
-                debug!(
-                    "Remove edge: src_index={:#?} dst_index={:#?} edge_index={:#?}",
-                    edge_src_index, edge_dst_index, edge_index
-                );
-                self.graph.remove_edge(edge_index);
-                ()
-            }
-        }
-
-        self.state = GraphState::Dirty;
         self.graph.update_edge(src_index, dst_index, input_num);
+        self.state = GraphState::Dirty;
     }
 
     // Get the stack of indices to be computed, going upstream

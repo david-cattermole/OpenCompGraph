@@ -83,6 +83,9 @@ public:
     bool node_exists(const Node& node) noexcept;
 
     OCG_API_EXPORT
+    void disconnect_input(const Node& dst_node, uint8_t input_num) noexcept;
+
+    OCG_API_EXPORT
     void connect(const Node& src_node, const Node& dst_node, uint8_t input_num) noexcept;
 
     OCG_API_EXPORT
