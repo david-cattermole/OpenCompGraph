@@ -183,7 +183,12 @@ impl Operation for ViewerOperation {
         }
 
         match inputs.len() {
-            0 => NodeStatus::Error,
+            0 => {
+                // No input given, return an empty default stream.
+                let mut stream_data = StreamDataImpl::new();
+                *output = std::rc::Rc::new(stream_data);
+                NodeStatus::Warning
+            }
             _ => {
                 let input = &inputs[0].clone();
                 let mut copy = (**input).clone();
