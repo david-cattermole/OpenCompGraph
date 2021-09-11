@@ -134,7 +134,7 @@ ExecuteStatus Graph::execute(const Node &node,
                              std::shared_ptr<Cache> &cache) noexcept {
     std::vector<double> float_frames(frames.size());
     for (uint32_t i = 0; i < frames.size(); ++i) {
-        float_frames.push_back(frames[i]);
+        float_frames.push_back(static_cast<double>(frames[i]));
     }
     return Graph::execute(
         node,
