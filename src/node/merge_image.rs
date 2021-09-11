@@ -88,13 +88,12 @@ impl MergeImageAttrs {
 }
 
 fn do_image_process(
-    inputs: &Vec<Rc<StreamDataImpl>>,
+    mut stream_data_a: &mut StreamDataImpl,
+    mut stream_data_b: &mut StreamDataImpl,
     merge_mode: MergeImageMode,
     mix: f32,
 ) -> ImageShared {
-    debug_assert!(inputs.len() == 2);
-    let input_a = &inputs[0].clone();
-    let src_a_pixel_block = input_a.pixel_block();
+    let src_a_pixel_block = stream_data_a.pixel_block();
     debug!(
         "Merge Source A: {} x {} : {}",
         src_a_pixel_block.width(),
@@ -102,8 +101,7 @@ fn do_image_process(
         src_a_pixel_block.num_channels()
     );
 
-    let input_b = &inputs[1].clone();
-    let src_b_pixel_block = input_b.pixel_block();
+    let src_b_pixel_block = stream_data_b.pixel_block();
     debug!(
         "Merge Source B: {} x {} : {}",
         src_b_pixel_block.width(),
@@ -111,13 +109,11 @@ fn do_image_process(
         src_b_pixel_block.num_channels()
     );
 
-    // Copy input data
-    let mut copy_a = &mut (**input_a).clone();
-    let mut copy_b = &mut (**input_b).clone();
-    let mut pixel_block_a = copy_a.clone_pixel_block();
-    let mut pixel_block_b = copy_b.clone_pixel_block();
-    let mut image_spec_a = copy_a.clone_image_spec();
-    let mut image_spec_b = copy_b.clone_image_spec();
+    // Input data
+    let mut pixel_block_a = stream_data_a.clone_pixel_block();
+    let mut pixel_block_b = stream_data_b.clone_pixel_block();
+    let mut image_spec_a = stream_data_a.clone_image_spec();
+    let mut image_spec_b = stream_data_b.clone_image_spec();
 
     let bake_option = BakeOption::All;
     let from_color_space_a = &image_spec_a.color_space();
@@ -125,15 +121,15 @@ fn do_image_process(
     let to_color_space = COLOR_SPACE_NAME_LINEAR.to_string();
 
     // Stream A
-    let display_window_a = copy_a.display_window();
-    let mut data_window_a = copy_a.data_window();
+    let display_window_a = stream_data_a.display_window();
+    let mut data_window_a = stream_data_a.data_window();
     bake::do_process(
         bake_option,
         &mut pixel_block_a,
         display_window_a,
         &mut data_window_a,
         &mut image_spec_a,
-        &mut copy_a,
+        &mut stream_data_a,
         &from_color_space_a,
         &to_color_space,
         PixelDataType::Float32,
@@ -147,15 +143,15 @@ fn do_image_process(
     };
 
     // Stream B
-    let display_window_b = copy_b.display_window();
-    let mut data_window_b = copy_b.data_window();
+    let display_window_b = stream_data_b.display_window();
+    let mut data_window_b = stream_data_b.data_window();
     bake::do_process(
         bake_option,
         &mut pixel_block_b,
         display_window_b,
         &mut data_window_b,
         &mut image_spec_b,
-        &mut copy_b,
+        &mut stream_data_b,
         &from_color_space_b,
         &to_color_space,
         PixelDataType::Float32,
@@ -163,8 +159,8 @@ fn do_image_process(
     let pixel_block_b_box = Box::new(pixel_block_b);
     let image_b = ImageShared {
         pixel_block: pixel_block_b_box,
-        display_window: input_b.display_window(),
-        data_window: input_b.data_window(),
+        display_window: stream_data_b.display_window(),
+        data_window: stream_data_b.data_window(),
         spec: image_spec_b,
     };
 
@@ -205,11 +201,32 @@ impl Operation for MergeImageOperation {
             *output = std::rc::Rc::new(stream_data);
             return NodeStatus::Warning;
         }
-        if inputs.len() != 2 {
+
+        let mut status = NodeStatus::Valid;
+        if inputs.len() == 0 {
             let stream_data = StreamDataImpl::new();
             *output = std::rc::Rc::new(stream_data);
             return NodeStatus::Warning;
         }
+
+        let input_a = &inputs[0].clone();
+        let mut stream_data_a = (**input_a).clone();
+
+        let mut stream_data_b = match inputs.len() {
+            0 => {
+                panic!("The node has no inputs, something has gone very wrong.");
+            }
+            1 => {
+                // No input given for second, return an empty default
+                // stream.
+                status = NodeStatus::Warning;
+                StreamDataImpl::new()
+            }
+            _ => {
+                let input_b = &inputs[1].clone();
+                (**input_b).clone()
+            }
+        };
 
         // Cache the results of the merge. If the input values do not
         // change we can easily look up the pixels again.
@@ -226,7 +243,7 @@ impl Operation for MergeImageOperation {
                 debug!("Cache Miss");
                 let merge_mode = MergeImageMode::from(attr_block.get_attr_i32("mode"));
                 let mix = attr_block.get_attr_f32("mix");
-                let img = do_image_process(inputs, merge_mode, mix);
+                let img = do_image_process(&mut stream_data_a, &mut stream_data_b, merge_mode, mix);
 
                 let pixel_block_rc = Rc::new(*img.pixel_block);
                 let cached_img = CachedImage {
@@ -274,7 +291,7 @@ impl Operation for MergeImageOperation {
         stream_data.set_pixel_block(pixel_block);
 
         *output = std::rc::Rc::new(stream_data);
-        NodeStatus::Valid
+        status
     }
 }
 
