@@ -46,7 +46,8 @@ pub struct DeformerTransform {
     pub rotate_center_y: f32,
     pub scale_x: f32,
     pub scale_y: f32,
-    // TODO: Add pivot point
+    pub pivot_x: f32,
+    pub pivot_y: f32,
 }
 
 impl hash::Hash for DeformerTransform {
@@ -60,6 +61,8 @@ impl hash::Hash for DeformerTransform {
         HashableF32::new(self.rotate_center_y).hash(state);
         HashableF32::new(self.scale_x).hash(state);
         HashableF32::new(self.scale_y).hash(state);
+        HashableF32::new(self.pivot_x).hash(state);
+        HashableF32::new(self.pivot_y).hash(state);
     }
 }
 
@@ -75,6 +78,8 @@ impl Default for DeformerTransform {
             rotate_center_y: 0.0,
             scale_x: 1.0,
             scale_y: 1.0,
+            pivot_x: 0.5,
+            pivot_y: 0.5,
         }
     }
 }
@@ -119,9 +124,12 @@ fn _apply(
         }
     }
 
-    let v = na::Point4::new(xd, yd, 0.0, 1.0);
+    let px = obj.pivot_x;
+    let py = obj.pivot_y;
+
+    let v = na::Point4::new(xd - px, yd - py, 0.0, 1.0);
     let r = out_matrix * v;
-    (r.x, r.y)
+    (r.x + px, r.y + py)
 }
 
 impl Deformer for DeformerTransform {
@@ -173,6 +181,8 @@ impl AttrBlock for DeformerTransform {
             "rotate_center_y" => AttrState::Exists,
             "scale_x" => AttrState::Exists,
             "scale_y" => AttrState::Exists,
+            "pivot_x" => AttrState::Exists,
+            "pivot_y" => AttrState::Exists,
             _ => AttrState::Missing,
         }
     }
@@ -210,6 +220,8 @@ impl AttrBlock for DeformerTransform {
             "rotate_center_y" => self.rotate_center_y,
             "scale_x" => self.scale_x,
             "scale_y" => self.scale_y,
+            "pivot_x" => self.pivot_x,
+            "pivot_y" => self.pivot_y,
             _ => 0.0,
         }
     }
@@ -223,6 +235,8 @@ impl AttrBlock for DeformerTransform {
             "rotate_center_y" => self.rotate_center_y = value,
             "scale_x" => self.scale_x = value,
             "scale_y" => self.scale_y = value,
+            "pivot_x" => self.pivot_x = value,
+            "pivot_y" => self.pivot_y = value,
             _ => (),
         }
     }

@@ -67,7 +67,8 @@ pub struct TransformAttrs {
     pub rotate_center_y: f32,
     pub scale_x: f32,
     pub scale_y: f32,
-    // TODO: Add pivot point.
+    pub pivot_x: f32,
+    pub pivot_y: f32,
 }
 
 impl hash::Hash for TransformAttrs {
@@ -81,6 +82,8 @@ impl hash::Hash for TransformAttrs {
         HashableF32::new(self.rotate_center_y).hash(state);
         HashableF32::new(self.scale_x).hash(state);
         HashableF32::new(self.scale_y).hash(state);
+        HashableF32::new(self.pivot_x).hash(state);
+        HashableF32::new(self.pivot_y).hash(state);
     }
 }
 
@@ -102,6 +105,8 @@ impl TransformAttrs {
             rotate_center_y: 0.0,
             scale_x: 1.0,
             scale_y: 1.0,
+            pivot_x: 0.5,
+            pivot_y: 0.5,
         }
     }
 }
@@ -158,6 +163,8 @@ impl Operation for TransformOperation {
             );
             deformer.set_attr_f32("scale_x", attr_block.get_attr_f32("scale_x"));
             deformer.set_attr_f32("scale_y", attr_block.get_attr_f32("scale_y"));
+            deformer.set_attr_f32("pivot_x", attr_block.get_attr_f32("pivot_x"));
+            deformer.set_attr_f32("pivot_y", attr_block.get_attr_f32("pivot_y"));
 
             deformer.commit_data().unwrap();
             stream_data.push_deformer(Box::new(deformer));
@@ -186,6 +193,8 @@ impl AttrBlock for TransformAttrs {
             "rotate_center_y" => AttrState::Exists,
             "scale_x" => AttrState::Exists,
             "scale_y" => AttrState::Exists,
+            "pivot_x" => AttrState::Exists,
+            "pivot_y" => AttrState::Exists,
             _ => AttrState::Missing,
         }
     }
@@ -223,6 +232,8 @@ impl AttrBlock for TransformAttrs {
             "rotate_center_y" => self.rotate_center_y,
             "scale_x" => self.scale_x,
             "scale_y" => self.scale_y,
+            "pivot_x" => self.pivot_x,
+            "pivot_y" => self.pivot_y,
             _ => 0.0,
         }
     }
@@ -236,6 +247,8 @@ impl AttrBlock for TransformAttrs {
             "rotate_center_y" => self.rotate_center_y = value,
             "scale_x" => self.scale_x = value,
             "scale_y" => self.scale_y = value,
+            "pivot_x" => self.pivot_x = value,
+            "pivot_y" => self.pivot_y = value,
             _ => (),
         }
     }
