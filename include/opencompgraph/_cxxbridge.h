@@ -2,6 +2,7 @@
 #include "rust/cxx.h"
 #include "opencompgraph/symbol_export.h"
 #include "opencompgraph/internal/colorspace.h"
+#include "opencompgraph/internal/imageresample.h"
 #include "opencompgraph/internal/ldpk_utils.h"
 #include "opencompgraph/internal/imageio.h"
 #include "opencompgraph/internal/systemmemory.h"
@@ -268,6 +269,7 @@ enum class NodeType : ::std::uint8_t {
   kViewer = 8,
   kTransform = 5,
   kCropImage = 7,
+  kResampleImage = 9,
   kMergeImage = 6,
   kGrade = 3,
   kLensDistort = 4,

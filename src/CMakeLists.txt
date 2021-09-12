@@ -55,6 +55,7 @@ set(opencompgraph_source_files
   ${CMAKE_CURRENT_SOURCE_DIR}/cache.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/imageio.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/deformer/ldpk_utils.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/ops/imageresample.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/oiio_utils.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/node.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/graph.cpp

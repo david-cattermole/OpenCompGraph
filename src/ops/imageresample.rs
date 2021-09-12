@@ -19,10 +19,21 @@
  *
  */
 
-pub mod bake;
-pub mod colorgrade;
-pub mod imagecrop;
-pub mod imagemerge;
-pub mod imageresample;
-pub mod pixelremap;
-pub mod xformcolor;
+use log::debug;
+use std::time::Instant;
+
+use crate::cxxbridge::ffi::oiio_image_resample;
+use crate::cxxbridge::ffi::ImageShared;
+
+pub fn image_resample(
+    src_image: &mut ImageShared,
+    dst_image: &mut ImageShared,
+    factor_num: i32,
+    interpolate: bool,
+) -> bool {
+    let start = Instant::now();
+    let ok = oiio_image_resample(src_image, dst_image, factor_num, interpolate);
+    let duration = start.elapsed();
+    debug!("Total time: {:?}", duration);
+    ok
+}

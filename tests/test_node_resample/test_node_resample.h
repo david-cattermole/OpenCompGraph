@@ -19,10 +19,7 @@
  *
  */
 
-pub mod bake;
-pub mod colorgrade;
-pub mod imagecrop;
-pub mod imagemerge;
-pub mod imageresample;
-pub mod pixelremap;
-pub mod xformcolor;
+#include <opencompgraph.h>
+
+int test_node_resample(const bool debug_print,
+                       std::shared_ptr<open_comp_graph::Cache> cache);

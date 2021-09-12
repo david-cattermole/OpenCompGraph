@@ -25,6 +25,7 @@
 
 #include <opencompgraph/_cxxbridge.h>
 #include <OpenImageIO/typedesc.h>
+#include <OpenImageIO/imageio.h>
 
 namespace open_comp_graph {
 namespace internal {
@@ -34,6 +35,34 @@ PixelDataType oiio_format_to_ocg_format(OIIO::TypeDesc oiio_type_desc);
 
 // Not exported to the API.
 OIIO::TypeDesc ocg_format_to_oiio_format(PixelDataType ocg_pixel_data_type);
+
+// Not exported to the API.
+bool oiio_construct_spec(
+        int data_window_min_x,
+        int data_window_min_y,
+        int data_width,
+        int data_height,
+        int display_window_min_x,
+        int display_window_min_y,
+        int display_window_max_x,
+        int display_window_max_y,
+        int num_channels,
+        const PixelDataType pixel_data_type,
+        OIIO::ImageSpec &spec);
+
+// Not exported to the API.
+bool oiio_construct_spec(
+    int data_width,
+    int data_height,
+    int num_channels,
+    const PixelDataType pixel_data_type,
+    OIIO::ImageSpec &spec);
+
+// Not exported to the API.
+bool oiio_allocate_image(
+    OIIO::ImageSpec &spec,
+    ImageShared &image);
+
 
 } // namespace internal
 } // namespace open_comp_graph

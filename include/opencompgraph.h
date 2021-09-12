@@ -25,6 +25,7 @@
 #include <rust/cxx.h>
 #include <opencompgraph/_cxxbridge.h>
 #include <opencompgraph/internal/colorspace.h>
+#include <opencompgraph/internal/imageresample.h>
 #include <opencompgraph/internal/debug.h>
 #include <opencompgraph/internal/ldpk_utils.h>
 #include <opencompgraph/internal/imageio.h>

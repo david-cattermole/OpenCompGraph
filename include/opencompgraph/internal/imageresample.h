@@ -19,10 +19,29 @@
  *
  */
 
-pub mod bake;
-pub mod colorgrade;
-pub mod imagecrop;
-pub mod imagemerge;
-pub mod imageresample;
-pub mod pixelremap;
-pub mod xformcolor;
+#ifndef OPENCOMPGRAPH_IMAGE_RESAMPLE_H
+#define OPENCOMPGRAPH_IMAGE_RESAMPLE_H
+
+#include <memory>
+
+#include <rust/cxx.h>
+#include <opencompgraph/_cxxbridge.h>
+#include "opencompgraph/symbol_export.h"
+
+namespace open_comp_graph {
+namespace internal {
+
+// Forward declare.
+struct ImageShared;
+
+OCG_API_EXPORT
+bool oiio_image_resample(
+        ImageShared &src_image,
+        ImageShared &dst_image,
+        int factor_num,
+        bool interpolate);
+
+} // namespace internal
+} // namespace open_comp_graph
+
+#endif // OPENCOMPGRAPH_IMAGE_RESAMPLE_H

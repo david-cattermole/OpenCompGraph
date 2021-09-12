@@ -37,6 +37,7 @@
 #include "test_node_imageio/test_node_imageio_tiff.h"
 #include "test_node_lens/test_node_lens.h"
 #include "test_node_transform/test_node_transform.h"
+#include "test_node_resample/test_node_resample.h"
 #include "test_node_grade/test_node_grade.h"
 #include "test_node_grade/test_node_grade_concat.h"
 #include "test_node_merge/test_node_merge.h"
@@ -83,6 +84,7 @@ int main() {
             test_node_imageio_png(debug_print, cache);
             test_node_imageio_tiff(debug_print, cache);
             test_node_null(debug_print, cache);
+            test_node_resample(debug_print, cache);
             test_node_grade(debug_print, cache);
             test_node_grade_concat(debug_print, cache);
             test_node_merge(debug_print, cache);

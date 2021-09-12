@@ -1,6 +1,7 @@
 #include "rust/cxx.h"
 #include "opencompgraph/symbol_export.h"
 #include "opencompgraph/internal/colorspace.h"
+#include "opencompgraph/internal/imageresample.h"
 #include "opencompgraph/internal/ldpk_utils.h"
 #include "opencompgraph/internal/imageio.h"
 #include "opencompgraph/internal/systemmemory.h"
@@ -337,6 +338,7 @@ enum class NodeType : ::std::uint8_t {
   kViewer = 8,
   kTransform = 5,
   kCropImage = 7,
+  kResampleImage = 9,
   kMergeImage = 6,
   kGrade = 3,
   kLensDistort = 4,
@@ -706,6 +708,11 @@ OCG_API_EXPORT bool open_comp_graph$internal$cxxbridge1$ocio_print_color_spaces(
 OCG_API_EXPORT bool open_comp_graph$internal$cxxbridge1$oiio_color_convert_inplace(::rust::Slice<float> pixel_data, ::std::int32_t width, ::std::int32_t height, ::std::int32_t num_channels, ::std::int32_t alpha_channel, bool unassociated_alpha, ::rust::Str src_color_space, ::rust::Str dst_color_space) noexcept {
   bool (*oiio_color_convert_inplace$)(::rust::Slice<float>, ::std::int32_t, ::std::int32_t, ::std::int32_t, ::std::int32_t, bool, ::rust::Str, ::rust::Str) = ::open_comp_graph::internal::oiio_color_convert_inplace;
   return oiio_color_convert_inplace$(pixel_data, width, height, num_channels, alpha_channel, unassociated_alpha, src_color_space, dst_color_space);
+}
+
+OCG_API_EXPORT bool open_comp_graph$internal$cxxbridge1$oiio_image_resample(::open_comp_graph::internal::ImageShared &src_image, ::open_comp_graph::internal::ImageShared &dst_image, ::std::int32_t factor_num, bool interpolate) noexcept {
+  bool (*oiio_image_resample$)(::open_comp_graph::internal::ImageShared &, ::open_comp_graph::internal::ImageShared &, ::std::int32_t, bool) = ::open_comp_graph::internal::oiio_image_resample;
+  return oiio_image_resample$(src_image, dst_image, factor_num, interpolate);
 }
 
 OCG_API_EXPORT ::rust::repr::Fat open_comp_graph$internal$cxxbridge1$OcgLdPluginBase$get_version_string(const ::open_comp_graph::internal::OcgLdPluginBase &self) noexcept {

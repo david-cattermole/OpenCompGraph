@@ -238,6 +238,8 @@ pub mod ffi {
         Transform = 5,
         #[cxx_name = "kCropImage"]
         CropImage = 7,
+        #[cxx_name = "kResampleImage"]
+        ResampleImage = 9,
         // ReformatImage,
 
         // Merges
@@ -514,6 +516,18 @@ pub mod ffi {
             unassociated_alpha: bool,
             src_color_space: &str,
             dst_color_space: &str) -> bool;
+    }
+
+    // Image Resample (up-res or down-res image, quickly).
+    #[namespace = "open_comp_graph::internal"]
+    unsafe extern "C++" {
+        include!("opencompgraph/internal/imageresample.h");
+
+        fn oiio_image_resample(
+            src_image: &mut ImageShared,
+            dst_image: &mut ImageShared,
+            factor_num: i32,
+            interpolate: bool) -> bool;
     }
 
     // LDPK and the tde4_ld_plugin class.

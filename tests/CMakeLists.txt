@@ -22,6 +22,7 @@ add_executable(${target_test_exe}
   ${CMAKE_CURRENT_SOURCE_DIR}/test_node_imageio/test_node_imageio_png.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/test_node_imageio/test_node_imageio_tiff.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/test_node_null/test_node_null.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/test_node_resample/test_node_resample.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/test_node_grade/test_node_grade.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/test_node_grade/test_node_grade_concat.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/test_node_merge/test_node_merge.cpp
