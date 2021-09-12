@@ -111,7 +111,8 @@ impl Operation for ResampleImageOperation {
 
         let enable = attr_block.get_attr_i32("enable");
         if enable != 1 {
-            let stream_data = StreamDataImpl::new();
+            let input = &inputs[0].clone();
+            let stream_data = (**input).clone();
             *output = std::rc::Rc::new(stream_data);
             return NodeStatus::Valid;
         }
