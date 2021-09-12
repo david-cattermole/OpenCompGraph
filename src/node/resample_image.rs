@@ -26,6 +26,7 @@ use std::rc::Rc;
 
 use crate::attrblock::AttrBlock;
 use crate::cache::CacheImpl;
+use crate::cache::CachedImage;
 use crate::cxxbridge::ffi::AttrState;
 use crate::cxxbridge::ffi::BBox2Di;
 use crate::cxxbridge::ffi::ImageShared;
@@ -81,6 +82,34 @@ impl ResampleImageAttrs {
     }
 }
 
+fn do_image_process(
+    stream_data: &StreamDataImpl,
+    factor: i32,
+    interpolate: bool,
+) -> (bool, ImageShared) {
+    // Source image.
+    let src_pixel_block = stream_data.clone_pixel_block();
+    let src_image_spec = stream_data.clone_image_spec();
+    let mut src_img = ImageShared {
+        pixel_block: Box::new(src_pixel_block),
+        display_window: stream_data.display_window(),
+        data_window: stream_data.data_window(),
+        spec: src_image_spec,
+    };
+
+    // Destination image.
+    let mut dst_img = ImageShared {
+        pixel_block: Box::new(PixelBlock::empty(PixelDataType::Float32)),
+        display_window: BBox2Di::new(0, 0, 0, 0),
+        data_window: BBox2Di::new(0, 0, 0, 0),
+        spec: ImageSpec::new(),
+    };
+
+    // Do work and use destination image.
+    let ok = imageresample::image_resample(&mut src_img, &mut dst_img, factor, interpolate);
+    (ok, dst_img)
+}
+
 impl Operation for ResampleImageOperation {
     fn compute(
         &mut self,
@@ -91,7 +120,7 @@ impl Operation for ResampleImageOperation {
         node_compute_mode: NodeComputeMode,
         inputs: &Vec<Rc<StreamDataImpl>>,
         output: &mut Rc<StreamDataImpl>,
-        _cache: &mut Box<CacheImpl>,
+        cache: &mut Box<CacheImpl>,
     ) -> NodeStatus {
         debug!("ResampleImageOperation.compute()");
         debug!(
@@ -117,64 +146,53 @@ impl Operation for ResampleImageOperation {
             return NodeStatus::Valid;
         }
 
-        // TODO: Use the given cache to search for an already existing
-        // image.
-
-        let mut status = NodeStatus::Valid;
-
         debug_assert!(inputs.len() == 1);
         let input = &inputs[0].clone();
         let mut stream_data = (**input).clone();
-        stream_data.set_hash(hash_value);
 
-        // Source image.
-        let src_pixel_block = stream_data.clone_pixel_block();
-        let src_image_spec = stream_data.clone_image_spec();
-        let mut src_img = ImageShared {
-            pixel_block: Box::new(src_pixel_block),
-            display_window: stream_data.display_window(),
-            data_window: stream_data.data_window(),
-            spec: src_image_spec,
-        };
-
-        // Destination image.
-        let mut dst_img = ImageShared {
-            pixel_block: Box::new(PixelBlock::empty(PixelDataType::Float32)),
-            display_window: BBox2Di::new(0, 0, 0, 0),
-            data_window: BBox2Di::new(0, 0, 0, 0),
-            spec: ImageSpec::new(),
-        };
-
+        let mut status = NodeStatus::Valid;
         let factor = attr_block.get_attr_i32("factor");
         if factor != 0 {
-            // Do work and use destination image.
-            let interpolate = attr_block.get_attr_i32("interpolate") != 0;
-            let ok = imageresample::image_resample(&mut src_img, &mut dst_img, factor, interpolate);
-            if ok == false {
-                error!("ResampleImage failed!");
-                status = NodeStatus::Error;
-            }
+            let (pixel_block, data_window, display_window) = match cache.get(&hash_value) {
+                Some(cached_img) => {
+                    debug!("Cache Hit");
+                    (
+                        cached_img.pixel_block.clone(),
+                        cached_img.data_window,
+                        cached_img.display_window,
+                    )
+                }
+                _ => {
+                    debug!("Cache Miss");
+                    let interpolate = attr_block.get_attr_i32("interpolate") != 0;
+                    let (ok, img) = do_image_process(&mut stream_data, factor, interpolate);
+                    if ok == false {
+                        error!("ResampleImage failed!");
+                        status = NodeStatus::Error;
+                    }
 
-            let pixel_block = Rc::new(*dst_img.pixel_block);
-            let data_window = dst_img.data_window;
-            let display_window = dst_img.display_window;
+                    let pixel_block_rc = Rc::new(*img.pixel_block);
+                    let cached_img = CachedImage {
+                        pixel_block: pixel_block_rc.clone(),
+                        spec: img.spec,
+                        data_window: img.data_window,
+                        display_window: img.display_window,
+                    };
+                    cache.insert(hash_value, cached_img);
+                    (pixel_block_rc.clone(), img.data_window, img.display_window)
+                }
+            };
 
             stream_data.set_data_window(data_window);
             stream_data.set_display_window(display_window);
             stream_data.set_pixel_block(pixel_block);
+            stream_data.set_hash(hash_value);
         } else {
             // Use source image.
-            let pixel_block = Rc::new(*src_img.pixel_block);
-            let data_window = src_img.data_window;
-            let display_window = src_img.display_window;
-
-            stream_data.set_data_window(data_window);
-            stream_data.set_display_window(display_window);
-
-            stream_data.set_pixel_block(pixel_block);
+            let input = &inputs[0].clone();
+            stream_data = (**input).clone();
         }
 
-        stream_data.set_hash(hash_value);
         *output = std::rc::Rc::new(stream_data);
         status
     }
