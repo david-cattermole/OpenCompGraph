@@ -19,13 +19,14 @@
  *
  */
 
-use log::debug;
+use log::{debug, error};
 use std::collections::hash_map::DefaultHasher;
 use std::hash::Hash;
 use std::rc::Rc;
 
 use crate::attrblock::AttrBlock;
 use crate::cache::CacheImpl;
+use crate::cache::CachedImage;
 use crate::cxxbridge::ffi::AttrState;
 use crate::cxxbridge::ffi::BBox2Di;
 use crate::cxxbridge::ffi::BakeOption;
@@ -92,6 +93,54 @@ impl CropImageAttrs {
     }
 }
 
+fn do_image_process(
+    stream_data: &mut StreamDataImpl,
+    crop_window: BBox2Di,
+    reformat: bool,
+    black_outside: bool,
+    intersect: bool,
+) -> (bool, ImageShared) {
+    // Source image.
+    let mut pixel_block = stream_data.clone_pixel_block();
+    let mut image_spec = stream_data.clone_image_spec();
+
+    // 'from' comes from the input stream, and 'to' is a common
+    // value in the graph.
+    let from_color_space = image_spec.color_space.clone();
+    let to_color_space = COLOR_SPACE_NAME_LINEAR.to_string();
+
+    let display_window = stream_data.display_window();
+    let mut data_window = stream_data.data_window();
+    let bake_option = BakeOption::All;
+    bake::do_process(
+        bake_option,
+        &mut pixel_block,
+        display_window,
+        &mut data_window,
+        &mut image_spec,
+        stream_data,
+        &from_color_space,
+        &to_color_space,
+        PixelDataType::Float32,
+    );
+
+    let mut dst_img = ImageShared {
+        pixel_block: Box::new(pixel_block),
+        display_window: display_window,
+        data_window: data_window,
+        spec: image_spec,
+    };
+
+    let ok = imagecrop::crop_image_in_place(
+        &mut dst_img,
+        crop_window,
+        reformat,
+        black_outside,
+        intersect,
+    );
+    (ok, dst_img)
+}
+
 impl Operation for CropImageOperation {
     fn compute(
         &mut self,
@@ -102,7 +151,7 @@ impl Operation for CropImageOperation {
         node_compute_mode: NodeComputeMode,
         inputs: &Vec<Rc<StreamDataImpl>>,
         output: &mut Rc<StreamDataImpl>,
-        _cache: &mut Box<CacheImpl>,
+        cache: &mut Box<CacheImpl>,
     ) -> NodeStatus {
         debug!("CropImageOperation.compute()");
         debug!(
@@ -120,78 +169,71 @@ impl Operation for CropImageOperation {
             return NodeStatus::Warning;
         }
 
+        let input = &inputs[0].clone();
+        let mut stream_data = (**input).clone();
         let enable = attr_block.get_attr_i32("enable");
         if enable != 1 {
-            let stream_data = StreamDataImpl::new();
             *output = std::rc::Rc::new(stream_data);
             return NodeStatus::Valid;
         }
 
-        let input = &inputs[0].clone();
-        let mut copy = (**input).clone();
-        copy.set_hash(hash_value);
+        let mut status = NodeStatus::Valid;
+        let (pixel_block, data_window, display_window) = match cache.get(&hash_value) {
+            Some(cached_img) => {
+                debug!("Cache Hit");
+                (
+                    cached_img.pixel_block.clone(),
+                    cached_img.data_window,
+                    cached_img.display_window,
+                )
+            }
+            _ => {
+                debug!("Cache Miss");
 
-        // Cache the results of the crop. If the input values do not
-        // change we can easily look up the pixels again.
-        let window_min_x = attr_block.get_attr_i32("window_min_x");
-        let window_min_y = attr_block.get_attr_i32("window_min_y");
-        let window_max_x = attr_block.get_attr_i32("window_max_x");
-        let window_max_y = attr_block.get_attr_i32("window_max_y");
-        let crop_window = BBox2Di::new(window_min_x, window_min_y, window_max_x, window_max_y);
+                // Cache the results of the crop. If the input values do not
+                // change we can easily look up the pixels again.
+                let window_min_x = attr_block.get_attr_i32("window_min_x");
+                let window_min_y = attr_block.get_attr_i32("window_min_y");
+                let window_max_x = attr_block.get_attr_i32("window_max_x");
+                let window_max_y = attr_block.get_attr_i32("window_max_y");
+                let crop_window =
+                    BBox2Di::new(window_min_x, window_min_y, window_max_x, window_max_y);
 
-        debug_assert!(inputs.len() == 1);
-        let mut pixel_block = input.clone_pixel_block();
-        let mut image_spec = input.clone_image_spec();
+                let reformat = attr_block.get_attr_i32("reformat") == 1;
+                let black_outside = attr_block.get_attr_i32("black_outside") == 1;
+                let intersect = attr_block.get_attr_i32("intersect") == 1;
 
-        // 'from' comes from the input stream, and 'to' is a common
-        // value in the graph.
-        let from_color_space = image_spec.color_space.clone();
-        let to_color_space = COLOR_SPACE_NAME_LINEAR.to_string();
+                let (ok, img) = do_image_process(
+                    &mut stream_data,
+                    crop_window,
+                    reformat,
+                    black_outside,
+                    intersect,
+                );
+                if ok == false {
+                    error!("CropImage failed!");
+                    status = NodeStatus::Error;
+                }
 
-        let display_window = input.display_window();
-        let mut data_window = input.data_window();
-        let bake_option = BakeOption::All;
-        bake::do_process(
-            bake_option,
-            &mut pixel_block,
-            display_window,
-            &mut data_window,
-            &mut image_spec,
-            &mut copy,
-            &from_color_space,
-            &to_color_space,
-            PixelDataType::Float32,
-        );
-
-        let mut img = ImageShared {
-            pixel_block: Box::new(pixel_block),
-            display_window: display_window,
-            data_window: data_window,
-            spec: image_spec,
+                let pixel_block_rc = Rc::new(*img.pixel_block);
+                let cached_img = CachedImage {
+                    pixel_block: pixel_block_rc.clone(),
+                    spec: img.spec,
+                    data_window: img.data_window,
+                    display_window: img.display_window,
+                };
+                cache.insert(hash_value, cached_img);
+                (pixel_block_rc.clone(), img.data_window, img.display_window)
+            }
         };
 
-        let reformat = attr_block.get_attr_i32("reformat") == 1;
-        let black_outside = attr_block.get_attr_i32("black_outside") == 1;
-        let intersect = attr_block.get_attr_i32("intersect") == 1;
-        let _ok = imagecrop::crop_image_in_place(
-            &mut img,
-            crop_window,
-            reformat,
-            black_outside,
-            intersect,
-        );
+        stream_data.set_hash(hash_value);
+        stream_data.set_data_window(data_window);
+        stream_data.set_display_window(display_window);
+        stream_data.set_pixel_block(pixel_block);
 
-        let pixel_block_rc = Rc::new(*img.pixel_block);
-        let (pixel_block, data_window, display_window) =
-            (pixel_block_rc.clone(), img.data_window, img.display_window);
-
-        copy.set_data_window(data_window);
-        copy.set_display_window(display_window);
-        copy.set_hash(hash_value);
-        copy.set_pixel_block(pixel_block);
-
-        *output = std::rc::Rc::new(copy);
-        NodeStatus::Valid
+        *output = std::rc::Rc::new(stream_data);
+        status
     }
 }
 
