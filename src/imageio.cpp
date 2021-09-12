@@ -101,7 +101,8 @@ bool oiio_read_image(const rust::String &file_path, ImageShared &image) {
     // formats that align to 48-bytes (such as RGB 8-bit), so we must
     // pad the channels.
     auto pixel_data_type = oiio_format_to_ocg_format(oiio_data_type);
-    auto padded_num_channels = stride_num_channels(num_channels, pixel_data_type);
+    auto padded_num_channels =
+        static_cast<int32_t>(stride_num_channels(num_channels, pixel_data_type));
     auto channel_num_bytes = channel_size_bytes(pixel_data_type);
     image.pixel_block->data_resize(
         width, height, padded_num_channels, pixel_data_type);
