@@ -17,7 +17,7 @@
  * along with OpenCompGraph.  If not, see <https://www.gnu.org/licenses/>.
  * ====================================================================
  *
- * Read EXR and write PNG image.
+ * Read EXR and write EXR image.
  */
 
 #include <iostream>
@@ -64,7 +64,7 @@ int test_node_imageio(const bool debug_print,
     graph.set_node_attr_str(
         read3_node, "file_path", "./tests/data/openexr-images/TestImages/BrightRingsNanInf.exr");
     graph.set_node_attr_str(
-        read4_node, "file_path", "./tests/data/openexr-images/TestImages/GammaChart.exr.exr");
+        read4_node, "file_path", "./tests/data/openexr-images/TestImages/GammaChart.exr");
     // graph.set_node_attr_str(
     //     read5_node, "file_path", "./tests/data/openexr-images/TestImages/GrayRampsDiagonal.exr");
     // graph.set_node_attr_str(
@@ -79,25 +79,55 @@ int test_node_imageio(const bool debug_print,
     //     read10_node, "file_path", "./tests/data/openexr-images/TestImages/WideFloatRange.exr");
 
     graph.set_node_attr_str(
-        write1_node, "file_path", "./tests/data/out/test_node_imageio_exr_out1.png");
+        write1_node, "file_path", "./tests/data/out/test_node_imageio_exr_out1.exr");
+
     graph.set_node_attr_str(
-        write2_node, "file_path", "./tests/data/out/test_node_imageio_exr_out2.png");
+        write2_node, "file_path", "./tests/data/out/test_node_imageio_exr_out2_dwaa.exr");
+    graph.set_node_attr_i32(
+        write2_node, "exr_compression",
+        static_cast<int32_t>(ocg::ExrCompression::kDwaa));
+    graph.set_node_attr_i32(
+        write2_node, "exr_dwa_compression_level", 300);
+
     graph.set_node_attr_str(
-        write3_node, "file_path", "./tests/data/out/test_node_imageio_exr_out3.png");
+        write3_node, "file_path", "./tests/data/out/test_node_imageio_exr_out3_dwab.exr");
+    graph.set_node_attr_i32(
+        write3_node, "exr_compression",
+        static_cast<int32_t>(ocg::ExrCompression::kDwab));
+    graph.set_node_attr_i32(
+        write3_node, "exr_dwa_compression_level", 300);
+
     graph.set_node_attr_str(
-        write4_node, "file_path", "./tests/data/out/test_node_imageio_exr_out4.png");
+        write4_node, "file_path", "./tests/data/out/test_node_imageio_exr_out4_zips.exr");
+    graph.set_node_attr_i32(
+        write4_node, "exr_compression",
+        static_cast<int32_t>(ocg::ExrCompression::kZipScanline));
+
     // graph.set_node_attr_str(
-    //     write5_node, "file_path", "./tests/data/out/test_node_imageio_exr_out5.png");
+    //     write5_node, "file_path", "./tests/data/out/test_node_imageio_exr_out5.exr");
     // graph.set_node_attr_str(
-    //     write6_node, "file_path", "./tests/data/out/test_node_imageio_exr_out6.png");
+    //     write6_node, "file_path", "./tests/data/out/test_node_imageio_exr_out6.exr");
+
     graph.set_node_attr_str(
-        write7_node, "file_path", "./tests/data/out/test_node_imageio_exr_out7.png");
+        write7_node, "file_path", "./tests/data/out/test_node_imageio_exr_out7_piz.exr");
+    graph.set_node_attr_i32(
+        write7_node, "exr_compression",
+        static_cast<int32_t>(ocg::ExrCompression::kPiz));
+
     graph.set_node_attr_str(
-        write8_node, "file_path", "./tests/data/out/test_node_imageio_exr_out8.png");
+        write8_node, "file_path", "./tests/data/out/test_node_imageio_exr_out8_pxr24.exr");
+    graph.set_node_attr_i32(
+        write8_node, "exr_compression",
+        static_cast<int32_t>(ocg::ExrCompression::kPxr24));
+
     graph.set_node_attr_str(
-        write9_node, "file_path", "./tests/data/out/test_node_imageio_exr_out9.png");
+        write9_node, "file_path", "./tests/data/out/test_node_imageio_exr_out9_b44.exr");
+    graph.set_node_attr_i32(
+        write9_node, "exr_compression",
+        static_cast<int32_t>(ocg::ExrCompression::kB44));
+
     // graph.set_node_attr_str(
-    //     write10_node, "file_path", "./tests/data/out/test_node_imageio_exr_out10.png");
+    //     write10_node, "file_path", "./tests/data/out/test_node_imageio_exr_out10.exr");
 
     graph.connect(read1_node, write1_node, 0);
     graph.connect(read2_node, write2_node, 0);

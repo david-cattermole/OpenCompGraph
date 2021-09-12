@@ -28,6 +28,7 @@ use crate::cxxbridge::ffi::oiio_read_image;
 use crate::cxxbridge::ffi::oiio_set_thread_count;
 use crate::cxxbridge::ffi::oiio_write_image;
 use crate::cxxbridge::ffi::BBox2Di;
+use crate::cxxbridge::ffi::ImageCompression;
 use crate::cxxbridge::ffi::ImageShared;
 use crate::cxxbridge::ffi::ImageSpec;
 use crate::cxxbridge::ffi::PixelDataType;
@@ -85,6 +86,7 @@ pub fn write_image(
     path: &String,
     num_threads: i32,
     crop_to_display_window: bool,
+    compress: ImageCompression,
 ) -> bool {
     debug!("Writing... {:?}", path);
     debug!("Crop to Display Window: {:?}", crop_to_display_window);
@@ -126,7 +128,7 @@ pub fn write_image(
             oiio_get_thread_count(&mut old_num_threads);
             oiio_set_thread_count(num_threads);
 
-            let ok = oiio_write_image(&path, &image_out);
+            let ok = oiio_write_image(&path, &image_out, &compress);
 
             oiio_set_thread_count(old_num_threads);
 

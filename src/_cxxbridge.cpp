@@ -94,7 +94,11 @@ namespace open_comp_graph {
   enum class MergeImageMode : ::std::uint8_t;
   enum class ImageOrientation : ::std::uint8_t;
   enum class DiskCacheImageType : ::std::uint8_t;
+  enum class CropOnWrite : ::std::uint8_t;
+  enum class JpegChromaSubSampling : ::std::uint8_t;
+  enum class ExrCompression : ::std::uint8_t;
   namespace internal {
+    struct ImageCompression;
     struct GraphImplShared;
     struct StreamDataImplShared;
     struct CacheImplShared;
@@ -218,6 +222,20 @@ struct Matrix4 final {
 #endif // CXXBRIDGE1_STRUCT_open_comp_graph$Matrix4
 
 namespace internal {
+#ifndef CXXBRIDGE1_STRUCT_open_comp_graph$internal$ImageCompression
+#define CXXBRIDGE1_STRUCT_open_comp_graph$internal$ImageCompression
+struct ImageCompression final {
+  ::open_comp_graph::ExrCompression exr_compression;
+  ::std::int32_t exr_dwa_compression_level;
+  ::std::int32_t png_compression_level;
+  ::std::int32_t jpeg_compression_level;
+  ::open_comp_graph::JpegChromaSubSampling jpeg_subsampling;
+  bool jpeg_progressive;
+
+  using IsRelocatable = ::std::true_type;
+};
+#endif // CXXBRIDGE1_STRUCT_open_comp_graph$internal$ImageCompression
+
 #ifndef CXXBRIDGE1_STRUCT_open_comp_graph$internal$GraphImplShared
 #define CXXBRIDGE1_STRUCT_open_comp_graph$internal$GraphImplShared
 struct GraphImplShared final {
@@ -423,6 +441,46 @@ enum class DiskCacheImageType : ::std::uint8_t {
   kUninitialized = 255,
 };
 #endif // CXXBRIDGE1_ENUM_open_comp_graph$DiskCacheImageType
+
+#ifndef CXXBRIDGE1_ENUM_open_comp_graph$CropOnWrite
+#define CXXBRIDGE1_ENUM_open_comp_graph$CropOnWrite
+enum class CropOnWrite : ::std::uint8_t {
+  kDisable = 0,
+  kEnable = 1,
+  kAuto = 2,
+  kUninitialized = 255,
+};
+#endif // CXXBRIDGE1_ENUM_open_comp_graph$CropOnWrite
+
+#ifndef CXXBRIDGE1_ENUM_open_comp_graph$JpegChromaSubSampling
+#define CXXBRIDGE1_ENUM_open_comp_graph$JpegChromaSubSampling
+enum class JpegChromaSubSampling : ::std::uint8_t {
+  kDefault = 0,
+  kNone444 = 1,
+  kSample422 = 2,
+  kSample420 = 3,
+  kSample421 = 4,
+  kUninitialized = 255,
+};
+#endif // CXXBRIDGE1_ENUM_open_comp_graph$JpegChromaSubSampling
+
+#ifndef CXXBRIDGE1_ENUM_open_comp_graph$ExrCompression
+#define CXXBRIDGE1_ENUM_open_comp_graph$ExrCompression
+enum class ExrCompression : ::std::uint8_t {
+  kDefault = 0,
+  kNone = 1,
+  kRle = 2,
+  kZip = 3,
+  kZipScanline = 4,
+  kPiz = 5,
+  kPxr24 = 6,
+  kB44 = 7,
+  kB44a = 8,
+  kDwaa = 9,
+  kDwab = 10,
+  kUninitialized = 255,
+};
+#endif // CXXBRIDGE1_ENUM_open_comp_graph$ExrCompression
 
 namespace internal {
 #ifndef CXXBRIDGE1_STRUCT_open_comp_graph$internal$PixelBlock
@@ -745,9 +803,9 @@ OCG_API_EXPORT bool open_comp_graph$internal$cxxbridge1$oiio_read_image(const ::
   return oiio_read_image$(file_path, image);
 }
 
-OCG_API_EXPORT bool open_comp_graph$internal$cxxbridge1$oiio_write_image(const ::rust::String &file_path, const ::open_comp_graph::internal::ImageShared &image) noexcept {
-  bool (*oiio_write_image$)(const ::rust::String &, const ::open_comp_graph::internal::ImageShared &) = ::open_comp_graph::internal::oiio_write_image;
-  return oiio_write_image$(file_path, image);
+OCG_API_EXPORT bool open_comp_graph$internal$cxxbridge1$oiio_write_image(const ::rust::String &file_path, const ::open_comp_graph::internal::ImageShared &image, const ::open_comp_graph::internal::ImageCompression &compress) noexcept {
+  bool (*oiio_write_image$)(const ::rust::String &, const ::open_comp_graph::internal::ImageShared &, const ::open_comp_graph::internal::ImageCompression &) = ::open_comp_graph::internal::oiio_write_image;
+  return oiio_write_image$(file_path, image, compress);
 }
 
 OCG_API_EXPORT ::std::size_t open_comp_graph$internal$cxxbridge1$get_total_system_memory_as_bytes() noexcept {

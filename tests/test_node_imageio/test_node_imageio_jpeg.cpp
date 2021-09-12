@@ -17,7 +17,7 @@
  * along with OpenCompGraph.  If not, see <https://www.gnu.org/licenses/>.
  * ====================================================================
  *
- * Read JPEG and write PNG image.
+ * Read JPEG and write JPEG image.
  */
 
 #include <iostream>
@@ -59,15 +59,28 @@ int test_node_imageio_jpeg(const bool debug_print,
         read5_node, "file_path", "./tests/data/ocg-testdata/images/color_bars/3840x2160_jpg/color_bars.0951.jpg");
 
     graph.set_node_attr_str(
-        write1_node, "file_path", "./tests/data/out/test_node_imageio_jpeg_out1.png");
+        write1_node, "file_path", "./tests/data/out/test_node_imageio_jpeg_out1.jpg");
+
     graph.set_node_attr_str(
-        write2_node, "file_path", "./tests/data/out/test_node_imageio_jpeg_out2.png");
+        write2_node, "file_path", "./tests/data/out/test_node_imageio_jpeg_out2_comp_level_90.jpg");
+    graph.set_node_attr_i32(
+        write2_node, "jpeg_compression_level", 90);
+
     graph.set_node_attr_str(
-        write3_node, "file_path", "./tests/data/out/test_node_imageio_jpeg_out3.png");
+        write3_node, "file_path", "./tests/data/out/test_node_imageio_jpeg_out3_comp_level_10.jpg");
+    graph.set_node_attr_i32(
+        write3_node, "jpeg_compression_level", 10);
+
     graph.set_node_attr_str(
-        write4_node, "file_path", "./tests/data/out/test_node_imageio_jpeg_out4.png");
+        write4_node, "file_path", "./tests/data/out/test_node_imageio_jpeg_out4_subsample444.jpg");
+    graph.set_node_attr_i32(
+        write4_node, "jpeg_subsampling",
+        static_cast<int32_t>(ocg::JpegChromaSubSampling::kNone444));
+
     graph.set_node_attr_str(
-        write5_node, "file_path", "./tests/data/out/test_node_imageio_jpeg_out5.png");
+        write5_node, "file_path", "./tests/data/out/test_node_imageio_jpeg_out5_progressive.jpg");
+    graph.set_node_attr_i32(
+        write5_node, "jpeg_progressive", 1);
 
     graph.connect(read1_node, write1_node, 0);
     graph.connect(read2_node, write2_node, 0);

@@ -19,12 +19,18 @@
  *
  */
 
+// STL
+// #include <sstream>  // stringstream
+#include <cctype>   // tolower
 #include <iostream>
 #include <memory>
+
 #include <rust/cxx.h>
+
 #include <opencompgraph.h>
 #include <opencompgraph/internal/oiio_utils.h>
 #include <OpenImageIO/imageio.h>
+
 
 namespace open_comp_graph {
 namespace internal {
@@ -167,7 +173,16 @@ bool oiio_read_image(const rust::String &file_path, ImageShared &image) {
     return true;
 }
 
-bool oiio_write_image(const rust::String &file_path, const ImageShared &image) {
+bool name_has_suffix(std::string const &name, std::string const &suffix) {
+    if (name.length() >= suffix.length()) {
+        return 0 == name.compare(name.length() - suffix.length(), suffix.length(), suffix);
+    }
+    return false;
+}
+
+
+bool oiio_write_image(const rust::String &file_path, const ImageShared &image,
+                      const ImageCompression &compress) {
     const int32_t xres = image.pixel_block->width();
     const int32_t yres = image.pixel_block->height();
     const int32_t channels = image.pixel_block->num_channels();
@@ -213,6 +228,75 @@ bool oiio_write_image(const rust::String &file_path, const ImageShared &image) {
     spec.attribute("Orientation", orientation);
     spec.attribute("oiio:dither", dither);
     spec.attribute("oiio:UnassociatedAlpha", unassociated_alpha);
+
+    // Image Compression
+    {
+        std::string filename_lower = filename;
+        std::transform(
+            filename_lower.begin(),
+            filename_lower.end(),
+            filename_lower.begin(),
+            [](unsigned char c){ return std::tolower(c); }
+        );
+
+        if (name_has_suffix(filename_lower, ".exr")) {
+            auto exr_compress_name = "Compression";
+            auto exr_dwa_level_name = "openexr:dwaCompressionLevel";
+            auto dwa_level = static_cast<float>(compress.exr_dwa_compression_level);
+            if (compress.exr_compression == open_comp_graph::ExrCompression::kNone) {
+                spec.attribute(exr_compress_name, "none");
+            } else if (compress.exr_compression == open_comp_graph::ExrCompression::kRle) {
+                spec.attribute(exr_compress_name, "rle");
+            } else if (compress.exr_compression == open_comp_graph::ExrCompression::kZip) {
+                spec.attribute(exr_compress_name, "zip");
+            } else if (compress.exr_compression == open_comp_graph::ExrCompression::kZipScanline) {
+                spec.attribute(exr_compress_name, "zips");
+            } else if (compress.exr_compression == open_comp_graph::ExrCompression::kPiz) {
+                spec.attribute(exr_compress_name, "piz");
+            } else if (compress.exr_compression == open_comp_graph::ExrCompression::kPxr24) {
+                spec.attribute(exr_compress_name, "pxr24");
+            } else if (compress.exr_compression == open_comp_graph::ExrCompression::kB44) {
+                spec.attribute(exr_compress_name, "b44");
+            } else if (compress.exr_compression == open_comp_graph::ExrCompression::kB44a) {
+                spec.attribute(exr_compress_name, "b44a");
+            } else if (compress.exr_compression == open_comp_graph::ExrCompression::kDwaa) {
+                spec.attribute(exr_compress_name, "dwaa");
+                spec.attribute(exr_dwa_level_name, dwa_level);
+            } else if (compress.exr_compression == open_comp_graph::ExrCompression::kDwab) {
+                spec.attribute(exr_compress_name, "dwab");
+                spec.attribute(exr_dwa_level_name, dwa_level);
+            }
+
+        } else if (name_has_suffix(filename_lower, ".png")) {
+            spec.attribute(
+                "png:compressionLevel",
+                compress.png_compression_level);
+
+        } else if (name_has_suffix(filename_lower, ".jpg")
+                   || name_has_suffix(filename_lower, ".jpeg")
+                   || name_has_suffix(filename_lower, ".jpe")
+                   || name_has_suffix(filename_lower, ".jif")
+                   || name_has_suffix(filename_lower, ".jfif")
+                   || name_has_suffix(filename_lower, ".jfi")) {
+            spec.attribute("Compression", "jpeg");
+            spec.attribute("CompressionQuality", compress.jpeg_compression_level);
+
+            auto jpeg_subsamp_name = "jpeg:subsampling";
+            if (compress.jpeg_subsampling == open_comp_graph::JpegChromaSubSampling::kNone444) {
+                spec.attribute(jpeg_subsamp_name, "4:4:4");
+            } else if (compress.jpeg_subsampling == open_comp_graph::JpegChromaSubSampling::kSample422) {
+                spec.attribute(jpeg_subsamp_name, "4:2:2");
+            } else if (compress.jpeg_subsampling == open_comp_graph::JpegChromaSubSampling::kSample420) {
+                spec.attribute(jpeg_subsamp_name, "4:2:0");
+            } else if (compress.jpeg_subsampling == open_comp_graph::JpegChromaSubSampling::kSample421) {
+                spec.attribute(jpeg_subsamp_name, "4:2:1");
+            }
+
+            spec.attribute(
+                "jpeg:progressive",
+                static_cast<int32_t>(compress.jpeg_progressive));
+        }
+    }
 
     // // Mark the file that it's been created using OpenCompGraph.
     // auto software = std::string("OpenCompGraph");

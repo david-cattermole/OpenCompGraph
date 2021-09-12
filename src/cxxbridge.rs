@@ -114,6 +114,17 @@ pub mod ffi {
         m33: f32,
     }
 
+    #[derive(Debug, Copy, Clone)]
+    #[namespace = "open_comp_graph::internal"]
+    pub(crate) struct ImageCompression {
+        exr_compression: ExrCompression,
+        exr_dwa_compression_level: i32,
+        png_compression_level: i32,
+        jpeg_compression_level: i32,
+        jpeg_subsampling: JpegChromaSubSampling,
+        jpeg_progressive: bool,
+    }
+
     #[derive(Debug)]
     #[namespace = "open_comp_graph::internal"]
     pub(crate) struct GraphImplShared {
@@ -416,6 +427,77 @@ pub mod ffi {
         Uninitialized = 255,
     }
 
+    // Crop the input image the display window before writing?
+    //
+    // When 'auto' is enabled, if the image format to be writen does
+    // not support a data windows, the image is cropped, otherwise it
+    // is not.
+    #[repr(u8)]
+    #[derive(Debug, Copy, Clone, Hash, PartialEq)]
+    #[namespace = "open_comp_graph"]
+    pub enum CropOnWrite {
+        #[cxx_name = "kDisable"]
+        Disable = 0,
+        #[cxx_name = "kEnable"]
+        Enable = 1,
+        #[cxx_name = "kAuto"]
+        Auto = 2,
+        #[cxx_name = "kUninitialized"]
+        Uninitialized = 255,
+    }
+
+    // JPEG Image Chroma SubSampling values.
+    //
+    // https://en.wikipedia.org/wiki/Chroma_subsampling
+    #[repr(u8)]
+    #[derive(Debug, Copy, Clone, Hash, PartialEq)]
+    #[namespace = "open_comp_graph"]
+    pub enum JpegChromaSubSampling {
+        #[cxx_name = "kDefault"]
+        Default = 0,
+        #[cxx_name = "kNone444"]
+        None444 = 1,
+        #[cxx_name = "kSample422"]
+        Sample422 = 2,
+        #[cxx_name = "kSample420"]
+        Sample420 = 3,
+        #[cxx_name = "kSample421"]
+        Sample421 = 4,
+        #[cxx_name = "kUninitialized"]
+        Uninitialized = 255,
+    }
+
+    // The types of compression supported by EXR.
+    #[repr(u8)]
+    #[derive(Debug, Copy, Clone, Hash, PartialEq)]
+    #[namespace = "open_comp_graph"]
+    pub enum ExrCompression {
+        #[cxx_name = "kDefault"]
+        Default = 0,
+        #[cxx_name = "kNone"]
+        None = 1,
+        #[cxx_name = "kRle"]
+        Rle = 2,
+        #[cxx_name = "kZip"]
+        Zip = 3,
+        #[cxx_name = "kZipScanline"]
+        ZipScanline = 4,
+        #[cxx_name = "kPiz"]
+        Piz = 5,
+        #[cxx_name = "kPxr24"]
+        Pxr24 = 6,
+        #[cxx_name = "kB44"]
+        B44 = 7,
+        #[cxx_name = "kB44a"]
+        B44a = 8,
+        #[cxx_name = "kDwaa"]
+        Dwaa = 9,
+        #[cxx_name = "kDwab"]
+        Dwab = 10,
+        #[cxx_name = "kUninitialized"]
+        Uninitialized = 255,
+    }
+
     // Color Spaces (using OCIO)
     #[namespace = "open_comp_graph::internal"]
     unsafe extern "C++" {
@@ -535,7 +617,10 @@ pub mod ffi {
         fn oiio_get_thread_count(num_threads: &mut i32) -> bool;
         fn oiio_set_thread_count(num_threads: i32) -> bool;
         fn oiio_read_image(file_path: &String, image: &mut ImageShared) -> bool;
-        fn oiio_write_image(file_path: &String, image: &ImageShared) -> bool;
+        fn oiio_write_image(
+            file_path: &String,
+            image: &ImageShared,
+            compress: &ImageCompression) -> bool;
     }
 
     // System Memory Utilities
@@ -823,6 +908,49 @@ impl From<i32> for ffi::DiskCacheImageType {
             3 => ffi::DiskCacheImageType::EXR_Lossy_Half16,
             4 => ffi::DiskCacheImageType::EXR_Lossless_Half16,
             _ => ffi::DiskCacheImageType::Uninitialized,
+        }
+    }
+}
+
+impl From<i32> for ffi::CropOnWrite {
+    fn from(value: i32) -> Self {
+        match value {
+            0 => ffi::CropOnWrite::Disable,
+            1 => ffi::CropOnWrite::Enable,
+            2 => ffi::CropOnWrite::Auto,
+            _ => ffi::CropOnWrite::Uninitialized,
+        }
+    }
+}
+
+impl From<i32> for ffi::JpegChromaSubSampling {
+    fn from(value: i32) -> Self {
+        match value {
+            0 => ffi::JpegChromaSubSampling::Default,
+            1 => ffi::JpegChromaSubSampling::None444,
+            2 => ffi::JpegChromaSubSampling::Sample422,
+            3 => ffi::JpegChromaSubSampling::Sample420,
+            4 => ffi::JpegChromaSubSampling::Sample421,
+            _ => ffi::JpegChromaSubSampling::Uninitialized,
+        }
+    }
+}
+
+impl From<i32> for ffi::ExrCompression {
+    fn from(value: i32) -> Self {
+        match value {
+            0 => ffi::ExrCompression::Default,
+            1 => ffi::ExrCompression::None,
+            2 => ffi::ExrCompression::Rle,
+            3 => ffi::ExrCompression::Zip,
+            4 => ffi::ExrCompression::ZipScanline,
+            5 => ffi::ExrCompression::Piz,
+            6 => ffi::ExrCompression::Pxr24,
+            7 => ffi::ExrCompression::B44,
+            8 => ffi::ExrCompression::B44a,
+            9 => ffi::ExrCompression::Dwaa,
+            10 => ffi::ExrCompression::Dwab,
+            _ => ffi::ExrCompression::Uninitialized,
         }
     }
 }

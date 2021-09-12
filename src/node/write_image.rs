@@ -30,7 +30,11 @@ use crate::attrblock::AttrBlock;
 use crate::cache::CacheImpl;
 use crate::cxxbridge::ffi::AttrState;
 use crate::cxxbridge::ffi::BakeOption;
+use crate::cxxbridge::ffi::CropOnWrite;
+use crate::cxxbridge::ffi::ExrCompression;
+use crate::cxxbridge::ffi::ImageCompression;
 use crate::cxxbridge::ffi::ImageShared;
+use crate::cxxbridge::ffi::JpegChromaSubSampling;
 use crate::cxxbridge::ffi::NodeStatus;
 use crate::cxxbridge::ffi::NodeType;
 use crate::cxxbridge::ffi::PixelDataType;
@@ -67,32 +71,35 @@ pub struct WriteImageOperation {}
 // - Pre-multiply (?)
 // - Output Channels
 // - Output colour space.
-// - Compression...
-//   - JPEG Compression Level
-//   - JPEG Sub-sample
-//   - PNG Compression level
-//   - EXR Compression method
-//   - EXR Compression DWA Level
-// -
 //
 #[derive(Debug, Clone, Default, hash::Hash)]
 pub struct WriteImageAttrs {
     pub enable: i32,
     pub execute: i32,
     pub file_path: String,
+
     // Crop the input image the display window before writing?
-    //
-    // '-1' = Auto.
-    // '0' = disabled.
-    // '1' = enabled.
-    //
-    // When 'auto' is enabled, if the image format to be writen does
-    // not support a data windows, the image is cropped, otherwise it
-    // is not.
-    pub crop_on_write: i32, // TODO: Create a enum.
+    pub crop_on_write: i32, // index for WriteImageCropOnWrite.
 
     // The pixel data type for pixels written out.
     pub pixel_data_type: i32, // index for PixelDataType.
+
+    // EXR Compression
+    pub exr_compression: i32, // index for ExrCompression
+    pub exr_dwa_compression_level: i32,
+
+    // PNG Compression
+    //
+    // Compression level for zip/deflate compression, on a scale from
+    // 0 (fastest, minimal compression) to 9 (slowest, maximal
+    // compression). The default is 6. PNG compression is always
+    // lossless.
+    pub png_compression_level: i32,
+
+    // JPEG Compression
+    pub jpeg_compression_level: i32,
+    pub jpeg_subsampling: i32, // index for JpegChromaSubSampling
+    pub jpeg_progressive: i32,
 }
 
 impl WriteImageOperation {
@@ -107,8 +114,14 @@ impl WriteImageAttrs {
             enable: 1,
             execute: 1,
             file_path: "".to_string(),
-            crop_on_write: -1,
-            pixel_data_type: 255, // 255 = PixelDataType::Unknown
+            crop_on_write: 2,              // 2 = CropOnWrite::Auto
+            pixel_data_type: 255,          // 255 = PixelDataType::Unknown
+            exr_compression: 0,            // 0 = ExrCompression::Default
+            exr_dwa_compression_level: 45, // Good default for DWA compression
+            png_compression_level: 6,      // 0 to 9; 6 is default.
+            jpeg_compression_level: 90,    // 1 to 100; higher is larger.
+            jpeg_subsampling: 0,           // 0 = JpegChromaSubSampling::Default
+            jpeg_progressive: 0,           // Not progressive JPEG
         }
     }
 }
@@ -118,7 +131,8 @@ fn do_image_process(
     file_path: &str,
     frame: FrameValue,
     bake_pixel_data_type: PixelDataType,
-    crop_on_write: i32,
+    crop_on_write: CropOnWrite,
+    compress: ImageCompression,
 ) -> bool {
     let frame_num = frame.round().trunc() as i32;
     let path_expanded = pathutils::expand_string(file_path.to_string(), frame_num);
@@ -178,21 +192,19 @@ fn do_image_process(
     // Should the image be cropped to the display window
     // before writing?
     let do_crop = match crop_on_write {
-        0 => false, // Disabled
-        1 => true,  // Enabled
-        -1 => {
-            // Auto.
-            //
+        CropOnWrite::Disable => false,
+        CropOnWrite::Enable => true,
+        CropOnWrite::Auto => {
             // When If the image format does not support data
             // windows, then crop off the extra information outside
             // the display window.
             let format_supports_data_window = path_expanded.ends_with(".exr");
             !format_supports_data_window
         }
-        _ => panic!("Invalid crop_on_write value: {}", crop_on_write),
+        _ => panic!("Invalid crop_on_write value: {:?}", crop_on_write),
     };
 
-    let ok = imageio::write_image(&image, &path_expanded, num_threads, do_crop);
+    let ok = imageio::write_image(&image, &path_expanded, num_threads, do_crop, compress);
     ok
 }
 
@@ -241,13 +253,33 @@ impl Operation for WriteImageOperation {
                     let file_path = attr_block.get_attr_str("file_path");
                     let bake_pixel_data_type =
                         PixelDataType::from(attr_block.get_attr_i32("pixel_data_type"));
-                    let crop_on_write = attr_block.get_attr_i32("crop_on_write");
+                    let crop_on_write = CropOnWrite::from(attr_block.get_attr_i32("crop_on_write"));
+                    let exr_compression =
+                        ExrCompression::from(attr_block.get_attr_i32("exr_compression"));
+                    let exr_dwa_compression_level =
+                        attr_block.get_attr_i32("exr_dwa_compression_level");
+                    let png_compression_level = attr_block.get_attr_i32("png_compression_level");
+                    let jpeg_compression_level = attr_block.get_attr_i32("jpeg_compression_level");
+                    let jpeg_subsampling =
+                        JpegChromaSubSampling::from(attr_block.get_attr_i32("jpeg_subsampling"));
+                    let jpeg_progressive = attr_block.get_attr_i32("jpeg_progressive") != 0;
+
+                    let compress = ImageCompression {
+                        exr_compression,
+                        exr_dwa_compression_level,
+                        png_compression_level,
+                        jpeg_compression_level,
+                        jpeg_subsampling,
+                        jpeg_progressive,
+                    };
+
                     let ok = do_image_process(
                         input,
                         file_path,
                         frame,
                         bake_pixel_data_type,
                         crop_on_write,
+                        compress,
                     );
                     if ok == false {
                         warn!("Failed to write image: status={}", ok);
@@ -279,6 +311,12 @@ impl AttrBlock for WriteImageAttrs {
             "file_path" => AttrState::Exists,
             "crop_on_write" => AttrState::Exists,
             "pixel_data_type" => AttrState::Exists,
+            "exr_compression" => AttrState::Exists,
+            "exr_dwa_compression_level" => AttrState::Exists,
+            "png_compression_level" => AttrState::Exists,
+            "jpeg_compression_level" => AttrState::Exists,
+            "jpeg_subsampling" => AttrState::Exists,
+            "jpeg_progressive" => AttrState::Exists,
             _ => AttrState::Missing,
         }
     }
@@ -303,6 +341,12 @@ impl AttrBlock for WriteImageAttrs {
             "execute" => self.execute,
             "crop_on_write" => self.crop_on_write,
             "pixel_data_type" => self.pixel_data_type,
+            "exr_compression" => self.exr_compression,
+            "exr_dwa_compression_level" => self.exr_dwa_compression_level,
+            "png_compression_level" => self.png_compression_level,
+            "jpeg_compression_level" => self.jpeg_compression_level,
+            "jpeg_subsampling" => self.jpeg_subsampling,
+            "jpeg_progressive" => self.jpeg_progressive,
             _ => 0,
         }
     }
@@ -313,6 +357,12 @@ impl AttrBlock for WriteImageAttrs {
             "execute" => self.execute = value,
             "crop_on_write" => self.crop_on_write = value,
             "pixel_data_type" => self.pixel_data_type = value,
+            "exr_compression" => self.exr_compression = value,
+            "exr_dwa_compression_level" => self.exr_dwa_compression_level = value,
+            "png_compression_level" => self.png_compression_level = value,
+            "jpeg_compression_level" => self.jpeg_compression_level = value,
+            "jpeg_subsampling" => self.jpeg_subsampling = value,
+            "jpeg_progressive" => self.jpeg_progressive = value,
             _ => (),
         };
     }
