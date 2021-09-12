@@ -51,20 +51,28 @@ int test_node_resample(const bool debug_print,
         read_node, "file_path",
         "tests/data/openexr-images/ScanLines/Desk.exr");
 
+    // No change
+    graph.set_node_attr_i32(resample_node, "interpolate", 0);
+    graph.set_node_attr_i32(resample_node, "factor", 0);
+    graph.set_node_attr_str(
+        write_node, "file_path",
+        "./tests/data/out/test_node_resample_out1_noChange.png");
+    auto exec_status = graph.execute(write_node, frames, cache);
+
     // Down-res 1
     graph.set_node_attr_i32(resample_node, "interpolate", 0);
     graph.set_node_attr_i32(resample_node, "factor", -1);
     graph.set_node_attr_str(
         write_node, "file_path",
-        "./tests/data/out/test_node_resample_out1_downRes1_interpOff.png");
-    auto exec_status = graph.execute(write_node, frames, cache);
+        "./tests/data/out/test_node_resample_out2_downRes1_interpOff.png");
+    exec_status = graph.execute(write_node, frames, cache);
 
     // Down-res 2
     graph.set_node_attr_i32(resample_node, "interpolate", 1);
     graph.set_node_attr_i32(resample_node, "factor", -2);
     graph.set_node_attr_str(
         write_node, "file_path",
-        "./tests/data/out/test_node_resample_out2_downRes2_interpOn.png");
+        "./tests/data/out/test_node_resample_out3_downRes2_interpOn.png");
     exec_status = graph.execute(write_node, frames, cache);
 
     // Up-res 1
@@ -72,7 +80,7 @@ int test_node_resample(const bool debug_print,
     graph.set_node_attr_i32(resample_node, "factor", 1);
     graph.set_node_attr_str(
         write_node, "file_path",
-        "./tests/data/out/test_node_resample_out3_upRes1_interpOn.png");
+        "./tests/data/out/test_node_resample_out4_upRes1_interpOn.png");
     exec_status = graph.execute(write_node, frames, cache);
 
     // Up-res 2
@@ -80,7 +88,7 @@ int test_node_resample(const bool debug_print,
     graph.set_node_attr_i32(resample_node, "factor", 2);
     graph.set_node_attr_str(
         write_node, "file_path",
-        "./tests/data/out/test_node_resample_out4_upRes2_interpOff.png");
+        "./tests/data/out/test_node_resample_out5_upRes2_interpOff.png");
     exec_status = graph.execute(write_node, frames, cache);
 
     // Down-res 4 (single pixel)
@@ -88,7 +96,7 @@ int test_node_resample(const bool debug_print,
     graph.set_node_attr_i32(resample_node, "factor", -12);
     graph.set_node_attr_str(
         write_node, "file_path",
-        "./tests/data/out/test_node_resample_out5_downRes12_interpOn.png");
+        "./tests/data/out/test_node_resample_out6_downRes12_interpOn.png");
     exec_status = graph.execute(write_node, frames, cache);
 
     // Up-res 14 (maximum extent of image size)
@@ -96,7 +104,7 @@ int test_node_resample(const bool debug_print,
     graph.set_node_attr_i32(resample_node, "factor", 14);
     graph.set_node_attr_str(
         write_node, "file_path",
-        "./tests/data/out/test_node_resample_out6_upRes14_interpOff.png");
+        "./tests/data/out/test_node_resample_out7_upRes14_interpOff.png");
     exec_status = graph.execute(write_node, frames, cache);
 
     if (debug_print) {

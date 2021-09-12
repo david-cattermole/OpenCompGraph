@@ -146,23 +146,34 @@ impl Operation for ResampleImageOperation {
 
         let factor = attr_block.get_attr_i32("factor");
         if factor != 0 {
+            // Do work and use destination image.
             let interpolate = attr_block.get_attr_i32("interpolate") != 0;
             let ok = imageresample::image_resample(&mut src_img, &mut dst_img, factor, interpolate);
             if ok == false {
                 error!("ResampleImage failed!");
                 status = NodeStatus::Error;
             }
+
+            let pixel_block = Rc::new(*dst_img.pixel_block);
+            let data_window = dst_img.data_window;
+            let display_window = dst_img.display_window;
+
+            stream_data.set_data_window(data_window);
+            stream_data.set_display_window(display_window);
+            stream_data.set_pixel_block(pixel_block);
+        } else {
+            // Use source image.
+            let pixel_block = Rc::new(*src_img.pixel_block);
+            let data_window = src_img.data_window;
+            let display_window = src_img.display_window;
+
+            stream_data.set_data_window(data_window);
+            stream_data.set_display_window(display_window);
+
+            stream_data.set_pixel_block(pixel_block);
         }
 
-        let pixel_block = Rc::new(*dst_img.pixel_block);
-        let data_window = dst_img.data_window;
-        let display_window = dst_img.display_window;
-
-        stream_data.set_data_window(data_window);
-        stream_data.set_display_window(display_window);
         stream_data.set_hash(hash_value);
-        stream_data.set_pixel_block(pixel_block);
-
         *output = std::rc::Rc::new(stream_data);
         status
     }
