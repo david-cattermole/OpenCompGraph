@@ -26,7 +26,7 @@ worked on.
 | MS Windows support (MSVC)                                                    |          Done |
 | Linux support (GCC)                                                          | To be started |
 | MacOS support (Clang)                                                        | To be started |
-| Rust to C++ API                                                              |           WIP |
+| Rust to C++ API                                                              |          Done |
 | Node connection frame work.                                                  |          Done |
 | Node attribute getting/setting.                                              |          Done |
 | Node image data streams.                                                     |          Done |
@@ -56,13 +56,13 @@ worked on.
 | Internal "Half" Floating point 16-bit Pixel Format.                          |          Done |
 | Internal Floating Point 32-bit Pixel Format.                                 |          Done |
 | Image metadata display window and data window support.                       |          Done |
-| Standalone executable to read and executre node graphs.                      | To be started |
-| LDPK integration for lens distortion and image deformation.                  |           WIP |
-| OpenImageIO integration for image reading and image processing.              |           WIP |
-| OpenColorIO integration for accurate and configurable color workflow.        |           WIP |
+| Standalone executable to read and execute node graphs.                       | To be started |
+| LDPK integration for lens distortion and image deformation.                  |   In progress |
+| OpenImageIO integration for image reading and image processing.              |   In progress |
+| OpenColorIO integration for accurate and configurable color workflow.        |   In progress |
 | Create a Python API to wrap the library.                                     | To be started |
-| R&D - Decrease RAM usage while still working in floating-point linear color. | To be startad |
-| Write out cached data as loadable files for improved read-performance.       | To be started |
+| R&D - Decrease RAM usage while still working in floating-point linear color. |   In progress |
+| Write out cached data as loadable files for improved read-performance.       |   In progress |
 
 These are the nodes that are planed or currently implemented.
 
@@ -71,15 +71,23 @@ These are the nodes that are planed or currently implemented.
 | ReadImage     | Read an image file (JPEG, PNG, TIFF, TGA) as a stream.             |          Done |
 | WriteImage    | Write an image data stream to disk (JPEG, PNG, TIFF, TGA).         |          Done |
 | LensDistort   | Deforms the image pixels with a brownian lens distortion function. |          Done |
-| (Color) Grade | Applies a color matrix (4x4) to the input image stream             |          Done |
+| ColorGrade    | Applies a set of color operations to the input image stream        |          Done |
+| ColorCorrect  | Change saturation and contrast of image colors.                    | To be started |
 | Transform     | Applies a 2D transform to the input image stream                   |          Done |
 | Null          | A "no op" node, that does nothing.                                 |          Done |
+| Switch        | Choose the input stream using a number.                            | To be started |
+| Shuffle       | Re-order input image channels as output channels.                  | To be started |
+| Viewer        | Pre-defined operations available to viewing a node stream.         |           WIP |
 | MergeImage    | Blend/Combine 1 or more images together into a single image.       |           WIP |
 | CropImage     | Remove pixel data outside a square region.                         |           WIP |
+| ResampleImage | Increase/decrease image resolution for fast-preview results.       |          Done |
 | ReformatImage | Change the resolution of the image data.                           | To be started |
-| Exposure      | Change the colors of an image using exposure values (EV)           | To be started |
-| ConvertSTMap  | Apply a deformer as pixel colours                                  | To be started |
-| Keyer         | Calculate an alpha channel for a green/blue-screen image           | To be started |
+| ColorExposure | Change the colors of an image using exposure values (EV).          | To be started |
+| ConvertSTMap  | Apply a deformer as pixel colours.                                 | To be started |
+| KeyerImage    | Calculate an alpha channel for a green/blue-screen image.          | To be started |
+| BlurImage     | Blur (convolve) an image using a 2D kernel.                        | To be started |
+| FrameHold     | Hold all images upstream to the the given frame number.            | To be started |
+| FrameOffset   | Add/subtract a frame number from the current evaluation frame.     | To be started |
 
 ## Building
 
