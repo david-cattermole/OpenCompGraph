@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020, 2021 David Cattermole.
+ * Copyright (C) 2021 David Cattermole.
  *
  * This file is part of OpenCompGraph.
  *
@@ -19,5 +19,35 @@
  *
  */
 
-pub mod bbox2df;
-pub mod bbox2di;
+use crate::bbox::bbox2di::row::BBox2DRow;
+
+/// Iterator over row items.
+pub struct BBox2DRowIterator<'a> {
+    inner: &'a BBox2DRow<'a>,
+    index: i32,
+}
+
+impl<'a> BBox2DRowIterator<'a> {
+    #[allow(dead_code)]
+    pub fn new(inner: &'a BBox2DRow) -> Self {
+        BBox2DRowIterator {
+            inner,
+            index: inner.min(),
+        }
+    }
+}
+
+/// Implement a Iterator for Rows.
+impl<'a> Iterator for BBox2DRowIterator<'a> {
+    type Item = i32;
+
+    fn next(&mut self) -> Option<i32> {
+        if self.index >= self.inner.max() {
+            return None;
+        }
+
+        let current = self.index;
+        self.index += 1;
+        Some(current)
+    }
+}

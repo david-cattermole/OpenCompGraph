@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020, 2021 David Cattermole.
+ * Copyright (C) 2021 David Cattermole.
  *
  * This file is part of OpenCompGraph.
  *
@@ -19,5 +19,10 @@
  *
  */
 
-pub mod bbox2df;
-pub mod bbox2di;
+use crate::bbox::bbox2di::row::BBox2DRow;
+
+pub trait BBox2DRows<'a> {
+    fn row(&self, row: usize) -> BBox2DRow;
+
+    fn rows(&'a self) -> Box<dyn Iterator<Item = BBox2DRow> + 'a>;
+}

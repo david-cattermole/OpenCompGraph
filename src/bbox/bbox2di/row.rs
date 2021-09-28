@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020, 2021 David Cattermole.
+ * Copyright (C) 2021 David Cattermole.
  *
  * This file is part of OpenCompGraph.
  *
@@ -19,5 +19,38 @@
  *
  */
 
-pub mod bbox2df;
-pub mod bbox2di;
+use crate::cxxbridge::ffi::BBox2Di;
+
+/// Represents a single row of a BBox2Di.
+pub struct BBox2DRow<'a> {
+    pub inner: &'a BBox2Di,
+    pub row_index: usize,
+}
+
+impl<'a> BBox2DRow<'a> {
+    pub fn new(inner: &'a BBox2Di, row: usize) -> Self {
+        BBox2DRow {
+            inner,
+            row_index: row,
+        }
+    }
+
+    #[allow(dead_code)]
+    pub fn min(&self) -> i32 {
+        self.inner.min_x as i32
+    }
+
+    pub fn max(&self) -> i32 {
+        self.inner.max_x as i32
+    }
+
+    #[allow(dead_code)]
+    pub fn len(&self) -> usize {
+        self.inner.width() as usize
+    }
+
+    #[allow(dead_code)]
+    pub fn has_next(&self) -> bool {
+        self.row_index < self.len()
+    }
+}
