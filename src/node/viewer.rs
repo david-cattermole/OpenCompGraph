@@ -32,11 +32,11 @@ use crate::cache::CachedImage;
 use crate::cxxbridge::ffi::AttrState;
 use crate::cxxbridge::ffi::BBox2Di;
 use crate::cxxbridge::ffi::BakeOption;
+use crate::cxxbridge::ffi::DataType;
 use crate::cxxbridge::ffi::ImageShared;
 use crate::cxxbridge::ffi::ImageSpec;
 use crate::cxxbridge::ffi::NodeStatus;
 use crate::cxxbridge::ffi::NodeType;
-use crate::cxxbridge::ffi::PixelDataType;
 use crate::data::FrameValue;
 use crate::data::HashValue;
 use crate::data::Identifier;
@@ -47,7 +47,7 @@ use crate::node::traits::Validate;
 use crate::node::NodeImpl;
 use crate::ops::bake;
 use crate::ops::imagecrop;
-use crate::pixelblock::PixelBlock;
+use crate::pixelblock::pixelblock::PixelBlock;
 use crate::stream::StreamDataImpl;
 
 pub fn new(id: Identifier) -> NodeImpl {
@@ -68,7 +68,7 @@ pub struct ViewerOperation {}
 pub struct ViewerAttrs {
     pub enable: i32,
     pub bake_option: i32,          // index for a BakeOption.
-    pub bake_pixel_data_type: i32, // index for PixelDataType.
+    pub bake_pixel_data_type: i32, // index for DataType.
     pub bake_color_space: String,
     pub crop_to_format: i32,
 }
@@ -84,7 +84,7 @@ impl ViewerAttrs {
         ViewerAttrs {
             enable: 1,
             bake_option: 0,          // 0 = BakeOption::Nothing
-            bake_pixel_data_type: 1, // 1 = PixelDataType::Half16
+            bake_pixel_data_type: 1, // 1 = DataType::Half16
             bake_color_space: COLOR_SPACE_NAME_LINEAR.to_string(),
             crop_to_format: 0,
         }
@@ -94,7 +94,7 @@ impl ViewerAttrs {
 fn do_viewer_bake(
     mut stream_data: &mut StreamDataImpl,
     bake_option: BakeOption,
-    bake_pixel_data_type: PixelDataType,
+    bake_pixel_data_type: DataType,
     crop_to_format: bool,
     to_color_space: &str,
 ) -> (Rc<PixelBlock>, ImageSpec, BBox2Di, BBox2Di) {
@@ -106,7 +106,7 @@ fn do_viewer_bake(
     let mut pixel_block = stream_data.clone_pixel_block();
     let mut image_spec = stream_data.clone_image_spec();
 
-    let pixel_data_type = PixelDataType::Float32;
+    let data_type = DataType::Float32;
     let from_color_space = &image_spec.color_space();
     bake::do_process(
         bake_option,
@@ -117,7 +117,7 @@ fn do_viewer_bake(
         &mut stream_data,
         &from_color_space,
         to_color_space,
-        pixel_data_type,
+        data_type,
     );
 
     if crop_to_format {
@@ -145,10 +145,10 @@ fn do_viewer_bake(
         image_spec = img.spec;
     }
     debug!(
-        "ViewerOperation: convert to baked pixel_data_type={:#?}",
+        "ViewerOperation: convert to baked data_type={:#?}",
         bake_pixel_data_type,
     );
-    pixel_block.convert_into_pixel_data_type(bake_pixel_data_type);
+    pixel_block.convert_into_data_type(bake_pixel_data_type);
 
     let pixel_block_rc = Rc::new(pixel_block);
     (
@@ -205,7 +205,7 @@ impl Operation for ViewerOperation {
             };
 
             let bake_pixel_data_type =
-                PixelDataType::from(attr_block.get_attr_i32("bake_pixel_data_type"));
+                DataType::from(attr_block.get_attr_i32("bake_pixel_data_type"));
             debug!("crop_to_format={:#?}", crop_to_format);
             debug!("bake_pixel_data_type={:#?}", bake_pixel_data_type);
 

@@ -26,30 +26,30 @@
 namespace open_comp_graph {
 namespace internal {
 
-PixelDataType oiio_format_to_ocg_format(const OIIO::TypeDesc oiio_type_desc) {
-    auto pixel_data_type = PixelDataType::kUnknown;
+DataType oiio_format_to_ocg_format(const OIIO::TypeDesc oiio_type_desc) {
+    auto data_type = DataType::kUnknown;
     if (oiio_type_desc == OIIO::TypeDesc::UINT8) {
-        pixel_data_type = PixelDataType::kUInt8;
+        data_type = DataType::kUInt8;
     } else if (oiio_type_desc == OIIO::TypeDesc::HALF) {
-        pixel_data_type = PixelDataType::kHalf16;
+        data_type = DataType::kHalf16;
     } else if (oiio_type_desc == OIIO::TypeDesc::FLOAT) {
-        pixel_data_type = PixelDataType::kFloat32;
+        data_type = DataType::kFloat32;
     } else if (oiio_type_desc == OIIO::TypeDesc::UINT16) {
-        pixel_data_type = PixelDataType::kUInt16;
+        data_type = DataType::kUInt16;
     }
-    return pixel_data_type;
+    return data_type;
 }
 
 
-OIIO::TypeDesc ocg_format_to_oiio_format(const PixelDataType ocg_pixel_data_type) {
+OIIO::TypeDesc ocg_format_to_oiio_format(const DataType ocg_data_type) {
     auto oiio_type_desc = OIIO::TypeDesc::UNKNOWN;
-    if (ocg_pixel_data_type == PixelDataType::kUInt8) {
+    if (ocg_data_type == DataType::kUInt8) {
         oiio_type_desc = OIIO::TypeDesc::UINT8;
-    } else if (ocg_pixel_data_type == PixelDataType::kHalf16) {
+    } else if (ocg_data_type == DataType::kHalf16) {
         oiio_type_desc = OIIO::TypeDesc::HALF;
-    } else if (ocg_pixel_data_type == PixelDataType::kFloat32) {
+    } else if (ocg_data_type == DataType::kFloat32) {
         oiio_type_desc = OIIO::TypeDesc::FLOAT;
-    } else if (ocg_pixel_data_type == PixelDataType::kUInt16) {
+    } else if (ocg_data_type == DataType::kUInt16) {
         oiio_type_desc = OIIO::TypeDesc::UINT16;
     }
     return oiio_type_desc;
@@ -65,13 +65,13 @@ bool oiio_construct_spec(
         int display_window_max_x,
         int display_window_max_y,
         int num_channels,
-        const PixelDataType pixel_data_type,
+        const DataType data_type,
         OIIO::ImageSpec &spec) {
     spec.width = data_width;
     spec.height = data_height;
     spec.nchannels = num_channels;
 
-    auto type_desc = ocg_format_to_oiio_format(pixel_data_type);
+    auto type_desc = ocg_format_to_oiio_format(data_type);
     spec.format = type_desc;
 
     spec.full_x = display_window_min_x;
@@ -88,7 +88,7 @@ bool oiio_construct_spec(
         int data_width,
         int data_height,
         int num_channels,
-        const PixelDataType pixel_data_type,
+        const DataType data_type,
         OIIO::ImageSpec &spec) {
     return oiio_construct_spec(
         0, 0,
@@ -96,12 +96,12 @@ bool oiio_construct_spec(
         0, 0,
         data_width, data_height,
         num_channels,
-        pixel_data_type,
+        data_type,
         spec);
 }
 
 bool oiio_allocate_image(
-        OIIO::ImageSpec &spec,
+        const OIIO::ImageSpec &spec,
         ImageShared &image) {
 
     // Read the data window.
@@ -133,12 +133,16 @@ bool oiio_allocate_image(
     // needing "GL_UNPACK_ALIGNMENT". Maya does not support any pixel
     // formats that align to 48-bytes (such as RGB 8-bit), so we must
     // pad the channels.
-    auto pixel_data_type = oiio_format_to_ocg_format(spec.format);
+    auto data_type = oiio_format_to_ocg_format(spec.format);
     auto padded_num_channels =
-        static_cast<int32_t>(stride_num_channels(spec.nchannels, pixel_data_type));
-    auto channel_num_bytes = channel_size_bytes(pixel_data_type);
+        static_cast<int32_t>(stride_num_channels(spec.nchannels, data_type));
+    auto channel_num_bytes = channel_size_bytes(data_type);
+    auto blocksize = open_comp_graph::BlockSize{
+        spec.width,
+        spec.height,
+        padded_num_channels};
     image.pixel_block->data_resize(
-        spec.width, spec.height, padded_num_channels, pixel_data_type);
+        blocksize, data_type);
 
     return true;
 }

@@ -19,7 +19,7 @@
  *
  */
 
-use crate::pixelblock::get_pixel_index;
+use crate::pixelblock::utils::get_pixel_index;
 
 /// This assumes the 'pixels' have RGBA channels.
 #[inline]

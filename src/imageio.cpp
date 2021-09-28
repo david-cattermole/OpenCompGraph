@@ -29,6 +29,7 @@
 
 #include <opencompgraph.h>
 #include <opencompgraph/internal/oiio_utils.h>
+#include <opencompgraph/internal/pixelblock.h>
 #include <OpenImageIO/imageio.h>
 
 
@@ -44,15 +45,20 @@ bool oiio_set_thread_count(const int num_threads) {
 }
 
 bool oiio_read_image(const rust::String &file_path, ImageShared &image) {
+    // std::cerr << "oiio_read_image..." << file_path << '\n';
     auto filename = std::string(file_path);
     auto in = OIIO::ImageInput::open(filename);
     if (!in) {
+        std::cerr
+            << "oiio_read_image: failed to open file name: "
+            << filename << '\n';
         return false;
     }
     int subimage = 0;
     int miplevel = 0;
     bool seek_ok = in->seek_subimage(subimage, miplevel);
     if (!seek_ok) {
+        std::cerr << "oiio_read_image: failed to find sub-image.\n";
         return false;
     }
 
@@ -67,47 +73,26 @@ bool oiio_read_image(const rust::String &file_path, ImageShared &image) {
     // We do not support images with channels less than 3 (RGB) or
     // more than 4 (RGBA).
     if (num_channels < 3) {
+        std::cerr
+            << "oiio_read_image: Cannot open image with less than 3 channels (RGB).\n";
         return false;
     }
     std::max(num_channels, 4);
 
-    // Read the data window.
-    image.data_window.min_x = spec.x;
-    image.data_window.min_y = spec.y;
-    image.data_window.max_x = spec.x + spec.width;
-    image.data_window.max_y = spec.y + spec.height;
-
-    // Read the display window.
-    image.display_window.min_x = spec.full_x;
-    image.display_window.min_y = spec.full_y;
-    image.display_window.max_x = spec.full_x + spec.full_width;
-    image.display_window.max_y = spec.full_y + spec.full_height;
-
-    // Ensure the display window corner starts at 0,0 by removing any
-    // non-zero values and pushing the values into the data window.
-    image.data_window.min_x += image.display_window.min_x;
-    image.data_window.min_y += image.display_window.min_y;
-    image.data_window.max_x += image.display_window.min_x;
-    image.data_window.max_y += image.display_window.min_y;
-    image.display_window.max_x -= image.display_window.min_x;
-    image.display_window.max_y -= image.display_window.min_y;
-    image.display_window.min_x = 0;
-    image.display_window.min_y = 0;
-
-    // Allocate pixel memory with Rust data structure.
-    //
-    // Make sure the data read is compatible with OpenGL without
-    // needing "GL_UNPACK_ALIGNMENT". Maya does not support any pixel
-    // formats that align to 48-bytes (such as RGB 8-bit), so we must
-    // pad the channels.
     auto pixel_data_type = oiio_format_to_ocg_format(oiio_data_type);
+    auto channel_num_bytes = channel_size_bytes(pixel_data_type);
     auto padded_num_channels =
         static_cast<int32_t>(stride_num_channels(num_channels, pixel_data_type));
-    auto channel_num_bytes = channel_size_bytes(pixel_data_type);
-    image.pixel_block->data_resize(
-        width, height, padded_num_channels, pixel_data_type);
-    auto pixels = image.pixel_block->as_slice_mut();
-    auto pixel_data = pixels.data();
+    auto pixel_size_bytes = padded_num_channels * channel_num_bytes;
+
+    bool ok = oiio_allocate_image(spec, image);
+
+    auto pixel_data = pixelblock_get_pixel_data_ptr_read_write(image.pixel_block);
+    if (pixel_data == nullptr) {
+        std::cerr
+            << "oiio_read_image: Failed to get pixel data pointer.\n";
+        return false;
+    }
 
     // Read image metadata.
     //
@@ -160,7 +145,6 @@ bool oiio_read_image(const rust::String &file_path, ImageShared &image) {
 
     int chbegin = 0;
     int chend = num_channels;
-    auto pixel_size_bytes = padded_num_channels * channel_num_bytes;
     OIIO::stride_t xstride = pixel_size_bytes;
     OIIO::stride_t ystride = OIIO::AutoStride;
     OIIO::stride_t zstride = OIIO::AutoStride;
@@ -184,30 +168,54 @@ bool name_has_suffix(std::string const &name, std::string const &suffix) {
 
 bool oiio_write_image(const rust::String &file_path, const ImageShared &image,
                       const ImageCompression &compress) {
+    // std::cerr << "oiio_write_image..." << file_path << '\n';
     const int32_t xres = image.pixel_block->width();
     const int32_t yres = image.pixel_block->height();
     const int32_t channels = image.pixel_block->num_channels();
-    rust::Slice<const float> pixels = image.pixel_block->as_slice();
-    const float *pixel_data = pixels.data();
+    auto pixel_data_type = image.pixel_block->data_type();
+
+    // Get pixel data pointer from DataBlock.
+    auto pixel_data = pixelblock_get_pixel_data_ptr_read_only(image.pixel_block);
+    if (pixel_data == nullptr) {
+        std::cerr
+            << "oiio_write_image: Failed to get pixel data pointer.\n";
+        return false;
+    }
 
     auto filename = std::string(file_path);
     auto out = OIIO::ImageOutput::create(filename);
     if (!out) {
         std::cerr
+            << "oiio_write_image: "
             << "No valid OIIO output plug-in could be found. "
-            << "Cannot write image!\n";
+            << "Cannot write image! "
+            << filename << '\n';
         return false;
     }
     // std::cerr << "Output Format: " << out->format_name() << '\n';
 
-    auto type_desc = ocg_format_to_oiio_format(image.pixel_block->pixel_data_type());
-    OIIO::ImageSpec spec(xres, yres, channels, type_desc);
-    spec.full_x = image.display_window.min_x;
-    spec.full_y = image.display_window.min_y;
-    spec.full_width = image.display_window.max_x - image.display_window.min_x;
-    spec.full_height = image.display_window.max_y - image.display_window.min_y;
-    spec.x = image.data_window.min_x;
-    spec.y = image.data_window.min_y;
+    // Construct ImageSpec.
+    OIIO::ImageSpec spec;
+    bool ok = oiio_construct_spec(
+        image.data_window.min_x,
+        image.data_window.min_y,
+        xres,
+        yres,
+        image.display_window.min_x,
+        image.display_window.min_y,
+        image.display_window.max_x,
+        image.display_window.max_y,
+        channels,
+        pixel_data_type,
+        spec);
+    if (!ok) {
+        std::cerr
+            << "oiio_write_image: "
+            << "Invalid image specification. "
+            << "Cannot write image! "
+            << filename << '\n';
+        return false;
+    }
 
     // Set the 'colorspace', and other metadata, so that the image
     // writing can correctly convert the data for the intended format.
@@ -303,11 +311,12 @@ bool oiio_write_image(const rust::String &file_path, const ImageShared &image,
     // auto software = std::string("OpenCompGraph");
     // spec.attribute("Software", software);
 
+    auto type_desc = ocg_format_to_oiio_format(pixel_data_type);
     out->open(filename, spec);
-    auto ok = out->write_image(type_desc, pixel_data);
+    ok = out->write_image(type_desc, pixel_data);
     if (!ok) {
         auto error_message = out->geterror();
-        std::cerr << "ERROR: " << error_message << '\n';
+        std::cerr << "oiio_write_image: ERROR: " << error_message << '\n';
     }
     out->close();
     return true;

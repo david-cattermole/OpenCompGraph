@@ -19,10 +19,22 @@
  *
  */
 
-pub mod blocksize;
-pub mod datablock;
-pub mod dataslice;
-pub mod datatype;
-pub mod dynimage;
-pub mod pixelblock;
-pub mod utils;
+use half::f16;
+
+use crate::cxxbridge::ffi::DataType;
+
+impl DataType {
+    #[inline]
+    pub fn size_bytes(&self) -> usize {
+        let num_bytes = match *self {
+            DataType::UInt8 => std::mem::size_of::<u8>(),
+            DataType::Half16 => std::mem::size_of::<f16>(),
+            DataType::Float32 => std::mem::size_of::<f32>(),
+            DataType::UInt16 => std::mem::size_of::<u16>(),
+            _ => {
+                panic!("Invalid DataType: {:?}", self);
+            }
+        };
+        num_bytes
+    }
+}

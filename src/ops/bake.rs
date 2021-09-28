@@ -24,13 +24,13 @@ use log::{debug, warn};
 use crate::colorspace;
 use crate::cxxbridge::ffi::BBox2Di;
 use crate::cxxbridge::ffi::BakeOption;
+use crate::cxxbridge::ffi::DataType;
 use crate::cxxbridge::ffi::ImageSpec;
 use crate::cxxbridge::ffi::Matrix4;
-use crate::cxxbridge::ffi::PixelDataType;
 use crate::data::COLOR_SPACE_NAME_LINEAR;
 use crate::deformutils;
 use crate::ops;
-use crate::pixelblock::PixelBlock;
+use crate::pixelblock::pixelblock::PixelBlock;
 use crate::stream::StreamDataImpl;
 
 /// Convert pixels from color space to another color space.
@@ -49,7 +49,7 @@ pub fn do_process_colorspace(
     //
     // Before applying any changes to the pixels we must ensure we
     // work with 32-bit floating-point data.
-    pixel_block.convert_into_pixel_data_type(PixelDataType::Float32);
+    pixel_block.convert_into_data_type(DataType::Float32);
 
     if from_color_space == to_color_space {
         // Nothing to convert.
@@ -67,7 +67,7 @@ pub fn do_process_colorspace(
     }
 
     let ok = colorspace::color_convert_inplace(
-        &mut pixel_block.as_slice_mut(),
+        &mut pixel_block.as_mut_slice_f32(),
         width,
         height,
         num_channels,
@@ -102,11 +102,11 @@ pub fn do_process(
     stream_data: &mut StreamDataImpl,
     from_color_space: &str,
     to_color_space: &str,
-    out_pixel_data_type: PixelDataType,
+    to_data_type: DataType,
 ) {
     debug!(
         "ops::bake::do_process(bake_option={:#?} from_color_space={:#?} to_color_space={:#?} pixel_data_type={:#?})",
-        bake_option, from_color_space, to_color_space, out_pixel_data_type
+        bake_option, from_color_space, to_color_space, to_data_type
     );
 
     match bake_option {
@@ -115,7 +115,7 @@ pub fn do_process(
             do_process_colorspace(pixel_block, image_spec, &from_color_space, &to_color_space);
 
             // Convert to whatever output data type requested.
-            pixel_block.convert_into_pixel_data_type(out_pixel_data_type);
+            pixel_block.convert_into_data_type(to_data_type);
         }
         BakeOption::ColorSpaceAndGrade => {
             // Convert from user color space to linear space.
@@ -129,7 +129,7 @@ pub fn do_process(
 
             // Apply Color Matrix (in linear color space)
             let num_channels = pixel_block.num_channels();
-            let pixels = &mut pixel_block.as_slice_mut();
+            let pixels = &mut pixel_block.as_mut_slice_f32();
             let color_matrix = stream_data.color_matrix().to_na_matrix();
             ops::xformcolor::apply_color_matrix_inplace(pixels, num_channels, color_matrix);
             stream_data.set_color_matrix(Matrix4::identity());
@@ -144,7 +144,7 @@ pub fn do_process(
             image_spec.set_color_space(to_color_space.to_string());
 
             // Convert to whatever output data type requested.
-            pixel_block.convert_into_pixel_data_type(out_pixel_data_type);
+            pixel_block.convert_into_data_type(to_data_type);
         }
         BakeOption::All => {
             // Convert from user color space to linear space.
@@ -161,7 +161,7 @@ pub fn do_process(
             // Apply Color Matrix (in linear color space)
             debug!("apply color matrix: START");
             let num_channels = pixel_block.num_channels();
-            let pixels = &mut pixel_block.as_slice_mut();
+            let pixels = &mut pixel_block.as_mut_slice_f32();
             let color_matrix = stream_data.color_matrix().to_na_matrix();
             ops::xformcolor::apply_color_matrix_inplace(pixels, num_channels, color_matrix);
             stream_data.set_color_matrix(Matrix4::identity());
@@ -195,7 +195,7 @@ pub fn do_process(
             debug!("apply POST colorspace: END");
 
             // Convert to whatever output data type requested.
-            pixel_block.convert_into_pixel_data_type(out_pixel_data_type);
+            pixel_block.convert_into_data_type(to_data_type);
         }
         _ => panic!("Unknown"),
     }

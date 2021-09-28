@@ -31,13 +31,13 @@ use crate::cache::CacheImpl;
 use crate::cxxbridge::ffi::AttrState;
 use crate::cxxbridge::ffi::BakeOption;
 use crate::cxxbridge::ffi::CropOnWrite;
+use crate::cxxbridge::ffi::DataType;
 use crate::cxxbridge::ffi::ExrCompression;
 use crate::cxxbridge::ffi::ImageCompression;
 use crate::cxxbridge::ffi::ImageShared;
 use crate::cxxbridge::ffi::JpegChromaSubSampling;
 use crate::cxxbridge::ffi::NodeStatus;
 use crate::cxxbridge::ffi::NodeType;
-use crate::cxxbridge::ffi::PixelDataType;
 use crate::data::FrameValue;
 use crate::data::HashValue;
 use crate::data::Identifier;
@@ -82,7 +82,7 @@ pub struct WriteImageAttrs {
     pub crop_on_write: i32, // index for WriteImageCropOnWrite.
 
     // The pixel data type for pixels written out.
-    pub pixel_data_type: i32, // index for PixelDataType.
+    pub pixel_data_type: i32, // index for DataType.
 
     // EXR Compression
     pub exr_compression: i32, // index for ExrCompression
@@ -115,7 +115,7 @@ impl WriteImageAttrs {
             execute: 1,
             file_path: "".to_string(),
             crop_on_write: 2,              // 2 = CropOnWrite::Auto
-            pixel_data_type: 255,          // 255 = PixelDataType::Unknown
+            pixel_data_type: 255,          // 255 = DataType::Unknown
             exr_compression: 0,            // 0 = ExrCompression::Default
             exr_dwa_compression_level: 45, // Good default for DWA compression
             png_compression_level: 6,      // 0 to 9; 6 is default.
@@ -130,7 +130,7 @@ fn do_image_process(
     input: &Rc<StreamDataImpl>,
     file_path: &str,
     frame: FrameValue,
-    bake_pixel_data_type: PixelDataType,
+    bake_pixel_data_type: DataType,
     crop_on_write: CropOnWrite,
     compress: ImageCompression,
 ) -> bool {
@@ -148,7 +148,7 @@ fn do_image_process(
     // The Pixels will be baked into this data type before
     // writing out.
     let out_pixel_data_type = match bake_pixel_data_type {
-        PixelDataType::Unknown => copy.pixel_data_type(),
+        DataType::Unknown => copy.pixel_data_type(),
         _ => bake_pixel_data_type,
     };
 
@@ -252,7 +252,7 @@ impl Operation for WriteImageOperation {
                     let input = &inputs[0].clone();
                     let file_path = attr_block.get_attr_str("file_path");
                     let bake_pixel_data_type =
-                        PixelDataType::from(attr_block.get_attr_i32("pixel_data_type"));
+                        DataType::from(attr_block.get_attr_i32("pixel_data_type"));
                     let crop_on_write = CropOnWrite::from(attr_block.get_attr_i32("crop_on_write"));
                     let exr_compression =
                         ExrCompression::from(attr_block.get_attr_i32("exr_compression"));

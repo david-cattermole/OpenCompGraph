@@ -26,6 +26,7 @@
 
 #include <opencompgraph.h>
 #include <opencompgraph/internal/oiio_utils.h>
+#include <opencompgraph/internal/pixelblock.h>
 
 // OIIO
 #include <OpenImageIO/imagebufalgo.h>
@@ -39,7 +40,7 @@ bool oiio_image_resample(
         int factor_num,
         bool interpolate) {
     bool ok = false;
-    auto pixel_data_type = src_image.pixel_block->pixel_data_type();
+    auto pixel_data_type = src_image.pixel_block->data_type();
     auto num_channels = src_image.pixel_block->num_channels();
     auto src_width = src_image.pixel_block->width();
     auto src_height = src_image.pixel_block->height();
@@ -54,8 +55,12 @@ bool oiio_image_resample(
     if (!ok) {
         return ok;
     }
-    auto src_pixels = src_image.pixel_block->as_slice_mut();
-    auto src_pixel_data = src_pixels.data();
+
+    auto src_pixel_data = pixelblock_get_pixel_data_ptr_read_write(
+        src_image.pixel_block);
+    if (src_pixel_data == nullptr) {
+        return false;
+    }
     auto src_image_buffer = OIIO::ImageBuf::ImageBuf(src_spec, src_pixel_data);
     auto src_roi = OIIO::get_roi_full(src_spec);
 
@@ -84,8 +89,11 @@ bool oiio_image_resample(
     if (!ok) {
         return ok;
     }
-    auto dst_pixels = dst_image.pixel_block->as_slice_mut();
-    auto dst_pixel_data = dst_pixels.data();
+    auto dst_pixel_data = pixelblock_get_pixel_data_ptr_read_write(
+        dst_image.pixel_block);
+    if (dst_pixel_data == nullptr) {
+        return false;
+    }
     auto dst_image_buffer = OIIO::ImageBuf::ImageBuf(dst_spec, dst_pixel_data);
 
     // Do image processing.

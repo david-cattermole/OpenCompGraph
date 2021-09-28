@@ -30,10 +30,10 @@ use crate::cache::CachedImage;
 use crate::cxxbridge::ffi::AttrState;
 use crate::cxxbridge::ffi::BBox2Di;
 use crate::cxxbridge::ffi::BakeOption;
+use crate::cxxbridge::ffi::DataType;
 use crate::cxxbridge::ffi::ImageShared;
 use crate::cxxbridge::ffi::NodeStatus;
 use crate::cxxbridge::ffi::NodeType;
-use crate::cxxbridge::ffi::PixelDataType;
 use crate::data::FrameValue;
 use crate::data::HashValue;
 use crate::data::Identifier;
@@ -121,7 +121,7 @@ fn do_image_process(
         stream_data,
         &from_color_space,
         &to_color_space,
-        PixelDataType::Float32,
+        DataType::Float32,
     );
 
     let mut dst_img = ImageShared {

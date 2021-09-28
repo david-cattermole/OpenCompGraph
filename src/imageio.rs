@@ -21,6 +21,7 @@
 
 use image;
 use log::debug;
+use log::warn;
 use std::time::Instant;
 
 use crate::cxxbridge::ffi::oiio_get_thread_count;
@@ -28,17 +29,19 @@ use crate::cxxbridge::ffi::oiio_read_image;
 use crate::cxxbridge::ffi::oiio_set_thread_count;
 use crate::cxxbridge::ffi::oiio_write_image;
 use crate::cxxbridge::ffi::BBox2Di;
+use crate::cxxbridge::ffi::DataType;
 use crate::cxxbridge::ffi::ImageCompression;
 use crate::cxxbridge::ffi::ImageShared;
 use crate::cxxbridge::ffi::ImageSpec;
-use crate::cxxbridge::ffi::PixelDataType;
 use crate::imagebuffer::create_image_buffer_rgb_u8;
 use crate::imagebuffer::create_image_buffer_rgba_u8;
 use crate::ops::imagecrop;
-use crate::pixelblock;
+use crate::pixelblock::dynimage::from_dynamic_image;
+use crate::pixelblock::pixelblock::PixelBlock;
 
 pub fn read_image(path: &String, num_threads: i32) -> ImageShared {
     debug!("Reading... {:?}", path);
+    debug!("num_threads: {:?}", num_threads);
     let start = Instant::now();
 
     let use_oiio = true;
@@ -46,7 +49,7 @@ pub fn read_image(path: &String, num_threads: i32) -> ImageShared {
         true => {
             // Use OpenImageIO C++ library to read the image path.
             let mut image = ImageShared {
-                pixel_block: Box::new(pixelblock::PixelBlock::empty(PixelDataType::Float32)),
+                pixel_block: Box::new(PixelBlock::empty(DataType::Float32)),
                 display_window: BBox2Di::new(0, 0, 0, 0),
                 data_window: BBox2Di::new(0, 0, 0, 0),
                 spec: ImageSpec::new(),
@@ -56,15 +59,18 @@ pub fn read_image(path: &String, num_threads: i32) -> ImageShared {
             let mut old_num_threads = 0;
             oiio_get_thread_count(&mut old_num_threads);
             oiio_set_thread_count(num_threads);
-            oiio_read_image(&path, &mut image);
+            let ok = oiio_read_image(&path, &mut image);
             oiio_set_thread_count(old_num_threads);
+            if ok == false {
+                warn!("Reading image failed: {:?}", path);
+            }
 
             image
         }
         false => {
             // Use Rust "image" Crate.
             let img = image::open(path).unwrap();
-            let pixel_block = Box::new(pixelblock::from_dynamic_image(img));
+            let pixel_block = Box::new(from_dynamic_image(img));
             let display_window = BBox2Di::new(0, 0, pixel_block.width(), pixel_block.height());
             let data_window = display_window.clone();
             ImageShared {
@@ -89,7 +95,9 @@ pub fn write_image(
     compress: ImageCompression,
 ) -> bool {
     debug!("Writing... {:?}", path);
-    debug!("Crop to Display Window: {:?}", crop_to_display_window);
+    debug!("num_threads: {:?}", num_threads);
+    debug!("crop_to_display_window: {:?}", crop_to_display_window);
+    debug!("compress: {:#?}", compress);
     let start = Instant::now();
 
     let new_pixel_block = (*image.pixel_block).clone();
@@ -155,6 +163,10 @@ pub fn write_image(
             ok
         }
     };
+    if ok == false {
+        warn!("Writing image failed: {:?}", path);
+    }
+
     let duration = start.elapsed();
     debug!("Writing total time: {:?}", duration);
 

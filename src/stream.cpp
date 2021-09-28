@@ -86,7 +86,7 @@ void StreamData::apply_deformers(rust::Slice<float> &buffer,
         data_window);
 };
 
-rust::Slice<const float> StreamData::pixel_buffer() const noexcept {
+rust::Slice<const uint8_t> StreamData::pixel_buffer() const noexcept {
     return this->inner.inner->pixel_buffer();
 };
 
@@ -102,7 +102,7 @@ int32_t StreamData::pixel_num_channels() const noexcept {
     return this->inner.inner->pixel_num_channels();
 };
 
-PixelDataType StreamData::pixel_data_type() const noexcept {
+DataType StreamData::pixel_data_type() const noexcept {
     return this->inner.inner->pixel_data_type();
 };
 

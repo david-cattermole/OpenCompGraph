@@ -122,7 +122,7 @@ int test_node_viewer_3dlut(const bool debug_print,
         std::cout << "lut_image.pixel_block.height()=" << lut_image.pixel_block->height() << '\n';
         std::cout << "lut_image.pixel_block.num_channels()=" << lut_image.pixel_block->num_channels() << '\n';
 
-        auto pixel_buffer = lut_image.pixel_block->as_slice();
+        auto pixel_buffer = lut_image.pixel_block->as_slice_f32();
         std::cout << "lut_image.pixel_block length=" << pixel_buffer.length() << '\n';
         auto max_index = pixel_buffer.length();
         if (max_index >= 32) {

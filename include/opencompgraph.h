@@ -29,6 +29,7 @@
 #include <opencompgraph/internal/debug.h>
 #include <opencompgraph/internal/ldpk_utils.h>
 #include <opencompgraph/internal/imageio.h>
+#include <opencompgraph/internal/pixelblock.h>
 #include <opencompgraph/colorlutimage.h>
 #include <opencompgraph/cache.h>
 #include <opencompgraph/config.h>

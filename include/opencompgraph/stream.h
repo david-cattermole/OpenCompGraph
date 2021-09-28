@@ -76,7 +76,7 @@ public:
                          BBox2Df data_window) noexcept;
 
     OCG_API_EXPORT
-    rust::Slice<const float> pixel_buffer() const noexcept;
+    rust::Slice<const uint8_t> pixel_buffer() const noexcept;
 
     OCG_API_EXPORT
     int32_t pixel_width() const noexcept;
@@ -88,7 +88,7 @@ public:
     int32_t pixel_num_channels() const noexcept;
 
     OCG_API_EXPORT
-    PixelDataType pixel_data_type() const noexcept;
+    DataType pixel_data_type() const noexcept;
 
 private:
     internal::StreamDataImplShared inner;

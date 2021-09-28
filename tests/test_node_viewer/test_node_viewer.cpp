@@ -96,7 +96,7 @@ int test_node_viewer(const bool debug_print,
     // Viewer Nodes
     auto bake_option = static_cast<int32_t>(ocg::BakeOption::kColorSpace);
     auto bake_color_space = "Linear";
-    auto bake_pixel_data_type = static_cast<int32_t>(ocg::PixelDataType::kHalf16);
+    auto bake_pixel_data_type = static_cast<int32_t>(ocg::DataType::kHalf16);
     graph.set_node_attr_i32(viewer1_node, "bake_option", bake_option);
     graph.set_node_attr_str(viewer1_node, "bake_color_space", bake_color_space);
     graph.set_node_attr_i32(viewer1_node, "bake_pixel_data_type", bake_pixel_data_type);

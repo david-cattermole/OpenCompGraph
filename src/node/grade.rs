@@ -31,9 +31,9 @@ use crate::cache::CachedImage;
 use crate::cxxbridge::ffi::AttrState;
 use crate::cxxbridge::ffi::BakeOption;
 use crate::cxxbridge::ffi::ImageShared;
+use crate::cxxbridge::ffi::DataType;
 use crate::cxxbridge::ffi::NodeStatus;
 use crate::cxxbridge::ffi::NodeType;
-use crate::cxxbridge::ffi::PixelDataType;
 use crate::cxxbridge::ffi::Vector4f32;
 use crate::cxxbridge::ffi::Vector4i32;
 use crate::data::FrameValue;
@@ -264,7 +264,7 @@ fn do_image_process(
     let to_color_space = COLOR_SPACE_NAME_LINEAR.to_string();
 
     let bake_option = BakeOption::ColorSpaceAndGrade;
-    let bake_pixel_data_type = PixelDataType::Float32;
+    let bake_pixel_data_type = DataType::Float32;
     bake::do_process(
         bake_option,
         &mut pixel_block,
@@ -278,7 +278,7 @@ fn do_image_process(
     );
 
     let num_channels = pixel_block.num_channels();
-    let pixels = &mut pixel_block.as_slice_mut();
+    let pixels = &mut pixel_block.as_mut_slice_f32();
     colorgrade::apply_color_grade_inplace(
         pixels,
         num_channels,

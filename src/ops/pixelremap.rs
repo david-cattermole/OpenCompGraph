@@ -23,11 +23,11 @@ use log::{debug, error};
 
 use crate::cxxbridge::ffi::BBox2Df;
 use crate::cxxbridge::ffi::BBox2Di;
-use crate::cxxbridge::ffi::PixelDataType;
+use crate::cxxbridge::ffi::DataType;
 use crate::math;
 use crate::pixel::get_pixel_rgb;
 use crate::pixel::get_pixel_rgba;
-use crate::pixelblock::PixelBlock;
+use crate::pixelblock::pixelblock::PixelBlock;
 
 /// Move each pixel to a new position using a slice of 2D pixel
 /// coordinates.
@@ -39,8 +39,8 @@ pub fn pixels_remap_coords(
     dst_pixel_block: &mut PixelBlock,
     _dst_data_window: &mut BBox2Di,
 ) {
-    assert_eq!(src_pixel_block.pixel_data_type(), PixelDataType::Float32);
-    assert_eq!(dst_pixel_block.pixel_data_type(), PixelDataType::Float32);
+    assert_eq!(src_pixel_block.data_type(), DataType::Float32);
+    assert_eq!(dst_pixel_block.data_type(), DataType::Float32);
 
     let display_window_f32 = BBox2Df::from(display_window);
     debug!("display_window = {:?}", display_window);
@@ -56,7 +56,7 @@ pub fn pixels_remap_coords(
         error!("Destination pixel count and pixel coordinates do not match.");
         return;
     }
-    let dst_pixels = dst_pixel_block.as_slice_mut();
+    let dst_pixels = dst_pixel_block.as_mut_slice_f32();
     debug!("dst_width = {}", dst_width);
     debug!("dst_height = {}", dst_height);
     debug!("dst_num_channels = {}", dst_num_channels);
@@ -64,7 +64,7 @@ pub fn pixels_remap_coords(
     let src_width = src_pixel_block.width();
     let src_height = src_pixel_block.height();
     let src_num_channels = src_pixel_block.num_channels();
-    let src_pixels = src_pixel_block.as_slice();
+    let src_pixels = src_pixel_block.as_slice_f32();
     debug!("src_width = {}", src_width);
     debug!("src_height = {}", src_height);
     debug!("src_num_channels = {}", src_num_channels);

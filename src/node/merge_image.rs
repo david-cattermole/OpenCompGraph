@@ -30,12 +30,12 @@ use crate::cache::CachedImage;
 use crate::cxxbridge::ffi::AttrState;
 use crate::cxxbridge::ffi::BBox2Di;
 use crate::cxxbridge::ffi::BakeOption;
+use crate::cxxbridge::ffi::DataType;
 use crate::cxxbridge::ffi::ImageShared;
 use crate::cxxbridge::ffi::ImageSpec;
 use crate::cxxbridge::ffi::MergeImageMode;
 use crate::cxxbridge::ffi::NodeStatus;
 use crate::cxxbridge::ffi::NodeType;
-use crate::cxxbridge::ffi::PixelDataType;
 use crate::data::FrameValue;
 use crate::data::HashValue;
 use crate::data::Identifier;
@@ -47,7 +47,7 @@ use crate::node::traits::Validate;
 use crate::node::NodeImpl;
 use crate::ops::bake;
 use crate::ops::imagemerge;
-use crate::pixelblock::PixelBlock;
+use crate::pixelblock::pixelblock::PixelBlock;
 use crate::stream::StreamDataImpl;
 
 pub fn new(id: Identifier) -> NodeImpl {
@@ -132,7 +132,7 @@ fn do_image_process(
         &mut stream_data_a,
         &from_color_space_a,
         &to_color_space,
-        PixelDataType::Float32,
+        DataType::Float32,
     );
     let pixel_block_a_box = Box::new(pixel_block_a);
     let image_a = ImageShared {
@@ -154,7 +154,7 @@ fn do_image_process(
         &mut stream_data_b,
         &from_color_space_b,
         &to_color_space,
-        PixelDataType::Float32,
+        DataType::Float32,
     );
     let pixel_block_b_box = Box::new(pixel_block_b);
     let image_b = ImageShared {

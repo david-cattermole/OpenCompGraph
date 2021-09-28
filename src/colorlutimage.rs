@@ -32,11 +32,12 @@ use std::rc::Rc;
 use crate::cache::CacheImpl;
 use crate::cache::CachedImage;
 use crate::cxxbridge::ffi::BBox2Di;
+use crate::cxxbridge::ffi::BlockSize;
+use crate::cxxbridge::ffi::DataType;
 use crate::cxxbridge::ffi::ImageShared;
 use crate::cxxbridge::ffi::ImageSpec;
-use crate::cxxbridge::ffi::PixelDataType;
 use crate::ops::bake;
-use crate::pixelblock::PixelBlock;
+use crate::pixelblock::pixelblock::PixelBlock;
 
 /// Compute the image width / height
 fn get_3dlut_image_size(cube_size: i32) -> (i32, i32) {
@@ -77,13 +78,14 @@ fn generate_color_transform_3dlut(
     let mut image_spec = ImageSpec::new();
     image_spec.set_color_space(from_color_space.to_string());
 
-    let mut pixel_block_box = Box::new(PixelBlock::new(
-        width,
-        height,
+    let blocksize = BlockSize::new(width, height, num_channels);
+    let data_type = DataType::Float32;
+    let mut pixel_block_box = Box::new(PixelBlock::new(blocksize, data_type));
+    generate_identity_3dlut(
+        &mut pixel_block_box.as_mut_slice_f32(),
+        cube_size,
         num_channels,
-        PixelDataType::Float32,
-    ));
-    generate_identity_3dlut(&mut pixel_block_box.as_slice_mut(), cube_size, num_channels);
+    );
 
     // Transform the identity LUT into the color space.
     bake::do_process_colorspace(

@@ -24,9 +24,10 @@ use std::time::Instant;
 
 use crate::cxxbridge::ffi::BBox2Df;
 use crate::cxxbridge::ffi::BBox2Di;
+use crate::cxxbridge::ffi::BlockSize;
 use crate::deformer::Deformer;
 use crate::ops;
-use crate::pixelblock::PixelBlock;
+use crate::pixelblock::pixelblock::PixelBlock;
 
 pub fn apply_deformers_to_positions(
     deformers: &Vec<Box<dyn Deformer>>,
@@ -95,12 +96,13 @@ pub fn apply_deformers_to_pixels(
     dst_data_window.max_x = tmp_data_window.max_x.ceil() as i32;
     dst_data_window.max_y = tmp_data_window.max_y.ceil() as i32;
 
-    dst_pixel_block.data_resize(
+    let data_type = src_pixel_block.data_type();
+    let blocksize = BlockSize::new(
         dst_data_window.width(),
         dst_data_window.height(),
         src_pixel_block.num_channels(),
-        src_pixel_block.pixel_data_type(),
     );
+    dst_pixel_block.data_resize(blocksize, data_type);
     let startup_duration = startup_start.elapsed();
     let pixel_coords_start = Instant::now();
 

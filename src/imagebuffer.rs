@@ -31,7 +31,7 @@ pub fn create_image_buffer_rgb_u8(
     let pixel_block = &image.pixel_block;
     let width = pixel_block.width();
     let height = pixel_block.height();
-    let pixels = &pixel_block.as_slice();
+    let pixels = &pixel_block.as_slice_f32();
 
     // Get pixel statistics
     if log_enabled!(Level::Debug) {
@@ -61,7 +61,7 @@ pub fn create_image_buffer_rgba_u8(
     let pixel_block = &image.pixel_block;
     let width = pixel_block.width();
     let height = pixel_block.height();
-    let pixels = &pixel_block.as_slice();
+    let pixels = &pixel_block.as_slice_f32();
 
     // Get pixel statistics
     if log_enabled!(Level::Debug) {

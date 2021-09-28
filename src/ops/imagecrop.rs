@@ -26,8 +26,7 @@ use std::time::Instant;
 use crate::cxxbridge::ffi::BBox2Di;
 use crate::cxxbridge::ffi::ImageShared;
 use crate::cxxbridge::ffi::ImageSpec;
-use crate::cxxbridge::ffi::PixelDataType;
-use crate::pixelblock::PixelBlock;
+use crate::pixelblock::pixelblock::PixelBlock;
 use crate::stream::StreamDataImpl;
 
 pub fn do_image_process(
@@ -105,9 +104,6 @@ pub fn crop_image_in_place(
         true => crop_window,
     };
 
-    // TODO: Remove the clone once pixel_data_types other than f32 are
-    // supported.
-    src_pixel_block.convert_into_pixel_data_type(PixelDataType::Float32);
     let pixel_block_box = Box::new(PixelBlock::from_pixel_block(
         &src_pixel_block,
         src_data_window,

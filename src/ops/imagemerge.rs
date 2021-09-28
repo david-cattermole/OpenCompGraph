@@ -23,9 +23,10 @@ use log::debug;
 use std::time::Instant;
 
 use crate::cxxbridge::ffi::BBox2Di;
+use crate::cxxbridge::ffi::BlockSize;
+use crate::cxxbridge::ffi::DataType;
 use crate::cxxbridge::ffi::ImageShared;
 use crate::cxxbridge::ffi::MergeImageMode;
-use crate::cxxbridge::ffi::PixelDataType;
 
 #[inline]
 fn get_pixel_rgba(image: &ImageShared, x: i32, y: i32) -> (f32, f32, f32, f32) {
@@ -34,7 +35,7 @@ fn get_pixel_rgba(image: &ImageShared, x: i32, y: i32) -> (f32, f32, f32, f32) {
     //
     // TODO: This function should support 'clamp' and 'black outside'
     // features.
-    let pixels = image.pixel_block.as_slice();
+    let pixels = image.pixel_block.as_slice_f32();
     let num_channels = image.pixel_block.num_channels();
     let image_x = x - image.data_window.min_x;
     let image_y = y - image.data_window.min_y;
@@ -84,8 +85,8 @@ pub fn merge(
         return false;
     }
 
-    assert!(image_a.pixel_block.pixel_data_type() == PixelDataType::Float32);
-    assert!(image_b.pixel_block.pixel_data_type() == PixelDataType::Float32);
+    assert!(image_a.pixel_block.data_type() == DataType::Float32);
+    assert!(image_b.pixel_block.data_type() == DataType::Float32);
 
     debug!("Image A: Data Window {:?}", image_a.data_window);
     debug!("Image B: Data Window {:?}", image_b.data_window);
@@ -96,12 +97,14 @@ pub fn merge(
     // Compute the output image dimensions and allocate needed memory.
     let out_data_window = BBox2Di::combine(image_a.data_window, image_b.data_window);
     image_out.data_window = out_data_window;
-    image_out.pixel_block.data_resize(
+    let blocksize = BlockSize::new(
         out_data_window.width(),
         out_data_window.height(),
         image_b.pixel_block.num_channels(),
-        image_b.pixel_block.pixel_data_type(),
     );
+    image_out
+        .pixel_block
+        .data_resize(blocksize, image_b.pixel_block.data_type());
     image_out.display_window = image_b.display_window;
     image_out.spec = image_b.spec.clone();
 
@@ -115,8 +118,9 @@ pub fn merge(
     debug!("Image OUT: Display Window {:?}", image_out.display_window);
 
     let stride = image_out.pixel_block.num_channels() as usize;
-    let out_pixels = image_out.pixel_block.as_slice_mut();
+    let out_pixels = image_out.pixel_block.as_mut_slice_f32();
     let mut index = 0;
+
     for row in out_data_window.min_y..out_data_window.max_y {
         for col in out_data_window.min_x..out_data_window.max_x {
             let (r_a, g_a, b_a, a_a) = get_pixel_rgba(image_a, col, row);

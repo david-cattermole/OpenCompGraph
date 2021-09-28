@@ -36,9 +36,9 @@ use crate::hashutils::generate_random_id;
 use crate::logger::initialize;
 use crate::node::create_node_box_with_id;
 use crate::node::NodeImpl;
-use crate::pixelblock::channel_size_bytes;
-use crate::pixelblock::stride_num_channels;
-use crate::pixelblock::PixelBlock;
+use crate::pixelblock::pixelblock::PixelBlock;
+use crate::pixelblock::utils::channel_size_bytes;
+use crate::pixelblock::utils::stride_num_channels;
 use crate::stream::create_stream_data_box;
 use crate::stream::create_stream_data_box_rc;
 use crate::stream::StreamDataImpl;
@@ -112,6 +112,14 @@ pub mod ffi {
         m31: f32,
         m32: f32,
         m33: f32,
+    }
+
+    #[derive(Clone, Copy, Debug, Hash, Default, Eq, PartialEq, Ord, PartialOrd)]
+    #[namespace = "open_comp_graph"]
+    pub(crate) struct BlockSize {
+        width: i32,
+        height: i32,
+        num_channels: i32,
     }
 
     #[derive(Debug, Copy, Clone)]
@@ -260,7 +268,7 @@ pub mod ffi {
     #[repr(u8)]
     #[derive(Debug, Copy, Clone, Hash, PartialEq, PartialOrd)]
     #[namespace = "open_comp_graph"]
-    pub(crate) enum PixelDataType {
+    pub(crate) enum DataType {
         #[cxx_name = "kFloat32"]
         Float32 = 0,
         #[cxx_name = "kHalf16"]
@@ -652,20 +660,29 @@ pub mod ffi {
         fn width(&self) -> i32;
         fn height(&self) -> i32;
         fn num_channels(&self) -> i32;
-        fn pixel_data_type(&self) -> PixelDataType;
+        fn data_type(&self) -> DataType;
 
-        fn as_slice(&self) -> &[f32];
-        fn as_slice_mut(&mut self) -> &mut [f32];
+        fn as_slice_f32(&self) -> &[f32];
+        /// CXX does not support f16 primative data type like we need,
+        /// so we pretend it's u16.
+        fn as_slice_f16_fake(&self) -> &[u16];
+        fn as_slice_u16(&self) -> &[u16];
+        fn as_slice_u8(&self) -> &[u8];
 
-        fn stride_num_channels(num_channels: i32, pixel_data_type: PixelDataType) -> usize;
-        fn channel_size_bytes(pixel_data_type: PixelDataType) -> usize;
+        fn as_mut_slice_f32(&mut self) -> &mut [f32];
+        /// CXX does not support f16 primative data type like we need,
+        /// so we pretend it's u16.
+        fn as_mut_slice_f16_fake(&mut self) -> &mut [u16];
+        fn as_mut_slice_u16(&mut self) -> &mut [u16];
+        fn as_mut_slice_u8(&mut self) -> &mut [u8];
+
+        fn stride_num_channels(num_channels: i32, data_type: DataType) -> usize;
+        fn channel_size_bytes(data_type: DataType) -> usize;
 
         fn data_resize(
             &mut self,
-            width: i32,
-            height: i32,
-            num_channels: i32,
-            pixel_data_type: PixelDataType);
+            blocksize: BlockSize,
+            data_type: DataType);
     }
 
     // StreamData (Rc)
@@ -687,11 +704,11 @@ pub mod ffi {
             display_window: BBox2Df,
             data_window: BBox2Df,
         );
-        fn pixel_buffer(&self) -> &[f32];
+        fn pixel_buffer(&self) -> &[u8];
         fn pixel_width(&self) -> i32;
         fn pixel_height(&self) -> i32;
         fn pixel_num_channels(&self) -> i32;
-        fn pixel_data_type(&self) -> PixelDataType;
+        fn pixel_data_type(&self) -> DataType;
 
         // Creation
         fn create_stream_data_box_rc() -> Box<StreamDataImplRc>;
@@ -852,14 +869,14 @@ pub mod ffi {
     }
 }
 
-impl From<i32> for ffi::PixelDataType {
+impl From<i32> for ffi::DataType {
     fn from(value: i32) -> Self {
         match value {
-            0 => ffi::PixelDataType::Float32,
-            1 => ffi::PixelDataType::Half16,
-            2 => ffi::PixelDataType::UInt8,
-            3 => ffi::PixelDataType::UInt16,
-            _ => ffi::PixelDataType::Unknown,
+            0 => ffi::DataType::Float32,
+            1 => ffi::DataType::Half16,
+            2 => ffi::DataType::UInt8,
+            3 => ffi::DataType::UInt16,
+            _ => ffi::DataType::Unknown,
         }
     }
 }

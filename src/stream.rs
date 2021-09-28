@@ -24,14 +24,18 @@ use std::rc::Rc;
 
 use crate::cxxbridge::ffi::BBox2Df;
 use crate::cxxbridge::ffi::BBox2Di;
+use crate::cxxbridge::ffi::DataType;
 use crate::cxxbridge::ffi::ImageSpec;
 use crate::cxxbridge::ffi::Matrix4;
-use crate::cxxbridge::ffi::PixelDataType;
 use crate::cxxbridge::ffi::StreamDataState;
 use crate::data::HashValue;
 use crate::deformer::Deformer;
 use crate::deformutils;
-use crate::pixelblock::PixelBlock;
+use crate::pixelblock::dataslice::DataSlice;
+use crate::pixelblock::pixelblock::PixelBlock;
+use crate::pixelblock::utils::transmute_slice_f16_to_u8;
+use crate::pixelblock::utils::transmute_slice_f32_to_u8;
+use crate::pixelblock::utils::transmute_slice_u16_to_u8;
 
 #[derive(Debug, Clone, Hash)]
 pub struct StreamDataImpl {
@@ -178,8 +182,14 @@ impl StreamDataImpl {
         self.pixel_block = pixel_block.clone();
     }
 
-    pub fn pixel_buffer(&self) -> &[f32] {
-        &self.pixel_block.as_slice()
+    pub fn pixel_buffer(&self) -> &[u8] {
+        let slice = self.pixel_block.as_slice();
+        match &slice {
+            DataSlice::Float32(data) => transmute_slice_f32_to_u8(data),
+            DataSlice::UInt8(data) => data,
+            DataSlice::Half16(data) => transmute_slice_f16_to_u8(data),
+            DataSlice::UInt16(data) => transmute_slice_u16_to_u8(data),
+        }
     }
 
     pub fn pixel_width(&self) -> i32 {
@@ -194,8 +204,8 @@ impl StreamDataImpl {
         self.pixel_block.num_channels()
     }
 
-    pub fn pixel_data_type(&self) -> PixelDataType {
-        self.pixel_block.pixel_data_type()
+    pub fn pixel_data_type(&self) -> DataType {
+        self.pixel_block.data_type()
     }
 }
 
@@ -288,7 +298,7 @@ impl StreamDataImplRc {
     //     self.inner.pixel_block()
     // }
 
-    pub fn pixel_buffer(&self) -> &[f32] {
+    pub fn pixel_buffer(&self) -> &[u8] {
         self.inner.pixel_buffer()
     }
 
@@ -304,7 +314,7 @@ impl StreamDataImplRc {
         self.inner.pixel_num_channels()
     }
 
-    pub fn pixel_data_type(&self) -> PixelDataType {
+    pub fn pixel_data_type(&self) -> DataType {
         self.inner.pixel_data_type()
     }
 }

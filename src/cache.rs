@@ -26,7 +26,7 @@ use std::rc::Rc;
 use crate::cxxbridge::ffi::BBox2Di;
 use crate::cxxbridge::ffi::ImageSpec;
 use crate::data::BYTES_TO_GIGABYTES;
-use crate::pixelblock::PixelBlock;
+use crate::pixelblock::pixelblock::PixelBlock;
 
 #[derive(Debug, Clone)]
 pub struct CachedImage {
@@ -251,18 +251,3 @@ pub fn create_cache_box_with_capacity(capacity_bytes: usize) -> Box<CacheImpl> {
     debug!("create_cache_box_with_capacity()");
     Box::new(CacheImpl::with_capacity(capacity_bytes))
 }
-
-/*
- * // Disk-based cache.
- * ocg::DiskCache<ocg::Hash, ocg::BaseNodeResult> cacheB();
- * cacheB.setPath("/tmp/openCompGraph");
- * cacheB.setCapacity(10 * GIGABYTES_TO_BYTES);
- *
- * // RAM-based cache.
- * ocg::MemoryCache<ocg::Hash, ocg::BaseNodeResult> cacheA();
- * cacheA.setCapacity(1024 * MEGABYTES_TO_BYTES);
- *
- * std::vector<BaseCache> cacheList;
- * cacheList.push_back(cacheA);
- * cacheList.push_back(cacheB);
- */

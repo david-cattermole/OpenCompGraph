@@ -19,10 +19,33 @@
  *
  */
 
-pub mod blocksize;
-pub mod datablock;
-pub mod dataslice;
-pub mod datatype;
-pub mod dynimage;
-pub mod pixelblock;
-pub mod utils;
+use half::f16;
+
+#[repr(u8)]
+#[derive(Clone, Debug)]
+pub enum DataSlice<'a> {
+    Float32(&'a [f32]),
+    UInt8(&'a [u8]),
+    Half16(&'a [f16]),
+    UInt16(&'a [u16]),
+}
+
+#[repr(u8)]
+#[derive(Debug)]
+pub enum DataSliceMut<'a> {
+    Float32(&'a mut [f32]),
+    UInt8(&'a mut [u8]),
+    Half16(&'a mut [f16]),
+    UInt16(&'a mut [u16]),
+}
+
+impl<'a> DataSlice<'a> {
+    pub fn len(&self) -> usize {
+        match self {
+            DataSlice::Float32(slice) => slice.len(),
+            DataSlice::UInt8(slice) => slice.len(),
+            DataSlice::Half16(slice) => slice.len(),
+            DataSlice::UInt16(slice) => slice.len(),
+        }
+    }
+}

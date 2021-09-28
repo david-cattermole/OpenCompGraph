@@ -83,11 +83,12 @@ namespace open_comp_graph {
   struct Vector4f32;
   struct Vector4i32;
   struct Matrix4;
+  struct BlockSize;
   enum class GraphState : ::std::uint8_t;
   enum class ExecuteStatus : ::std::uint8_t;
   enum class BakeOption : ::std::uint8_t;
   enum class NodeType : ::std::uint8_t;
-  enum class PixelDataType : ::std::uint8_t;
+  enum class DataType : ::std::uint8_t;
   enum class NodeStatus : ::std::uint8_t;
   enum class AttrState : ::std::uint8_t;
   enum class StreamDataState : ::std::uint8_t;
@@ -222,6 +223,23 @@ struct Matrix4 final {
 };
 #endif // CXXBRIDGE1_STRUCT_open_comp_graph$Matrix4
 
+#ifndef CXXBRIDGE1_STRUCT_open_comp_graph$BlockSize
+#define CXXBRIDGE1_STRUCT_open_comp_graph$BlockSize
+struct BlockSize final {
+  ::std::int32_t width;
+  ::std::int32_t height;
+  ::std::int32_t num_channels;
+
+  bool operator==(const BlockSize &) const noexcept;
+  bool operator!=(const BlockSize &) const noexcept;
+  bool operator<(const BlockSize &) const noexcept;
+  bool operator<=(const BlockSize &) const noexcept;
+  bool operator>(const BlockSize &) const noexcept;
+  bool operator>=(const BlockSize &) const noexcept;
+  using IsRelocatable = ::std::true_type;
+};
+#endif // CXXBRIDGE1_STRUCT_open_comp_graph$BlockSize
+
 namespace internal {
 #ifndef CXXBRIDGE1_STRUCT_open_comp_graph$internal$ImageCompression
 #define CXXBRIDGE1_STRUCT_open_comp_graph$internal$ImageCompression
@@ -345,16 +363,16 @@ enum class NodeType : ::std::uint8_t {
 };
 #endif // CXXBRIDGE1_ENUM_open_comp_graph$NodeType
 
-#ifndef CXXBRIDGE1_ENUM_open_comp_graph$PixelDataType
-#define CXXBRIDGE1_ENUM_open_comp_graph$PixelDataType
-enum class PixelDataType : ::std::uint8_t {
+#ifndef CXXBRIDGE1_ENUM_open_comp_graph$DataType
+#define CXXBRIDGE1_ENUM_open_comp_graph$DataType
+enum class DataType : ::std::uint8_t {
   kFloat32 = 0,
   kHalf16 = 1,
   kUInt8 = 2,
   kUInt16 = 3,
   kUnknown = 255,
 };
-#endif // CXXBRIDGE1_ENUM_open_comp_graph$PixelDataType
+#endif // CXXBRIDGE1_ENUM_open_comp_graph$DataType
 
 #ifndef CXXBRIDGE1_ENUM_open_comp_graph$NodeStatus
 #define CXXBRIDGE1_ENUM_open_comp_graph$NodeStatus
@@ -491,10 +509,24 @@ struct PixelBlock final : public ::rust::Opaque {
   OCG_API_EXPORT ::std::int32_t width() const noexcept;
   OCG_API_EXPORT ::std::int32_t height() const noexcept;
   OCG_API_EXPORT ::std::int32_t num_channels() const noexcept;
-  OCG_API_EXPORT ::open_comp_graph::PixelDataType pixel_data_type() const noexcept;
-  OCG_API_EXPORT ::rust::Slice<const float> as_slice() const noexcept;
-  OCG_API_EXPORT ::rust::Slice<float> as_slice_mut() noexcept;
-  OCG_API_EXPORT void data_resize(::std::int32_t width, ::std::int32_t height, ::std::int32_t num_channels, ::open_comp_graph::PixelDataType pixel_data_type) noexcept;
+  OCG_API_EXPORT ::open_comp_graph::DataType data_type() const noexcept;
+  OCG_API_EXPORT ::rust::Slice<const float> as_slice_f32() const noexcept;
+
+  // CXX does not support f16 primative data type like we need,
+  // so we pretend it's u16.
+  OCG_API_EXPORT ::rust::Slice<const ::std::uint16_t> as_slice_f16_fake() const noexcept;
+
+  OCG_API_EXPORT ::rust::Slice<const ::std::uint16_t> as_slice_u16() const noexcept;
+  OCG_API_EXPORT ::rust::Slice<const ::std::uint8_t> as_slice_u8() const noexcept;
+  OCG_API_EXPORT ::rust::Slice<float> as_mut_slice_f32() noexcept;
+
+  // CXX does not support f16 primative data type like we need,
+  // so we pretend it's u16.
+  OCG_API_EXPORT ::rust::Slice<::std::uint16_t> as_mut_slice_f16_fake() noexcept;
+
+  OCG_API_EXPORT ::rust::Slice<::std::uint16_t> as_mut_slice_u16() noexcept;
+  OCG_API_EXPORT ::rust::Slice<::std::uint8_t> as_mut_slice_u8() noexcept;
+  OCG_API_EXPORT void data_resize(::open_comp_graph::BlockSize blocksize, ::open_comp_graph::DataType data_type) noexcept;
   ~PixelBlock() = delete;
 
 private:
@@ -518,11 +550,11 @@ struct StreamDataImplRc final : public ::rust::Opaque {
   OCG_API_EXPORT ::open_comp_graph::internal::ImageSpec clone_image_spec() const noexcept;
   OCG_API_EXPORT ::std::size_t deformers_len() const noexcept;
   OCG_API_EXPORT void apply_deformers(::rust::Slice<float> buffer, ::open_comp_graph::BBox2Df display_window, ::open_comp_graph::BBox2Df data_window) const noexcept;
-  OCG_API_EXPORT ::rust::Slice<const float> pixel_buffer() const noexcept;
+  OCG_API_EXPORT ::rust::Slice<const ::std::uint8_t> pixel_buffer() const noexcept;
   OCG_API_EXPORT ::std::int32_t pixel_width() const noexcept;
   OCG_API_EXPORT ::std::int32_t pixel_height() const noexcept;
   OCG_API_EXPORT ::std::int32_t pixel_num_channels() const noexcept;
-  OCG_API_EXPORT ::open_comp_graph::PixelDataType pixel_data_type() const noexcept;
+  OCG_API_EXPORT ::open_comp_graph::DataType pixel_data_type() const noexcept;
   ~StreamDataImplRc() = delete;
 
 private:
@@ -694,6 +726,10 @@ bool open_comp_graph$cxxbridge1$Matrix4$operator$lt(const Matrix4 &, const Matri
 bool open_comp_graph$cxxbridge1$Matrix4$operator$le(const Matrix4 &, const Matrix4 &) noexcept;
 bool open_comp_graph$cxxbridge1$Matrix4$operator$gt(const Matrix4 &, const Matrix4 &) noexcept;
 bool open_comp_graph$cxxbridge1$Matrix4$operator$ge(const Matrix4 &, const Matrix4 &) noexcept;
+bool open_comp_graph$cxxbridge1$BlockSize$operator$eq(const BlockSize &, const BlockSize &) noexcept;
+bool open_comp_graph$cxxbridge1$BlockSize$operator$lt(const BlockSize &, const BlockSize &) noexcept;
+bool open_comp_graph$cxxbridge1$BlockSize$operator$le(const BlockSize &, const BlockSize &) noexcept;
+::std::size_t open_comp_graph$cxxbridge1$BlockSize$operator$hash(const BlockSize &) noexcept;
 } // extern "C"
 
 namespace internal {
@@ -828,17 +864,29 @@ OCG_API_EXPORT ::std::size_t open_comp_graph$internal$cxxbridge1$get_total_syste
 
 ::std::int32_t open_comp_graph$internal$cxxbridge1$PixelBlock$num_channels(const ::open_comp_graph::internal::PixelBlock &self) noexcept;
 
-::open_comp_graph::PixelDataType open_comp_graph$internal$cxxbridge1$PixelBlock$pixel_data_type(const ::open_comp_graph::internal::PixelBlock &self) noexcept;
+::open_comp_graph::DataType open_comp_graph$internal$cxxbridge1$PixelBlock$data_type(const ::open_comp_graph::internal::PixelBlock &self) noexcept;
 
-::rust::repr::Fat open_comp_graph$internal$cxxbridge1$PixelBlock$as_slice(const ::open_comp_graph::internal::PixelBlock &self) noexcept;
+::rust::repr::Fat open_comp_graph$internal$cxxbridge1$PixelBlock$as_slice_f32(const ::open_comp_graph::internal::PixelBlock &self) noexcept;
 
-::rust::repr::Fat open_comp_graph$internal$cxxbridge1$PixelBlock$as_slice_mut(::open_comp_graph::internal::PixelBlock &self) noexcept;
+::rust::repr::Fat open_comp_graph$internal$cxxbridge1$PixelBlock$as_slice_f16_fake(const ::open_comp_graph::internal::PixelBlock &self) noexcept;
 
-::std::size_t open_comp_graph$internal$cxxbridge1$stride_num_channels(::std::int32_t num_channels, ::open_comp_graph::PixelDataType pixel_data_type) noexcept;
+::rust::repr::Fat open_comp_graph$internal$cxxbridge1$PixelBlock$as_slice_u16(const ::open_comp_graph::internal::PixelBlock &self) noexcept;
 
-::std::size_t open_comp_graph$internal$cxxbridge1$channel_size_bytes(::open_comp_graph::PixelDataType pixel_data_type) noexcept;
+::rust::repr::Fat open_comp_graph$internal$cxxbridge1$PixelBlock$as_slice_u8(const ::open_comp_graph::internal::PixelBlock &self) noexcept;
 
-void open_comp_graph$internal$cxxbridge1$PixelBlock$data_resize(::open_comp_graph::internal::PixelBlock &self, ::std::int32_t width, ::std::int32_t height, ::std::int32_t num_channels, ::open_comp_graph::PixelDataType pixel_data_type) noexcept;
+::rust::repr::Fat open_comp_graph$internal$cxxbridge1$PixelBlock$as_mut_slice_f32(::open_comp_graph::internal::PixelBlock &self) noexcept;
+
+::rust::repr::Fat open_comp_graph$internal$cxxbridge1$PixelBlock$as_mut_slice_f16_fake(::open_comp_graph::internal::PixelBlock &self) noexcept;
+
+::rust::repr::Fat open_comp_graph$internal$cxxbridge1$PixelBlock$as_mut_slice_u16(::open_comp_graph::internal::PixelBlock &self) noexcept;
+
+::rust::repr::Fat open_comp_graph$internal$cxxbridge1$PixelBlock$as_mut_slice_u8(::open_comp_graph::internal::PixelBlock &self) noexcept;
+
+::std::size_t open_comp_graph$internal$cxxbridge1$stride_num_channels(::std::int32_t num_channels, ::open_comp_graph::DataType data_type) noexcept;
+
+::std::size_t open_comp_graph$internal$cxxbridge1$channel_size_bytes(::open_comp_graph::DataType data_type) noexcept;
+
+void open_comp_graph$internal$cxxbridge1$PixelBlock$data_resize(::open_comp_graph::internal::PixelBlock &self, ::open_comp_graph::BlockSize blocksize, ::open_comp_graph::DataType data_type) noexcept;
 ::std::size_t open_comp_graph$internal$cxxbridge1$StreamDataImplRc$operator$sizeof() noexcept;
 ::std::size_t open_comp_graph$internal$cxxbridge1$StreamDataImplRc$operator$alignof() noexcept;
 
@@ -868,7 +916,7 @@ void open_comp_graph$internal$cxxbridge1$StreamDataImplRc$apply_deformers(const 
 
 ::std::int32_t open_comp_graph$internal$cxxbridge1$StreamDataImplRc$pixel_num_channels(const ::open_comp_graph::internal::StreamDataImplRc &self) noexcept;
 
-::open_comp_graph::PixelDataType open_comp_graph$internal$cxxbridge1$StreamDataImplRc$pixel_data_type(const ::open_comp_graph::internal::StreamDataImplRc &self) noexcept;
+::open_comp_graph::DataType open_comp_graph$internal$cxxbridge1$StreamDataImplRc$pixel_data_type(const ::open_comp_graph::internal::StreamDataImplRc &self) noexcept;
 
 ::open_comp_graph::internal::StreamDataImplRc *open_comp_graph$internal$cxxbridge1$create_stream_data_box_rc() noexcept;
 ::std::size_t open_comp_graph$internal$cxxbridge1$StreamDataImpl$operator$sizeof() noexcept;
@@ -1025,6 +1073,12 @@ template <> struct hash<::open_comp_graph::Vector4i32> {
   }
 };
 
+template <> struct hash<::open_comp_graph::BlockSize> {
+  ::std::size_t operator()(const ::open_comp_graph::BlockSize &self) const noexcept {
+    return ::open_comp_graph::open_comp_graph$cxxbridge1$BlockSize$operator$hash(self);
+  }
+};
+
 template <> struct hash<::open_comp_graph::internal::StreamDataImplShared> {
   ::std::size_t operator()(const ::open_comp_graph::internal::StreamDataImplShared &self) const noexcept {
     return ::open_comp_graph::internal::open_comp_graph$internal$cxxbridge1$StreamDataImplShared$operator$hash(self);
@@ -1153,6 +1207,30 @@ bool Matrix4::operator>=(const Matrix4 &rhs) const noexcept {
   return open_comp_graph$cxxbridge1$Matrix4$operator$ge(*this, rhs);
 }
 
+bool BlockSize::operator==(const BlockSize &rhs) const noexcept {
+  return open_comp_graph$cxxbridge1$BlockSize$operator$eq(*this, rhs);
+}
+
+bool BlockSize::operator!=(const BlockSize &rhs) const noexcept {
+  return !(*this == rhs);
+}
+
+bool BlockSize::operator<(const BlockSize &rhs) const noexcept {
+  return open_comp_graph$cxxbridge1$BlockSize$operator$lt(*this, rhs);
+}
+
+bool BlockSize::operator<=(const BlockSize &rhs) const noexcept {
+  return open_comp_graph$cxxbridge1$BlockSize$operator$le(*this, rhs);
+}
+
+bool BlockSize::operator>(const BlockSize &rhs) const noexcept {
+  return !(*this <= rhs);
+}
+
+bool BlockSize::operator>=(const BlockSize &rhs) const noexcept {
+  return !(*this < rhs);
+}
+
 namespace internal {
 ::std::size_t PixelBlock::layout::size() noexcept {
   return open_comp_graph$internal$cxxbridge1$PixelBlock$operator$sizeof();
@@ -1174,28 +1252,52 @@ OCG_API_EXPORT ::std::int32_t PixelBlock::num_channels() const noexcept {
   return open_comp_graph$internal$cxxbridge1$PixelBlock$num_channels(*this);
 }
 
-OCG_API_EXPORT ::open_comp_graph::PixelDataType PixelBlock::pixel_data_type() const noexcept {
-  return open_comp_graph$internal$cxxbridge1$PixelBlock$pixel_data_type(*this);
+OCG_API_EXPORT ::open_comp_graph::DataType PixelBlock::data_type() const noexcept {
+  return open_comp_graph$internal$cxxbridge1$PixelBlock$data_type(*this);
 }
 
-OCG_API_EXPORT ::rust::Slice<const float> PixelBlock::as_slice() const noexcept {
-  return ::rust::impl<::rust::Slice<const float>>::slice(open_comp_graph$internal$cxxbridge1$PixelBlock$as_slice(*this));
+OCG_API_EXPORT ::rust::Slice<const float> PixelBlock::as_slice_f32() const noexcept {
+  return ::rust::impl<::rust::Slice<const float>>::slice(open_comp_graph$internal$cxxbridge1$PixelBlock$as_slice_f32(*this));
 }
 
-OCG_API_EXPORT ::rust::Slice<float> PixelBlock::as_slice_mut() noexcept {
-  return ::rust::impl<::rust::Slice<float>>::slice(open_comp_graph$internal$cxxbridge1$PixelBlock$as_slice_mut(*this));
+OCG_API_EXPORT ::rust::Slice<const ::std::uint16_t> PixelBlock::as_slice_f16_fake() const noexcept {
+  return ::rust::impl<::rust::Slice<const ::std::uint16_t>>::slice(open_comp_graph$internal$cxxbridge1$PixelBlock$as_slice_f16_fake(*this));
 }
 
-OCG_API_EXPORT ::std::size_t stride_num_channels(::std::int32_t num_channels, ::open_comp_graph::PixelDataType pixel_data_type) noexcept {
-  return open_comp_graph$internal$cxxbridge1$stride_num_channels(num_channels, pixel_data_type);
+OCG_API_EXPORT ::rust::Slice<const ::std::uint16_t> PixelBlock::as_slice_u16() const noexcept {
+  return ::rust::impl<::rust::Slice<const ::std::uint16_t>>::slice(open_comp_graph$internal$cxxbridge1$PixelBlock$as_slice_u16(*this));
 }
 
-OCG_API_EXPORT ::std::size_t channel_size_bytes(::open_comp_graph::PixelDataType pixel_data_type) noexcept {
-  return open_comp_graph$internal$cxxbridge1$channel_size_bytes(pixel_data_type);
+OCG_API_EXPORT ::rust::Slice<const ::std::uint8_t> PixelBlock::as_slice_u8() const noexcept {
+  return ::rust::impl<::rust::Slice<const ::std::uint8_t>>::slice(open_comp_graph$internal$cxxbridge1$PixelBlock$as_slice_u8(*this));
 }
 
-OCG_API_EXPORT void PixelBlock::data_resize(::std::int32_t width, ::std::int32_t height, ::std::int32_t num_channels, ::open_comp_graph::PixelDataType pixel_data_type) noexcept {
-  open_comp_graph$internal$cxxbridge1$PixelBlock$data_resize(*this, width, height, num_channels, pixel_data_type);
+OCG_API_EXPORT ::rust::Slice<float> PixelBlock::as_mut_slice_f32() noexcept {
+  return ::rust::impl<::rust::Slice<float>>::slice(open_comp_graph$internal$cxxbridge1$PixelBlock$as_mut_slice_f32(*this));
+}
+
+OCG_API_EXPORT ::rust::Slice<::std::uint16_t> PixelBlock::as_mut_slice_f16_fake() noexcept {
+  return ::rust::impl<::rust::Slice<::std::uint16_t>>::slice(open_comp_graph$internal$cxxbridge1$PixelBlock$as_mut_slice_f16_fake(*this));
+}
+
+OCG_API_EXPORT ::rust::Slice<::std::uint16_t> PixelBlock::as_mut_slice_u16() noexcept {
+  return ::rust::impl<::rust::Slice<::std::uint16_t>>::slice(open_comp_graph$internal$cxxbridge1$PixelBlock$as_mut_slice_u16(*this));
+}
+
+OCG_API_EXPORT ::rust::Slice<::std::uint8_t> PixelBlock::as_mut_slice_u8() noexcept {
+  return ::rust::impl<::rust::Slice<::std::uint8_t>>::slice(open_comp_graph$internal$cxxbridge1$PixelBlock$as_mut_slice_u8(*this));
+}
+
+OCG_API_EXPORT ::std::size_t stride_num_channels(::std::int32_t num_channels, ::open_comp_graph::DataType data_type) noexcept {
+  return open_comp_graph$internal$cxxbridge1$stride_num_channels(num_channels, data_type);
+}
+
+OCG_API_EXPORT ::std::size_t channel_size_bytes(::open_comp_graph::DataType data_type) noexcept {
+  return open_comp_graph$internal$cxxbridge1$channel_size_bytes(data_type);
+}
+
+OCG_API_EXPORT void PixelBlock::data_resize(::open_comp_graph::BlockSize blocksize, ::open_comp_graph::DataType data_type) noexcept {
+  open_comp_graph$internal$cxxbridge1$PixelBlock$data_resize(*this, blocksize, data_type);
 }
 
 ::std::size_t StreamDataImplRc::layout::size() noexcept {
@@ -1244,8 +1346,8 @@ OCG_API_EXPORT void StreamDataImplRc::apply_deformers(::rust::Slice<float> buffe
   open_comp_graph$internal$cxxbridge1$StreamDataImplRc$apply_deformers(*this, buffer, display_window, data_window);
 }
 
-OCG_API_EXPORT ::rust::Slice<const float> StreamDataImplRc::pixel_buffer() const noexcept {
-  return ::rust::impl<::rust::Slice<const float>>::slice(open_comp_graph$internal$cxxbridge1$StreamDataImplRc$pixel_buffer(*this));
+OCG_API_EXPORT ::rust::Slice<const ::std::uint8_t> StreamDataImplRc::pixel_buffer() const noexcept {
+  return ::rust::impl<::rust::Slice<const ::std::uint8_t>>::slice(open_comp_graph$internal$cxxbridge1$StreamDataImplRc$pixel_buffer(*this));
 }
 
 OCG_API_EXPORT ::std::int32_t StreamDataImplRc::pixel_width() const noexcept {
@@ -1260,7 +1362,7 @@ OCG_API_EXPORT ::std::int32_t StreamDataImplRc::pixel_num_channels() const noexc
   return open_comp_graph$internal$cxxbridge1$StreamDataImplRc$pixel_num_channels(*this);
 }
 
-OCG_API_EXPORT ::open_comp_graph::PixelDataType StreamDataImplRc::pixel_data_type() const noexcept {
+OCG_API_EXPORT ::open_comp_graph::DataType StreamDataImplRc::pixel_data_type() const noexcept {
   return open_comp_graph$internal$cxxbridge1$StreamDataImplRc$pixel_data_type(*this);
 }
 

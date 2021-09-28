@@ -578,6 +578,7 @@ impl GraphImpl {
         let node_indexes = self.find_all_upstream_nodes(start_node_idx);
 
         for frame in frames {
+            debug!("Execute Frame: {}", *frame);
             match self.execute_frame(&node_indexes, *frame, cache) {
                 Err(e) => {
                     match e {
