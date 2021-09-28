@@ -56,12 +56,15 @@ default-features = false
 features = ["std", "matrixmultiply"]  # "serde"
 
 [profile.release]
-opt-level = 2
-debug = false
-rpath = false
-lto = false
+opt-level = 2             # Optimization level, 0=None 1=Ok 2=High 3=Experimental
+debug = false             # Include debug info.
+debug-assertions = false  # Enables debug assertions.
+overflow-checks = false   # Enables runtime integer overflow checks.
+lto = "thin"              # Sets link-time optimization.
 # NOTE: If we use 'panic = "abort"' then we are unable to produce tests.
-# # https://github.com/rust-lang/cargo/issues/6313
-#
-# panic = "abort"
-debug-assertions = false
+# https://github.com/rust-lang/cargo/issues/6313
+panic = "abort"           # The panic strategy.
+incremental = false       # Incremental compilation.
+# NOTE: Change 'codegen-units' to '1' for better optimisation.
+codegen-units = 16        # Number of code generation units.
+rpath = false             # Sets the rpath linking option.
