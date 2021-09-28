@@ -132,7 +132,8 @@ void Graph::connect(const Node& src_node, const Node& dst_node, uint8_t input_nu
 ExecuteStatus Graph::execute(const Node &node,
                              std::vector<int32_t> &frames,
                              std::shared_ptr<Cache> &cache) noexcept {
-    std::vector<double> float_frames(frames.size());
+    std::vector<double> float_frames;
+    float_frames.reserve(frames.size());
     for (uint32_t i = 0; i < frames.size(); ++i) {
         float_frames.push_back(static_cast<double>(frames[i]));
     }
