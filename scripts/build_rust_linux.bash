@@ -11,7 +11,7 @@ ROOT=`readlink -f ${THIS_DIR}`
 
 # Install the needed cxxbridge.exe command to be installed with the
 # exact version we need.
-cargo install cxxbridge-cmd --version 1.0.52
+cargo install cxxbridge-cmd --version 1.0.55
 
 # Build Rust
 #

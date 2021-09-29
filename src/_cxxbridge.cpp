@@ -1684,7 +1684,7 @@ void cxxbridge1$rust_vec$open_comp_graph$internal$StreamDataImplShared$drop(::ru
 ::std::size_t cxxbridge1$rust_vec$open_comp_graph$internal$StreamDataImplShared$len(const ::rust::Vec<::open_comp_graph::internal::StreamDataImplShared> *ptr) noexcept;
 ::std::size_t cxxbridge1$rust_vec$open_comp_graph$internal$StreamDataImplShared$capacity(const ::rust::Vec<::open_comp_graph::internal::StreamDataImplShared> *ptr) noexcept;
 const ::open_comp_graph::internal::StreamDataImplShared *cxxbridge1$rust_vec$open_comp_graph$internal$StreamDataImplShared$data(const ::rust::Vec<::open_comp_graph::internal::StreamDataImplShared> *ptr) noexcept;
-void cxxbridge1$rust_vec$open_comp_graph$internal$StreamDataImplShared$reserve_total(::rust::Vec<::open_comp_graph::internal::StreamDataImplShared> *ptr, ::std::size_t cap) noexcept;
+void cxxbridge1$rust_vec$open_comp_graph$internal$StreamDataImplShared$reserve_total(::rust::Vec<::open_comp_graph::internal::StreamDataImplShared> *ptr, ::std::size_t new_cap) noexcept;
 void cxxbridge1$rust_vec$open_comp_graph$internal$StreamDataImplShared$set_len(::rust::Vec<::open_comp_graph::internal::StreamDataImplShared> *ptr, ::std::size_t len) noexcept;
 
 ::open_comp_graph::internal::GraphImpl *cxxbridge1$box$open_comp_graph$internal$GraphImpl$alloc() noexcept;
@@ -1762,8 +1762,8 @@ OCG_API_EXPORT const ::open_comp_graph::internal::StreamDataImplShared *Vec<::op
   return cxxbridge1$rust_vec$open_comp_graph$internal$StreamDataImplShared$data(this);
 }
 template <>
-OCG_API_EXPORT void Vec<::open_comp_graph::internal::StreamDataImplShared>::reserve_total(::std::size_t cap) noexcept {
-  return cxxbridge1$rust_vec$open_comp_graph$internal$StreamDataImplShared$reserve_total(this, cap);
+OCG_API_EXPORT void Vec<::open_comp_graph::internal::StreamDataImplShared>::reserve_total(::std::size_t new_cap) noexcept {
+  return cxxbridge1$rust_vec$open_comp_graph$internal$StreamDataImplShared$reserve_total(this, new_cap);
 }
 template <>
 OCG_API_EXPORT void Vec<::open_comp_graph::internal::StreamDataImplShared>::set_len(::std::size_t len) noexcept {
