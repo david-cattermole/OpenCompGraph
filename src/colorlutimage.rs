@@ -67,7 +67,9 @@ fn get_3dlut_image_size(cube_size: i32, num_channels: i32) -> (i32, i32) {
 }
 
 /// Generate a 3D (cube) LUT that has no effect - just an identity 3D
-/// LUT. Only supports 3D LUTs with 3 or 4 channels (RGB or RGBA).
+/// LUT.
+///
+/// Only supports 3D LUTs with 1 or 3 channels (Alpha or RGB).
 fn generate_identity_3dlut(img: &mut [f32], edge_length: i32, num_channels: i32) {
     assert!(num_channels == 1 || num_channels == 3);
     let num_channels = num_channels as usize;
