@@ -79,6 +79,10 @@ pub struct DeformerTde4Classic {
 impl hash::Hash for DeformerTde4Classic {
     fn hash<H: hash::Hasher>(&self, state: &mut H) {
         self.enable.hash(state);
+        if self.enable == 0 {
+            return;
+        }
+
         HashableF32::new(self.focal_length).hash(state);
         HashableF32::new(self.film_back_width).hash(state);
         HashableF32::new(self.film_back_height).hash(state);

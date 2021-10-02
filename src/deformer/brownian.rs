@@ -53,6 +53,10 @@ pub struct DeformerBrownian {
 impl hash::Hash for DeformerBrownian {
     fn hash<H: hash::Hasher>(&self, state: &mut H) {
         self.enable.hash(state);
+        if self.enable == 0 {
+            return;
+        }
+
         HashableF32::new(self.k1).hash(state);
         HashableF32::new(self.k2).hash(state);
         HashableF32::new(self.xc).hash(state);

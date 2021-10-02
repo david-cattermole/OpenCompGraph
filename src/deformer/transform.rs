@@ -53,6 +53,10 @@ pub struct DeformerTransform {
 impl hash::Hash for DeformerTransform {
     fn hash<H: hash::Hasher>(&self, state: &mut H) {
         self.enable.hash(state);
+        if self.enable == 0 {
+            return;
+        }
+
         self.invert.hash(state);
         HashableF32::new(self.translate_x).hash(state);
         HashableF32::new(self.translate_y).hash(state);
