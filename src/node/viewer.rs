@@ -106,7 +106,6 @@ fn do_viewer_bake(
     let mut pixel_block = stream_data.clone_pixel_block();
     let mut image_spec = stream_data.clone_image_spec();
 
-    let data_type = DataType::Float32;
     let from_color_space = &image_spec.color_space();
     bake::do_process(
         bake_option,
@@ -117,7 +116,7 @@ fn do_viewer_bake(
         &mut stream_data,
         &from_color_space,
         to_color_space,
-        data_type,
+        bake_pixel_data_type,
     );
 
     if crop_to_format {
@@ -144,11 +143,6 @@ fn do_viewer_bake(
         data_window = img.data_window;
         image_spec = img.spec;
     }
-    debug!(
-        "ViewerOperation: convert to baked data_type={:#?}",
-        bake_pixel_data_type,
-    );
-    pixel_block.convert_into_data_type(bake_pixel_data_type);
 
     let pixel_block_rc = Rc::new(pixel_block);
     (
