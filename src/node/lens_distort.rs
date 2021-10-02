@@ -95,7 +95,7 @@ impl LensDistortAttrs {
     pub fn new() -> LensDistortAttrs {
         LensDistortAttrs {
             enable: 1,
-            direction: 1, // 0 = 'undistort'
+            direction: 0, // 0 = 'undistort', 1 = 'distort'
             lens_center_offset_x: 0.0,
             lens_center_offset_y: 0.0,
             distortion: 0.0,
