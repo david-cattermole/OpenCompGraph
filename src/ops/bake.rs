@@ -151,9 +151,10 @@ pub fn do_process(
         bake_option, from_color_space, to_color_space, to_data_type
     );
 
-    // Use Float32 if user didn't specify the data type wanted.
+    // Use the input pixel data type if user didn't specify the data
+    // type wanted on output.
     let to_data_type = match to_data_type {
-        DataType::Unknown => DataType::Float32,
+        DataType::Unknown => pixel_block.data_type(),
         _ => to_data_type,
     };
 
