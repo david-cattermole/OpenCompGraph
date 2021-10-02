@@ -29,6 +29,7 @@ use std::hash::Hasher;
 use crate::attrblock::AttrBlock;
 use crate::cxxbridge::ffi::AttrState;
 use crate::cxxbridge::ffi::BBox2Df;
+use crate::cxxbridge::ffi::TransformationOrder;
 use crate::data::FrameValue;
 use crate::deformer::Deformer;
 use crate::hashutils::HashableF32;
@@ -99,7 +100,9 @@ fn _apply(
     // Normalise the translate values between the image window.
     let tx = interp::inverse_lerp(image_window.min_x, image_window.max_x, obj.translate_x);
     let ty = interp::inverse_lerp(image_window.min_x, image_window.max_x, obj.translate_y);
-    let mut out_matrix = xform::create_transform_trs_2d(
+    let transformation_order = TransformationOrder::SRT;
+    let mut out_matrix = xform::create_transform_2d(
+        transformation_order,
         tx,
         ty,
         obj.rotate_center_x,

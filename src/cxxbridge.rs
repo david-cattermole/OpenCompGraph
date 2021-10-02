@@ -509,6 +509,19 @@ pub mod ffi {
         Uninitialized = 255,
     }
 
+    // Transformation orders.
+    #[repr(u8)]
+    #[namespace = "open_comp_graph"]
+    #[derive(Debug, Copy, Clone, Hash)]
+    pub enum TransformationOrder {
+        #[cxx_name = "kSRT"]
+        SRT = 0, // Scale-Rotate-Translate
+        #[cxx_name = "kTRS"]
+        TRS = 1, // Translate-Rotate-Scale
+        #[cxx_name = "kUninitialized"]
+        Uninitialized = 255,
+    }
+
     // Color Spaces (using OCIO)
     #[namespace = "open_comp_graph::internal"]
     unsafe extern "C++" {

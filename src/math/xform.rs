@@ -21,6 +21,8 @@
 
 use nalgebra as na;
 
+use crate::cxxbridge::ffi::TransformationOrder;
+
 fn create_translate_2d(translate_x: f32, translate_y: f32) -> na::Matrix4<f32> {
     na::Matrix4::<f32>::new(
         1.0,
@@ -81,8 +83,9 @@ fn create_scale_2d(scale_x: f32, scale_y: f32) -> na::Matrix4<f32> {
     )
 }
 
-/// The transformation order is "TRS".
-pub fn create_transform_trs_2d(
+/// Create a 2D transformation matrix.
+pub fn create_transform_2d(
+    transformation_order: TransformationOrder,
     translate_x: f32,
     translate_y: f32,
     rotate_center_x: f32,
@@ -94,5 +97,9 @@ pub fn create_transform_trs_2d(
     let translate = create_translate_2d(translate_x, translate_y);
     let rotate = create_rotate_2d(rotate_center_x, rotate_center_y, rotate_degree);
     let scale = create_scale_2d(scale_x, scale_y);
-    scale * rotate * translate
+    match transformation_order {
+        TransformationOrder::SRT => translate * rotate * scale,
+        TransformationOrder::TRS => scale * rotate * translate,
+        _ => panic!("Unsupported transformation order."),
+    }
 }

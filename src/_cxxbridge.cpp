@@ -99,6 +99,7 @@ namespace open_comp_graph {
   enum class CropOnWrite : ::std::uint8_t;
   enum class JpegChromaSubSampling : ::std::uint8_t;
   enum class ExrCompression : ::std::uint8_t;
+  enum class TransformationOrder : ::std::uint8_t;
   namespace internal {
     struct ImageCompression;
     struct GraphImplShared;
@@ -501,6 +502,15 @@ enum class ExrCompression : ::std::uint8_t {
   kUninitialized = 255,
 };
 #endif // CXXBRIDGE1_ENUM_open_comp_graph$ExrCompression
+
+#ifndef CXXBRIDGE1_ENUM_open_comp_graph$TransformationOrder
+#define CXXBRIDGE1_ENUM_open_comp_graph$TransformationOrder
+enum class TransformationOrder : ::std::uint8_t {
+  kSRT = 0,
+  kTRS = 1,
+  kUninitialized = 255,
+};
+#endif // CXXBRIDGE1_ENUM_open_comp_graph$TransformationOrder
 
 namespace internal {
 #ifndef CXXBRIDGE1_STRUCT_open_comp_graph$internal$PixelBlock
