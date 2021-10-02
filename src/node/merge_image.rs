@@ -67,6 +67,7 @@ pub struct MergeImageOperation {}
 #[derive(Debug, Clone, Default)]
 pub struct MergeImageAttrs {
     pub enable: i32,
+    pub use_cache: i32,
     pub mode: i32, // index for a MergeImageMode.
     pub mix: f32,
 }
@@ -81,6 +82,7 @@ impl MergeImageAttrs {
     pub fn new() -> MergeImageAttrs {
         MergeImageAttrs {
             enable: 1,
+            use_cache: 0,
             mode: 1, // 1 = 'A Over B'
             mix: 1.0,
         }
@@ -228,31 +230,41 @@ impl Operation for MergeImageOperation {
             }
         };
 
+        let merge_mode = MergeImageMode::from(attr_block.get_attr_i32("mode"));
+        let mix = attr_block.get_attr_f32("mix");
+
         // Cache the results of the merge. If the input values do not
         // change we can easily look up the pixels again.
-        let (pixel_block, data_window, display_window) = match cache.get(&hash_value) {
-            Some(cached_img) => {
-                debug!("Cache Hit");
-                (
-                    cached_img.pixel_block.clone(),
-                    cached_img.data_window,
-                    cached_img.display_window,
-                )
-            }
-            _ => {
-                debug!("Cache Miss");
-                let merge_mode = MergeImageMode::from(attr_block.get_attr_i32("mode"));
-                let mix = attr_block.get_attr_f32("mix");
-                let img = do_image_process(&mut stream_data_a, &mut stream_data_b, merge_mode, mix);
+        let use_cache = attr_block.get_attr_i32("use_cache") != 0;
+        let (pixel_block, data_window, display_window) = match use_cache {
+            true => match cache.get(&hash_value) {
+                Some(cached_img) => {
+                    debug!("Cache Hit");
+                    (
+                        cached_img.pixel_block.clone(),
+                        cached_img.data_window,
+                        cached_img.display_window,
+                    )
+                }
+                _ => {
+                    debug!("Cache Miss");
+                    let img =
+                        do_image_process(&mut stream_data_a, &mut stream_data_b, merge_mode, mix);
 
+                    let pixel_block_rc = Rc::new(*img.pixel_block);
+                    let cached_img = CachedImage {
+                        pixel_block: pixel_block_rc.clone(),
+                        spec: img.spec,
+                        data_window: img.data_window,
+                        display_window: img.display_window,
+                    };
+                    cache.insert(hash_value, cached_img);
+                    (pixel_block_rc.clone(), img.data_window, img.display_window)
+                }
+            },
+            false => {
+                let img = do_image_process(&mut stream_data_a, &mut stream_data_b, merge_mode, mix);
                 let pixel_block_rc = Rc::new(*img.pixel_block);
-                let cached_img = CachedImage {
-                    pixel_block: pixel_block_rc.clone(),
-                    spec: img.spec,
-                    data_window: img.data_window,
-                    display_window: img.display_window,
-                };
-                cache.insert(hash_value, cached_img);
                 (pixel_block_rc.clone(), img.data_window, img.display_window)
             }
         };
@@ -307,6 +319,7 @@ impl AttrBlock for MergeImageAttrs {
     fn attr_exists(&self, name: &str) -> AttrState {
         match name {
             "enable" => AttrState::Exists,
+            "use_cache" => AttrState::Exists,
             "mode" => AttrState::Exists,
             "mix" => AttrState::Exists,
             _ => AttrState::Missing,
@@ -324,6 +337,7 @@ impl AttrBlock for MergeImageAttrs {
     fn get_attr_i32(&self, name: &str) -> i32 {
         match name {
             "enable" => self.enable,
+            "use_cache" => self.use_cache,
             "mode" => self.mode,
             _ => 0,
         }
@@ -332,6 +346,7 @@ impl AttrBlock for MergeImageAttrs {
     fn set_attr_i32(&mut self, name: &str, value: i32) {
         match name {
             "enable" => self.enable = value,
+            "use_cache" => self.use_cache = value,
             "mode" => self.mode = value,
             _ => (),
         };

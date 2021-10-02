@@ -67,6 +67,7 @@ pub struct ViewerOperation {}
 #[derive(Debug, Clone, Default)]
 pub struct ViewerAttrs {
     pub enable: i32,
+    pub use_cache: i32,
     pub bake_option: i32,          // index for a BakeOption.
     pub bake_pixel_data_type: i32, // index for DataType.
     pub bake_color_space: String,
@@ -83,6 +84,7 @@ impl ViewerAttrs {
     pub fn new() -> ViewerAttrs {
         ViewerAttrs {
             enable: 1,
+            use_cache: 0,
             bake_option: 0,          // 0 = BakeOption::Nothing
             bake_pixel_data_type: 1, // 1 = DataType::Half16
             bake_color_space: COLOR_SPACE_NAME_LINEAR.to_string(),
@@ -203,26 +205,44 @@ impl Operation for ViewerOperation {
             debug!("crop_to_format={:#?}", crop_to_format);
             debug!("bake_pixel_data_type={:#?}", bake_pixel_data_type);
 
-            let (pixel_block, image_spec, data_window, display_window) = match cache
-                .get(&hash_value)
-            {
-                Some(cached_img) => {
-                    debug!("Cache Hit");
-                    (
-                        cached_img.pixel_block.clone(),
-                        cached_img.spec.clone(),
-                        cached_img.data_window,
-                        cached_img.display_window,
-                    )
-                }
-                _ => {
-                    debug!("Cache Miss");
-                    // Bake the image data down and add to
-                    // the image cache.
+            let bake_color_space = attr_block.get_attr_str("bake_color_space");
+            debug!("bake_color_space: {:?}", bake_color_space);
 
-                    let bake_color_space = attr_block.get_attr_str("bake_color_space");
-                    debug!("bake_color_space: {:?}", bake_color_space);
-
+            let use_cache = attr_block.get_attr_i32("use_cache") != 0;
+            let (pixel_block, image_spec, data_window, display_window) = match use_cache {
+                true => match cache.get(&hash_value) {
+                    Some(cached_img) => {
+                        debug!("Cache Hit");
+                        (
+                            cached_img.pixel_block.clone(),
+                            cached_img.spec.clone(),
+                            cached_img.data_window,
+                            cached_img.display_window,
+                        )
+                    }
+                    _ => {
+                        debug!("Cache Miss");
+                        // Bake the image data down and add to
+                        // the image cache.
+                        let (pixel_block_rc, image_spec, data_window, display_window) =
+                            do_viewer_bake(
+                                &mut stream_data,
+                                bake_option,
+                                bake_pixel_data_type,
+                                crop_to_format,
+                                &bake_color_space,
+                            );
+                        let cached_img = CachedImage {
+                            pixel_block: pixel_block_rc.clone(),
+                            spec: image_spec.clone(),
+                            data_window: data_window,
+                            display_window: display_window,
+                        };
+                        cache.insert(hash_value, cached_img);
+                        (pixel_block_rc, image_spec, data_window, display_window)
+                    }
+                },
+                false => {
                     let (pixel_block_rc, image_spec, data_window, display_window) = do_viewer_bake(
                         &mut stream_data,
                         bake_option,
@@ -230,13 +250,7 @@ impl Operation for ViewerOperation {
                         crop_to_format,
                         &bake_color_space,
                     );
-                    let cached_img = CachedImage {
-                        pixel_block: pixel_block_rc.clone(),
-                        spec: image_spec.clone(),
-                        data_window: data_window,
-                        display_window: display_window,
-                    };
-                    cache.insert(hash_value, cached_img);
+
                     (pixel_block_rc, image_spec, data_window, display_window)
                 }
             };
@@ -268,10 +282,10 @@ impl Operation for ViewerOperation {
 
 impl AttrBlock for ViewerAttrs {
     fn attr_hash(&self, _frame: FrameValue, state: &mut DefaultHasher) {
-        self.enable.hash(state);
         if self.enable == 0 {
             return;
         }
+        self.enable.hash(state);
 
         let bake_option = BakeOption::from(self.bake_option);
         if bake_option != BakeOption::Nothing {
@@ -283,23 +297,10 @@ impl AttrBlock for ViewerAttrs {
     }
 
     fn attr_exists(&self, name: &str) -> AttrState {
-        /*
-         * Add attributes:
-         *
-         * - Image Exposure
-         * - Image Gamma
-         * - Image Soft-clip
-         * - Crop image to the image display window.
-         * - Down-res image
-         */
         match name {
             "enable" => AttrState::Exists,
+            "use_cache" => AttrState::Exists,
 
-            // "color_exposure" => AttrState::Exists,
-            // "color_gamma" => AttrState::Exists,
-            // "color_soft_clip" => AttrState::Exists,
-
-            // "down_res" => AttrState::Exists,
             "crop_to_format" => AttrState::Exists,
 
             "bake_option" => AttrState::Exists,
@@ -327,6 +328,7 @@ impl AttrBlock for ViewerAttrs {
     fn get_attr_i32(&self, name: &str) -> i32 {
         match name {
             "enable" => self.enable,
+            "use_cache" => self.use_cache,
             "crop_to_format" => self.crop_to_format,
             "bake_option" => self.bake_option,
             "bake_pixel_data_type" => self.bake_pixel_data_type,
@@ -337,6 +339,7 @@ impl AttrBlock for ViewerAttrs {
     fn set_attr_i32(&mut self, name: &str, value: i32) {
         match name {
             "enable" => self.enable = value,
+            "use_cache" => self.use_cache = value,
             "crop_to_format" => self.crop_to_format = value,
             "bake_option" => self.bake_option = value,
             "bake_pixel_data_type" => self.bake_pixel_data_type = value,

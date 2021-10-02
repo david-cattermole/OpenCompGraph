@@ -62,6 +62,7 @@ pub struct ResampleImageOperation {}
 #[derive(Debug, Clone, Default)]
 pub struct ResampleImageAttrs {
     pub enable: i32,
+    pub use_cache: i32,
     pub factor: i32,
     pub interpolate: i32, // 0 = off, 1 = on.
 }
@@ -76,6 +77,7 @@ impl ResampleImageAttrs {
     pub fn new() -> ResampleImageAttrs {
         ResampleImageAttrs {
             enable: 1,
+            use_cache: 0,
             factor: 0,      // 0 = no change, negative is down-res, positive is up-res.
             interpolate: 0, // 0 = do not interpolate.
         }
@@ -153,18 +155,39 @@ impl Operation for ResampleImageOperation {
         let mut status = NodeStatus::Valid;
         let factor = attr_block.get_attr_i32("factor");
         if factor != 0 {
-            let (pixel_block, data_window, display_window) = match cache.get(&hash_value) {
-                Some(cached_img) => {
-                    debug!("Cache Hit");
-                    (
-                        cached_img.pixel_block.clone(),
-                        cached_img.data_window,
-                        cached_img.display_window,
-                    )
-                }
-                _ => {
-                    debug!("Cache Miss");
-                    let interpolate = attr_block.get_attr_i32("interpolate") != 0;
+            let interpolate = attr_block.get_attr_i32("interpolate") != 0;
+            let use_cache = attr_block.get_attr_i32("use_cache") != 0;
+
+            let (pixel_block, data_window, display_window) = match use_cache {
+                true => match cache.get(&hash_value) {
+                    Some(cached_img) => {
+                        debug!("Cache Hit");
+                        (
+                            cached_img.pixel_block.clone(),
+                            cached_img.data_window,
+                            cached_img.display_window,
+                        )
+                    }
+                    _ => {
+                        debug!("Cache Miss");
+                        let (ok, img) = do_image_process(&mut stream_data, factor, interpolate);
+                        if ok == false {
+                            error!("ResampleImage failed!");
+                            status = NodeStatus::Error;
+                        }
+
+                        let pixel_block_rc = Rc::new(*img.pixel_block);
+                        let cached_img = CachedImage {
+                            pixel_block: pixel_block_rc.clone(),
+                            spec: img.spec,
+                            data_window: img.data_window,
+                            display_window: img.display_window,
+                        };
+                        cache.insert(hash_value, cached_img);
+                        (pixel_block_rc.clone(), img.data_window, img.display_window)
+                    }
+                },
+                false => {
                     let (ok, img) = do_image_process(&mut stream_data, factor, interpolate);
                     if ok == false {
                         error!("ResampleImage failed!");
@@ -172,13 +195,6 @@ impl Operation for ResampleImageOperation {
                     }
 
                     let pixel_block_rc = Rc::new(*img.pixel_block);
-                    let cached_img = CachedImage {
-                        pixel_block: pixel_block_rc.clone(),
-                        spec: img.spec,
-                        data_window: img.data_window,
-                        display_window: img.display_window,
-                    };
-                    cache.insert(hash_value, cached_img);
                     (pixel_block_rc.clone(), img.data_window, img.display_window)
                 }
             };
@@ -212,6 +228,7 @@ impl AttrBlock for ResampleImageAttrs {
     fn attr_exists(&self, name: &str) -> AttrState {
         match name {
             "enable" => AttrState::Exists,
+            "use_cache" => AttrState::Exists,
             "factor" => AttrState::Exists,
             "interpolate" => AttrState::Exists,
             _ => AttrState::Missing,
@@ -229,6 +246,7 @@ impl AttrBlock for ResampleImageAttrs {
     fn get_attr_i32(&self, name: &str) -> i32 {
         match name {
             "enable" => self.enable,
+            "use_cache" => self.use_cache,
             "factor" => self.factor,
             "interpolate" => self.interpolate,
             _ => 0,
@@ -238,6 +256,7 @@ impl AttrBlock for ResampleImageAttrs {
     fn set_attr_i32(&mut self, name: &str, value: i32) {
         match name {
             "enable" => self.enable = value,
+            "use_cache" => self.use_cache = value,
             "factor" => self.factor = value,
             "interpolate" => self.interpolate = value,
             _ => (),

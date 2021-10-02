@@ -60,6 +60,7 @@ pub struct ReadImageOperation {}
 #[derive(Debug, Clone, Default)]
 pub struct ReadImageAttrs {
     pub enable: i32,
+    pub use_cache: i32,
     pub file_path: String,
     // TODO: Add more attributes:
     //
@@ -83,6 +84,7 @@ impl ReadImageAttrs {
     pub fn new() -> ReadImageAttrs {
         ReadImageAttrs {
             enable: 1,
+            use_cache: 0,
             file_path: "".to_string(),
         }
     }
@@ -110,8 +112,8 @@ impl Operation for ReadImageOperation {
         // debug!("Output: {:?}", output);
 
         if node_compute_mode.contains(NodeComputeMode::PIXEL) {
-            let enable = attr_block.get_attr_i32("enable");
-            if enable != 1 {
+            let enable = attr_block.get_attr_i32("enable") != 0;
+            if enable == false {
                 let stream_data = StreamDataImpl::new();
                 *output = std::rc::Rc::new(stream_data);
                 return NodeStatus::Warning;
@@ -135,10 +137,11 @@ impl Operation for ReadImageOperation {
             if path.is_file() == true {
                 let mut stream_data = StreamDataImpl::new();
 
-                let (pixel_block, image_spec, data_window, display_window) =
-                    match cache.get(&hash_value) {
+                let use_cache = attr_block.get_attr_i32("use_cache") != 0;
+                let (pixel_block, image_spec, data_window, display_window) = match use_cache {
+                    true => match cache.get(&hash_value) {
                         Some(cached_img) => {
-                            // debug!("Cache Hit");
+                            debug!("Cache Hit");
                             (
                                 cached_img.pixel_block.clone(),
                                 cached_img.spec.clone(),
@@ -147,7 +150,7 @@ impl Operation for ReadImageOperation {
                             )
                         }
                         _ => {
-                            // debug!("Cache Miss");
+                            debug!("Cache Miss");
                             let num_threads = 0;
                             let img = imageio::read_image(&path_expanded, num_threads);
                             let pixel_block_rc = Rc::new(*img.pixel_block);
@@ -165,7 +168,20 @@ impl Operation for ReadImageOperation {
                                 img.display_window,
                             )
                         }
-                    };
+                    },
+                    false => {
+                        debug!("From Disk");
+                        let num_threads = 0;
+                        let img = imageio::read_image(&path_expanded, num_threads);
+                        let pixel_block_rc = Rc::new(*img.pixel_block);
+                        (
+                            pixel_block_rc.clone(),
+                            img.spec.clone(),
+                            img.data_window,
+                            img.display_window,
+                        )
+                    }
+                };
 
                 // debug!(
                 //     "pixel_block: {:?} x {:?} x {:?}",
@@ -219,8 +235,8 @@ impl Operation for ReadImageOperation {
 
 impl AttrBlock for ReadImageAttrs {
     fn attr_hash(&self, frame: FrameValue, state: &mut DefaultHasher) {
-        self.enable.hash(state);
         if self.enable == 1 {
+            self.enable.hash(state);
             let frame_num = frame.round().trunc() as i32;
             let path_expanded = pathutils::expand_string(self.file_path.to_string(), frame_num);
             path_expanded.hash(state);
@@ -230,6 +246,7 @@ impl AttrBlock for ReadImageAttrs {
     fn attr_exists(&self, name: &str) -> AttrState {
         match name {
             "enable" => AttrState::Exists,
+            "use_cache" => AttrState::Exists,
             "file_path" => AttrState::Exists,
             _ => AttrState::Missing,
         }
@@ -252,6 +269,7 @@ impl AttrBlock for ReadImageAttrs {
     fn get_attr_i32(&self, name: &str) -> i32 {
         match name {
             "enable" => self.enable,
+            "use_cache" => self.use_cache,
             _ => 0,
         }
     }
@@ -259,6 +277,7 @@ impl AttrBlock for ReadImageAttrs {
     fn set_attr_i32(&mut self, name: &str, value: i32) {
         match name {
             "enable" => self.enable = value,
+            "use_cache" => self.use_cache = value,
             _ => (),
         };
     }

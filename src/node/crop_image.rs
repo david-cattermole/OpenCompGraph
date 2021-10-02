@@ -63,6 +63,7 @@ pub struct CropImageOperation {}
 #[derive(Debug, Clone, Default)]
 pub struct CropImageAttrs {
     pub enable: i32,
+    pub use_cache: i32,
     pub window_min_x: i32,
     pub window_min_y: i32,
     pub window_max_x: i32,
@@ -82,6 +83,7 @@ impl CropImageAttrs {
     pub fn new() -> CropImageAttrs {
         CropImageAttrs {
             enable: 1,
+            use_cache: 0,
             window_min_x: 0,
             window_min_y: 0,
             window_max_x: 0,
@@ -177,32 +179,57 @@ impl Operation for CropImageOperation {
             return NodeStatus::Valid;
         }
 
+        let window_min_x = attr_block.get_attr_i32("window_min_x");
+        let window_min_y = attr_block.get_attr_i32("window_min_y");
+        let window_max_x = attr_block.get_attr_i32("window_max_x");
+        let window_max_y = attr_block.get_attr_i32("window_max_y");
+        let crop_window = BBox2Di::new(window_min_x, window_min_y, window_max_x, window_max_y);
+
+        let reformat = attr_block.get_attr_i32("reformat") == 1;
+        let black_outside = attr_block.get_attr_i32("black_outside") == 1;
+        let intersect = attr_block.get_attr_i32("intersect") == 1;
+
         let mut status = NodeStatus::Valid;
-        let (pixel_block, data_window, display_window) = match cache.get(&hash_value) {
-            Some(cached_img) => {
-                debug!("Cache Hit");
-                (
-                    cached_img.pixel_block.clone(),
-                    cached_img.data_window,
-                    cached_img.display_window,
-                )
-            }
-            _ => {
-                debug!("Cache Miss");
+        let use_cache = attr_block.get_attr_i32("use_cache") != 0;
+        let (pixel_block, data_window, display_window) = match use_cache {
+            true => match cache.get(&hash_value) {
+                Some(cached_img) => {
+                    debug!("Cache Hit");
+                    (
+                        cached_img.pixel_block.clone(),
+                        cached_img.data_window,
+                        cached_img.display_window,
+                    )
+                }
+                _ => {
+                    debug!("Cache Miss");
 
-                // Cache the results of the crop. If the input values do not
-                // change we can easily look up the pixels again.
-                let window_min_x = attr_block.get_attr_i32("window_min_x");
-                let window_min_y = attr_block.get_attr_i32("window_min_y");
-                let window_max_x = attr_block.get_attr_i32("window_max_x");
-                let window_max_y = attr_block.get_attr_i32("window_max_y");
-                let crop_window =
-                    BBox2Di::new(window_min_x, window_min_y, window_max_x, window_max_y);
+                    // Cache the results of the crop. If the input values do not
+                    // change we can easily look up the pixels again.
+                    let (ok, img) = do_image_process(
+                        &mut stream_data,
+                        crop_window,
+                        reformat,
+                        black_outside,
+                        intersect,
+                    );
+                    if ok == false {
+                        error!("CropImage failed!");
+                        status = NodeStatus::Error;
+                    }
 
-                let reformat = attr_block.get_attr_i32("reformat") == 1;
-                let black_outside = attr_block.get_attr_i32("black_outside") == 1;
-                let intersect = attr_block.get_attr_i32("intersect") == 1;
-
+                    let pixel_block_rc = Rc::new(*img.pixel_block);
+                    let cached_img = CachedImage {
+                        pixel_block: pixel_block_rc.clone(),
+                        spec: img.spec,
+                        data_window: img.data_window,
+                        display_window: img.display_window,
+                    };
+                    cache.insert(hash_value, cached_img);
+                    (pixel_block_rc.clone(), img.data_window, img.display_window)
+                }
+            },
+            false => {
                 let (ok, img) = do_image_process(
                     &mut stream_data,
                     crop_window,
@@ -216,13 +243,6 @@ impl Operation for CropImageOperation {
                 }
 
                 let pixel_block_rc = Rc::new(*img.pixel_block);
-                let cached_img = CachedImage {
-                    pixel_block: pixel_block_rc.clone(),
-                    spec: img.spec,
-                    data_window: img.data_window,
-                    display_window: img.display_window,
-                };
-                cache.insert(hash_value, cached_img);
                 (pixel_block_rc.clone(), img.data_window, img.display_window)
             }
         };
@@ -254,6 +274,7 @@ impl AttrBlock for CropImageAttrs {
     fn attr_exists(&self, name: &str) -> AttrState {
         match name {
             "enable" => AttrState::Exists,
+            "use_cache" => AttrState::Exists,
             "window_min_x" => AttrState::Exists,
             "window_min_y" => AttrState::Exists,
             "window_max_x" => AttrState::Exists,
@@ -276,6 +297,7 @@ impl AttrBlock for CropImageAttrs {
     fn get_attr_i32(&self, name: &str) -> i32 {
         match name {
             "enable" => self.enable,
+            "use_cache" => self.use_cache,
             "window_min_x" => self.window_min_x,
             "window_min_y" => self.window_min_y,
             "window_max_x" => self.window_max_x,
@@ -290,6 +312,7 @@ impl AttrBlock for CropImageAttrs {
     fn set_attr_i32(&mut self, name: &str, value: i32) {
         match name {
             "enable" => self.enable = value,
+            "use_cache" => self.use_cache = value,
             "window_min_x" => self.window_min_x = value,
             "window_min_y" => self.window_min_y = value,
             "window_max_x" => self.window_max_x = value,

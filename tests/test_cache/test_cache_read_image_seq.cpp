@@ -56,6 +56,9 @@ int test_cache_read_image_seq(const bool debug_print) {
         // "tests/data/ocg-testdata/images/color_bars/3840x2160_exr_dwab/color_bars.####.exr"
     );
 
+    // Ensure the cache is used for our multi-frame tests.
+    graph.set_node_attr_i32(read_node, "use_cache", 1);
+
     graph.set_node_attr_str(
         write_node, "file_path",
         "./tests/data/out/test_cache_read_image_seq_out_color_bars_3840x2160.####.png");
