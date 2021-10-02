@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020, 2021 David Cattermole.
+ * Copyright (C) 2021 David Cattermole.
  *
  * This file is part of OpenCompGraph.
  *
@@ -19,44 +19,23 @@
  *
  */
 
-use log::debug;
 use std::collections::hash_map::DefaultHasher;
 use std::hash;
 use std::hash::Hash;
-use std::rc::Rc;
+use std::hash::Hasher;
 
 use crate::attrblock::AttrBlock;
-use crate::cache::CacheImpl;
-use crate::colorop::colorgrade::ColorOpGrade;
+use crate::colorop::ColorOp;
 use crate::cxxbridge::ffi::AttrState;
-use crate::cxxbridge::ffi::NodeStatus;
-use crate::cxxbridge::ffi::NodeType;
+use crate::cxxbridge::ffi::Vector4f32;
+use crate::cxxbridge::ffi::Vector4i32;
 use crate::data::FrameValue;
 use crate::data::HashValue;
-use crate::data::Identifier;
-use crate::data::NodeComputeMode;
 use crate::hashutils::HashableF32;
-use crate::node::traits::Operation;
-use crate::node::traits::Validate;
-use crate::node::NodeImpl;
-use crate::stream::StreamDataImpl;
+use crate::ops;
 
-pub fn new(id: Identifier) -> NodeImpl {
-    NodeImpl {
-        node_type: NodeType::Grade,
-        id,
-        status: NodeStatus::Uninitialized,
-        compute: Box::new(GradeOperation::new()),
-        validate: Box::new(GradeValidate::new()),
-        attr_block: Box::new(GradeAttrs::new()),
-    }
-}
-
-#[derive(Debug, Clone, Default)]
-pub struct GradeOperation {}
-
-#[derive(Debug, Clone, Default)]
-pub struct GradeAttrs {
+#[derive(Debug, Clone)]
+pub struct ColorOpGrade {
     pub enable: i32,
 
     pub process_r: i32,
@@ -106,7 +85,7 @@ pub struct GradeAttrs {
     pub mix: f32,
 }
 
-impl hash::Hash for GradeAttrs {
+impl hash::Hash for ColorOpGrade {
     fn hash<H: hash::Hasher>(&self, state: &mut H) {
         self.enable.hash(state);
         if self.enable == 0 {
@@ -169,15 +148,9 @@ impl hash::Hash for GradeAttrs {
     }
 }
 
-impl GradeOperation {
-    pub fn new() -> GradeOperation {
-        GradeOperation {}
-    }
-}
-
-impl GradeAttrs {
-    pub fn new() -> GradeAttrs {
-        GradeAttrs {
+impl Default for ColorOpGrade {
+    fn default() -> Self {
+        Self {
             enable: 1,
 
             process_r: 1,
@@ -225,151 +198,86 @@ impl GradeAttrs {
             clamp_black: 1,
             clamp_white: 0,
             premult: 0,
-
             mix: 1.0,
         }
     }
 }
 
-impl Operation for GradeOperation {
-    fn compute(
-        &mut self,
-        _frame: FrameValue,
-        _node_type_id: u8,
-        attr_block: &Box<dyn AttrBlock>,
-        hash_value: HashValue,
-        node_compute_mode: NodeComputeMode,
-        inputs: &Vec<Rc<StreamDataImpl>>,
-        output: &mut Rc<StreamDataImpl>,
-        _cache: &mut Box<CacheImpl>,
-    ) -> NodeStatus {
-        debug!("GradeOperation.compute()");
-        debug!("GradeOperation NodeComputeMode={:#?}", node_compute_mode);
-        // debug!("AttrBlock: {:?}", attr_block);
-        // debug!("Inputs: {:?}", inputs);
-        // debug!("Output: {:?}", output);
+impl ColorOp for ColorOpGrade {
+    fn hash_color_op(&self) -> HashValue {
+        let mut state = DefaultHasher::default();
+        self.hash(&mut state);
+        state.finish()
+    }
 
-        let mut status = NodeStatus::Valid;
-        let mut stream_data = match inputs.len() {
-            0 => {
-                // No input given, return an empty default stream.
-                status = NodeStatus::Warning;
-                StreamDataImpl::new()
-            }
-            _ => {
-                let input = &inputs[0].clone();
-                (**input).clone()
-            }
-        };
-
-        let enable = attr_block.get_attr_i32("enable");
-        let process_r = attr_block.get_attr_i32("process_r");
-        let process_g = attr_block.get_attr_i32("process_g");
-        let process_b = attr_block.get_attr_i32("process_b");
-        let process_a = attr_block.get_attr_i32("process_a");
+    fn apply_slice_in_place(&self, buffer: &mut [f32], num_channels: i32) {
+        let enable = self.enable;
+        let process = Vector4i32::new(
+            self.process_r,
+            self.process_g,
+            self.process_b,
+            self.process_a,
+        );
         let has_work_to_do = enable == 1
-            && ((process_r != 0) || (process_g != 0) || (process_b != 0) || (process_a != 0));
+            && ((process.x != 0) || (process.y != 0) || (process.z != 0) || (process.w != 0));
 
         if has_work_to_do == false {
             // Set Output data
-            *output = std::rc::Rc::new(stream_data);
-            return status;
+            return;
         }
 
-        let mut color_op = ColorOpGrade::default();
-        // No need to set 'enable' attribute, because we ensure
-        // there's some work to do before creating the ColorOpGrade.
-        color_op.set_attr_i32("process_r", process_r);
-        color_op.set_attr_i32("process_g", process_g);
-        color_op.set_attr_i32("process_b", process_b);
-        color_op.set_attr_i32("process_a", process_a);
-
         // Attributes that change are non-linear.
-        let gamma_r = attr_block.get_attr_f32("gamma_r");
-        let gamma_g = attr_block.get_attr_f32("gamma_g");
-        let gamma_b = attr_block.get_attr_f32("gamma_b");
-        let gamma_a = attr_block.get_attr_f32("gamma_a");
-        color_op.set_attr_f32("gamma_r", gamma_r);
-        color_op.set_attr_f32("gamma_g", gamma_g);
-        color_op.set_attr_f32("gamma_b", gamma_b);
-        color_op.set_attr_f32("gamma_a", gamma_a);
-
-        let reverse = attr_block.get_attr_i32("reverse");
-        let clamp_black = attr_block.get_attr_i32("clamp_black");
-        let clamp_white = attr_block.get_attr_i32("clamp_white");
-        let premult = attr_block.get_attr_i32("premult");
-        let mix = attr_block.get_attr_f32("mix");
-        color_op.set_attr_i32("reverse", reverse);
-        color_op.set_attr_i32("clamp_black", clamp_black);
-        color_op.set_attr_i32("clamp_white", clamp_white);
-        color_op.set_attr_i32("premult", premult);
-        color_op.set_attr_f32("mix", mix);
+        let gamma = Vector4f32::new(self.gamma_r, self.gamma_g, self.gamma_b, self.gamma_a);
+        let reverse = self.reverse != 0;
+        let clamp_black = self.clamp_black != 0;
+        let clamp_white = self.clamp_white != 0;
+        let premult = self.premult != 0;
+        let mix = self.mix;
 
         // Attributes making linear changes to the colour.
-        let black_point_r = attr_block.get_attr_f32("black_point_r");
-        let black_point_g = attr_block.get_attr_f32("black_point_g");
-        let black_point_b = attr_block.get_attr_f32("black_point_b");
-        let black_point_a = attr_block.get_attr_f32("black_point_a");
-        color_op.set_attr_f32("black_point_r", black_point_r);
-        color_op.set_attr_f32("black_point_g", black_point_g);
-        color_op.set_attr_f32("black_point_b", black_point_b);
-        color_op.set_attr_f32("black_point_a", black_point_a);
+        let black_point = Vector4f32::new(
+            self.black_point_r,
+            self.black_point_g,
+            self.black_point_b,
+            self.black_point_a,
+        );
+        let white_point = Vector4f32::new(
+            self.white_point_r,
+            self.white_point_g,
+            self.white_point_b,
+            self.white_point_a,
+        );
+        let lift = Vector4f32::new(self.lift_r, self.lift_g, self.lift_b, self.lift_a);
+        let gain = Vector4f32::new(self.gain_r, self.gain_g, self.gain_b, self.gain_a);
+        let multiply = Vector4f32::new(
+            self.multiply_r,
+            self.multiply_g,
+            self.multiply_b,
+            self.multiply_a,
+        );
+        let offset = Vector4f32::new(self.offset_r, self.offset_g, self.offset_b, self.offset_a);
 
-        let white_point_r = attr_block.get_attr_f32("white_point_r");
-        let white_point_g = attr_block.get_attr_f32("white_point_g");
-        let white_point_b = attr_block.get_attr_f32("white_point_b");
-        let white_point_a = attr_block.get_attr_f32("white_point_a");
-        color_op.set_attr_f32("white_point_r", white_point_r);
-        color_op.set_attr_f32("white_point_g", white_point_g);
-        color_op.set_attr_f32("white_point_b", white_point_b);
-        color_op.set_attr_f32("white_point_a", white_point_a);
-
-        let lift_r = attr_block.get_attr_f32("lift_r");
-        let lift_g = attr_block.get_attr_f32("lift_g");
-        let lift_b = attr_block.get_attr_f32("lift_b");
-        let lift_a = attr_block.get_attr_f32("lift_a");
-        color_op.set_attr_f32("lift_r", lift_r);
-        color_op.set_attr_f32("lift_g", lift_g);
-        color_op.set_attr_f32("lift_b", lift_b);
-        color_op.set_attr_f32("lift_a", lift_a);
-
-        let gain_r = attr_block.get_attr_f32("gain_r");
-        let gain_g = attr_block.get_attr_f32("gain_g");
-        let gain_b = attr_block.get_attr_f32("gain_b");
-        let gain_a = attr_block.get_attr_f32("gain_a");
-        color_op.set_attr_f32("gain_r", gain_r);
-        color_op.set_attr_f32("gain_g", gain_g);
-        color_op.set_attr_f32("gain_b", gain_b);
-        color_op.set_attr_f32("gain_a", gain_a);
-
-        let multiply_r = attr_block.get_attr_f32("multiply_r");
-        let multiply_g = attr_block.get_attr_f32("multiply_g");
-        let multiply_b = attr_block.get_attr_f32("multiply_b");
-        let multiply_a = attr_block.get_attr_f32("multiply_a");
-        color_op.set_attr_f32("multiply_r", multiply_r);
-        color_op.set_attr_f32("multiply_g", multiply_g);
-        color_op.set_attr_f32("multiply_b", multiply_b);
-        color_op.set_attr_f32("multiply_a", multiply_a);
-
-        let offset_r = attr_block.get_attr_f32("offset_r");
-        let offset_g = attr_block.get_attr_f32("offset_g");
-        let offset_b = attr_block.get_attr_f32("offset_b");
-        let offset_a = attr_block.get_attr_f32("offset_a");
-        color_op.set_attr_f32("offset_r", offset_r);
-        color_op.set_attr_f32("offset_g", offset_g);
-        color_op.set_attr_f32("offset_b", offset_b);
-        color_op.set_attr_f32("offset_a", offset_a);
-
-        stream_data.push_color_op(Box::new(color_op));
-
-        // Set Output data
-        stream_data.set_hash(hash_value);
-        *output = Rc::new(stream_data);
-        status
+        ops::colorgrade::apply_color_grade_inplace(
+            buffer,
+            num_channels,
+            process,
+            black_point,
+            white_point,
+            lift,
+            gain,
+            multiply,
+            offset,
+            gamma,
+            reverse,
+            clamp_black,
+            clamp_white,
+            premult,
+            mix,
+        )
     }
 }
 
-impl AttrBlock for GradeAttrs {
+impl AttrBlock for ColorOpGrade {
     fn attr_hash(&self, _frame: FrameValue, state: &mut DefaultHasher) {
         self.hash(state)
     }
@@ -556,38 +464,5 @@ impl AttrBlock for GradeAttrs {
 
             _ => (),
         }
-    }
-}
-
-#[derive(Debug, Clone, Default)]
-pub struct GradeValidate {}
-
-impl GradeValidate {
-    pub fn new() -> GradeValidate {
-        GradeValidate {}
-    }
-}
-
-impl Validate for GradeValidate {
-    fn validate_inputs(
-        &self,
-        _node_type_id: u8,
-        _attr_block: &Box<dyn AttrBlock>,
-        hash_value: HashValue,
-        node_compute_mode: NodeComputeMode,
-        input_nodes: &Vec<&Box<NodeImpl>>,
-    ) -> Vec<NodeComputeMode> {
-        debug!(
-            "GradeValidate::validate_inputs(): NodeComputeMode={:#?} HashValue={:#?}",
-            node_compute_mode, hash_value
-        );
-        let mut node_compute_modes = Vec::new();
-        if input_nodes.len() > 0 {
-            node_compute_modes.push(node_compute_mode & NodeComputeMode::ALL);
-            for _ in input_nodes.iter().skip(1) {
-                node_compute_modes.push(node_compute_mode & NodeComputeMode::NONE);
-            }
-        }
-        node_compute_modes
     }
 }

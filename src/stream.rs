@@ -22,6 +22,9 @@
 use log::debug;
 use std::rc::Rc;
 
+use crate::colorop::color_ops_hash;
+use crate::colorop::ColorOp;
+use crate::coloroputils;
 use crate::cxxbridge::ffi::BBox2Df;
 use crate::cxxbridge::ffi::BBox2Di;
 use crate::cxxbridge::ffi::DataType;
@@ -47,6 +50,7 @@ pub struct StreamDataImpl {
     image_spec: ImageSpec,
     pixel_block: Rc<PixelBlock>,
     deformers: Vec<Box<dyn Deformer>>,
+    color_ops: Vec<Box<dyn ColorOp>>,
 }
 
 impl StreamDataImpl {
@@ -62,6 +66,7 @@ impl StreamDataImpl {
         let color_matrix = Matrix4::identity();
         let image_spec = ImageSpec::new();
         let deformers = Vec::new();
+        let color_ops = Vec::new();
 
         StreamDataImpl {
             state,
@@ -72,6 +77,7 @@ impl StreamDataImpl {
             image_spec,
             pixel_block,
             deformers,
+            color_ops,
         }
     }
 
@@ -160,6 +166,31 @@ impl StreamDataImpl {
 
     pub fn clear_deformers(&mut self) {
         self.deformers.clear();
+    }
+
+    pub fn apply_color_ops(&self, pixels: &mut [f32], num_channels: i32) {
+        debug!("StreamData.apply_color_ops...");
+        coloroputils::apply_color_ops_to_pixels(&self.color_ops, pixels, num_channels);
+    }
+
+    pub fn color_ops(&self) -> &Vec<Box<dyn ColorOp>> {
+        &self.color_ops
+    }
+
+    pub fn color_ops_hash(&self) -> HashValue {
+        color_ops_hash(&self.color_ops)
+    }
+
+    pub fn color_ops_len(&self) -> usize {
+        self.color_ops.len()
+    }
+
+    pub fn push_color_op(&mut self, value: Box<dyn ColorOp>) {
+        self.color_ops.push(value);
+    }
+
+    pub fn clear_color_ops(&mut self) {
+        self.color_ops.clear();
     }
 
     pub fn clone_pixel_block(&self) -> PixelBlock {
@@ -292,6 +323,22 @@ impl StreamDataImplRc {
 
     pub fn deformers_len(&self) -> usize {
         self.inner.deformers_len()
+    }
+
+    pub fn apply_color_ops(&self, pixels: &mut [f32], num_channels: i32) {
+        self.inner.apply_color_ops(pixels, num_channels);
+    }
+
+    pub fn color_ops(&self) -> &Vec<Box<dyn ColorOp>> {
+        self.inner.color_ops()
+    }
+
+    pub fn color_ops_hash(&self) -> HashValue {
+        self.inner.color_ops_hash()
+    }
+
+    pub fn color_ops_len(&self) -> usize {
+        self.inner.color_ops_len()
     }
 
     // pub fn pixel_block(&self) -> Rc<PixelBlock> {

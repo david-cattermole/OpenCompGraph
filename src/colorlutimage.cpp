@@ -19,8 +19,16 @@
  *
  */
 
+// STL
 #include <iostream>
 #include <string>
+
+// Rust CXX
+#include <rust/cxx.h>
+#include <opencompgraph/_cxxbridge.h>
+#include <opencompgraph/stream.h>
+#include <opencompgraph/cache.h>
+
 #include <opencompgraph/colorlutimage.h>
 
 namespace open_comp_graph {
@@ -38,6 +46,28 @@ internal::ImageShared get_color_transform_3dlut(
         edge_size,
         cache_box);
     cache->set_box(std::move(cache_box));  // Return the cache to it's owner.
+    return img;
+}
+
+internal::ImageShared get_color_ops_lut(
+    StreamData &stream_data,
+    int32_t edge_size,    // Common values; 20, 32 or 64.
+    int32_t num_channels, // Number of channels; must be above 0.
+    std::shared_ptr<Cache> &cache) noexcept
+{
+    // Borrow the underlying objects.
+    auto stream_data_box = stream_data.get_box();
+    auto cache_box = cache->get_box();
+
+    auto img = internal::get_color_ops_lut(
+        stream_data_box,
+        edge_size,
+        num_channels,
+        cache_box);
+
+    // Return the memory to it's owner.
+    cache->set_box(std::move(cache_box));
+    stream_data.set_box(std::move(stream_data_box));
     return img;
 }
 

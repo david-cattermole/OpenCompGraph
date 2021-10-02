@@ -75,6 +75,7 @@ int test_node_viewer_3dlut(const bool debug_print,
     graph.set_node_attr_f32(grade_node, "offset_b", 0.01f);
     graph.set_node_attr_f32(grade_node, "offset_a", 0.01f);
 
+    graph.set_node_attr_f32(grade_node, "multiply_r", 2.0f);
     graph.set_node_attr_f32(grade_node, "multiply_g", 1.2f);
     graph.set_node_attr_f32(grade_node, "gamma_r", 1.2f);
     graph.set_node_attr_f32(grade_node, "gamma_b", 0.8f);
@@ -82,7 +83,6 @@ int test_node_viewer_3dlut(const bool debug_print,
     // Viewer Nodes
     graph.set_node_attr_i32(viewer1_node, "bake_option", 0);
     graph.set_node_attr_i32(viewer1_node, "crop_to_format", 0);
-    graph.set_node_attr_i32(viewer1_node, "disk_cache", 0);
 
     // Write Nodes
     graph.set_node_attr_str(
@@ -103,13 +103,19 @@ int test_node_viewer_3dlut(const bool debug_print,
                   << graph.data_debug_string();
     }
 
+    auto stream_data = graph.output_stream();
+    std::cout << "stream_data.color_ops_len="
+              << stream_data.color_ops_len() << '\n';
+    std::cout << "stream_data.color_ops_hash="
+              << stream_data.color_ops_hash() << '\n';
+
     // Generate a 3D volume texture to be used to look
     // up color space transforms.
     auto lut_edge_size = 32;
-    auto stream_data = graph.output_stream();
     auto from_color_space = stream_data.clone_image_spec().color_space;
     auto to_color_space = "Linear";
     auto use_3dlut = from_color_space != to_color_space;
+
     auto lut_image = ocg::get_color_transform_3dlut(
         from_color_space, to_color_space,
         lut_edge_size, cache);
@@ -124,6 +130,58 @@ int test_node_viewer_3dlut(const bool debug_print,
 
         auto pixel_buffer = lut_image.pixel_block->as_slice_f32();
         std::cout << "lut_image.pixel_block length=" << pixel_buffer.length() << '\n';
+        auto max_index = pixel_buffer.length();
+        if (max_index >= 32) {
+            max_index = 32;
+        }
+        for (auto i = 0; i < max_index; ++i) {
+            std::cout << "num: " << i << "=" << pixel_buffer[i] << "\n";
+        }
+    }
+
+    auto num_channels = 3;
+    auto lut_3d_ops_image = ocg::get_color_ops_lut(
+        stream_data, lut_edge_size, num_channels, cache);
+    if (debug_print) {
+        std::cout << "ColorOps 3D LUT (RGB)" << '\n';
+        std::cout << "lut_edge_size=" << lut_edge_size << '\n';
+        std::cout << "lut_3d_ops_image.spec.color_space="
+                  << lut_3d_ops_image.spec.color_space << '\n';
+        std::cout << "lut_3d_ops_image.pixel_block.width()="
+                  << lut_3d_ops_image.pixel_block->width() << '\n';
+        std::cout << "lut_3d_ops_image.pixel_block.height()="
+                  << lut_3d_ops_image.pixel_block->height() << '\n';
+        std::cout << "lut_3d_ops_image.pixel_block.num_channels()="
+                  << lut_3d_ops_image.pixel_block->num_channels() << '\n';
+
+        auto pixel_buffer = lut_3d_ops_image.pixel_block->as_slice_f32();
+        std::cout << "lut_3d_ops_image.pixel_block length=" << pixel_buffer.length() << '\n';
+        auto max_index = pixel_buffer.length();
+        if (max_index >= 32) {
+            max_index = 32;
+        }
+        for (auto i = 0; i < max_index; ++i) {
+            std::cout << "num: " << i << "=" << pixel_buffer[i] << "\n";
+        }
+    }
+
+    num_channels = 1;
+    auto lut_1d_ops_image = ocg::get_color_ops_lut(
+        stream_data, lut_edge_size, num_channels, cache);
+    if (debug_print) {
+        std::cout << "ColorOps 1D LUT (Alpha)" << '\n';
+        std::cout << "lut_edge_size=" << lut_edge_size << '\n';
+        std::cout << "lut_1d_ops_image.spec.color_space="
+                  << lut_1d_ops_image.spec.color_space << '\n';
+        std::cout << "lut_1d_ops_image.pixel_block.width()="
+                  << lut_1d_ops_image.pixel_block->width() << '\n';
+        std::cout << "lut_1d_ops_image.pixel_block.height()="
+                  << lut_1d_ops_image.pixel_block->height() << '\n';
+        std::cout << "lut_1d_ops_image.pixel_block.num_channels()="
+                  << lut_1d_ops_image.pixel_block->num_channels() << '\n';
+
+        auto pixel_buffer = lut_1d_ops_image.pixel_block->as_slice_f32();
+        std::cout << "lut_1d_ops_image.pixel_block length=" << pixel_buffer.length() << '\n';
         auto max_index = pixel_buffer.length();
         if (max_index >= 32) {
             max_index = 32;

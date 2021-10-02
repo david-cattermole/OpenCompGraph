@@ -184,7 +184,36 @@ pub fn apply_color_grade_inplace(
 
     let pixel_count = pixels.len() / (num_channels as usize);
     match num_channels {
+        1 => {
+            // 1 channel; Alpha.
+            for i in 0..pixel_count {
+                let r = 1.0;
+                let g = 1.0;
+                let b = 1.0;
+                let a = pixels[i];
+
+                let pixel = Vector4f32::new(r, g, b, a);
+                let rgba = grade(
+                    pixel,
+                    pixel_mask,
+                    black_point,
+                    white_point,
+                    lift,
+                    gain,
+                    multiply,
+                    offset,
+                    gamma,
+                    reverse,
+                    clamp_black,
+                    clamp_white,
+                    premult,
+                );
+
+                pixels[i] = rgba.w;
+            }
+        }
         3 => {
+            // 3 channels; RGB.
             for i in 0..pixel_count {
                 let index = i * (num_channels as usize);
                 let r = pixels[index + 0];
@@ -214,6 +243,7 @@ pub fn apply_color_grade_inplace(
             }
         }
         4 => {
+            // 4 channels; RGBA.
             for i in 0..pixel_count {
                 let index = i * (num_channels as usize);
                 let r = pixels[index + 0];

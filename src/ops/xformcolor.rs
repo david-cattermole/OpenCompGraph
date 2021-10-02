@@ -25,7 +25,19 @@ pub fn apply_color_matrix_inplace(pixels: &mut [f32], num_channels: i32, matrix:
     assert!(num_channels > 0);
     let pixel_count = pixels.len() / (num_channels as usize);
     match num_channels {
+        1 => {
+            // Only one channel, it is assumed to be the alpha channel.
+            for i in 0..pixel_count {
+                let r = 1.0;
+                let g = 1.0;
+                let b = 1.0;
+                let a = pixels[i];
+                let rgba = matrix * na::Vector4::new(r, g, b, a);
+                pixels[i] = rgba.w;
+            }
+        }
         3 => {
+            // 3 channels: RGB.
             for i in 0..pixel_count {
                 let index = i * (num_channels as usize);
                 let r = pixels[index + 0];
@@ -44,6 +56,7 @@ pub fn apply_color_matrix_inplace(pixels: &mut [f32], num_channels: i32, matrix:
             }
         }
         4 => {
+            // 4 channels: RGBA.
             for i in 0..pixel_count {
                 let index = i * (num_channels as usize);
                 let r = pixels[index + 0];

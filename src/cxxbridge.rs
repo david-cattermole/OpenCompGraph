@@ -23,6 +23,7 @@ use log::debug;
 
 use crate::cache::create_cache_box_with_capacity;
 use crate::cache::CacheImpl;
+use crate::colorlutimage::get_color_ops_lut;
 use crate::colorlutimage::get_color_transform_3dlut;
 use crate::config::get_config;
 use crate::config::ConfigImpl;
@@ -704,6 +705,13 @@ pub mod ffi {
             display_window: BBox2Df,
             data_window: BBox2Df,
         );
+        fn color_ops_len(&self) -> usize;
+        fn color_ops_hash(&self) -> u64;
+        fn apply_color_ops(
+            &self,
+            pixels: &mut [f32],
+            num_channels: i32,
+        );
         fn pixel_buffer(&self) -> &[u8];
         fn pixel_width(&self) -> i32;
         fn pixel_height(&self) -> i32;
@@ -827,6 +835,13 @@ pub mod ffi {
             from_color_space: &str,
             to_color_space: &str,
             cube_size: i32,
+            cache: &mut Box<CacheImpl>,
+        ) -> ImageShared;
+
+        fn get_color_ops_lut(
+            stream_data: &Box<StreamDataImplRc>,
+            cube_size: i32,
+            num_channels: i32,
             cache: &mut Box<CacheImpl>,
         ) -> ImageShared;
     }

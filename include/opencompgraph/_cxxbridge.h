@@ -481,6 +481,9 @@ struct StreamDataImplRc final : public ::rust::Opaque {
   OCG_API_EXPORT ::open_comp_graph::internal::ImageSpec clone_image_spec() const noexcept;
   OCG_API_EXPORT ::std::size_t deformers_len() const noexcept;
   OCG_API_EXPORT void apply_deformers(::rust::Slice<float> buffer, ::open_comp_graph::BBox2Df display_window, ::open_comp_graph::BBox2Df data_window) const noexcept;
+  OCG_API_EXPORT ::std::size_t color_ops_len() const noexcept;
+  OCG_API_EXPORT ::std::uint64_t color_ops_hash() const noexcept;
+  OCG_API_EXPORT void apply_color_ops(::rust::Slice<float> pixels, ::std::int32_t num_channels) const noexcept;
   OCG_API_EXPORT ::rust::Slice<const ::std::uint8_t> pixel_buffer() const noexcept;
   OCG_API_EXPORT ::std::int32_t pixel_width() const noexcept;
   OCG_API_EXPORT ::std::int32_t pixel_height() const noexcept;
@@ -650,6 +653,8 @@ OCG_API_EXPORT ::open_comp_graph::internal::GraphImplShared create_graph_shared(
 OCG_API_EXPORT ::rust::Box<::open_comp_graph::internal::GeometryPlaneImpl> create_geometry_plane_box(float center_x, float center_y, float size_x, float size_y, ::std::uint32_t divisions_x, ::std::uint32_t divisions_y) noexcept;
 
 OCG_API_EXPORT ::open_comp_graph::internal::ImageShared get_color_transform_3dlut(::rust::Str from_color_space, ::rust::Str to_color_space, ::std::int32_t cube_size, ::rust::Box<::open_comp_graph::internal::CacheImpl> &cache) noexcept;
+
+OCG_API_EXPORT ::open_comp_graph::internal::ImageShared get_color_ops_lut(const ::rust::Box<::open_comp_graph::internal::StreamDataImplRc> &stream_data, ::std::int32_t cube_size, ::std::int32_t num_channels, ::rust::Box<::open_comp_graph::internal::CacheImpl> &cache) noexcept;
 
 OCG_API_EXPORT void export_mesh(::rust::Slice<const float> buffer_vertex_positions, ::rust::Slice<const float> buffer_vertex_uvs, ::rust::Slice<const ::std::uint32_t> buffer_index_tris, ::rust::Str file_path) noexcept;
 } // namespace internal

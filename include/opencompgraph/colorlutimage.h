@@ -27,6 +27,7 @@
 #include <rust/cxx.h>
 #include <opencompgraph/_cxxbridge.h>
 #include <opencompgraph/cache.h>
+#include <opencompgraph/stream.h>
 #include "symbol_export.h"
 
 namespace open_comp_graph {
@@ -36,6 +37,13 @@ internal::ImageShared get_color_transform_3dlut(
     rust::Str from_color_space,
     rust::Str to_color_space,
     int32_t edge_size,  // Common values; 20, 32 or 64.
+    std::shared_ptr<Cache> &cache) noexcept;
+
+OCG_API_EXPORT
+internal::ImageShared get_color_ops_lut(
+    StreamData &stream_data,
+    int32_t edge_size,    // Common values; 20, 32 or 64.
+    int32_t num_channels, // Number of channels; must be above 0.
     std::shared_ptr<Cache> &cache) noexcept;
 
 } // namespace open_comp_graph

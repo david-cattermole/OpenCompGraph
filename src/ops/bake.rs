@@ -21,6 +21,8 @@
 
 use log::{debug, warn};
 
+use crate::colorop::ColorOp;
+use crate::coloroputils;
 use crate::colorspace;
 use crate::cxxbridge::ffi::BBox2Di;
 use crate::cxxbridge::ffi::BakeOption;
@@ -91,6 +93,46 @@ pub fn do_process_colorspace(
     );
 }
 
+/// Convert pixels from color space to another color space.
+pub fn do_process_colorgrade(
+    pixel_block: &mut PixelBlock,
+    color_matrix: Matrix4,
+    color_ops: &Vec<Box<dyn ColorOp>>,
+) {
+    debug!("ops::bake::do_process_colorgrade() START",);
+
+    // Apply Color Matrix (in linear color space)
+    let num_channels = pixel_block.num_channels();
+    let pixels = &mut pixel_block.as_mut_slice_f32();
+    let color_matrix = color_matrix.to_na_matrix();
+    ops::xformcolor::apply_color_matrix_inplace(pixels, num_channels, color_matrix);
+
+    // Apply Color Operations (in linear color space)
+    debug!("apply color operations: START");
+    coloroputils::apply_color_ops_to_pixels(&color_ops, pixels, num_channels);
+    debug!("apply color operations: END");
+
+    debug!("ops::bake::do_process_colorgrade() END");
+}
+
+/// Convert pixels from color space to another color space.
+pub fn do_process_stream_colorgrade(
+    pixel_block: &mut PixelBlock,
+    stream_data: &mut StreamDataImpl,
+) {
+    debug!("ops::bake::do_process_stream_colorgrade() START",);
+
+    let color_matrix = stream_data.color_matrix();
+    let color_ops = &stream_data.color_ops();
+    do_process_colorgrade(pixel_block, color_matrix, color_ops);
+
+    // Reset stream values
+    stream_data.set_color_matrix(Matrix4::identity());
+    stream_data.clear_color_ops();
+
+    debug!("ops::bake::do_process_stream_colorgrade() END");
+}
+
 /// Apply transform matrix, deformations and color corrections before
 /// image operations.
 pub fn do_process(
@@ -127,12 +169,7 @@ pub fn do_process(
                 &linear_color_space,
             );
 
-            // Apply Color Matrix (in linear color space)
-            let num_channels = pixel_block.num_channels();
-            let pixels = &mut pixel_block.as_mut_slice_f32();
-            let color_matrix = stream_data.color_matrix().to_na_matrix();
-            ops::xformcolor::apply_color_matrix_inplace(pixels, num_channels, color_matrix);
-            stream_data.set_color_matrix(Matrix4::identity());
+            do_process_stream_colorgrade(pixel_block, stream_data);
 
             // Convert from Linear to user given color space.
             do_process_colorspace(
@@ -158,14 +195,7 @@ pub fn do_process(
             );
             debug!("apply PRE colorspace: END");
 
-            // Apply Color Matrix (in linear color space)
-            debug!("apply color matrix: START");
-            let num_channels = pixel_block.num_channels();
-            let pixels = &mut pixel_block.as_mut_slice_f32();
-            let color_matrix = stream_data.color_matrix().to_na_matrix();
-            ops::xformcolor::apply_color_matrix_inplace(pixels, num_channels, color_matrix);
-            stream_data.set_color_matrix(Matrix4::identity());
-            debug!("apply color matrix: END");
+            do_process_stream_colorgrade(pixel_block, stream_data);
 
             // Apply Deformations.
             debug!("apply deformations: START");

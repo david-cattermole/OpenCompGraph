@@ -550,6 +550,9 @@ struct StreamDataImplRc final : public ::rust::Opaque {
   OCG_API_EXPORT ::open_comp_graph::internal::ImageSpec clone_image_spec() const noexcept;
   OCG_API_EXPORT ::std::size_t deformers_len() const noexcept;
   OCG_API_EXPORT void apply_deformers(::rust::Slice<float> buffer, ::open_comp_graph::BBox2Df display_window, ::open_comp_graph::BBox2Df data_window) const noexcept;
+  OCG_API_EXPORT ::std::size_t color_ops_len() const noexcept;
+  OCG_API_EXPORT ::std::uint64_t color_ops_hash() const noexcept;
+  OCG_API_EXPORT void apply_color_ops(::rust::Slice<float> pixels, ::std::int32_t num_channels) const noexcept;
   OCG_API_EXPORT ::rust::Slice<const ::std::uint8_t> pixel_buffer() const noexcept;
   OCG_API_EXPORT ::std::int32_t pixel_width() const noexcept;
   OCG_API_EXPORT ::std::int32_t pixel_height() const noexcept;
@@ -908,6 +911,12 @@ void open_comp_graph$internal$cxxbridge1$StreamDataImplRc$clone_image_spec(const
 
 void open_comp_graph$internal$cxxbridge1$StreamDataImplRc$apply_deformers(const ::open_comp_graph::internal::StreamDataImplRc &self, ::rust::Slice<float> buffer, ::open_comp_graph::BBox2Df display_window, ::open_comp_graph::BBox2Df data_window) noexcept;
 
+::std::size_t open_comp_graph$internal$cxxbridge1$StreamDataImplRc$color_ops_len(const ::open_comp_graph::internal::StreamDataImplRc &self) noexcept;
+
+::std::uint64_t open_comp_graph$internal$cxxbridge1$StreamDataImplRc$color_ops_hash(const ::open_comp_graph::internal::StreamDataImplRc &self) noexcept;
+
+void open_comp_graph$internal$cxxbridge1$StreamDataImplRc$apply_color_ops(const ::open_comp_graph::internal::StreamDataImplRc &self, ::rust::Slice<float> pixels, ::std::int32_t num_channels) noexcept;
+
 ::rust::repr::Fat open_comp_graph$internal$cxxbridge1$StreamDataImplRc$pixel_buffer(const ::open_comp_graph::internal::StreamDataImplRc &self) noexcept;
 
 ::std::int32_t open_comp_graph$internal$cxxbridge1$StreamDataImplRc$pixel_width(const ::open_comp_graph::internal::StreamDataImplRc &self) noexcept;
@@ -1029,6 +1038,8 @@ bool open_comp_graph$internal$cxxbridge1$GeometryPlaneImpl$fill_buffer_index_wir
 ::open_comp_graph::internal::GeometryPlaneImpl *open_comp_graph$internal$cxxbridge1$create_geometry_plane_box(float center_x, float center_y, float size_x, float size_y, ::std::uint32_t divisions_x, ::std::uint32_t divisions_y) noexcept;
 
 void open_comp_graph$internal$cxxbridge1$get_color_transform_3dlut(::rust::Str from_color_space, ::rust::Str to_color_space, ::std::int32_t cube_size, ::rust::Box<::open_comp_graph::internal::CacheImpl> &cache, ::open_comp_graph::internal::ImageShared *return$) noexcept;
+
+void open_comp_graph$internal$cxxbridge1$get_color_ops_lut(const ::rust::Box<::open_comp_graph::internal::StreamDataImplRc> &stream_data, ::std::int32_t cube_size, ::std::int32_t num_channels, ::rust::Box<::open_comp_graph::internal::CacheImpl> &cache, ::open_comp_graph::internal::ImageShared *return$) noexcept;
 
 void open_comp_graph$internal$cxxbridge1$export_mesh(::rust::Slice<const float> buffer_vertex_positions, ::rust::Slice<const float> buffer_vertex_uvs, ::rust::Slice<const ::std::uint32_t> buffer_index_tris, ::rust::Str file_path) noexcept;
 } // extern "C"
@@ -1346,6 +1357,18 @@ OCG_API_EXPORT void StreamDataImplRc::apply_deformers(::rust::Slice<float> buffe
   open_comp_graph$internal$cxxbridge1$StreamDataImplRc$apply_deformers(*this, buffer, display_window, data_window);
 }
 
+OCG_API_EXPORT ::std::size_t StreamDataImplRc::color_ops_len() const noexcept {
+  return open_comp_graph$internal$cxxbridge1$StreamDataImplRc$color_ops_len(*this);
+}
+
+OCG_API_EXPORT ::std::uint64_t StreamDataImplRc::color_ops_hash() const noexcept {
+  return open_comp_graph$internal$cxxbridge1$StreamDataImplRc$color_ops_hash(*this);
+}
+
+OCG_API_EXPORT void StreamDataImplRc::apply_color_ops(::rust::Slice<float> pixels, ::std::int32_t num_channels) const noexcept {
+  open_comp_graph$internal$cxxbridge1$StreamDataImplRc$apply_color_ops(*this, pixels, num_channels);
+}
+
 OCG_API_EXPORT ::rust::Slice<const ::std::uint8_t> StreamDataImplRc::pixel_buffer() const noexcept {
   return ::rust::impl<::rust::Slice<const ::std::uint8_t>>::slice(open_comp_graph$internal$cxxbridge1$StreamDataImplRc$pixel_buffer(*this));
 }
@@ -1625,6 +1648,12 @@ OCG_API_EXPORT ::rust::Box<::open_comp_graph::internal::GeometryPlaneImpl> creat
 OCG_API_EXPORT ::open_comp_graph::internal::ImageShared get_color_transform_3dlut(::rust::Str from_color_space, ::rust::Str to_color_space, ::std::int32_t cube_size, ::rust::Box<::open_comp_graph::internal::CacheImpl> &cache) noexcept {
   ::rust::MaybeUninit<::open_comp_graph::internal::ImageShared> return$;
   open_comp_graph$internal$cxxbridge1$get_color_transform_3dlut(from_color_space, to_color_space, cube_size, cache, &return$.value);
+  return ::std::move(return$.value);
+}
+
+OCG_API_EXPORT ::open_comp_graph::internal::ImageShared get_color_ops_lut(const ::rust::Box<::open_comp_graph::internal::StreamDataImplRc> &stream_data, ::std::int32_t cube_size, ::std::int32_t num_channels, ::rust::Box<::open_comp_graph::internal::CacheImpl> &cache) noexcept {
+  ::rust::MaybeUninit<::open_comp_graph::internal::ImageShared> return$;
+  open_comp_graph$internal$cxxbridge1$get_color_ops_lut(stream_data, cube_size, num_channels, cache, &return$.value);
   return ::std::move(return$.value);
 }
 

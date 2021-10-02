@@ -19,31 +19,27 @@
  *
  */
 
-pub mod attrblock;
-pub mod bbox;
-pub mod cache;
-pub mod colorlutimage;
-pub mod colorop;
-pub mod coloroputils;
-pub mod colorspace;
-pub mod colorutils;
-pub mod config;
-pub mod cxxbridge;
-pub mod data;
-pub mod deformer;
-pub mod deformutils;
-pub mod geom;
-pub mod graph;
-pub mod graphiter;
-pub mod hashutils;
-pub mod imagebuffer;
-pub mod imageio;
-pub mod imagespec;
-pub mod logger;
-pub mod math;
-pub mod node;
-pub mod ops;
-pub mod pathutils;
-pub mod pixel;
-pub mod pixelblock;
-pub mod stream;
+use crate::colorop::ColorOp;
+
+pub fn apply_color_ops_to_pixels(
+    color_ops: &Vec<Box<dyn ColorOp>>,
+    pixels: &mut [f32],
+    num_channels: i32,
+) {
+    assert!(num_channels > 0);
+
+    if color_ops.len() == 0 {
+        return;
+    }
+    let enabled_color_ops: Vec<_> = color_ops
+        .iter()
+        .filter(|x| x.get_attr_i32("enable") == 1)
+        .collect();
+    if enabled_color_ops.len() == 0 {
+        return;
+    }
+
+    for color_op in enabled_color_ops {
+        color_op.apply_slice_in_place(pixels, num_channels);
+    }
+}

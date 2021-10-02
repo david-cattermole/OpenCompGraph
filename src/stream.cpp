@@ -86,6 +86,14 @@ void StreamData::apply_deformers(rust::Slice<float> &buffer,
         data_window);
 };
 
+size_t StreamData::color_ops_len() const noexcept {
+    return this->inner.inner->color_ops_len();
+};
+
+uint64_t StreamData::color_ops_hash() const noexcept {
+    return this->inner.inner->color_ops_hash();
+}
+
 rust::Slice<const uint8_t> StreamData::pixel_buffer() const noexcept {
     return this->inner.inner->pixel_buffer();
 };

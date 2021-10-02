@@ -76,6 +76,12 @@ public:
                          BBox2Df data_window) noexcept;
 
     OCG_API_EXPORT
+    size_t color_ops_len() const noexcept;
+
+    OCG_API_EXPORT
+    uint64_t color_ops_hash() const noexcept;
+
+    OCG_API_EXPORT
     rust::Slice<const uint8_t> pixel_buffer() const noexcept;
 
     OCG_API_EXPORT
