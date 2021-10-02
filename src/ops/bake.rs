@@ -151,6 +151,12 @@ pub fn do_process(
         bake_option, from_color_space, to_color_space, to_data_type
     );
 
+    // Use Float32 if user didn't specify the data type wanted.
+    let to_data_type = match to_data_type {
+        DataType::Unknown => DataType::Float32,
+        _ => to_data_type,
+    };
+
     match bake_option {
         BakeOption::Nothing => {}
         BakeOption::ColorSpace => {
