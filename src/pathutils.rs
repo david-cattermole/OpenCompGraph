@@ -19,7 +19,8 @@
  *
  */
 
-use log::debug;
+use log::{debug, warn};
+use shellexpand;
 
 struct FramePaddingIndexRange {
     start_index: usize,
@@ -93,13 +94,28 @@ fn create_expanded_string(
     expanded_string
 }
 
+fn expand_file_path(value: &str) -> String {
+    let expanded_path = match shellexpand::full(value) {
+        Ok(v) => (*v).to_string(),
+        Err(e) => {
+            warn!(
+                "Environment variable unknown: name={} cause={}",
+                e.var_name, e.cause
+            );
+            value.to_string()
+        }
+    };
+    expanded_path.to_string()
+}
+
 pub fn expand_string(value: String, frame: i32) -> String {
     debug!("expand_string: {} frame={}", value, frame);
-    let index_range = find_frame_padding_index_range(&value);
+    let expanded_path = expand_file_path(&value);
+    let index_range = find_frame_padding_index_range(&expanded_path);
     if index_range.padding_count > 0 {
-        create_expanded_string(&value, index_range, frame)
+        create_expanded_string(&expanded_path, index_range, frame)
     } else {
         // No expansion needed.
-        value
+        expanded_path
     }
 }
