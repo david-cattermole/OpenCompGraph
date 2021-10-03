@@ -235,8 +235,8 @@ impl Operation for ReadImageOperation {
 
 impl AttrBlock for ReadImageAttrs {
     fn attr_hash(&self, frame: FrameValue, state: &mut DefaultHasher) {
+        self.enable.hash(state);
         if self.enable == 1 {
-            self.enable.hash(state);
             let frame_num = frame.round().trunc() as i32;
             let path_expanded = pathutils::expand_string(self.file_path.to_string(), frame_num);
             path_expanded.hash(state);

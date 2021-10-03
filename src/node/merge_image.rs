@@ -309,8 +309,8 @@ impl Operation for MergeImageOperation {
 
 impl AttrBlock for MergeImageAttrs {
     fn attr_hash(&self, _frame: FrameValue, state: &mut DefaultHasher) {
+        self.enable.hash(state);
         if self.enable == 1 {
-            self.enable.hash(state);
             self.mode.hash(state);
             HashableF32::new(self.mix).hash(state);
         }

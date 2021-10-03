@@ -216,8 +216,8 @@ impl Operation for ResampleImageOperation {
 
 impl AttrBlock for ResampleImageAttrs {
     fn attr_hash(&self, _frame: FrameValue, state: &mut DefaultHasher) {
+        self.enable.hash(state);
         if self.enable == 1 {
-            self.enable.hash(state);
             if self.factor != 0 {
                 self.factor.hash(state);
                 self.interpolate.hash(state);

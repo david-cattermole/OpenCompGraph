@@ -282,10 +282,10 @@ impl Operation for ViewerOperation {
 
 impl AttrBlock for ViewerAttrs {
     fn attr_hash(&self, _frame: FrameValue, state: &mut DefaultHasher) {
+        self.enable.hash(state);
         if self.enable == 0 {
             return;
         }
-        self.enable.hash(state);
 
         let bake_option = BakeOption::from(self.bake_option);
         if bake_option != BakeOption::Nothing {

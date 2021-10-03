@@ -259,16 +259,17 @@ impl Operation for CropImageOperation {
 
 impl AttrBlock for CropImageAttrs {
     fn attr_hash(&self, _frame: FrameValue, state: &mut DefaultHasher) {
-        if self.enable == 1 {
-            self.enable.hash(state);
-            self.window_min_x.hash(state);
-            self.window_min_y.hash(state);
-            self.window_max_x.hash(state);
-            self.window_max_y.hash(state);
-            self.reformat.hash(state);
-            self.black_outside.hash(state);
-            self.intersect.hash(state);
+        self.enable.hash(state);
+        if self.enable == 0 {
+            return;
         }
+        self.window_min_x.hash(state);
+        self.window_min_y.hash(state);
+        self.window_max_x.hash(state);
+        self.window_max_y.hash(state);
+        self.reformat.hash(state);
+        self.black_outside.hash(state);
+        self.intersect.hash(state);
     }
 
     fn attr_exists(&self, name: &str) -> AttrState {

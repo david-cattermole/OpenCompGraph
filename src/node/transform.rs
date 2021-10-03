@@ -74,6 +74,10 @@ pub struct TransformAttrs {
 impl hash::Hash for TransformAttrs {
     fn hash<H: hash::Hasher>(&self, state: &mut H) {
         self.enable.hash(state);
+        if self.enable == 0 {
+            return;
+        }
+
         self.invert.hash(state);
         HashableF32::new(self.translate_x).hash(state);
         HashableF32::new(self.translate_y).hash(state);
