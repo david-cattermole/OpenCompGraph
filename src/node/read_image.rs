@@ -84,7 +84,7 @@ impl ReadImageAttrs {
     pub fn new() -> ReadImageAttrs {
         ReadImageAttrs {
             enable: 1,
-            use_cache: 0,
+            use_cache: 1,
             file_path: "".to_string(),
         }
     }

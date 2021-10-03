@@ -77,7 +77,7 @@ impl ResampleImageAttrs {
     pub fn new() -> ResampleImageAttrs {
         ResampleImageAttrs {
             enable: 1,
-            use_cache: 0,
+            use_cache: 1,
             factor: 0,      // 0 = no change, negative is down-res, positive is up-res.
             interpolate: 0, // 0 = do not interpolate.
         }

@@ -82,7 +82,7 @@ impl MergeImageAttrs {
     pub fn new() -> MergeImageAttrs {
         MergeImageAttrs {
             enable: 1,
-            use_cache: 0,
+            use_cache: 1,
             mode: 1, // 1 = 'A Over B'
             mix: 1.0,
         }

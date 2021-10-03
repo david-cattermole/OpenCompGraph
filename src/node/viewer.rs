@@ -84,7 +84,7 @@ impl ViewerAttrs {
     pub fn new() -> ViewerAttrs {
         ViewerAttrs {
             enable: 1,
-            use_cache: 0,
+            use_cache: 1,
             bake_option: 0,          // 0 = BakeOption::Nothing
             bake_pixel_data_type: 1, // 1 = DataType::Half16
             bake_color_space: COLOR_SPACE_NAME_LINEAR.to_string(),

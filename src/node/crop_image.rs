@@ -83,7 +83,7 @@ impl CropImageAttrs {
     pub fn new() -> CropImageAttrs {
         CropImageAttrs {
             enable: 1,
-            use_cache: 0,
+            use_cache: 1,
             window_min_x: 0,
             window_min_y: 0,
             window_max_x: 0,
